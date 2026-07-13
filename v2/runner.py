@@ -39,10 +39,11 @@ class UncappedHoptimusBatches:
         index = data.hoptimus_store.index_path
         rows = __import__("pandas").read_parquet(index).set_index("patient_id")
         counts = [int(rows.loc[data.patient_ids[i], "n_tokens"]) for i in self.indices]
-        self.sampler = DynamicTokenBatchSampler(self.indices.tolist(), counts, token_budget, seed)
+        self.sampler = DynamicTokenBatchSampler(counts, token_budget, seed)
 
     def __iter__(self) -> Iterator[dict[str, torch.Tensor]]:
-        for group in self.sampler:
+        for local_group in self.sampler.batches(self.seed, shuffle=True):
+            group = self.indices[local_group]
             bags, slides, coords = [], [], []
             loaded = self.data.hoptimus_store.load_many_patient_tokens(
                 [self.data.patient_ids[index] for index in group], max_tokens=None, seed=self.seed
@@ -71,7 +72,7 @@ class UncappedHoptimusBatches:
             }
 
     def state_dict(self) -> dict[str, object]:
-        return {"indices": self.indices.tolist(), "token_budget": self.sampler.token_budget, "seed": self.seed, "coverage": self.sampler.coverage()}
+        return {"indices": self.indices.tolist(), "token_budget": self.sampler.token_budget, "seed": self.seed, "coverage": self.sampler.coverage(self.seed).tolist()}
 
 
 def attach_v2_targets(data) -> dict[str, list[float]]:
