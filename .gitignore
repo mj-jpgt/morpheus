@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated v1 artifacts. Keep configs, source, and tests under version control.
+data/processed/
+outputs/
+
+# Root-level phase-v1 artifacts are ignored by the repo root .gitignore.
+../external_models/
+../data/cache/zenodo/
+../data/processed/rna/bulkformer/
+../data/processed/wsi/

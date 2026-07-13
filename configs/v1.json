@@ -1,0 +1,75 @@
+{
+  "project_root": ".",
+  "seed": 42,
+  "paths": {
+    "morpheus_root": "morpheus",
+    "processed_dir": "morpheus/data/processed",
+    "outputs_dir": "morpheus/outputs",
+    "root_manifests_dir": "data/manifests",
+    "hf_inventory_manifest": "data/manifests/hf_tcga_cptac_cgga_inventory.parquet",
+    "modality_registry": "data/manifests/modality_registry.json",
+    "master_patient_table_v0": "data/processed/master_patient_table_v0.parquet",
+    "meta_intersurv_data": "meta-intersurv/data",
+    "prism_processed": "PRISM/data/processed",
+    "wsi_hoptimus_dir": "meta-intersurv/data/tcga_ut/embeddings_hoptimus0",
+    "wsi_standard_dir": "data/processed/wsi",
+    "wsi_patch_dir": "meta-intersurv/data/wsi/wsi_embeddings",
+    "rna_processed": "meta-intersurv/data/omics/processed/rna_features.parquet",
+    "rna_bulkformer_embeddings": "data/processed/rna/bulkformer/tcga_bulkformer_embeddings.parquet",
+    "rna_geneformer_embeddings": "meta-intersurv/data/embeddings/rna_geneformer/emb_out/tcga_bulk_patient.embeddings.with_pid.parquet",
+    "hallmark_scores": "data/processed/genesets/msigdb_hallmark_scores.parquet",
+    "bulkformer_cache_dir": "data/cache/zenodo/bulkformer",
+    "bulkformer_local_dir": "external_models/bulkformer",
+    "clinical_processed": "meta-intersurv/data/omics/processed/clinical_features.parquet",
+    "snv_processed": "meta-intersurv/data/omics/processed/snv_features.parquet",
+    "cnv_processed": "meta-intersurv/data/omics/processed/cnv_features.parquet",
+    "master_registry": "meta-intersurv/data/metadata/master_registry_with_wsi.parquet",
+    "msigdb_hallmark_gmt": "meta-intersurv/data/msigdb/h.all.v2024.1.Hs.symbols.gmt"
+  },
+  "foundation_models": {
+    "wsi_primary": {
+      "name": "H-Optimus0",
+      "repo_id": "bioptimus/H-optimus-0",
+      "local_mode": "precomputed"
+    },
+    "rna_primary": {
+      "name": "BulkFormer",
+      "source": "zenodo",
+      "zenodo_record_id": "15744294",
+      "zenodo_url": "https://zenodo.org/records/15744294",
+      "compatibility_record_id": "15559368",
+      "compatibility_url": "https://zenodo.org/records/15559368",
+      "embedding_dim": 512,
+      "local_mode": "precomputed_after_zenodo_extraction",
+      "required_for_official_v1": true
+    },
+    "rna_fallback": {
+      "name": "Geneformer",
+      "local_mode": "precomputed"
+    }
+  },
+  "splits": {
+    "train_fraction": 0.7,
+    "val_fraction": 0.15,
+    "test_fraction": 0.15,
+    "heldout_cancers": ["BRCA", "LUAD"],
+    "domain_adaptation_cancers": ["BRCA", "LUAD"],
+    "adaptation_fractions": [0.05, 0.1, 0.25, 0.5, 1.0]
+  },
+  "alignment": {
+    "embedding_dim": 256,
+    "temperature": 0.07,
+    "supervised_contrastive_weight": 0.15,
+    "k_values": [1, 5, 10],
+    "max_epochs": 50,
+    "batch_size": 256,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01
+  },
+  "molecular_prompting": {
+    "k": 5,
+    "tau": 0.1,
+    "gene_set_controls": 50,
+    "target_source": "hallmark_ssgsea"
+  }
+}
