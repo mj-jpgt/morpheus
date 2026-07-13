@@ -283,6 +283,17 @@ class HoptimusPatchStore:
         return self.load_many_patient_tokens([patient_id], max_tokens=max_tokens, seed=seed,
                                              slide_balanced=slide_balanced, required_membership=required_membership)[0]
 
+    def patient_token_count(self, patient_id: str, required_membership: str | None = None) -> int:
+        """Return token availability from cached metadata without touching HDF5."""
+        patient = normalize_tcga_patient_id(patient_id)
+        rows = self._patient_rows.get(patient)
+        if rows is None:
+            return 0
+        if required_membership:
+            col, partition = self._membership_filter(required_membership)
+            return int((rows[col].astype("string").str.lower() == partition).sum())
+        return int(len(rows))
+
     def load_many_patient_tokens(self, patient_ids: Sequence[str], max_tokens: int | None = 512, seed: int = 42,
                                  slide_balanced: bool = True, required_membership: str | None = None) -> list[tuple[np.ndarray, pd.DataFrame]]:
         """Read a dynamic patient batch with one metadata cache and one HDF5 handle.
