@@ -62,6 +62,7 @@ class UncappedHoptimusBatches:
                 patches[row, :len(bag)] = bag; mask[row, :len(bag)] = True
                 slide_ids[row, :len(bag)] = ids; coordinate_batch[row, :len(bag)] = xy
             batch = {
+                "indices": torch.from_numpy(group.copy()),
                 "patches": torch.from_numpy(patches), "patch_mask": torch.from_numpy(mask),
                 "slide_ids": torch.from_numpy(slide_ids), "coordinates": torch.from_numpy(coordinate_batch),
                 "rna": torch.from_numpy(self.data.rna[group].astype(np.float32)),
