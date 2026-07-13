@@ -44,8 +44,10 @@ class UncappedHoptimusBatches:
     def __iter__(self) -> Iterator[dict[str, torch.Tensor]]:
         for group in self.sampler:
             bags, slides, coords = [], [], []
-            for index in group:
-                features, metadata = self.data.hoptimus_store.load_patient_tokens(self.data.patient_ids[index], max_tokens=None)
+            loaded = self.data.hoptimus_store.load_many_patient_tokens(
+                [self.data.patient_ids[index] for index in group], max_tokens=None, seed=self.seed
+            )
+            for index, (features, metadata) in zip(group, loaded):
                 if len(features) == 0:
                     raise RuntimeError(f"patient {self.data.patient_ids[index]} has no canonical tokens")
                 codes, _ = __import__("pandas").factorize(metadata.slide_id.astype(str), sort=True)

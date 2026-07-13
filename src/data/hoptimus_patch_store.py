@@ -6,6 +6,7 @@ import json
 import os
 import tarfile
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from typing import Any, Iterator, Sequence
 
@@ -210,8 +211,17 @@ class HoptimusPatchStore:
     def metadata_parquet(self) -> Path:
         return self.metadata_path
 
-    def _metadata(self) -> pd.DataFrame:
+    @cached_property
+    def _metadata_frame(self) -> pd.DataFrame:
         return pd.read_parquet(self.metadata_path)
+
+    def _metadata(self) -> pd.DataFrame:
+        """Cached immutable metadata; never reread the parquet per patient."""
+        return self._metadata_frame
+
+    @cached_property
+    def _patient_rows(self) -> dict[str, pd.DataFrame]:
+        return {str(patient): group.reset_index(drop=True) for patient, group in self._metadata_frame.groupby("patient_id", sort=False)}
 
     @staticmethod
     def _membership_filter(value: str) -> tuple[str, str]:
@@ -270,23 +280,41 @@ class HoptimusPatchStore:
         same seed gives the same selection; slide-balanced sampling represents
         every available slide before filling remaining budget.
         """
-        patient = normalize_tcga_patient_id(patient_id)
-        rows = self._metadata()
-        rows = rows.loc[rows.patient_id.astype(str) == patient].copy()
-        if required_membership:
-            col, partition = self._membership_filter(required_membership)
-            rows = rows.loc[rows[col].astype("string").str.lower() == partition].copy()
-        if rows.empty:
-            return np.zeros((0, EXPECTED_HOPTIMUS_DIM), dtype=np.float32), rows.reset_index(drop=True)
-        budget = len(rows) if max_tokens is None else int(max_tokens)
-        if budget > 0 and len(rows) > budget:
-            rows = _sample_slide_balanced(rows, budget, seed) if slide_balanced else rows.sample(n=budget, random_state=seed).sort_values("row_idx")
-        indices = rows.row_idx.to_numpy(dtype=np.int64)
+        return self.load_many_patient_tokens([patient_id], max_tokens=max_tokens, seed=seed,
+                                             slide_balanced=slide_balanced, required_membership=required_membership)[0]
+
+    def load_many_patient_tokens(self, patient_ids: Sequence[str], max_tokens: int | None = 512, seed: int = 42,
+                                 slide_balanced: bool = True, required_membership: str | None = None) -> list[tuple[np.ndarray, pd.DataFrame]]:
+        """Read a dynamic patient batch with one metadata cache and one HDF5 handle.
+
+        This is the uncapped-bag fast path used by V2.  It preserves the exact
+        semantics of :meth:`load_patient_tokens` while avoiding one Parquet and
+        one HDF5 open per patient.
+        """
+        selected: list[pd.DataFrame] = []
+        for offset, patient_id in enumerate(patient_ids):
+            patient = normalize_tcga_patient_id(patient_id)
+            rows = self._patient_rows.get(patient, self._metadata_frame.iloc[0:0]).copy()
+            if required_membership:
+                col, partition = self._membership_filter(required_membership)
+                rows = rows.loc[rows[col].astype("string").str.lower() == partition].copy()
+            budget = len(rows) if max_tokens is None else int(max_tokens)
+            if budget > 0 and len(rows) > budget:
+                rows = _sample_slide_balanced(rows, budget, seed + offset) if slide_balanced else rows.sample(n=budget, random_state=seed + offset).sort_values("row_idx")
+            selected.append(rows.reset_index(drop=True))
+        result: list[tuple[np.ndarray, pd.DataFrame]] = []
         with h5py.File(self.embeddings_path, "r") as handle:
-            tokens = np.asarray(handle[EMBEDDINGS_DATASET][indices], dtype=np.float32)
-        if tokens.shape != (len(rows), EXPECTED_HOPTIMUS_DIM) or not np.isfinite(tokens).all():
-            raise ValueError("Invalid token read: non-finite or metadata/embedding misalignment")
-        return tokens, rows.reset_index(drop=True)
+            dataset = handle[EMBEDDINGS_DATASET]
+            for rows in selected:
+                if rows.empty:
+                    result.append((np.zeros((0, EXPECTED_HOPTIMUS_DIM), dtype=np.float32), rows))
+                    continue
+                indices = rows.row_idx.to_numpy(dtype=np.int64)
+                tokens = np.asarray(dataset[indices], dtype=np.float32)
+                if tokens.shape != (len(rows), EXPECTED_HOPTIMUS_DIM) or not np.isfinite(tokens).all():
+                    raise ValueError("Invalid token read: non-finite or metadata/embedding misalignment")
+                result.append((tokens, rows))
+        return result
 
     def load_patient(self, patient_id: str, max_patches: int = 512, seed: int = 42) -> tuple[np.ndarray, pd.DataFrame]:
         """Compatibility alias for older code."""
