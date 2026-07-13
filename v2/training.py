@@ -25,6 +25,8 @@ class V2LossSchedule:
     supcon_after_warmup: float = 0.20
     separation_after_warmup: float = 0.01
     rna_reconstruction_after_warmup: float = 0.03
+    teacher_warmup_epochs: int = 0
+    teacher_weight: float = 1.0
 
     def weights(self, epoch: int) -> dict[str, float]:
         warmup = epoch < self.warmup_epochs
@@ -35,6 +37,7 @@ class V2LossSchedule:
             "supcon": 0.0 if warmup else self.supcon_after_warmup,
             "separation": 0.0 if warmup else self.separation_after_warmup,
             "rna_reconstruction": 0.0 if warmup else self.rna_reconstruction_after_warmup,
+            "teacher": self.teacher_weight if epoch < self.teacher_warmup_epochs else 0.0,
         }
 
 
@@ -58,6 +61,13 @@ class V2Trainer:
             identity = symmetric_infonce(out_wsi["z_identity"], out_rna["z_identity"])
             loss = loss + weights["identity"] * identity
             metrics["identity"] = float(identity.detach())
+        if weights["teacher"] and "teacher_wsi" in batch:
+            teacher = 0.5 * (
+                (1.0 - nn.functional.cosine_similarity(out_wsi["z_identity"], batch["teacher_wsi"], dim=-1)).mean()
+                + (1.0 - nn.functional.cosine_similarity(out_rna["z_identity"], batch["teacher_rna"], dim=-1)).mean()
+            )
+            loss = loss + weights["teacher"] * teacher
+            metrics["teacher"] = float(teacher.detach())
         if "programme_target" in batch:
             present = batch.get("programme_present", torch.ones(len(output["z_biology"]), device=self.device, dtype=torch.bool)).bool()
             if present.any():

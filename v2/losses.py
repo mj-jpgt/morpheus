@@ -40,7 +40,10 @@ def supervised_programme_contrastive(state: torch.Tensor, positive_mask: torch.T
     if len(state) < 3 or not positive_mask.any():
         return state.new_zeros(())
     valid = positive_mask.bool() & ~torch.eye(len(state), dtype=torch.bool, device=state.device)
-    logits = (_norm(state) @ _norm(state).T / temperature).masked_fill(~torch.eye(len(state), dtype=torch.bool, device=state.device), -1e4)
+    # Self-pairs are invalid; off-diagonal programme-similar patients are the
+    # only legal positives.  Masking the complement would turn every positive
+    # into -1e4 and dominate the entire objective.
+    logits = (_norm(state) @ _norm(state).T / temperature).masked_fill(torch.eye(len(state), dtype=torch.bool, device=state.device), -1e4)
     log_prob = torch.log_softmax(logits, dim=-1)
     losses = [-log_prob[row, valid[row]].mean() for row in range(len(state)) if valid[row].any()]
     return torch.stack(losses).mean() if losses else state.new_zeros(())
