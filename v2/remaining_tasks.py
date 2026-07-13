@@ -33,11 +33,15 @@ def main():
         for row in evaluate_few_shot(f,cancer,split,unseen,episodes=100):
             rows += [{"method":method,"task":"few_shot_unseen","metric":k,"value":float(v)} for k,v in row.items() if k not in {"k","episodes"}]
         y=hallmark.reindex(ids); cols=[c for c in hallmark if c.startswith("HALLMARK_")]; immune=[c for c in cols if any(q in c for q in ("INTERFERON","ALLOGRAFT","INFLAMMATORY","COMPLEMENT"))]
-        valid=np.isfinite(y[immune].to_numpy(float)).all(1); target=y[immune].mean(1).to_numpy(float); pred=train_ridge_predict(f,target[:,None],tr&valid,te&valid)[:,0]
-        rows.append({"method":method,"task":"immune_programme","metric":"pearson","value":mean_column_correlation(target[te&valid,None],pred[:,None])})
-        if "wsi_identity" in z.files and "rna_identity" in z.files:
-            wp=train_ridge_predict(z["wsi_identity"],target[:,None],tr&valid,te&valid)[:,0]; rp=train_ridge_predict(z["rna_identity"],target[:,None],tr&valid,te&valid)[:,0]
-            d=cancer_controlled_discordance(wp,rp,cancer[te&valid]); rows += [{"method":method,"task":"immune_discordance","metric":k,"value":float(v)} for k,v in d.items() if np.isscalar(v)]
+        valid=np.isfinite(y[immune].to_numpy(float)).all(1); target=y[immune].mean(1).to_numpy(float); train_immune=tr&valid; test_immune=te&valid
+        if train_immune.sum() >= 2 and test_immune.sum() >= 2:
+            pred=train_ridge_predict(f,target[:,None],train_immune,test_immune)[:,0]
+            rows.append({"method":method,"task":"immune_programme","metric":"pearson","value":mean_column_correlation(target[test_immune,None],pred[:,None])})
+        else:
+            rows.append({"method":method,"task":"immune_programme","metric":"pearson","value":float("nan"),"note":"insufficient_hallmark_coverage"})
+        if train_immune.sum() >= 2 and test_immune.sum() >= 2 and "wsi_identity" in z.files and "rna_identity" in z.files:
+            wp=train_ridge_predict(z["wsi_identity"],target[:,None],train_immune,test_immune)[:,0]; rp=train_ridge_predict(z["rna_identity"],target[:,None],train_immune,test_immune)[:,0]
+            d=cancer_controlled_discordance(wp,rp,cancer[test_immune]); rows += [{"method":method,"task":"immune_discordance","metric":k,"value":float(v)} for k,v in d.items() if np.isscalar(v)]
         surv=master.reindex(ids); ok=tr & surv.survival_time.notna().to_numpy() & surv.survival_event.notna().to_numpy(); ev=te & surv.survival_time.notna().to_numpy() & surv.survival_event.notna().to_numpy()
         if ok.sum()>10 and ev.sum()>10:
             risk=train_ridge_predict(f,surv.survival_event.fillna(0).to_numpy()[:,None],ok,ev)[:,0]
