@@ -1,0 +1,12 @@
+seed: 42
+protocol: heldout_cancer_11v22
+paths:
+  registry: morpheus/data/processed/master_patient_table.parquet
+  split: morpheus/data/processed/splits/heldout_cancer_splits.json
+  patch_registry: data/processed/wsi/tcga_ut_patch_bag_registry.parquet
+  hallmark_scores: data/processed/genesets/msigdb_hallmark_scores.parquet
+  descriptions: morpheus/v2/tcga_cancer_descriptions.yaml
+  output_root: morpheus/outputs/v2_local
+model: {hidden_dim: 512, heads: 8, layers: 4, local_slots: 8, slide_slots: 8, patient_slots: 16}
+training: {epochs: 40, learning_rate: 0.0002, weight_decay: 0.01, token_budget_candidates: [16384, 32768, 65536], gpu_memory_fraction_limit: 0.9}
+evaluation: {seeds: [42, 43, 44], bootstrap_repeats: 1000, few_shot_k: [1, 2, 5, 10, 20], few_shot_episodes: 100, text_model: microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext, candidate_sets: [unseen_22, all_33]}

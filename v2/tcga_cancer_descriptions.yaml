@@ -1,0 +1,38 @@
+# Public-knowledge-only prompts.  No TCGA patient counts, test statistics, or
+# patient examples are allowed in this resource.
+source_policy: "NCI Cancer Types and TCGA project nomenclature; reviewed public knowledge only"
+cancers:
+  ACC: {name: adrenocortical carcinoma, tissue: adrenal cortex, histology: endocrine cortical malignancy, features: steroidogenic and TP53 or WNT pathway alterations, context: hormonally active tumours may have a vascular stromal component}
+  BLCA: {name: bladder urothelial carcinoma, tissue: urinary bladder urothelium, histology: urothelial carcinoma, features: FGFR3 and TP53 pathway alterations, context: variable immune infiltration and basal or luminal programmes}
+  BRCA: {name: breast invasive carcinoma, tissue: breast epithelium, histology: ductal or lobular carcinoma, features: ERBB2, hormone receptor and DNA-repair programmes, context: luminal, HER2-enriched or basal-like states}
+  CESC: {name: cervical squamous cell carcinoma and endocervical adenocarcinoma, tissue: cervix, histology: squamous or glandular carcinoma, features: human papillomavirus-associated biology, context: immune and stromal variation}
+  CHOL: {name: cholangiocarcinoma, tissue: biliary epithelium, histology: adenocarcinoma, features: IDH1, FGFR2 and KRAS pathway alterations, context: desmoplastic stroma}
+  COAD: {name: colon adenocarcinoma, tissue: colon, histology: gland-forming adenocarcinoma, features: APC WNT, KRAS and mismatch-repair pathways, context: immune heterogeneity including microsatellite-instability states}
+  DLBC: {name: diffuse large B-cell lymphoma, tissue: lymphoid tissue, histology: aggressive mature B-cell lymphoma, features: B-cell receptor and MYC programmes, context: immune-cell-rich lymphoid morphology}
+  ESCA: {name: esophageal carcinoma, tissue: esophagus, histology: squamous carcinoma or adenocarcinoma, features: TP53 and receptor tyrosine kinase pathways, context: epithelial and stromal variation}
+  GBM: {name: glioblastoma, tissue: brain, histology: high-grade diffuse astrocytic glioma, features: EGFR and cell-cycle programmes, context: necrosis, vascular proliferation and myeloid context}
+  HNSC: {name: head and neck squamous cell carcinoma, tissue: upper aerodigestive mucosa, histology: squamous carcinoma, features: TP53, PI3K and HPV-associated states, context: variable lymphocytic infiltration}
+  KICH: {name: kidney chromophobe carcinoma, tissue: kidney, histology: chromophobe renal cell carcinoma, features: mitochondrial and chromosome-level alterations, context: epithelial renal morphology}
+  KIRC: {name: kidney renal clear cell carcinoma, tissue: kidney, histology: clear cell renal cell carcinoma, features: VHL hypoxia and angiogenesis programmes, context: vascular and immune heterogeneity}
+  KIRP: {name: kidney renal papillary cell carcinoma, tissue: kidney, histology: papillary renal cell carcinoma, features: MET and chromosome copy-number programmes, context: papillary architecture}
+  LAML: {name: acute myeloid leukemia, tissue: bone marrow and blood, histology: myeloid leukemia, features: myeloid differentiation and recurrent myeloid mutations, context: circulating and marrow immune-cell context}
+  LGG: {name: lower grade glioma, tissue: brain, histology: diffuse glioma, features: IDH-associated and 1p 19q-related programmes, context: infiltrative glial morphology}
+  LIHC: {name: liver hepatocellular carcinoma, tissue: liver, histology: hepatocellular carcinoma, features: WNT, TP53 and metabolic programmes, context: vascular and immune microenvironment variation}
+  LUAD: {name: lung adenocarcinoma, tissue: lung, histology: gland-forming lung carcinoma, features: EGFR KRAS and ALK pathway alterations, context: variable immune and stromal context}
+  LUSC: {name: lung squamous cell carcinoma, tissue: lung, histology: squamous lung carcinoma, features: TP53, SOX2 and oxidative-stress programmes, context: keratinizing morphology and immune variation}
+  MESO: {name: mesothelioma, tissue: pleura or serosa, histology: mesothelial malignancy, features: BAP1, NF2 and Hippo pathway alterations, context: fibrotic and inflammatory stroma}
+  OV: {name: ovarian serous cystadenocarcinoma, tissue: ovary or fallopian tube, histology: high-grade serous carcinoma, features: TP53 and homologous-recombination deficiency, context: stromal and immune heterogeneity}
+  PAAD: {name: pancreatic adenocarcinoma, tissue: pancreas, histology: ductal adenocarcinoma, features: KRAS, TP53 and SMAD4 pathways, context: dense desmoplastic stroma}
+  PCPG: {name: pheochromocytoma and paraganglioma, tissue: adrenal medulla or paraganglia, histology: neuroendocrine tumour, features: pseudohypoxia and kinase-signalling programmes, context: vascular neuroendocrine morphology}
+  PRAD: {name: prostate adenocarcinoma, tissue: prostate, histology: gland-forming adenocarcinoma, features: androgen receptor and ETS fusion programmes, context: glandular and stromal architecture}
+  READ: {name: rectal adenocarcinoma, tissue: rectum, histology: gland-forming adenocarcinoma, features: APC WNT, KRAS and mismatch-repair pathways, context: immune heterogeneity}
+  SARC: {name: sarcoma, tissue: connective and soft tissue, histology: mesenchymal malignancy, features: lineage-specific fusion and copy-number programmes, context: variable extracellular matrix and stromal morphology}
+  SKCM: {name: skin cutaneous melanoma, tissue: skin melanocytes, histology: melanoma, features: BRAF NRAS and MAPK pathways, context: often immune-infiltrated or immune-excluded states}
+  STAD: {name: stomach adenocarcinoma, tissue: stomach, histology: gastric adenocarcinoma, features: chromosomal instability, EBV or microsatellite-instability programmes, context: immune and stromal variation}
+  TGCT: {name: testicular germ cell tumour, tissue: testis, histology: seminomatous or nonseminomatous germ cell tumour, features: germ-cell developmental programmes, context: lymphocytic or embryonal morphology}
+  THCA: {name: thyroid carcinoma, tissue: thyroid, histology: differentiated thyroid carcinoma, features: BRAF, RAS and MAPK pathways, context: follicular or papillary architecture}
+  THYM: {name: thymoma, tissue: thymus, histology: thymic epithelial tumour, features: thymic epithelial differentiation, context: prominent immature T-cell lymphoid background}
+  UCEC: {name: uterine corpus endometrial carcinoma, tissue: endometrium, histology: endometrioid or serous carcinoma, features: POLE, mismatch repair, PI3K and TP53 programmes, context: immune and hormone-related variation}
+  UCS: {name: uterine carcinosarcoma, tissue: uterus, histology: mixed epithelial and mesenchymal malignancy, features: TP53 and epithelial-mesenchymal programmes, context: aggressive biphasic morphology}
+  UVM: {name: uveal melanoma, tissue: uveal tract, histology: melanoma, features: GNAQ GNA11 and BAP1 pathways, context: pigmented spindle or epithelioid morphology}
+source_url: https://www.cancer.gov/types
