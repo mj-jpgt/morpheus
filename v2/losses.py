@@ -43,6 +43,33 @@ def whitened_cross_covariance(left: torch.Tensor, right: torch.Tensor, eps: floa
     return ((left.T @ right) / max(len(left) - 1, 1)).square().mean()
 
 
+def feature_decorrelation(state: torch.Tensor, min_batch: int = 8, eps: float = 1e-4) -> torch.Tensor:
+    """Off-diagonal feature-*correlation* penalty (Barlow-Twins style).
+
+    Unlike :func:`variance_floor`, which acts per dimension and cannot raise the
+    rank of a representation, this penalises *cross-dimension* correlation and so
+    directly discourages rank collapse of the biology head onto the low-rank
+    programme-target manifold.
+
+    The features are standardised to unit variance BEFORE the off-diagonal
+    penalty (as in :func:`whitened_cross_covariance`).  This is deliberate and
+    load-bearing: ``z_biology`` is L2-normalised, so its raw per-feature variance
+    is O(1/dim) and a plain covariance penalty is numerically negligible (it
+    silently no-ops at any sane weight).  Standardising makes the term a
+    scale-invariant correlation penalty of O(1).  The batch correlation is a
+    rank-``(B-1)`` estimator, so it is skipped below ``min_batch`` where the
+    estimate is unreliable on small, ragged patient batches
+    (F-R2; see v2/research/B2_implementation_and_audit.md).
+    """
+    if len(state) < min_batch:
+        return state.new_zeros(())
+    standardized = (state - state.mean(dim=0, keepdim=True)) / torch.sqrt(
+        state.var(dim=0, unbiased=False, keepdim=True) + eps)
+    correlation = (standardized.T @ standardized) / (len(state) - 1)
+    off_diagonal = correlation - torch.diag(torch.diag(correlation))
+    return off_diagonal.square().sum() / correlation.shape[0]
+
+
 def programme_neighbourhood_loss(state: torch.Tensor, targets: torch.Tensor, temperature: float = 0.20) -> torch.Tensor:
     """Match state similarity to train-fold programme similarity."""
     if len(state) < 3:

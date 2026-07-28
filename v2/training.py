@@ -10,7 +10,8 @@ import numpy as np
 import torch
 from torch import nn
 
-from .losses import (gaussian_nll, programme_neighbourhood_loss,
+from .losses import (feature_decorrelation, gaussian_nll,
+                     programme_neighbourhood_loss,
                      supervised_programme_contrastive, symmetric_infonce,
                      variance_floor, whitened_cross_covariance)
 from .model import TumorStateV2
@@ -30,6 +31,10 @@ class V2LossSchedule:
     supcon_after_warmup: float = 0.20
     separation_after_warmup: float = 0.01
     variance_after_warmup: float = 0.01
+    # Off-diagonal covariance decorrelation on the biology head. The per-dim
+    # variance floor cannot raise rank; this term directly counters the collapse
+    # onto the low-rank programme manifold (F-R2).
+    decorrelation_after_warmup: float = 0.04
     rna_reconstruction_after_warmup: float = 0.03
     fusion_identity_after_warmup: float = 0.25
     patient_consistency_after_warmup: float = 0.25
@@ -51,6 +56,7 @@ class V2LossSchedule:
             "supcon": 0.0 if warmup else self.supcon_after_warmup,
             "separation": 0.0 if warmup else self.separation_after_warmup,
             "variance": 0.0 if warmup else self.variance_after_warmup,
+            "decorrelation": 0.0 if warmup else self.decorrelation_after_warmup,
             "rna_reconstruction": 0.0 if warmup else self.rna_reconstruction_after_warmup,
             "fusion_identity": self.fusion_identity_warmup if warmup else self.fusion_identity_after_warmup,
             "patient_consistency": self.patient_consistency_warmup if warmup else self.patient_consistency_after_warmup,
@@ -61,7 +67,9 @@ class V2LossSchedule:
             # gradient without introducing patient/biology objectives.
             return {key: (value if key in {"identity", "fusion_identity"} else 0.0) for key, value in weights.items()}
         if self.objective_profile == "programme_only":
-            return {key: (value if key in {"programme", "neighbourhood", "supcon"} else 0.0)
+            # decorrelation trains biology geometry, so it must stay active in
+            # the profile that trains the biology head in isolation.
+            return {key: (value if key in {"programme", "neighbourhood", "supcon", "decorrelation"} else 0.0)
                     for key, value in weights.items()}
         return weights
 
@@ -235,6 +243,14 @@ class V2Trainer:
             variance_term = weights["variance"] * variance
             loss = loss + variance_term
             metrics["variance_floor"] = float(variance.detach())
+        decorrelation_term = output["z_identity"].new_zeros(())
+        if weights["decorrelation"]:
+            # Off-diagonal covariance penalty on the primary biology view; the
+            # min-batch guard inside feature_decorrelation skips ragged batches.
+            decorrelation = feature_decorrelation(output["z_biology"])
+            decorrelation_term = weights["decorrelation"] * decorrelation
+            loss = loss + decorrelation_term
+            metrics["decorrelation"] = float(decorrelation.detach())
         for name, value in (("identity", output["z_identity"]), ("biology", output["z_biology"])):
             metrics[f"{name}_feature_std"] = float(value.detach().float().std(dim=0).mean())
         reconstruction_term = output["z_identity"].new_zeros(())
