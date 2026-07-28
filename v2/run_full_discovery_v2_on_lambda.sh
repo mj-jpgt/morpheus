@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+exec "$(dirname "$0")/run_strict_core_v2_on_lambda.sh" "$@"
+
+# Legacy controller retained below only for historical provenance.  The exec
+# above makes it unreachable so no future launch can invoke stale src modules.
 set -Eeuo pipefail
 
 ROOT="${ROOT:-/lambda/nfs/geeg/biorag3_persistent_20260711}"

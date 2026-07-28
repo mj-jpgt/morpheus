@@ -26,6 +26,23 @@ def centered_cross_covariance(left: torch.Tensor, right: torch.Tensor) -> torch.
     return ((left.T @ right) / max(len(left) - 1, 1)).square().mean()
 
 
+def variance_floor(state: torch.Tensor, target_std: float = 1.0, eps: float = 1e-4) -> torch.Tensor:
+    """Keep a specialised state from satisfying separation by collapsing."""
+    if len(state) < 2:
+        return state.new_zeros(())
+    std = torch.sqrt(state.var(dim=0, unbiased=False) + eps)
+    return torch.relu(float(target_std) - std).mean()
+
+
+def whitened_cross_covariance(left: torch.Tensor, right: torch.Tensor, eps: float = 1e-4) -> torch.Tensor:
+    """Cross-covariance after per-dimension whitening, robust to scale tricks."""
+    if len(left) < 2:
+        return left.new_zeros(())
+    left = (left - left.mean(dim=0, keepdim=True)) / torch.sqrt(left.var(dim=0, unbiased=False, keepdim=True) + eps)
+    right = (right - right.mean(dim=0, keepdim=True)) / torch.sqrt(right.var(dim=0, unbiased=False, keepdim=True) + eps)
+    return ((left.T @ right) / max(len(left) - 1, 1)).square().mean()
+
+
 def programme_neighbourhood_loss(state: torch.Tensor, targets: torch.Tensor, temperature: float = 0.20) -> torch.Tensor:
     """Match state similarity to train-fold programme similarity."""
     if len(state) < 3:
@@ -49,5 +66,20 @@ def supervised_programme_contrastive(state: torch.Tensor, positive_mask: torch.T
     return torch.stack(losses).mean() if losses else state.new_zeros(())
 
 
-def gaussian_nll(mean: torch.Tensor, log_variance: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
-    return 0.5 * (log_variance + (target - mean).square() * torch.exp(-log_variance)).mean()
+def gaussian_nll(mean: torch.Tensor, log_variance: torch.Tensor, target: torch.Tensor,
+                 target_mask: torch.Tensor | None = None) -> torch.Tensor:
+    """Heteroscedastic Gaussian NLL with optional per-programme availability.
+
+    A patient can legitimately lack one RNA-derived programme while retaining
+    others.  Reducing over a row-level mask would either discard usable labels
+    or silently treat unavailable targets as zeros.
+    """
+    value = 0.5 * (log_variance + (target - mean).square() * torch.exp(-log_variance))
+    if target_mask is None:
+        return value.mean()
+    if target_mask.shape != value.shape:
+        raise ValueError("target_mask must have the same [batch, programme] shape as Gaussian NLL inputs")
+    mask = target_mask.bool()
+    if not mask.any():
+        return value.new_zeros(())
+    return value.masked_select(mask).mean()

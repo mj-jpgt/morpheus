@@ -1,0 +1,188 @@
+MORPHEUS V2 (a hierarchical patch-pooling Query-Former for WSI↔RNA that produces
+specialized identity/biology/context states, anchored as a zero-init residual on a
+frozen MLP-CLIP teacher) fails to beat the simple MLP-CLIP baseline. Diagnostics we
+ran on the real seed-42 artifacts established the mechanism:
+
+- Biology head has collapsed to effective rank ~5–6 of 256 (identity head is
+healthy at ~84); the anchor residual is a near-noop (1),
+so identity ≈ the frozen teacher by construction.
+- The molecular-prompting benchmark is confounded: ~4
+cross-cancer cohort structure, and the genuine within-cancer, random-control-adjusted
+signal is only ~+0.07 for every method including the
+- SigLIP is the only variant that already beats MLP-CLIP on molecular prompting in
+our own data (+0.005 within-cancer, wins 62% of targe
+
+The user wants to pursue two directions in parallel,
+multi-agent research effort with non-redundant, doc-writing subagents and
+adversarial verification:
+
+- Branch A — Formalize/harden the research contributi
+benchmark-confound finding): is it a real, publishable contribution, and how do we
+turn it into something usable (benchmark / method / t+
+a paper direction.
+- Branch B — Fix MORPHEUS/QueryFormer (root cause: bih
+HOW to implement the 6 fixes, vet each proposal for fit + scaling, hunt for other
+dead/broken wiring, and design fast stress tests thatl run.
+
+This plan file specifies the orchestration (agent topns,
+shared docs, adversarial checks) and the concrete deliverables. Execution (launching the
+workflows) happens only after approval.
+
+Codebase findings so far (grounds Branch B)
+
+From morpheus/v2/model.py, training.py, runner.py, ex
+- Dead wiring (candidate causes of / obstacles to fixes):
+  - z_context (128-D, model.py:287): computed, never .
+  - z_uncertainty (512-D) and 5× modality residuals (z_{wsi,rna,clinical,snv,cnv}_residual):
+computed, no supervision, not exported. The residuals.
+- Biology-head collapse suspects:
+  - Biology head fed by only 4 query slots, combined py:254`)
+— mean-pooling destroys variance before the 256-D projection.
+  - z_biology is L2-normalized after projection (mode
+  - Programme losses on biology: Gaussian NLL (programme 1.0) + neighbourhood KL (0.20) +
+supcon (0.20); plus in full: separation 0.01, varianc
+anti-collapse term that already exists but is weighted only 0.01 — likely too weak),
+patient_consistency 0.25, rna_reconstruction 0.03.
+  - Profiles (runner.py:302-318 / training.py:45-66): identity_only, programme_only, full
+gate which losses are active — enables clean ablation
+- Anchor: gated, bounded residual (anchor_residual_bound=0.25), zero-init so
+z_identity = anchor at start; observed residual scale
+- Instrumentation that already exists: local_slot_entropy, patient_slot_effective_tokens
+(an effective-rank proxy, computed but not exported),ict
+metrics partially implemented (training.py:264-305) but only sampled periodically.
+Missing: per-batch effective-rank/SVD of identity & blapse detector.
+
+Mechanistic root cause of biology-head collapse (fromnner.py)
+
+- Low-rank target manifold (primary): z_biology is 25
+(losses.py:46-53, temp 0.20) and supcon (losses.py:56-66, temp 0.20) losses
+(combined weight 0.40 post-warmup) constrain its pair-D
+Hallmark programme target manifold. The ~206 "free" dims get no programme signal and
+decay under AdamW weight decay → low effective rank. orse
+than ~50, so mean-pooling 4 biology slots + weight decay compound it.)
+- Underpowered decorrelation: identity↔biology cross-
+weight 0.01 vs programme 1.0 (training.py:52).
+- Variance floor is per-dimension (losses.py:29-34, r
+individual dims from dying but does not prevent rank collapse — this is why the
+existing anti-collapse term didn't save it.
+- Normalization inconsistency: programme Gaussian-NLL heads receive unnormalized
+biology_state, while KL/supcon receive L2-normalized
+- SigLIP swap point (precise): identity uses symmetric InfoNCE (losses.py:13-18,
+temp 0.07 hardcoded) at training.py:194-196 on z_iden
+contrastive by design. SigLIP = swap to binary_cross_entropy_with_logits here.
+- Anchor can move (±0.25 bounded, per-patient gated) sistent
+with "identity already saturated by the frozen teacher."
+- Other dead paths: semantic/PLIP head off by defaulth
+programme memory bank is detached (training.py:104, no backprop); RNA-reconstruction
+trains identity, not biology.
+
+Candidate fixes to research (Branch B will vet these aration
+0.01→~0.1; replace per-dim variance floor with a covariance/whitening term (VICReg/Barlow)
+that penalizes rank collapse directly; make programmee not
+per-50-programme) or replace KL-to-50-D with a contrastive that lives in 256-D; give biology
+more slots / attention-pool instead of .mean(1); fix
+reclaim the 20 dead residual slots.
+
+Test scaffolding (grounds Branch B stress-test lane)
+
+- 31 CPU tests in morpheus/v2/tests/ (~2-3 min, no GPU markers). Existing gradient-flow
+tests already assert each head receives non-zero grad
+validate_artifact (contracts.py) checks isfinite. Reusable micro-fixtures: _batch()
+(test_v21_model.py), _model_and_batch() (morpheus/tes.py),
+seeded RNGs. There is an unused assert_module_used helper that checks a head got gradient.
+- Gap (nothing catches): representational/rank collap) in
+KL / log(0) in Gaussian NLL, heteroscedastic mode collapse (log_variance→∞), no-op losses,
+anchor-gate saturation. These are precisely the fast
+
+---
+ORCHESTRATION DESIGN
+
+Both branches run as custom Workflow orchestrations (not the stock deep-research skill —
+it lacks the master/sub hierarchy, proposal-critics, ts requested).
+Non-redundancy mechanism: workflow subagents run in parallel and cannot read each other's
+docs mid-run, so redundancy is prevented by constructt partitions
+the work into disjoint lanes up front; each lane agent Writes its own ledger/<lane>.md
+(distinct filenames = no write conflicts) recording wnd; a master
+synthesis agent merges into the deliverable. Adversarial truth-seeking = dedicated refute/critic
+stages (2-of-3 to kill a claim).
+
+Branch A — Formalize & harden the WSI contribution (~
+
+Master question: is the "multi-objective head collapsbenchmark"
+finding a real, novel, usable contribution, and what is the strongest paper we can build?
+Pipeline (Workflow script):
+1. Scope/master (1 agent) → writes A1_lanes.md: 8 disjoint lanes, each a distinct
+question + search remit (explicitly non-overlapping).
+2. Lane research (8 parallel agents, web-search heavy) → each Writes A1_ledger/<lane>.md
+{queries, sources, falsifiable findings, novelty verd
+(a) prior WSI→molecular/pathway benchmarks (HEST/HEST-bench, Pathomic, SEQ-to-slide) — is the
+confound already reported? (b) batch-effect/cohort-co & multimodal
+genomics; (c) random-control/null-model methodology in signature prediction; (d) multi-objective
+/multi-task head collapse as a named, citable phenomee packaged
+(leaderboard, task cards, eval harness, dataset card); (f) theory — identifiability/info-theoretic
+why a shared latent can't be optimal for retrieval + n we state a
+proposition?); (g) venue/novelty scan (MICCAI/CVPR-med/Nature Methods/ICLR) + 3 closest papers;
+(h) counterfactual "steelman the null" — strongest ca.
+3. Adversarial verify (fan-out, ~3 per top claim) → try to refute each novelty/"unreported"
+claim by surfacing prior art; 2/3 refute kills it. Wr
+4. Master synthesis (1 agent) → writes A2_litreview_and_direction.md: lit review + gap
+map + chosen formalization (benchmark vs method vs th claims,
+experiments) mapped to results we already have (rank-collapse numbers, within-cancer ~0.07,
+random-control specificity, SigLIP win).
+
+Branch B — Fix MORPHEUS/QueryFormer (~15 agents)
+
+Master question: how do we implement the 6 fixes so tebase, what
+else is broken, and how do we catch breakage cheaply before a full run? Seeded with the codebase
+findings above. Pipeline:
+1. Scope/master (1 agent, given the code findings) → B1_lanes.md: disjoint lanes.
+2. Lane research (7 parallel agents) → each Writes B1
+(1) biology-collapse remedy — VICReg/Barlow covariance vs whitening vs DirectCLR vs spectral
+penalty, chosen for our L2-normalized 256-D head; (2)L redesign
+(higher-rank targets / per-gene / drop KL-to-50-D for a 256-D contrastive); (3) SigLIP swap at
+training.py:194-196 (bias/temp init, batch-size intergradient-
+conflict instrumentation + PCGrad/CAGrad (reuse partial impl at training.py:264-305);
+(5) honest-metric harness (within-cancer + random-conmalize
+existing macro_cancer_pearson); (6) fast stress-test suite (rank/effective-rank check,
+NaN guards, no-op-loss/grad-flow, anchor-gate saturatn NLL) built
+on _batch()/_model_and_batch(); (7) dead-wiring audit — validate & prioritize the
+dead z_context/z_uncertainty/20 residual slots, mean-
+inconsistency, detached memory bank.
+3. Proposal-critic (adversarial, ~2 per proposed fix)r-
+residual + hierarchical-pooling design, leakage discipline, 11-dev/21-heldout protocol) and a
+"why it fails given our actual code" critic + a scalil,
+survives uncapped patches). Writes verdicts to ledger.
+4. Master synthesis (1 agent) → B2_implementation_and-fix
+plan (what to change, exact file:line, the gating stress test, scaling note), dead-wiring
+findings, and recommended order of operations.
+
+Deliverables & location
+
+Docs written under morpheus/v2/research/:
+A1_lanes.md, A1_ledger/*.md, A2_litreview_and_direction.md,
+B1_lanes.md, B1_ledger/*.md, B2_implementation_and_au
+
+Verification (of this orchestration's output)
+
+- Each ledger file exists and records queries + findig (spot-check).
+- A2 ends with a single chosen paper direction + outline; B2 ends with a ranked fix list where
+every fix names a file:line and a gating test.
+- Sanity: at least the SigLIP swap point (training.py:194-196), the separation-weight change,
+and a rank-collapse stress test must appear concretel
+- Implementation of the fixes/tests is a separate, post-approval step (out of scope here).
+
+Confirmed decisions
+
+1. Branch B = research/plan docs only. No code/patch drafting in this orchestration; the
+stress-test lane produces runnable designs (rank/NaN/tures to
+reuse), and B2 is a ranked, vetted fix plan. Implementation is a separate post-approval step.
+2. Both branches launched concurrently, at the specifnts plus
+adversarial verify/critic fan-out, 3-vote to kill a claim). Two Workflow calls in one message.
+3. Docs written under morpheus/v2/research/.
+
+Execution (after approval — plan mode blocks it now)
+
+- Launch two custom Workflow orchestrations concurrencripted above.
+- Each writes its lane ledgers + deliverable doc under morpheus/v2/research/.
+- I relay: A2's chosen paper direction, and B2's rank gating tests)
+and dead-wiring audit. Then you decide what to implement.

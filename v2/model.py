@@ -17,14 +17,26 @@ class V2ModelConfig:
     hidden_dim: int = 512
     heads: int = 8
     layers: int = 4
-    local_slots: int = 8
-    slide_slots: int = 8
-    patient_slots: int = 16
+    # A direct global path protects the strong frozen H-Optimus signal while
+    # slots add regional and cross-slide evidence.  The old 8->8->16 hierarchy
+    # compressed thousands of tiles before patient fusion.
+    local_slots: int = 64
+    slide_slots: int = 32
+    patient_slots: int = 128
     identity_slots: int = 4
     biology_slots: int = 4
     context_slots: int = 2
     residual_slots: int = 4
     uncertainty_slots: int = 2
+    semantic_dim: int = 0
+    # When supplied, frozen all-patch MLP-CLIP embeddings are a retrieval
+    # skip connection.  A zero-initialised residual coefficient makes the
+    # anchored model exactly equal to the baseline at step zero.
+    use_mlp_clip_anchor: bool = False
+    # The refiner is deliberately bounded.  At initialization its global
+    # coefficient is zero, so an anchored identity state is exactly the
+    # supplied frozen MLP-CLIP state.
+    anchor_residual_bound: float = 0.25
     dropout: float = 0.10
 
     @property
@@ -99,24 +111,46 @@ class HierarchicalWSIEncoder(nn.Module):
         super().__init__()
         h = config.hidden_dim
         self.patch = nn.Sequential(nn.Linear(config.patch_dim, h), nn.LayerNorm(h), nn.GELU(), nn.Linear(h, h))
+        self.global_summary = nn.Sequential(
+            nn.Linear(config.patch_dim * 2, h), nn.LayerNorm(h), nn.GELU(), nn.Linear(h, h)
+        )
         self.coordinates = nn.Sequential(nn.Linear(2, h), nn.LayerNorm(h), nn.GELU(), nn.Linear(h, h))
         self.local = SoftSlotPool(h, config.local_slots)
         self.slide = SoftSlotPool(h, config.slide_slots)
         self.patient = SoftSlotPool(h, config.patient_slots)
 
-    def forward(self, patches: torch.Tensor, patch_mask: torch.Tensor, slide_ids: torch.Tensor, coordinates: torch.Tensor | None = None) -> tuple[ModalityTokens, dict[str, torch.Tensor]]:
+    def forward(self, patches: torch.Tensor, patch_mask: torch.Tensor,
+                slide_ids: torch.Tensor, coordinates: torch.Tensor | None = None,
+                coordinate_present: torch.Tensor | None = None) -> tuple[ModalityTokens, dict[str, torch.Tensor]]:
+        """Encode an uncapped ragged patch bag.
+
+        ``coordinate_present`` is patient-level on purpose.  Callers may pad
+        coordinate tensors for a mixed batch, but an absent/constant metadata
+        row must never be interpreted as a real all-zero spatial layout.
+        """
         tokens = self.patch(patches)
         if coordinates is not None:
+            if coordinate_present is None:
+                coordinate_present = torch.ones(len(tokens), device=tokens.device, dtype=torch.bool)
+            if coordinate_present.shape != (len(tokens),):
+                raise ValueError("coordinate_present must be a patient-level [batch] mask")
             scale = coordinates.abs().amax(1, keepdim=True).clamp_min(1.0)
-            tokens = tokens + self.coordinates(coordinates / scale)
-        rows, masks, entropies = [], [], []
+            encoded = self.coordinates(coordinates / scale)
+            tokens = tokens + encoded * coordinate_present[:, None, None].to(encoded.dtype)
+        rows, masks, globals_, entropies = [], [], [], []
         for batch_index in range(tokens.shape[0]):
             valid = patch_mask[batch_index]
             if not valid.any():
                 rows.append(tokens.new_zeros((1, tokens.shape[-1])))
                 masks.append(torch.zeros(1, device=tokens.device, dtype=torch.bool))
+                globals_.append(tokens.new_zeros((1, tokens.shape[-1])))
                 continue
             current = tokens[batch_index, valid]
+            raw = patches[batch_index, valid]
+            # Mean and dispersion are a lossless-in-coverage global skip path;
+            # learned slots are a residual refinement, not the only evidence.
+            summary = torch.cat((raw.mean(0), raw.std(0, unbiased=False)), dim=-1)
+            globals_.append(self.global_summary(summary).unsqueeze(0))
             ids = slide_ids[batch_index, valid]
             slides = []
             for slide_id in torch.unique(ids, sorted=True):
@@ -137,9 +171,15 @@ class HierarchicalWSIEncoder(nn.Module):
             packed[index, : row.shape[0]] = row
             packed_mask[index, : row.shape[0]] = masks[index]
         pooled, pooled_mask, attention = self.patient(packed, packed_mask)
-        return ModalityTokens(pooled, pooled_mask, "wsi"), {
+        global_tokens = torch.stack(globals_, dim=0)
+        tokens_out = torch.cat((pooled, global_tokens), dim=1)
+        mask_out = torch.cat((pooled_mask, torch.ones((len(rows), 1), dtype=torch.bool, device=pooled.device)), dim=1)
+        return ModalityTokens(tokens_out, mask_out, "wsi"), {
             "local_slot_entropy": torch.stack(entropies).mean() if entropies else tokens.new_zeros(()),
             "patient_slot_effective_tokens": 1.0 / attention.square().sum(-1).clamp_min(1e-12),
+            "coordinate_present_fraction": (
+                coordinate_present.float().mean() if coordinate_present is not None else tokens.new_zeros(())
+            ),
         }
 
 
@@ -162,10 +202,20 @@ class TumorStateV2(nn.Module):
         self.identity = nn.Linear(c.hidden_dim, 256)
         self.biology = nn.Linear(c.hidden_dim, 256)
         self.context = nn.Linear(c.hidden_dim, 128)
-        self.patient = nn.Linear(c.hidden_dim, 256)
+        self.patient = nn.Sequential(nn.LayerNorm(c.hidden_dim), nn.Linear(c.hidden_dim, 256))
         self.rna_reconstruction = nn.Linear(256, c.rna_dim)
-        self.programme_mean = nn.Linear(c.hidden_dim, programme_dim)
-        self.programme_log_variance = nn.Linear(c.hidden_dim, programme_dim)
+        # Programme regression is deliberately downstream of the exported
+        # biology state.  The old heads consumed the pre-projection hidden
+        # vector, leaving `z_biology` without a direct regression gradient
+        # whenever neighbourhood positives were sparse.
+        self.programme_mean = nn.Linear(256, programme_dim)
+        self.programme_log_variance = nn.Linear(256, programme_dim)
+        self.semantic = nn.Linear(c.hidden_dim, c.semantic_dim) if c.semantic_dim else None
+        self.anchor_residual_scale = nn.Parameter(torch.zeros(())) if c.use_mlp_clip_anchor else None
+        # This gate determines where a contextual correction is useful; the
+        # separate zero-initialised global coefficient preserves the teacher
+        # exactly at step zero.  It is intentionally not a second teacher loss.
+        self.anchor_gate = nn.Sequential(nn.LayerNorm(c.hidden_dim), nn.Linear(c.hidden_dim, 1)) if c.use_mlp_clip_anchor else None
 
     def forward(self, batch: dict[str, torch.Tensor], view: str = "full") -> dict[str, torch.Tensor]:
         if view not in {"full", "wsi", "rna"}:
@@ -174,7 +224,10 @@ class TumorStateV2(nn.Module):
         modalities: dict[str, ModalityTokens] = {}
         diagnostics: dict[str, torch.Tensor] = {}
         if view != "rna":
-            wsi, diagnostics = self.wsi(batch["patches"], batch["patch_mask"], batch["slide_ids"], batch.get("coordinates"))
+            wsi, diagnostics = self.wsi(
+                batch["patches"], batch["patch_mask"], batch["slide_ids"],
+                batch.get("coordinates"), batch.get("coordinate_present"),
+            )
             modalities["wsi"] = wsi
         else:
             first = batch["rna"]
@@ -182,10 +235,13 @@ class TumorStateV2(nn.Module):
         if view != "wsi":
             present = batch.get("rna_present", torch.ones(len(wsi.mask), device=wsi.mask.device, dtype=torch.bool))
             modalities["rna"] = self.rna(batch.get("rna"), present)
-            for name, adapter in (("clinical", self.clinical), ("snv", self.snv), ("cnv", self.cnv)):
-                if adapter is not None:
-                    present = batch.get(f"{name}_present", torch.zeros(len(wsi.mask), device=wsi.mask.device, dtype=torch.bool))
-                    modalities[name] = adapter(batch.get(name), present)
+            # The RNA retrieval view must stay RNA-only.  Extra modalities are
+            # admitted only to the explicitly requested fused patient view.
+            if view == "full":
+                for name, adapter in (("clinical", self.clinical), ("snv", self.snv), ("cnv", self.cnv)):
+                    if adapter is not None:
+                        present = batch.get(f"{name}_present", torch.zeros(len(wsi.mask), device=wsi.mask.device, dtype=torch.bool))
+                        modalities[name] = adapter(batch.get(name), present)
         evidence = torch.cat([item.tokens for item in modalities.values()], dim=1)
         mask = torch.cat([item.mask for item in modalities.values()], dim=1).bool()
         query = self.queries.expand(len(evidence), -1, -1)
@@ -201,10 +257,44 @@ class TumorStateV2(nn.Module):
         identity, biology, context = take(c.identity_slots), take(c.biology_slots), take(c.context_slots)
         residuals = {name: take(c.residual_slots) for name in ("wsi", "rna", "clinical", "snv", "cnv")}
         uncertainty = take(c.uncertainty_slots)
-        z_identity = self.identity(identity)
-        return {
-            "z_identity": z_identity, "z_biology": self.biology(biology), "z_context": self.context(context), "z_patient": self.patient(query.mean(1)),
+        identity_residual = nn.functional.normalize(self.identity(identity), dim=-1)
+        anchor = None
+        if self.anchor_residual_scale is not None:
+            if view == "wsi":
+                anchor = batch.get("mlp_clip_anchor_wsi")
+            elif view == "rna":
+                anchor = batch.get("mlp_clip_anchor_rna")
+            else:
+                wsi_anchor, rna_anchor = batch.get("mlp_clip_anchor_wsi"), batch.get("mlp_clip_anchor_rna")
+                if wsi_anchor is not None and rna_anchor is not None:
+                    anchor = nn.functional.normalize(wsi_anchor + rna_anchor, dim=-1)
+            if anchor is None:
+                raise ValueError("anchored V2 requires MLP-CLIP anchors for every requested view")
+            # Keep the learned correction bounded so anchored retrieval cannot
+            # drift arbitrarily far from the fair all-patch baseline.
+            anchor = nn.functional.normalize(anchor, dim=-1)
+            residual_scale = c.anchor_residual_bound * torch.tanh(self.anchor_residual_scale)
+            assert self.anchor_gate is not None
+            gate = torch.sigmoid(self.anchor_gate(identity)).squeeze(-1)
+            correction = residual_scale * gate[:, None] * identity_residual
+            z_identity = nn.functional.normalize(anchor + correction, dim=-1)
+        else:
+            z_identity = identity_residual
+        biology_state = self.biology(biology)
+        result = {
+            "z_identity": z_identity,
+            "z_biology": nn.functional.normalize(biology_state, dim=-1),
+            "z_context": self.context(context),
+            "z_patient": nn.functional.normalize(self.patient(query.mean(1)), dim=-1),
             "rna_reconstruction": self.rna_reconstruction(z_identity),
-            "programme_mean": self.programme_mean(biology), "programme_log_variance": self.programme_log_variance(biology).clamp(-8, 8),
+            "programme_mean": self.programme_mean(biology_state), "programme_log_variance": self.programme_log_variance(biology_state).clamp(-8, 8),
             "z_uncertainty": uncertainty, **{f"z_{name}_residual": value for name, value in residuals.items()}, **diagnostics,
         }
+        if self.semantic is not None:
+            # Only the WSI path is eligible for pathology-text semantic use.
+            result["z_semantic"] = self.semantic(identity)
+        if self.anchor_residual_scale is not None:
+            result["anchor_residual_scale"] = (c.anchor_residual_bound * torch.tanh(self.anchor_residual_scale)).detach()
+            result["anchor_gate_mean"] = gate.detach().mean()
+            result["anchor_correction_norm"] = correction.detach().norm(dim=-1).mean()
+        return result

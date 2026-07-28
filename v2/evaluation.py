@@ -73,6 +73,18 @@ def evaluate_zero_shot(state: np.ndarray, cancer: np.ndarray, split: np.ndarray,
     return multiclass_metrics(cancer[test], scores, candidates)
 
 
+def evaluate_direct_zero_shot(image_space_state: np.ndarray, cancer: np.ndarray, split: np.ndarray,
+                              candidates: Iterable[str], candidate_text_prototypes: np.ndarray) -> dict[str, float]:
+    """Evaluate frozen image--text cosine directly, with no fitted label mapper."""
+    candidates = np.asarray(sorted(candidates))
+    if len(candidates) != len(candidate_text_prototypes):
+        raise ValueError("candidate text prototypes must follow sorted candidate labels")
+    test = (split == "test") & np.isin(cancer, candidates)
+    if not test.any():
+        return {"accuracy": float("nan")}
+    return multiclass_metrics(cancer[test], zero_shot_predict(image_space_state[test], candidate_text_prototypes), candidates)
+
+
 def evaluate_few_shot(state: np.ndarray, cancer: np.ndarray, split: np.ndarray, candidates: Iterable[str], k_values: tuple[int, ...] = (1, 2, 5, 10, 20), episodes: int = 100, seed: int = 42) -> list[dict[str, float]]:
     candidates = np.asarray(sorted(candidates)); test = (split == "test") & np.isin(cancer, candidates)
     rows = few_shot_episodes(state[test], cancer[test], candidates, k_values, episodes, seed)

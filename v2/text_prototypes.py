@@ -12,6 +12,7 @@ from torch import nn
 
 
 DEFAULT_TEXT_MODEL = "microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext"
+PLIP_TEXT_MODEL = "vinid/plip"
 
 
 def l2_normalize(values: np.ndarray, eps: float = 1e-12) -> np.ndarray:
@@ -53,6 +54,26 @@ def embed_descriptions(descriptions: list[CancerDescription], output_path: str |
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(output, cancers=np.asarray([item.cancer for item in descriptions]), embeddings=l2_normalize(vectors.cpu().numpy().astype(np.float32)), texts=np.asarray(texts), sources=np.asarray([item.source for item in descriptions]), model_id=model_id, revision="" if revision is None else revision)
+    return output
+
+
+def embed_plip_descriptions(descriptions: list[CancerDescription], output_path: str | Path, device: str = "cpu") -> Path:
+    """Create direct pathology image--text prototypes without a label mapper."""
+    try:
+        from transformers import CLIPModel, CLIPProcessor
+    except ImportError as exc:  # pragma: no cover
+        raise RuntimeError("install transformers and safetensors before generating PLIP prompts") from exc
+    model = CLIPModel.from_pretrained(PLIP_TEXT_MODEL).to(device).eval()
+    processor = CLIPProcessor.from_pretrained(PLIP_TEXT_MODEL)
+    encoded = processor(text=[item.text for item in descriptions], return_tensors="pt", padding=True, truncation=True)
+    encoded = {key: value.to(device) for key, value in encoded.items()}
+    with torch.no_grad():
+        vectors = model.get_text_features(**encoded).float().cpu().numpy()
+    output = Path(output_path); output.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(output, cancers=np.asarray([item.cancer for item in descriptions]),
+                        embeddings=l2_normalize(vectors.astype(np.float32)), texts=np.asarray([item.text for item in descriptions]),
+                        sources=np.asarray([item.source for item in descriptions]), model_id=np.asarray(PLIP_TEXT_MODEL),
+                        direct_image_text_space=np.asarray(True))
     return output
 
 
