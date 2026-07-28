@@ -280,10 +280,16 @@ class TumorStateV2(nn.Module):
             z_identity = nn.functional.normalize(anchor + correction, dim=-1)
         else:
             z_identity = identity_residual
-        biology_state = self.biology(biology)
+        # Normalise the biology state once so the programme regression heads
+        # (Gaussian NLL) and the rank-spreading objectives (z_biology / KL /
+        # supcon) operate on the SAME geometry.  Previously the NLL saw the raw
+        # projection while z_biology/KL/supcon saw the unit-norm state, so the
+        # dominant low-rank pull acted on a different manifold than the weak
+        # spreaders (F-R1; see v2/research/B2_implementation_and_audit.md).
+        biology_state = nn.functional.normalize(self.biology(biology), dim=-1)
         result = {
             "z_identity": z_identity,
-            "z_biology": nn.functional.normalize(biology_state, dim=-1),
+            "z_biology": biology_state,
             "z_context": self.context(context),
             "z_patient": nn.functional.normalize(self.patient(query.mean(1)), dim=-1),
             "rna_reconstruction": self.rna_reconstruction(z_identity),
