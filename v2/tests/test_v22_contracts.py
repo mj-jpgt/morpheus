@@ -24,6 +24,28 @@ def test_survival_alignment_reports_split_coverage_and_rejects_duplicates():
         audit_survival_alignment(pd.concat([outcomes, outcomes.iloc[[0]]]), ["TCGA-AA-0001"], ["test"])
 
 
+def test_card_evaluator_emits_selective_risk_so_the_gate_can_pass():
+    """Regression: the quality gate requires a selective_risk metric, but
+    evaluate_hypothesis_cards never produced one -> nan -> the gate could NEVER
+    pass and every discovery card was silently forced to abstention. The evaluator
+    must now emit selective_risk, and a confident+correct card set must clear the gate."""
+    import numpy as np
+    from morpheus.v2.hypothesis_cards import (PROGRAMMES, evaluate_hypothesis_cards,
+                                              generate_hypothesis_cards)
+    names = sorted(PROGRAMMES)[:6]
+    pids = [f"TCGA-AA-{i:04d}" for i in range(10)]
+    scores = np.random.default_rng(0).normal(size=(len(pids), len(names))).astype(float)
+    cards = generate_hypothesis_cards(pids, scores, names)
+    # Evaluate against the SAME score matrix as targets => predictions are confident
+    # and direction-correct => selective risk ~0.
+    metrics = evaluate_hypothesis_cards(cards, pids, scores, names)
+    assert "selective_risk" in metrics
+    assert metrics["selective_risk"] == metrics["selective_risk"]  # finite, not nan
+    gate = CardQualityGate().assess(metrics)
+    assert gate["passed"], (gate["checks"], metrics)
+    assert gate["checks"]["selective_risk"]
+
+
 def test_failed_card_gate_emits_only_valid_abstentions():
     gate = CardQualityGate().assess({"programme_ndcg_at_k": 0.1, "direction_accuracy": 0.5,
                                      "confidence_brier": 0.5, "selective_risk": 0.8})

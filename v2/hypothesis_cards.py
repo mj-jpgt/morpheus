@@ -14,6 +14,8 @@ from typing import Any, Mapping, Sequence
 
 import numpy as np
 
+from .tasks import missingness_selective_risk
+
 
 CARD_MODE = "research_hypothesis_not_clinical_decision"
 CARD_VERSION = "morpheus_hypothesis_card_v1"
@@ -341,9 +343,22 @@ def evaluate_hypothesis_cards(
     def mean(values: Sequence[float]) -> float:
         return float(np.mean(values)) if values else float("nan")
     brier = mean([(confidence - outcome) ** 2 for confidence, outcome in confidence_outcomes])
+    # Selective risk: the error rate on the claims the model is most confident about
+    # (its non-abstained, committed predictions). This is the metric the card quality
+    # gate checks; it was previously never produced, so the gate could never pass.
+    # Reported as the risk over the most-confident half of emitted claims.
+    if confidence_outcomes:
+        errors = np.array([1.0 - outcome for _, outcome in confidence_outcomes])
+        uncertainty = np.array([1.0 - confidence for confidence, _ in confidence_outcomes])
+        selective = missingness_selective_risk(errors, uncertainty)
+        selective_risk = selective.get("risk_at_0.50", float("nan"))
+    else:
+        selective, selective_risk = {}, float("nan")
     return {
         "n_cards": float(len(cards)), "n_target_covered": float(len(precision)),
         "programme_precision_at_k": mean(precision), "programme_recall_at_k": mean(recall),
         "programme_ndcg_at_k": mean(ndcg), "direction_accuracy": mean(direction_correct),
         "confidence_brier": brier, "composite_accuracy": mean(composite_correct),
+        "selective_risk": selective_risk,
+        **{f"selective_{name}": value for name, value in selective.items()},
     }
