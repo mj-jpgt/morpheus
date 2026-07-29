@@ -125,12 +125,20 @@ The recovery is **large (~2.1×) and remarkably tight across seeds** (baseline s
 so the T4 effect is not a seed artifact. This closes the review's multi-seed BLOCKER for the
 rank-recovery claim (C3-i).
 
-**Specificity readout (ii) — pending.** The molecular-prompting probe in this sweep was
-mis-conditioned — a large Ridge penalty on L2-normalized biology features shrank predictions to a
-near-constant, returning undefined (nan) Pearson. The probe is **fixed in code** (feature
-standardization; `f2a7922`); re-measuring control-adjusted within-cancer specificity for both arms
-(the falsifiable "rank rises, specificity unchanged" test) is the remaining step and needs one
-follow-up sweep.
+**Specificity readout (ii) — done, and it confirms the prediction.** A ridge probe of
+`wsi_biology → regenerated held-out Hallmark targets` (full test coverage, n=2530) gives within-cancer
+Pearson **0.1366 (baseline, rank 49)** vs **0.1367 (F-R2, rank 103)**; pooled 0.217 vs 0.219. **Doubling
+the biology-head rank does not move molecular-prompting specificity** — exactly the pre-registered
+"rank rises, specificity unchanged." This is the pivotal coupling result (C2): effective rank is
+**decoupled from the confounded benchmark score**, so the collapse is a pathology the metric is blind
+to — which is *why* a rank fingerprint is diagnostic where the benchmark isn't. (Earlier this probe
+returned nan because the loader's hallmark is a train-fold-only constant placeholder on the held-out
+test split; fixed by scoring against regenerated `frozen_rna_targets`, commit `337b2b1`.)
+
+Interpretation caveat (ties to the reviewer critique): "specificity unchanged" also means the fix does
+**not** improve real molecular prediction on this benchmark — consistent with C2 (the benchmark can't
+reward the fix). Whether recovering rank helps on a *de-confounded / site-stratified external* task is
+the separate, stronger experiment still to run.
 
 ---
 
