@@ -375,7 +375,10 @@ def run(args: argparse.Namespace) -> Path:
             "baseline-preserving anchor residual, not a separate teacher loss.", RuntimeWarning,
         )
     trainer = V2Trainer(
-        model, optimizer, V2LossSchedule(objective_profile=args.objective_profile), device,
+        model, optimizer,
+        V2LossSchedule(objective_profile=args.objective_profile,
+                       decorrelation_after_warmup=args.decorrelation_weight),
+        device,
         gradient_diagnostics_every=args.gradient_diagnostics_every,
     )
     trained_states = _trained_states_for_profile(args.objective_profile, semantic_dim)
@@ -462,6 +465,8 @@ def main() -> None:
                         help="log objective-gradient cosines every N train batches; 0 disables")
     parser.add_argument("--objective-profile", choices=("full", "identity_only", "programme_only"), default="full",
                         help="diagnostic objective ablation; preserves data/model while selectively zeroing losses")
+    parser.add_argument("--decorrelation-weight", type=float, default=0.04,
+                        help="F-R2 biology feature-decorrelation weight; set 0.0 for the collapse-baseline arm of the rank ablation")
     parser.add_argument("--pretrain-epochs", type=int, default=0,
                         help="development-train-only slide self-supervision epochs before V2 fine-tuning")
     parser.add_argument("--pretrain-checkpoint", default="",
