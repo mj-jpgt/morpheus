@@ -72,6 +72,7 @@ def molecular_prompting_probe(train_idx, test_idx, data, model, device, token_bu
     the model's actual molecular-prompting specificity, or is rank decoupled from the
     (confounded) task score?"""
     from sklearn.linear_model import Ridge
+    from sklearn.preprocessing import StandardScaler
     from morpheus.v2.honest_metrics import macro_group_pearson, _pearson
     Xtr, itr = collect_biology(train_idx, data, model, device, token_budget, seed)
     Xte, ite = collect_biology(test_idx, data, model, device, token_budget, seed)
@@ -80,7 +81,11 @@ def molecular_prompting_probe(train_idx, test_idx, data, model, device, token_bu
     Ytr, Yte = hall[itr], hall[ite]
     ok = np.isfinite(Ytr).all(0) & np.isfinite(Yte).all(0)  # usable targets
     Ytr, Yte = Ytr[:, ok], Yte[:, ok]
-    ridge = Ridge(alpha=1000.0).fit(Xtr, Ytr)
+    # Standardize the (L2-normalized, small-magnitude) biology features before Ridge;
+    # without this a large alpha shrinks predictions to a near-constant -> nan Pearson.
+    scaler = StandardScaler().fit(Xtr)
+    Xtr, Xte = scaler.transform(Xtr), scaler.transform(Xte)
+    ridge = Ridge(alpha=10.0).fit(Xtr, Ytr)
     pred = ridge.predict(Xte)
     g = np.nanmean([_pearson(pred[:, j], Yte[:, j]) for j in range(Yte.shape[1])])
     w = np.nanmean([macro_group_pearson(pred[:, j], Yte[:, j], cancers[ite]) for j in range(Yte.shape[1])])
