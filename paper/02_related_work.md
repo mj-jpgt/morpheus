@@ -1,3 +1,5 @@
+> **Note:** `main.md` is the authoritative assembled paper. This section draft predates the P4 metric correction (effective rank restated as Roy–Vetterli / singular-value: biology ~33–47, identity ~142–191); any `~5–6`/`84` figures here are superseded by main.md.
+
 ## Related Work
 
 Our contribution sits at the intersection of four literatures. We are neither the first to build a WSI$\rightarrow$expression benchmark, nor to warn about cohort confounds, nor to characterize representational collapse, nor to reason about what contrastive alignment retains. Our novelty is the *coupled* package: a matched dual-head **rank-collapse fingerprint** that ties a specific geometric failure of the biology head to the cross-cancer structure of the benchmark, together with a prescriptive fix. We situate that claim against each thread below and state precisely where we differ.

@@ -1,3 +1,5 @@
+> **Note:** `main.md` is the authoritative assembled paper. This section draft predates the P4 metric correction (effective rank restated as Roy–Vetterli / singular-value: biology ~33–47, identity ~142–191); any `~5–6`/`84` figures here are superseded by main.md.
+
 ## Experiments & Results
 
 We organize the empirical section around the paper's three claims. **C1 (mechanism):** the biology head of a matched dual-head model undergoes effective-rank collapse while its sibling identity head stays healthy (T1). **C2 (coupling):** a rank-5–6 head nonetheless scores respectably *only* because the benchmark is dominated by cross-cancer cohort structure and random-gene nulls are already high, leaving a small, method-invariant residual of genuine within-cancer signal (T2, T3, plus retrieval and head-to-head). **C3 (prescriptive):** a per-dimension variance floor cannot repair *rank* collapse, whereas a covariance-decorrelation term is the pre-registered intervention we test in T4.

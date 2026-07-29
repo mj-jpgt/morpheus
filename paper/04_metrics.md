@@ -1,3 +1,5 @@
+> **Note:** `main.md` is the authoritative assembled paper. This section draft predates the P4 metric correction (effective rank restated as Roy–Vetterli / singular-value: biology ~33–47, identity ~142–191); any `~5–6`/`84` figures here are superseded by main.md.
+
 ## Metrics (confound-aware evaluation)
 
 We evaluate WSI$\to$molecular-programme alignment by how well a slide embedding predicts each of $P$ molecular-programme targets (50-D MSigDB Hallmark scores plus held-out and control gene sets). The central methodological point of this section is that the *default* way to report such prediction — a pooled correlation over all held-out slides — is confounded by cohort (cancer-type) structure, and that a **control-adjusted within-cancer specificity** is the only quantity that isolates the signal a molecular head actually contributes. We define each metric formally, state the null model, and justify the choice of primary endpoint.

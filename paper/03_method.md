@@ -1,3 +1,5 @@
+> **Note:** `main.md` is the authoritative assembled paper. This section draft predates the P4 metric correction (effective rank restated as Roy–Vetterli / singular-value: biology ~33–47, identity ~142–191); any `~5–6`/`84` figures here are superseded by main.md.
+
 ## Method (architecture + the fix)
 
 We first describe the MORPHEUS V2 architecture that produces the two embedding
