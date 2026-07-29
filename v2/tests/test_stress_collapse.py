@@ -197,6 +197,27 @@ def test_anchor_gate_not_saturated_and_residual_can_move() -> None:
 
 # --- slot accounting: take() must consume every query slot exactly once ---
 
+def test_gradient_conflict_exposes_biology_sublosses() -> None:
+    """The gradient-conflict diagnostic must (a) measure at the shared trunk and
+    (b) expose the biology sub-losses (NLL / neighbour-KL / supcon) separately, so
+    it can detect the intra-biology conflict implicated in the collapse — not just
+    biology-vs-identity. Previously it lumped them into one 'programme' bucket and
+    measured pre-trunk input encoders."""
+    torch.manual_seed(0)
+    model = TumorStateV2(_config(hidden=32), programme_dim=8)
+    trainer = V2Trainer(model, torch.optim.AdamW(model.parameters()),
+                        V2LossSchedule(objective_profile="programme_only", warmup_epochs=0),
+                        "cpu", gradient_diagnostics_every=1)
+    # step() leaves the graph alive; the diagnostic runs before backward().
+    trainer.step(_big_batch(n=12, k=8), epoch=1)
+    conflict = trainer._gradient_conflict_metrics()
+    keys = list(conflict)
+    assert any("programme_nll" in k for k in keys), keys
+    assert any(("programme_neighbour" in k) or ("programme_supcon" in k) for k in keys), keys
+    for value in conflict.values():
+        assert value == value and -1.001 <= value <= 1.001  # finite, valid cosine
+
+
 def test_query_slots_are_fully_accounted() -> None:
     config = V2ModelConfig()
     assert config.query_slots == (

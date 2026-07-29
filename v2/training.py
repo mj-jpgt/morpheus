@@ -147,10 +147,10 @@ class V2Trainer:
                         weights: dict[str, float], include_structure: bool) -> tuple[torch.Tensor, dict[str, float]]:
         zero = state["z_biology"].new_zeros(())
         if "programme_target" not in batch:
-            return zero, {}
+            return zero, {}, {}
         present = batch.get("programme_present", torch.ones(len(state["z_biology"]), device=self.device, dtype=torch.bool)).bool()
         if not present.any():
-            return zero, {}
+            return zero, {}, {}
         target_mask = batch.get("programme_target_mask")
         if target_mask is not None:
             target_mask = target_mask[present]
@@ -158,14 +158,20 @@ class V2Trainer:
             state["programme_mean"][present], state["programme_log_variance"][present],
             batch["programme_target"][present], target_mask,
         )
-        value, metrics = weights["programme"] * programme, {"programme": float(programme.detach())}
+        nll_term = weights["programme"] * programme
+        value, metrics = nll_term, {"programme": float(programme.detach())}
+        # Keep the weighted biology sub-losses as graph-carrying tensors so the
+        # gradient-conflict diagnostic can see NLL vs neighbour-KL vs supcon
+        # separately — the exact pairs implicated in biology-head collapse.
+        components: dict[str, torch.Tensor] = {"programme_nll": nll_term}
         structure_present = present
         if target_mask is not None:
             structure_present = present.clone()
             structure_present[present] = target_mask.all(dim=1)
         if include_structure and weights["neighbourhood"] and structure_present.any():
             neighbourhood = programme_neighbourhood_loss(state["z_biology"][structure_present], batch["programme_target"][structure_present])
-            value = value + weights["neighbourhood"] * neighbourhood
+            components["programme_neighbour"] = weights["neighbourhood"] * neighbourhood
+            value = value + components["programme_neighbour"]
             metrics["neighbourhood"] = float(neighbourhood.detach())
         if include_structure and weights["supcon"] and "programme_positive_mask" in batch:
             positive_mask = batch["programme_positive_mask"][structure_present][:, structure_present]
@@ -183,9 +189,10 @@ class V2Trainer:
                     metrics["programme_memory_positive_anchors"] = float(n_cross_batch)
             if terms:
                 contrastive = torch.stack(terms).mean()
-                value = value + weights["supcon"] * contrastive
+                components["programme_supcon"] = weights["supcon"] * contrastive
+                value = value + components["programme_supcon"]
                 metrics["programme_supcon"] = float(contrastive.detach())
-        return value, metrics
+        return value, metrics, components
 
     def step(self, batch: dict[str, torch.Tensor], epoch: int) -> tuple[torch.Tensor, dict[str, float], dict[str, torch.Tensor]]:
         out_wsi = self.model(batch, view="wsi")
@@ -219,15 +226,20 @@ class V2Trainer:
         # receives the structural programme losses because it is the primary
         # molecular-prompting view.
         programme_total = output["z_biology"].new_zeros(())
+        programme_component_totals: dict[str, torch.Tensor] = {}
         structure_for_all_biology_views = self.schedule.objective_profile == "programme_only"
         for name, state, structure, scale in (
             ("wsi", out_wsi, True, 1.0),
             ("rna", out_rna, structure_for_all_biology_views, 0.5),
             ("full", output, structure_for_all_biology_views, 1.0),
         ):
-            programme_loss, programme_metrics = self._programme_loss(state, batch, weights, structure)
+            programme_loss, programme_metrics, programme_components = self._programme_loss(state, batch, weights, structure)
             loss = loss + scale * programme_loss
             programme_total = programme_total + scale * programme_loss
+            for component_name, component_value in programme_components.items():
+                programme_component_totals[component_name] = (
+                    programme_component_totals.get(component_name, 0.0) + scale * component_value
+                )
             metrics.update({f"{name}_{key}": value for key, value in programme_metrics.items()})
         # Stable aggregate retained for legacy monitors; the namespaced terms
         # above identify which view contributed to it.
@@ -283,12 +295,16 @@ class V2Trainer:
                 loss = loss + weights["semantic"] * semantic
                 metrics["semantic"] = float(semantic.detach())
         metrics["loss"] = float(loss.detach())
+        # Expose the biology sub-losses (NLL / neighbour-KL / supcon) as separate
+        # components so the gradient-conflict diagnostic can detect intra-biology
+        # conflict, not just biology-vs-identity. Falls back to the combined
+        # programme term if a profile produced no split components.
         self._last_loss_components = {
             "identity": weights["identity"] * identity if "rna" in batch else loss.new_zeros(()),
-            "programme": programme_total,
             "reconstruction": reconstruction_term,
             "separation": separation_term,
             "variance": variance_term,
+            **(programme_component_totals or {"programme": programme_total}),
         }
         return loss, metrics, output
 
@@ -301,11 +317,14 @@ class V2Trainer:
         default.
         """
         components = getattr(self, "_last_loss_components", {})
+        # Measure conflict at the SHARED TRUNK where the 32 query slots are jointly
+        # produced and then split into the identity/biology heads — i.e. the query
+        # bank + Query-Former blocks + final norm. The previous set used pre-trunk,
+        # per-view input encoders (wsi.patch / rna.projection), which sit *before*
+        # the head split and so confound the cosine and miss the trunk entirely.
         shared = [self.model.queries]
-        if hasattr(self.model.wsi.patch[-1], "weight"):
-            shared.append(self.model.wsi.patch[-1].weight)
-        if hasattr(self.model.rna.projection[-1], "weight"):
-            shared.append(self.model.rna.projection[-1].weight)
+        shared += [p for p in self.model.blocks.parameters() if p.requires_grad]
+        shared += [p for p in self.model.norm.parameters() if p.requires_grad]
         gradients: dict[str, list[torch.Tensor]] = {}
         for name, component in components.items():
             if not component.requires_grad or not torch.isfinite(component).all() or component.detach().abs().item() == 0:
