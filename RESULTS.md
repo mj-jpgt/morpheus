@@ -111,13 +111,26 @@ The baseline **collapses**; F-R2 **holds**. This confirms the primary prediction
 covariance term recovers rank on real data where the per-dimension variance floor cannot.
 The variance-floor-only baseline *is* the negative control (predicted flat/collapsed — confirmed).
 
-**Multi-seed + specificity readout (running).** A sweep over seeds {42,43,44} × {baseline, F-R2}
-is measuring (i) the rank-recovery distribution and (ii) whether recovering rank changes the model's
-molecular-prompting specificity (a ridge probe `wsi_biology → Hallmark`, pooled + within-cancer).
-Prediction (ii): specificity stays ~decoupled from rank — i.e., rank flags the confound-induced
-geometry *independently* of the (confounded) task score. *This section updates when the sweep lands.*
+**Multi-seed rank recovery (done).**  ·  Fig. 5. Seeds {42,43,44} × {baseline, F-R2},
+`programme_only`, 15 epochs each on the A100. All runs init at rank 146.0:
 
-<!-- MULTISEED_RESULTS -->
+| seed | baseline (decorr=0) | F-R2 (decorr=0.04) | Δ |
+|---|---:|---:|---:|
+| 42 | 49.0 | 102.8 | +53.7 |
+| 43 | 51.0 | 101.5 | +50.6 |
+| 44 | 49.8 | 105.5 | +55.7 |
+| **mean ± s.d.** | **49.9 ± 0.8** | **103.3 ± 1.7** | **+53.3 ± 2.1** |
+
+The recovery is **large (~2.1×) and remarkably tight across seeds** (baseline s.d. 0.8, F-R2 s.d. 1.7),
+so the T4 effect is not a seed artifact. This closes the review's multi-seed BLOCKER for the
+rank-recovery claim (C3-i).
+
+**Specificity readout (ii) — pending.** The molecular-prompting probe in this sweep was
+mis-conditioned — a large Ridge penalty on L2-normalized biology features shrank predictions to a
+near-constant, returning undefined (nan) Pearson. The probe is **fixed in code** (feature
+standardization; `f2a7922`); re-measuring control-adjusted within-cancer specificity for both arms
+(the falsifiable "rank rises, specificity unchanged" test) is the remaining step and needs one
+follow-up sweep.
 
 ---
 
@@ -144,8 +157,9 @@ The work was checked by an 8-agent adversarial workflow. It found real problems,
 **Diagnostic-paper scope (C1 geometry + C2 confound + C3 fix):** supported, with the real-data T4
 now in hand. Remaining before submission:
 
-- **Multi-seed geometry / T4** — running now (closes a review BLOCKER).
-- **T4 specificity readout (ii)** — running now (completes the T4 triplet).
+- **Multi-seed T4 rank recovery** — ✅ **done** (49.9 ± 0.8 → 103.3 ± 1.7, +53.3 ± 2.1 over 3 seeds; closes the multi-seed BLOCKER for C3-i).
+- **T4 specificity readout (ii)** — pending one follow-up sweep (probe fixed in code); completes the T4 triplet.
+- **Multi-seed *identity/biology geometry* (T1)** — only seed-42 exports exist; the multi-seed run above is `programme_only` (biology-only), so multi-seed *identity*-vs-biology geometry still needs full-profile exports for 43/44.
 - **The causal downstream probe (the stronger novelty).** Freeze `z_biology` (collapsed),
   `z_biology` post-F-R2 (recovered), and `z_identity`, then probe real endpoints (survival C-index,
   molecular subtype, driver-mutation AUROC) under **site-stratified vs. naive splits**. If rank

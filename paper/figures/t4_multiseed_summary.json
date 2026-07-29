@@ -1,0 +1,42 @@
+{
+  "seeds": [
+    {
+      "seed": 42,
+      "off_rank": 49.01641767831605,
+      "on_rank": 102.7522818854627,
+      "off_spec": NaN,
+      "on_spec": NaN,
+      "off_pool": NaN,
+      "on_pool": NaN,
+      "d_rank": 53.73586420714664
+    },
+    {
+      "seed": 43,
+      "off_rank": 50.97073089458873,
+      "on_rank": 101.5434662025471,
+      "off_spec": NaN,
+      "on_spec": NaN,
+      "off_pool": NaN,
+      "on_pool": NaN,
+      "d_rank": 50.57273530795836
+    },
+    {
+      "seed": 44,
+      "off_rank": 49.848915123283426,
+      "on_rank": 105.52336200565345,
+      "off_spec": NaN,
+      "on_spec": NaN,
+      "off_pool": NaN,
+      "on_pool": NaN,
+      "d_rank": 55.67444688237003
+    }
+  ],
+  "off_rank_mean": 49.945354565396066,
+  "off_rank_std": 0.8007540035577991,
+  "on_rank_mean": 103.27303669788775,
+  "on_rank_std": 1.6659895621709424,
+  "d_rank_mean": 53.327682132491674,
+  "d_rank_std": 2.102668891619048,
+  "off_spec_mean": NaN,
+  "on_spec_mean": NaN
+}
