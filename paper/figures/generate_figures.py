@@ -14,15 +14,17 @@ BLUE, RED, GREY, GREEN = "#2b6cb0", "#c53030", "#718096", "#2f855a"
 
 # ---- Fig 1: dual-head effective-rank spectrum (T1) ----
 states = ["wsi\nidentity", "rna\nidentity", "full\nidentity", "wsi\nbiology", "rna\nbiology", "full\nbiology", "full\npatient"]
-ranks = [84.3, 37.5, 55.8, 6.0, 4.4, 5.3, 8.0]
+ranks = [191.1, 141.6, 176.3, 38.5, 32.6, 47.3, 60.5]  # Roy-Vetterli (singular values)
 colors = [BLUE, BLUE, BLUE, RED, RED, RED, GREY]
-fig, ax = plt.subplots(figsize=(7.2, 3.8))
+fig, ax = plt.subplots(figsize=(7.2, 3.9))
 bars = ax.bar(range(len(states)), ranks, color=colors)
+ax.axhline(91.5, ls="--", c=GREEN, lw=1.2)
+ax.text(6.4, 96, "Hallmark target rank ≈ 92", ha="right", va="bottom", fontsize=8.5, color=GREEN)
 for i, v in enumerate(ranks):
-    ax.text(i, v + 2, f"{v:.1f}", ha="center", fontsize=9)
+    ax.text(i, v + 4, f"{v:.0f}", ha="center", fontsize=9)
 ax.set_xticks(range(len(states))); ax.set_xticklabels(states)
-ax.set_ylabel("effective rank (Roy–Vetterli)  /  256 dims"); ax.set_ylim(0, 95)
-ax.set_title("Dual-head rank fingerprint: biology heads collapse (~5), identity stays healthy (~84)")
+ax.set_ylabel("effective rank (Roy–Vetterli)  /  256 dims"); ax.set_ylim(0, 256)
+ax.set_title("Biology heads use ~4–5× lower effective rank (~40) than identity heads (~180)")
 from matplotlib.patches import Patch
 ax.legend(handles=[Patch(color=BLUE, label="identity heads"), Patch(color=RED, label="biology heads"),
                    Patch(color=GREY, label="fused patient")], loc="upper right", frameon=False, fontsize=9)
