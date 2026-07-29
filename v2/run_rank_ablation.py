@@ -64,23 +64,32 @@ def biology_rank_on(indices, data, model, device, token_budget, seed):
     return effective_rank(torch.from_numpy(reps)), len(reps)
 
 
-def molecular_prompting_probe(train_idx, test_idx, data, model, device, token_budget, seed):
+def molecular_prompting_probe(train_idx, test_idx, data, model, device, token_budget, seed, targets):
     """Ridge probe wsi_biology -> Hallmark targets; report pooled and within-cancer
     (macro-cancer) Pearson averaged over targets, on the held-out test split.
 
     This is the T4 secondary readout (ii): does recovering biology-head rank change
     the model's actual molecular-prompting specificity, or is rank decoupled from the
-    (confounded) task score?"""
+    (confounded) task score?
+
+    `targets` is an (n_patients, K) matrix aligned to data.patient_ids, with NaN for
+    patients lacking a target vector. The loader's own hallmark is train-fold-only and
+    is a constant placeholder on the held-out-cancer test split, so callers must pass
+    regenerated targets (frozen_rna_targets) that actually vary on test."""
     from sklearn.linear_model import Ridge
     from sklearn.preprocessing import StandardScaler
     from morpheus.v2.honest_metrics import macro_group_pearson, _pearson
     Xtr, itr = collect_biology(train_idx, data, model, device, token_budget, seed)
     Xte, ite = collect_biology(test_idx, data, model, device, token_budget, seed)
-    hall = np.asarray(data.hallmark, dtype=np.float64)
     cancers = np.asarray(data.cancers)
-    Ytr, Yte = hall[itr], hall[ite]
-    ok = np.isfinite(Ytr).all(0) & np.isfinite(Yte).all(0)  # usable targets
-    Ytr, Yte = Ytr[:, ok], Yte[:, ok]
+    Ytr_all, Yte_all = targets[itr], targets[ite]
+    # Keep only patients (rows) with a full target vector; the target set covers a
+    # subset of patients.
+    mtr, mte = np.isfinite(Ytr_all).all(1), np.isfinite(Yte_all).all(1)
+    Xtr, Ytr = Xtr[mtr], Ytr_all[mtr]
+    Xte, Yte, cte = Xte[mte], Yte_all[mte], cancers[ite][mte]
+    if len(Xtr) < 10 or len(Xte) < 10:
+        return {"prompting_error": f"too few covered patients (train={len(Xtr)}, test={len(Xte)})"}
     # Standardize the (L2-normalized, small-magnitude) biology features before Ridge;
     # without this a large alpha shrinks predictions to a near-constant -> nan Pearson.
     scaler = StandardScaler().fit(Xtr)
@@ -88,9 +97,24 @@ def molecular_prompting_probe(train_idx, test_idx, data, model, device, token_bu
     ridge = Ridge(alpha=10.0).fit(Xtr, Ytr)
     pred = ridge.predict(Xte)
     g = np.nanmean([_pearson(pred[:, j], Yte[:, j]) for j in range(Yte.shape[1])])
-    w = np.nanmean([macro_group_pearson(pred[:, j], Yte[:, j], cancers[ite]) for j in range(Yte.shape[1])])
+    w = np.nanmean([macro_group_pearson(pred[:, j], Yte[:, j], cte) for j in range(Yte.shape[1])])
     return {"prompting_pooled_pearson": float(g), "prompting_within_cancer_pearson": float(w),
-            "n_targets": int(Yte.shape[1])}
+            "n_targets": int(Yte.shape[1]), "n_train_covered": int(len(Xtr)), "n_test_covered": int(len(Xte))}
+
+
+def load_aligned_targets(npz_path, data):
+    """Build an (n_patients, K) target matrix aligned to data.patient_ids from a
+    frozen targets npz (patient_ids + scores), NaN where a patient has no target."""
+    t = np.load(npz_path, allow_pickle=True)
+    pid_to_row = {str(p): i for i, p in enumerate(t["patient_ids"])}
+    scores = np.asarray(t["scores"], dtype=np.float64)
+    K = scores.shape[1]
+    out = np.full((len(data.patient_ids), K), np.nan, dtype=np.float64)
+    for i, pid in enumerate(data.patient_ids):
+        r = pid_to_row.get(str(pid))
+        if r is not None:
+            out[i] = scores[r]
+    return out
 
 
 def main() -> None:
@@ -102,6 +126,7 @@ def main() -> None:
     ap.add_argument("--token-budget", type=int, default=16384)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--limit", type=int, default=0, help="subset patients per split for a fast smoke; 0 = full")
+    ap.add_argument("--targets-npz", default="", help="frozen_rna_targets.npz (patient_ids+scores) for the T4 specificity probe; the loader's own hallmark lacks test coverage")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
@@ -156,7 +181,10 @@ def main() -> None:
     record["final_biology_effective_rank"] = record["history"][-1]["biology_effective_rank"]
     # T4 secondary readout (ii): does rank recovery change molecular-prompting specificity?
     try:
-        probe = molecular_prompting_probe(train, test, data, model, device, args.token_budget, args.seed)
+        if not args.targets_npz:
+            raise ValueError("pass --targets-npz frozen_rna_targets.npz (loader hallmark lacks test coverage)")
+        targets = load_aligned_targets(args.targets_npz, data)
+        probe = molecular_prompting_probe(train, test, data, model, device, args.token_budget, args.seed, targets)
         record["prompting"] = probe
         print(f"[probe] pooled={probe['prompting_pooled_pearson']:.4f}  "
               f"within_cancer={probe['prompting_within_cancer_pearson']:.4f}  "
