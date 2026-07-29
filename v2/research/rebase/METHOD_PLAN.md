@@ -142,11 +142,22 @@ structured molecular modalities.* See §4 for the reframe that keeps this alive.
 | **Identification-buys-intervention** (part of C-I) | **NOVEL ONLY IF REFRAMED** | Zhang/Squires/Uhler (NeurIPS 2023) already state the theory *and* instantiate on Perturb-seq. | Only the **controlled ablation** survives: identified slots vs a **matched non-identified trunk** vs an **additive/linear mean-shift null**. Bar is brutal — Ahlmann-Eltze et al. (Nat. Methods 2025) report deep models losing to a trivial additive baseline on held-out doubles. *Do not lead with this.* |
 | **Frozen-trunk identifiability guarantee** | **NOT CLAIMABLE as stated** | Identifiability requires interventions; observational trunks inherit none. | Restated as C-I: identify in Stage A, **measure** what survives transfer in Stage B. |
 
-**Unresolved (honest gap).** The five "reframe-or-die" near-collisions — Nguyen triage (C-III),
-SurvPath (C-I), Winter 2606.29949 (Stage B), Probing/Fusion 2606.17115 + VCBench (C-II), Decode-gLM /
-amnesic probing (C-II gate) — **were NOT resolved**: no differentiation claim survived verification in
-the gap study. Positioning against these five is a **prerequisite for writing**, not a detail. Resolve
-by reading the five papers directly (not by search), since search has now twice failed to settle them.
+**RESOLVED** by direct paper reading — see `NEAR_COLLISIONS.md`. Summary:
+
+| Threat | Verdict | Consequence |
+|---|---|---|
+| "Nguyen et al." triage | **PHANTOM — does not exist.** Real neighbour: Baan et al. 2605.25831 (a *closer* threat; latent = semantic query ambiguity) | Concede the triage mechanism. Keep: latent = *biological task*, and abstention is **structural** ("no identified slot covers this"), not a confidence threshold. |
+| SurvPath | **DELTA SURVIVES (wide)** | 331 a-priori pathways (281 Reactome + 50 Hallmark); "identifiability" appears nowhere; **no prompting interface**; **no external cohort** (internal CV on 5 TCGA). It is our *control arm*, not a scoop. |
+| Winter et al. 2606.29949 | **DELTA SURVIVES, but badly narrowed** | They already own frozen WSI+RNA + CLIP adapter + pathway prompting + cross-cohort transfer + clinical-trial validation + the graduated-predictability spectrum. **Retire the system-combination claim.** Only the **block-identifiability guarantee** survives. |
+| 2606.17115 "Probing, Fusion, Trustworthiness" (+ "VCBench") | **DELTA SURVIVES (widest)**; "VCBench (single-cell)" is a **phantom** (the real VCBench is a venture-capital LLM benchmark) | They score **Biopsy Site and Tumor Site as legitimate downstream tasks** — the exact *inverse* of our validity certificate, and directly quotable. Absent: Hewitt–Liang selectivity, MDL, NL elicitation, text-prior nulls. Two proprietary cohorts, not a reproducible benchmark. |
+| Elazar amnesic / "Decode-gLM" | **DELTA SURVIVES**; "Decode-gLM" is a **phantom** | Elazar is post-hoc explanation of BERT behaviour and **gates nothing**. Real neighbour: arXiv 2607.19618 (SAE + causal ablation on Nucleotide Transformer) — DNA-only, no INLP/LEACE, no gating of generated output. |
+
+**Two consequences worth acting on:**
+1. **Winter's own failure is our motivation.** Their retrieval collapses to **R@10 = 10.8% (LUAD) / 4.0%
+   (BRCA)** — a published, quantified failure of a *non-identified* adapter on exactly our transfer axis.
+   Reproduce-and-beat this and C-I has a concrete target.
+2. **Winter's "predictability tracks morphological footprint" is the null hypothesis for every slot-quality
+   result we will produce.** We must stratify by morphological footprint or our gains will be attributed to it.
 
 ---
 
@@ -171,7 +182,16 @@ random-programme) and the confound it survives (site/scanner).
   do not make interventional prediction a headline claim; report it as an ablation.
 - **Identifiability may not survive Stage-B transfer.** This is a real possible negative result — and
   it is publishable as such *only if* C-II exists to measure it credibly.
-- **The five unresolved near-collisions** could each shrink a contribution to a footnote.
-- **Verification caveat:** parts of the gap study ran while the safety classifier was unavailable. The
-  He et al. citation was directly verified; the Ahlmann-Eltze null is corroborated by an independent
-  earlier sweep but was not re-verified (web budget exhausted). Re-verify before submission.
+- **CORPUS CONTAMINATION — the most serious risk.** Direct paper-reading found that **three of the five
+  recorded "threats" do not exist**: "Nguyen et al. Answer/Clarify/Abstain", "Decode-gLM", and
+  "VCBench (single-cell)" return zero hits on arXiv, OpenReview, and Semantic Scholar. They were
+  fabricated somewhere in the 499-paper sweep and survived its per-lane quality referees. **Treat every
+  un-verified citation in `lit/*.md` as suspect until individually checked**, and never cite from the
+  ledger without opening the paper. (Notably, the *real* nearest neighbours found by direct reading —
+  Baan 2605.25831, arXiv 2607.19618 — were in two cases *stronger* threats than the phantoms.)
+- **Winter et al. narrows us more than expected.** The system-level combination is theirs; only the
+  identifiability guarantee is ours. If the guarantee proves unattainable (see §1), C-I collapses.
+- **The additive-baseline null (Ahlmann-Eltze)** may beat us on perturbation prediction (already noted).
+- **Verification caveat:** parts of the gap study ran while the safety classifier was unavailable. He et
+  al. (JMLR 2024) was directly verified; the Ahlmann-Eltze null is corroborated by an independent sweep
+  but not re-verified (web-search budget exhausted). Re-verify before submission.
