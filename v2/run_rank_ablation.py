@@ -43,18 +43,49 @@ def effective_rank(x: torch.Tensor) -> float:
 
 
 @torch.no_grad()
-def biology_rank_on(indices: np.ndarray, data, model, device: str, token_budget: int, seed: int) -> tuple[float, int]:
+def collect_biology(indices: np.ndarray, data, model, device: str, token_budget: int, seed: int):
+    """Return (wsi_biology reps [N,256], aligned global patient indices [N])."""
     model.eval()
     loader = UncappedHoptimusBatches(data, indices, token_budget, seed, shuffle=False)
-    chunks = []
+    reps, idx = [], []
     for batch in loader:
+        gid = batch["indices"].cpu().numpy()
         batch = {k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
-        # Measure the WSI biology view — the view the decorrelation term acts on
-        # and the one the paper reports the collapse fingerprint for.
-        chunks.append(model(batch, "wsi")["z_biology"].float().cpu())
+        # WSI biology view — the view the decorrelation term acts on and the one
+        # the paper reports the collapse fingerprint for.
+        reps.append(model(batch, "wsi")["z_biology"].float().cpu().numpy())
+        idx.append(gid)
     model.train()
-    stacked = torch.cat(chunks, dim=0)
-    return effective_rank(stacked), len(stacked)
+    return np.concatenate(reps, 0), np.concatenate(idx, 0)
+
+
+def biology_rank_on(indices, data, model, device, token_budget, seed):
+    reps, _ = collect_biology(indices, data, model, device, token_budget, seed)
+    return effective_rank(torch.from_numpy(reps)), len(reps)
+
+
+def molecular_prompting_probe(train_idx, test_idx, data, model, device, token_budget, seed):
+    """Ridge probe wsi_biology -> Hallmark targets; report pooled and within-cancer
+    (macro-cancer) Pearson averaged over targets, on the held-out test split.
+
+    This is the T4 secondary readout (ii): does recovering biology-head rank change
+    the model's actual molecular-prompting specificity, or is rank decoupled from the
+    (confounded) task score?"""
+    from sklearn.linear_model import Ridge
+    from morpheus.v2.honest_metrics import macro_group_pearson, _pearson
+    Xtr, itr = collect_biology(train_idx, data, model, device, token_budget, seed)
+    Xte, ite = collect_biology(test_idx, data, model, device, token_budget, seed)
+    hall = np.asarray(data.hallmark, dtype=np.float64)
+    cancers = np.asarray(data.cancers)
+    Ytr, Yte = hall[itr], hall[ite]
+    ok = np.isfinite(Ytr).all(0) & np.isfinite(Yte).all(0)  # usable targets
+    Ytr, Yte = Ytr[:, ok], Yte[:, ok]
+    ridge = Ridge(alpha=1000.0).fit(Xtr, Ytr)
+    pred = ridge.predict(Xte)
+    g = np.nanmean([_pearson(pred[:, j], Yte[:, j]) for j in range(Yte.shape[1])])
+    w = np.nanmean([macro_group_pearson(pred[:, j], Yte[:, j], cancers[ite]) for j in range(Yte.shape[1])])
+    return {"prompting_pooled_pearson": float(g), "prompting_within_cancer_pearson": float(w),
+            "n_targets": int(Yte.shape[1])}
 
 
 def main() -> None:
@@ -118,6 +149,16 @@ def main() -> None:
         out.write_text(json.dumps(record, indent=2))
 
     record["final_biology_effective_rank"] = record["history"][-1]["biology_effective_rank"]
+    # T4 secondary readout (ii): does rank recovery change molecular-prompting specificity?
+    try:
+        probe = molecular_prompting_probe(train, test, data, model, device, args.token_budget, args.seed)
+        record["prompting"] = probe
+        print(f"[probe] pooled={probe['prompting_pooled_pearson']:.4f}  "
+              f"within_cancer={probe['prompting_within_cancer_pearson']:.4f}  "
+              f"(n_targets={probe['n_targets']})", flush=True)
+    except Exception as exc:  # keep the rank result even if the probe fails
+        record["prompting_error"] = str(exc)
+        print(f"[probe] FAILED: {exc}", flush=True)
     Path(args.out).write_text(json.dumps(record, indent=2))
     print(f"[done] final biology effective_rank={record['final_biology_effective_rank']:.2f} -> {args.out}", flush=True)
 
