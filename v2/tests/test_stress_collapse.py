@@ -131,6 +131,29 @@ def test_programme_log_variance_not_pinned_at_clamp() -> None:
 
 # --- collapse instrument on the real model (lenient; fixes should raise this) ---
 
+def test_decorrelation_is_active_at_small_real_batch_sizes() -> None:
+    """Guard F1: real uncapped batches hold only B~1-3 patients, far below a usable
+    256-D correlation estimate, so a per-batch decorrelation term silently no-ops
+    (the bug the adversarial review caught). The feature bank must keep it ACTIVE:
+    the decorrelation metric must be non-zero and the pooled sample count must grow
+    well beyond the per-batch B once the bank warms up."""
+    torch.manual_seed(0)
+    model = TumorStateV2(_config(hidden=64), programme_dim=8)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    trainer = V2Trainer(model, optimizer, V2LossSchedule(
+        objective_profile="programme_only", warmup_epochs=0, decorrelation_after_warmup=0.04),
+        "cpu", gradient_diagnostics_every=0)
+    last = {}
+    for step in range(12):
+        batch = _big_batch(n=2, k=8, seed=step)  # the real-data regime: B=2
+        optimizer.zero_grad()
+        loss, last, _ = trainer.step(batch, epoch=1)  # step() -> (loss, metrics, output)
+        loss.backward()
+        optimizer.step()
+    assert last.get("decorrelation", 0.0) > 0.0, "decorrelation silently no-ops at small B"
+    assert last.get("decorrelation_pool", 0) >= 8, f"bank did not accumulate: pool={last.get('decorrelation_pool')}"
+
+
 def test_biology_head_effective_rank_is_not_degenerate() -> None:
     torch.manual_seed(0)
     model = TumorStateV2(_config(hidden=32), programme_dim=8)

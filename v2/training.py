@@ -133,6 +133,7 @@ class V2Trainer:
     amp_dtype: torch.dtype = torch.bfloat16
     programme_memory: ProgrammeMemoryBank | None = None
     gradient_diagnostics_every: int = 25
+    decorrelation_bank_capacity: int = 512
 
     def __post_init__(self) -> None:
         if self.programme_memory is None:
@@ -245,12 +246,26 @@ class V2Trainer:
             metrics["variance_floor"] = float(variance.detach())
         decorrelation_term = output["z_identity"].new_zeros(())
         if weights["decorrelation"]:
-            # Off-diagonal covariance penalty on the primary biology view; the
-            # min-batch guard inside feature_decorrelation skips ragged batches.
-            decorrelation = feature_decorrelation(output["z_biology"])
+            # Decorrelate the WSI biology view (the view the collapse pressure and
+            # the reported rank fingerprint sit on). Real uncapped-patch batches
+            # hold only B~1-3 patients, far below a usable 256-D correlation
+            # estimate, so we pool the current (gradient-carrying) rows with a
+            # detached ring buffer of recent biology features. Gradient flows only
+            # through the current rows; the bank supplies sample count. The bank is
+            # updated in training only, so evaluation never contaminates it.
+            current = out_wsi["z_biology"]
+            bank = getattr(self, "_decorr_bank", None)
+            pool = current if bank is None else torch.cat([current, bank.to(current.device)], dim=0)
+            decorrelation = feature_decorrelation(pool)
             decorrelation_term = weights["decorrelation"] * decorrelation
             loss = loss + decorrelation_term
             metrics["decorrelation"] = float(decorrelation.detach())
+            metrics["decorrelation_pool"] = float(pool.shape[0])
+            if torch.is_grad_enabled():
+                with torch.no_grad():
+                    fresh = current.detach().float()
+                    combined = fresh if bank is None else torch.cat([bank, fresh], dim=0)
+                    self._decorr_bank = combined[-self.decorrelation_bank_capacity:]
         for name, value in (("identity", output["z_identity"]), ("biology", output["z_biology"])):
             metrics[f"{name}_feature_std"] = float(value.detach().float().std(dim=0).mean())
         reconstruction_term = output["z_identity"].new_zeros(())

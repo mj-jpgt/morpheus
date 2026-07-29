@@ -49,7 +49,9 @@ def biology_rank_on(indices: np.ndarray, data, model, device: str, token_budget:
     chunks = []
     for batch in loader:
         batch = {k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
-        chunks.append(model(batch, "full")["z_biology"].float().cpu())
+        # Measure the WSI biology view — the view the decorrelation term acts on
+        # and the one the paper reports the collapse fingerprint for.
+        chunks.append(model(batch, "wsi")["z_biology"].float().cpu())
     model.train()
     stacked = torch.cat(chunks, dim=0)
     return effective_rank(stacked), len(stacked)
