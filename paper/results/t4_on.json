@@ -1,0 +1,219 @@
+{
+  "decorrelation_weight": 0.04,
+  "epochs": 25,
+  "token_budget": 65536,
+  "seed": 42,
+  "programme_dim": 50,
+  "n_train": 3124,
+  "n_test": 2530,
+  "device": "cuda",
+  "biology_dim": 256,
+  "history": [
+    {
+      "epoch": -1,
+      "biology_effective_rank": 146.04919812150655,
+      "n_test": 2530
+    },
+    {
+      "epoch": 0,
+      "biology_effective_rank": 135.52531195454867,
+      "n_test": 2530,
+      "train_programme": 0.3124528080224991,
+      "train_decorrelation": NaN,
+      "seconds": 99.0
+    },
+    {
+      "epoch": 1,
+      "biology_effective_rank": 135.42774710944633,
+      "n_test": 2530,
+      "train_programme": 3.8051894903182983,
+      "train_decorrelation": 9.640004634857178,
+      "seconds": 96.3
+    },
+    {
+      "epoch": 2,
+      "biology_effective_rank": 132.22290073822091,
+      "n_test": 2530,
+      "train_programme": 3.774742007255554,
+      "train_decorrelation": 14.974570035934448,
+      "seconds": 96.8
+    },
+    {
+      "epoch": 3,
+      "biology_effective_rank": 129.97345936238474,
+      "n_test": 2530,
+      "train_programme": 3.7739505767822266,
+      "train_decorrelation": 3.446785569190979,
+      "seconds": 97.7
+    },
+    {
+      "epoch": 4,
+      "biology_effective_rank": 128.74026924335107,
+      "n_test": 2530,
+      "train_programme": 3.768195390701294,
+      "train_decorrelation": 1.2031076550483704,
+      "seconds": 96.6
+    },
+    {
+      "epoch": 5,
+      "biology_effective_rank": 127.51797561839817,
+      "n_test": 2530,
+      "train_programme": 3.762326240539551,
+      "train_decorrelation": 0.44244974851608276,
+      "seconds": 97.0
+    },
+    {
+      "epoch": 6,
+      "biology_effective_rank": 125.50119647579403,
+      "n_test": 2530,
+      "train_programme": 3.7563066482543945,
+      "train_decorrelation": 0.12675045430660248,
+      "seconds": 97.0
+    },
+    {
+      "epoch": 7,
+      "biology_effective_rank": 123.34429809895325,
+      "n_test": 2530,
+      "train_programme": 3.7510085105895996,
+      "train_decorrelation": 0.028799982741475105,
+      "seconds": 97.1
+    },
+    {
+      "epoch": 8,
+      "biology_effective_rank": 120.67867293714268,
+      "n_test": 2530,
+      "train_programme": 3.7440459728240967,
+      "train_decorrelation": 0.03099558874964714,
+      "seconds": 96.1
+    },
+    {
+      "epoch": 9,
+      "biology_effective_rank": 118.0846252968332,
+      "n_test": 2530,
+      "train_programme": 3.7306976318359375,
+      "train_decorrelation": 0.03647739253938198,
+      "seconds": 96.8
+    },
+    {
+      "epoch": 10,
+      "biology_effective_rank": 115.45051142181373,
+      "n_test": 2530,
+      "train_programme": 3.719543933868408,
+      "train_decorrelation": 0.04232308827340603,
+      "seconds": 96.5
+    },
+    {
+      "epoch": 11,
+      "biology_effective_rank": 112.37376653592824,
+      "n_test": 2530,
+      "train_programme": 3.7031707763671875,
+      "train_decorrelation": 0.06315859034657478,
+      "seconds": 96.4
+    },
+    {
+      "epoch": 12,
+      "biology_effective_rank": 109.2869847765231,
+      "n_test": 2530,
+      "train_programme": 3.6799447536468506,
+      "train_decorrelation": 0.12726274505257607,
+      "seconds": 96.7
+    },
+    {
+      "epoch": 13,
+      "biology_effective_rank": 105.05452119893934,
+      "n_test": 2530,
+      "train_programme": 3.641322374343872,
+      "train_decorrelation": 1.212088719010353,
+      "seconds": 97.6
+    },
+    {
+      "epoch": 14,
+      "biology_effective_rank": 98.05911259200563,
+      "n_test": 2530,
+      "train_programme": 3.5836843252182007,
+      "train_decorrelation": 0.7759940028190613,
+      "seconds": 96.7
+    },
+    {
+      "epoch": 15,
+      "biology_effective_rank": 94.51182878508199,
+      "n_test": 2530,
+      "train_programme": 3.5213338136672974,
+      "train_decorrelation": 2.4983915984630585,
+      "seconds": 95.8
+    },
+    {
+      "epoch": 16,
+      "biology_effective_rank": 95.65662380909356,
+      "n_test": 2530,
+      "train_programme": 3.470306396484375,
+      "train_decorrelation": 5.031704902648926,
+      "seconds": 97.5
+    },
+    {
+      "epoch": 17,
+      "biology_effective_rank": 97.11171037074801,
+      "n_test": 2530,
+      "train_programme": 3.460966467857361,
+      "train_decorrelation": 3.34662526845932,
+      "seconds": 96.6
+    },
+    {
+      "epoch": 18,
+      "biology_effective_rank": 98.59632580979691,
+      "n_test": 2530,
+      "train_programme": 3.44987690448761,
+      "train_decorrelation": 2.1503214240074158,
+      "seconds": 96.7
+    },
+    {
+      "epoch": 19,
+      "biology_effective_rank": 100.7059654132522,
+      "n_test": 2530,
+      "train_programme": 3.4147398471832275,
+      "train_decorrelation": 4.268952369689941,
+      "seconds": 96.9
+    },
+    {
+      "epoch": 20,
+      "biology_effective_rank": 101.34592245737606,
+      "n_test": 2530,
+      "train_programme": 3.4233373403549194,
+      "train_decorrelation": 5.033622741699219,
+      "seconds": 97.5
+    },
+    {
+      "epoch": 21,
+      "biology_effective_rank": 100.70179765295707,
+      "n_test": 2530,
+      "train_programme": 3.4333404302597046,
+      "train_decorrelation": 3.1396156549453735,
+      "seconds": 97.6
+    },
+    {
+      "epoch": 22,
+      "biology_effective_rank": 100.39259127448811,
+      "n_test": 2530,
+      "train_programme": 3.4399871826171875,
+      "train_decorrelation": 2.747578263282776,
+      "seconds": 96.2
+    },
+    {
+      "epoch": 23,
+      "biology_effective_rank": 100.78902628029269,
+      "n_test": 2530,
+      "train_programme": 3.4486290216445923,
+      "train_decorrelation": 3.082241654396057,
+      "seconds": 96.5
+    },
+    {
+      "epoch": 24,
+      "biology_effective_rank": 101.09398108976609,
+      "n_test": 2530,
+      "train_programme": 3.4562803506851196,
+      "train_decorrelation": 2.0923054218292236,
+      "seconds": 97.3
+    }
+  ],
+  "final_biology_effective_rank": 101.09398108976609
+}

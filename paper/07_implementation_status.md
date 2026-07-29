@@ -41,7 +41,18 @@ the full-data recovery is the queued Lambda ablation (T4).
 > gate is designed to prevent, and a concrete instance of the paper's thesis that anti-collapse
 > regularizers must be verified against a rank instrument, not assumed to work.
 
-### Queued for the Lambda full run (not in this draft)
+### Completed on Lambda (real-data T4, single seed)
+
+The rank ablation ran on the real held-out-cancer cohort ($n_{\text{test}}=2530$, seed 42,
+`programme_only`, 25 epochs, token budget 65{,}536, A100). Both arms init at biology-head
+effective rank $146.0$. **Baseline (variance floor only, decorr $=0$) collapses to $68.0$;
+F-R2 (decorr $=0.04$) holds at $101.1$ — $+33.1$ ($+49\%$).** This confirms the primary T4
+prediction (i) on real data. Trajectories/JSONs in `results/t4_off.json`, `results/t4_on.json`;
+figure `figures/fig4_ablation_trajectory.png`. Note: during this run the adversarial review
+caught that F-R2 was a silent no-op on real ragged batches (B≈1–3); the feature-bank fix
+(`training.py`) is what makes the decorrelation active here.
+
+### Still queued for the Lambda full run (not in this draft)
 
 - **T4 multi-seed $\lambda$ ablation:** biology-head effective rank and control-adjusted
   within-cancer specificity, with vs. without F-R2, across seeds 42/43/44 on the real
