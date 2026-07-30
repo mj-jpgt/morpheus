@@ -94,6 +94,17 @@ Also reuse (do **not** reimplement): `v2/honest_metrics.py` (`macro_group_pearso
 
 ## 5. Your next tasks (Milestone A — everything is already on disk, **no GPU needed**)
 
+> ### KEY QUESTION to answer inside A1 — the anchoring caveat
+> `z_identity` is **anchored on the frozen MLP-CLIP teacher with a learned residual of ≈0**
+> (`anchor_residual_scale ≈ -0.001`), so identity is *essentially the teacher itself*. That means F2
+> ("identity 0.539 > biology 0.477") may partly restate **"MLP-CLIP beats our biology head"** — which
+> we already knew, and which would deflate F2 from a discovery to a restatement.
+> **The test is free, because `diagnostic_programme_only_seed42.npz` has no anchor at all.**
+> - If `programme_only`'s biology channel is still weak → the effect is about the **objective**. F2 holds.
+> - If it is strong → F2 was an **anchoring artifact**; report that immediately and escalate.
+>
+> Report this comparison explicitly in the A1 output. Do not bury it.
+
 **A1 — the objective ablation (highest value).** Three artifacts share architecture, data and split
 and differ *only* in training objective:
 `diagnostic_identity_only_seed42.npz`, `diagnostic_programme_only_seed42.npz`,
@@ -127,6 +138,76 @@ PYTHONPATH=$WS python -B -m morpheus.v2.calibra.run_calibra \
 Outputs `task_rows.csv` (per-metric rows) and `calibra_summary.json`.
 **Note:** `heldout_top_cca` lands in `task_rows.csv`, *not* in the summary JSON — reading only the JSON
 will make it look like NaN (this already fooled me once).
+
+## 5b. The bigger picture — where F2 fits, and how we actually WIN
+
+**Be clear-eyed: MORPHEUS V2 lost to MLP-CLIP.** Retrieval 0.060 vs 0.066; molecular prompting −0.021
+global / −0.022 within-cancer; and on the honest metric every method ties at +0.07. We never beat the
+baseline on anything. Nothing below is a claim that we secretly won.
+
+**Why the confound still matters** (the objection "everyone uses TCGA, so it's a fair fight"):
+a shared confound partly cancels for *ranking*, but (i) it does not boost all methods equally — it
+rewards whoever best encodes cancer identity; (ii) it does not transfer to a new hospital, so it
+mispredicts deployment; and (iii) **it is demonstrably blind** — we doubled biology effective rank
+(49.9 → 103.3, 3 seeds) and the benchmark moved 0.1366 → 0.1367. A large representational change,
+invisible. That is our own evidence, not borrowed.
+
+**So the instrument is not a consolation prize — it is the measuring device that makes a win
+provable.** We built CALIBRA because the benchmark could not tell us whether we had improved. The
+endgame is to use it to demonstrate an improvement the old metric would have missed.
+
+### The chain
+```
+F2 (does molecular supervision hurt?)   ← A1 answers this
+      │  if YES
+      ▼
+D1  remove/replace the harmful supervision   →   D2 retrain   →   D3 measure with CALIBRA
+      │                                                              │
+      └── the fix is already built and tested ──────────────────────┘
+```
+
+### Milestone D — the win (needs a GPU; out of scope for you until A1 returns)
+If A1 confirms the objective is the problem, the fix is already specified and partly built:
+- **Drop or down-weight the low-rank programme supervision** — the neighbour-KL + supcon pin a 256-D
+  head to a ~50-D Hallmark manifold (this is the diagnosed collapse mechanism).
+- **Keep `losses.feature_decorrelation`** (built, tested; +53 rank / 2.1× over 3 seeds).
+- **Consider RNA-paired InfoNCE for the biology head** — give biology the same rank-preserving
+  contrastive signal that keeps identity healthy, instead of regression onto a low-rank target.
+
+**The win condition, stated in advance (do not move these goalposts):**
+1. beat MLP-CLIP on the **calibrated channel** (held-out CCA excess over permutation null), **and**
+2. beat it on **within-cancer control-adjusted specificity** (the honest +0.07 metric), **and**
+3. hold retrieval within **5%** of the anchor (the pre-existing success criterion).
+
+Winning on the *confounded* pooled metric is explicitly **not** a goal. If we beat MLP-CLIP on the
+calibrated channel while the old benchmark shows nothing, that is the strongest possible result —
+it is simultaneously a method win and a demonstration that the field's metric missed it.
+
+### The full milestone plan (A → B → C → D)
+- **A — the F2 result** (on disk, no GPU): A1 objective ablation (+ the anchoring key question),
+  A2 encoder breadth across the 4 baselines, A3 reconcile multivariate 0.477 vs univariate +0.07.
+  *New:* `v2/calibra/ablation.py`, `v2/calibra/univariate.py`.
+- **B — the audit frame** (makes A defensible): B1 N/I/C/B decomposition (Naive = zero-parameter
+  cancer-mean for bulk / **per-slide mean** for spots; Identity = site oracle; Composition =
+  capacity-matched; Biology = residual, all with bootstrap CIs). B2 multi-confound certificate
+  {TSS within-cancer, dx-year, n_patches} with a random-direction floor, full-state ceiling, BH
+  correction, mRNAsi as stratifier not gate; emit `robustness_index` + certified/failed/indeterminate.
+  *Power limit: TSS evaluable in ~10 of 21 test cancers — report `n_cancers_evaluable`, never certify
+  from <3.* *New:* `v2/calibra/decomposition.py`, `v2/calibra/certificate.py`.
+- **C — spatial replication** (HEST-1k, ~1,200 paired H&E+ST, CC BY): re-run A1+A3 with
+  spatially-localized targets to show the effect is a property of the channel, not an artifact of bulk
+  RNA averaging. Ship the **per-slide-mean** zero-parameter baseline — absent from the HEST leaderboard
+  and from the 46+ models the 2026 *Brief Bioinform* survey catalogues. *New:* `v2/calibra/hest.py`.
+  **User action: download HEST-1k (+ `cellvit_seg` for B1).**
+- **D — the win** (GPU): as above.
+
+**Target paper:** *molecular supervision measurably degrades the molecular channel; the effect is
+encoder-invariant, survives a calibrated confound audit, replicates at spot-level resolution, and
+removing it yields a representation that wins on a metric the standard benchmark cannot see.*
+Honest venue ceiling for A–C alone: Nature Methods / Nature BME. D is what lifts it.
+
+**If A1 inverts the thesis** (supervision *helps*), the paper becomes "why the collapsed head still
+works" — still publishable, but escalate before proceeding; the milestone chain changes.
 
 ## 6. Do NOT do these
 - Do **not** retrain anything for Milestones A–B; they are frozen-artifact analyses.
