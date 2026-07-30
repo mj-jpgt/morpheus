@@ -10,6 +10,71 @@ diagnostic paper). Do not start from `v2` or `main` — they predate everything 
 
 ---
 
+## 0. THE DESTINATION — read this before anything else
+
+**We are not fixing an evaluation bug. We are building toward a Nature-tier paper.** Everything in
+Milestones A–C is *instrumentation and evidence*; the paper is the thing at the end. If you only take
+one thing from this file, take this section.
+
+### What we are ultimately building
+A **pathway-addressable tumour representation** whose individual biological programmes can be
+*queried* — where the addressability is **earned from perturbation data**, its limits are **measured
+rather than asserted**, and it **beats prior representations on a metric the standard benchmark cannot
+see.**
+
+### The architecture we are moving to (this is the real change)
+The current model has a single dense 256-D "biology" vector supervised by regression onto ~50 Hallmark
+scores. That design is what collapsed. The replacement is **two-stage**:
+
+- **Stage A — interventionally-identified slots (cell line).** Replace the dense biology head with
+  **`(batch, n_programme, D)` addressable slots**, identified under *real perturbations* using
+  genome-scale Perturb-seq (Replogle: K562 GWPS 11,258 perturbations, K562 essential 2,285, RPE1 2,679
+  — on disk at `PRISM/data/perturbseq/`). This coverage satisfies the **Squires ~1-intervention-per-node**
+  regime, so **block/programme-group identifiability is defensible**. It does *not* satisfy Varıcı
+  (2/node, no doubles), so **never claim per-dimension identifiability.**
+- **Stage B — transfer to the frozen tumour trunk (patients).** Map the frozen WSI+RNA trunk into the
+  Stage-A slot basis with a lightweight adapter. **Identifiability does NOT transfer** — a frozen
+  *observational* trunk cannot inherit an interventional guarantee. What we claim here is **measured
+  stability and measured transfer**, not a guarantee. The seam is itself an open question nobody has
+  answered: *does identifiability learned in cell lines survive transfer to patient tumours?*
+
+### The losses that change
+- **Remove / down-weight:** the programme neighbour-KL + supervised-contrastive terms that pin a 256-D
+  head to a ~50-D manifold. **This is the diagnosed collapse mechanism.**
+- **Keep:** `losses.feature_decorrelation` — built and tested, +53 effective rank (2.1×, 3 seeds).
+  Must standardise features first; on L2-normalised embeddings a raw covariance penalty silently no-ops.
+- **Add:** conditional-prior / sparse-mechanism-shift identification (iVAE-style, metadata as the
+  auxiliary variable) for Stage A.
+- **Consider:** RNA-paired InfoNCE for the biology head — give it the rank-preserving contrastive
+  signal that keeps the identity head healthy, instead of regression onto a low-rank target.
+
+### The contributions we intend to claim
+1. **C-I (method)** — interventionally-identified programme slots transferred to an observational
+   tumour trunk, **with the transfer's identifiability loss measured rather than assumed**.
+2. **C-II (evaluation)** — **CALIBRA**: a confound-certified addressability instrument that reports
+   *what effect size an analysis would have missed*. Spike-recovery calibration has never been applied
+   to certify a cross-modal morphology↔molecular claim. **This is the most defensible contribution and
+   the one hardest to scoop.**
+3. **C-III** — abstention over identified slots (answer / multi-interpret / refuse).
+4. **C-IV** — a per-modality **encode-vs-retrieve** rule for structured molecular modalities.
+
+### Where F2 fits — this is the point
+**F2 is not the destination. F2 is the warrant for the architecture change.**
+If molecular supervision demonstrably *degrades* the molecular channel, then the case for tearing out
+the dense low-rank-regression head and replacing it with identified, addressable slots stops being a
+design preference and becomes an **empirically forced move**. That is the difference between "we
+refactored our model" and "we showed the standard way of supervising these models is harmful, and here
+is what to do instead." F2 is the bridge from *audit* to *new architecture*.
+
+### Honest ceiling (do not inflate this)
+- **A–C alone → Nature Methods / Nature Biomedical Engineering.** The instrument + the defect finding.
+- **+ D (the win) and the biology leg → Nature Cancer / Nature Medicine.**
+- ***Nature* main is NOT reachable** and is not the target. That slot goes to scale-currency papers
+  (Prov-GigaPath 1.3B tiles, CHIEF 60,530 WSIs); we cannot buy that on one A100 with open data.
+  Aiming there is how this becomes a *Nature Communications* paper instead of a *Nature Methods* one.
+
+---
+
 ## 1. What changed (the pivot, in one paragraph)
 
 We stopped trying to make MORPHEUS V2 beat MLP-CLIP. Investigation showed **the benchmark cannot see
