@@ -25,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .calibration import spike_recovery_curve
+from .calibration import permutation_null, spike_recovery_curve
 from .residualise import confound_design
 from .spectral import cca_spectrum, effective_rank
 
@@ -60,6 +60,7 @@ def main() -> None:
     parser.add_argument("--n-draws", type=int, default=10)
     parser.add_argument("--n-components", type=int, default=32)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--n-permutations", type=int, default=50)
     parser.add_argument("--target-group", default="", help="restrict to one target_group")
     args = parser.parse_args()
 
@@ -126,6 +127,12 @@ def main() -> None:
             result = spike_recovery_curve(x, y, design, levels=levels, n_draws=args.n_draws,
                                           n_components=args.n_components, seed=args.seed)
             summary = result.summary()
+            # The chance level. Without this the adjusted top-CCA is uninterpretable:
+            # it is a multivariate maximum and is inflated by capacity alone.
+            null = permutation_null(x, y, design, strata=frame["cancer"].to_numpy(),
+                                    n_permutations=args.n_permutations,
+                                    n_components=args.n_components, seed=args.seed)
+            summary.update(null)
             summaries[f"{method}::{state}"] = summary
 
             emit = {
@@ -136,6 +143,10 @@ def main() -> None:
                 "attenuation_slope": summary["attenuation_slope"],
                 "null_reference_p90": summary["null_reference_p90"],
                 "observed_above_floor": float(summary["observed_above_floor"]),
+                "permutation_null_median": null["null_median"],
+                "permutation_null_p95": null["null_p95"],
+                "excess_over_null_median": null["excess_over_null_median"],
+                "permutation_p": null["permutation_p"],
             }
             for metric, value in emit.items():
                 rows.append(_row(method=method, representation_state=state, task="calibra",
@@ -155,6 +166,7 @@ def main() -> None:
     (output / "calibra_protocol.json").write_text(json.dumps({
         "levels": list(levels), "n_draws": args.n_draws, "n_components": args.n_components,
         "seed": args.seed, "partition": args.partition, "confounds": ["cancer", "tss"],
+        "n_permutations": args.n_permutations, "permutation_strata": "cancer",
         "n_targets": int(scores.shape[1]), "target_group": args.target_group or "all_non_control",
         "recovery_fraction": 0.8,
     }, indent=2))

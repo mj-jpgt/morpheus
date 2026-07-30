@@ -42,7 +42,48 @@ import numpy as np
 from .residualise import cross_fitted_residuals
 from .spectral import top_canonical_correlation
 
-__all__ = ["SpikeRecoveryResult", "spike_targets", "spike_recovery_curve"]
+__all__ = ["SpikeRecoveryResult", "spike_targets", "spike_recovery_curve", "permutation_null"]
+
+
+def permutation_null(x: np.ndarray, y: np.ndarray, design: np.ndarray, *, strata=None,
+                     n_permutations: int = 100, n_components: int = 32, seed: int = 42) -> dict:
+    """Top-CCA under destroyed cross-modal pairing — the chance level.
+
+    Essential companion to the recovery curve. A top canonical correlation is a
+    multivariate *maximum* over ``n_components`` directions per side, so at finite
+    n it is substantially inflated by capacity alone: an observed 0.45 is
+    meaningless until you know that chance gives, say, 0.42. Rows of ``y`` are
+    permuted **within strata** (normally cancer type) so that cancer-level
+    structure is preserved and only the patient-level pairing is destroyed —
+    permuting globally would conflate the pairing with the cohort effect the
+    residualisation is already meant to remove.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    rng = np.random.default_rng(seed)
+    x_residual = cross_fitted_residuals(x, design, seed=seed)
+    strata = np.zeros(len(x), dtype=int) if strata is None else np.asarray(strata)
+
+    observed = top_canonical_correlation(x_residual, cross_fitted_residuals(y, design, seed=seed),
+                                         n_components=n_components)
+    null = np.empty(n_permutations)
+    for i in range(n_permutations):
+        order = np.arange(len(y))
+        for level in np.unique(strata):
+            idx = np.flatnonzero(strata == level)
+            order[idx] = rng.permutation(idx)
+        permuted = cross_fitted_residuals(y[order], design, seed=seed)
+        null[i] = top_canonical_correlation(x_residual, permuted, n_components=n_components)
+    exceed = int(np.sum(null >= observed))
+    return {
+        "observed_top_cca": float(observed),
+        "null_median": float(np.median(null)),
+        "null_p95": float(np.percentile(null, 95)),
+        "null_max": float(np.max(null)),
+        "excess_over_null_median": float(observed - np.median(null)),
+        "permutation_p": float((exceed + 1) / (n_permutations + 1)),
+        "n_permutations": int(n_permutations),
+    }
 
 
 def _standardise(vector: np.ndarray) -> np.ndarray:
