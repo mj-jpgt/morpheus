@@ -90,11 +90,16 @@ class SpikeRecoveryResult:
     recovery_fraction: float = 0.8
     meta: dict = field(default_factory=dict)
 
+    delta: np.ndarray | None = None   # per-draw increment over that draw's level-0 baseline
+
     def summary(self) -> dict:
         median = np.nanmedian(self.recovered, axis=1)
+        delta = self.delta if self.delta is not None else self.recovered - self.recovered[0][None, :]
         return {
             "levels": self.levels.tolist(),
             "recovered_median": median.tolist(),
+            "delta_median": np.nanmedian(delta, axis=1).tolist(),
+            "delta_p10": np.nanpercentile(delta, 10, axis=1).tolist(),
             "recovered_p10": np.nanpercentile(self.recovered, 10, axis=1).tolist(),
             "recovered_p90": np.nanpercentile(self.recovered, 90, axis=1).tolist(),
             "detection_floor": self.detection_floor,
@@ -131,35 +136,46 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
 
     x_residual = cross_fitted_residuals(x, design, seed=seed)
     recovered = np.full((len(levels), n_draws), np.nan)
-    for i, level in enumerate(levels):
-        for draw in range(n_draws):
-            direction = None
-            if molecular_directions is not None and len(molecular_directions):
-                direction = molecular_directions[rng.integers(len(molecular_directions))]
-            spiked = spike_targets(x, y, float(level), rng=rng, molecular_direction=direction)
+    # PAIRED design: the same (u, v) is reused across every level within a draw, so
+    # the level-0 value is that draw's own baseline. An unpaired design cannot detect
+    # a small spike, because the absolute top-CCA is dominated by pre-existing
+    # structure (and by CCA's own capacity) and swamps the injected effect.
+    for draw in range(n_draws):
+        direction = None
+        if molecular_directions is not None and len(molecular_directions):
+            direction = molecular_directions[rng.integers(len(molecular_directions))]
+        draw_seed = int(rng.integers(1 << 31))
+        for i, level in enumerate(levels):
+            spiked = spike_targets(x, y, float(level), rng=np.random.default_rng(draw_seed),
+                                   molecular_direction=direction)
             spiked_residual = cross_fitted_residuals(spiked, design, seed=seed)
             recovered[i, draw] = top_canonical_correlation(x_residual, spiked_residual,
                                                            n_components=n_components)
 
-    null_reference = float(np.nanpercentile(recovered[0], 90)) if np.isfinite(recovered[0]).any() else np.nan
+    # Work in per-draw INCREMENTS over that draw's own level-0 baseline.
+    delta = recovered - recovered[0][None, :]
+    null_reference = float(np.nanpercentile(delta[0], 90)) if np.isfinite(delta[0]).any() else 0.0
     detection_floor = float("nan")
     for i, level in enumerate(levels):
         if level <= 0:
             continue
-        hits = np.nanmean(recovered[i] > null_reference)
+        hits = np.nanmean(delta[i] > max(null_reference, 1e-9))
         if np.isfinite(hits) and hits >= recovery_fraction:
             detection_floor = float(level)
             break
 
-    finite = np.isfinite(levels) & np.isfinite(np.nanmedian(recovered, axis=1))
+    median_delta = np.nanmedian(delta, axis=1)
+    finite = np.isfinite(levels) & np.isfinite(median_delta)
     slope = float("nan")
     if finite.sum() >= 2:
-        slope = float(np.polyfit(levels[finite], np.nanmedian(recovered, axis=1)[finite], 1)[0])
+        slope = float(np.polyfit(levels[finite], median_delta[finite], 1)[0])
 
     observed = top_canonical_correlation(x_residual, cross_fitted_residuals(y, design, seed=seed),
                                          n_components=n_components)
     return SpikeRecoveryResult(levels=levels, recovered=recovered, detection_floor=detection_floor,
                                attenuation_slope=slope, observed=float(observed),
                                n_components=n_components, recovery_fraction=recovery_fraction,
+                               delta=delta,
                                meta={"null_reference_p90": null_reference, "n_draws": n_draws,
-                                     "n_patients": int(len(x))})
+                                     "n_patients": int(len(x)),
+                                     "baseline_top_cca": float(np.nanmedian(recovered[0]))})
