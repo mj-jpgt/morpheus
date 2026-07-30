@@ -26,8 +26,8 @@ import numpy as np
 import pandas as pd
 
 from .calibration import permutation_null, spike_recovery_curve
-from .residualise import confound_design
-from .spectral import cca_spectrum, effective_rank
+from .residualise import confound_design, cross_fitted_residuals
+from .spectral import cca_spectrum, effective_rank, heldout_top_cca
 
 
 def _row(**kwargs) -> dict:
@@ -61,6 +61,8 @@ def main() -> None:
     parser.add_argument("--n-components", type=int, default=32)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-permutations", type=int, default=50)
+    parser.add_argument("--min-site-count", type=int, default=10,
+                        help="pool TSS sites with fewer patients into OTHER")
     parser.add_argument("--target-group", default="", help="restrict to one target_group")
     args = parser.parse_args()
 
@@ -104,15 +106,22 @@ def main() -> None:
             continue
 
         y = scores[aligned[mask]]
-        frame = pd.DataFrame({
-            "cancer": cancers[mask],
-            "tss": [pid.split("-")[1] if len(pid.split("-")) > 1 else "NA" for pid in patient_ids[mask]],
-        })
+        tss_raw = np.asarray([pid.split("-")[1] if len(pid.split("-")) > 1 else "NA"
+                              for pid in patient_ids[mask]])
+        # Pool rare sites. ~600 TSS codes with 145 singletons means a rare-site dummy
+        # is effectively a per-patient indicator, and residualising it would delete
+        # that patient's signal entirely rather than adjust for a site effect.
+        unique, counts = np.unique(tss_raw, return_counts=True)
+        frequent = {u for u, c in zip(unique, counts) if c >= args.min_site_count}
+        tss = np.asarray([s if s in frequent else "OTHER" for s in tss_raw])
+        frame = pd.DataFrame({"cancer": cancers[mask], "tss": tss})
         design = confound_design(frame, ["cancer", "tss"])
         rows.append(_row(method=method, task="calibra", metric="n_patients", value=float(mask.sum()),
                          note=f"partition={args.partition}"))
         rows.append(_row(method=method, task="calibra", metric="n_confound_columns",
-                         value=float(design.shape[1]), note="cancer+tss"))
+                         value=float(design.shape[1]), note="cancer+tss_pooled"))
+        rows.append(_row(method=method, task="calibra", metric="n_distinct_sites_kept",
+                         value=float(len(frequent)), note=f"min_site_count={args.min_site_count}"))
 
         for state in sorted(declared):
             if state not in raw.files:
@@ -147,6 +156,10 @@ def main() -> None:
                 "permutation_null_p95": null["null_p95"],
                 "excess_over_null_median": null["excess_over_null_median"],
                 "permutation_p": null["permutation_p"],
+                "heldout_top_cca": heldout_top_cca(
+                    cross_fitted_residuals(x, design, seed=args.seed),
+                    cross_fitted_residuals(y, design, seed=args.seed),
+                    n_components=args.n_components, seed=args.seed),
             }
             for metric, value in emit.items():
                 rows.append(_row(method=method, representation_state=state, task="calibra",

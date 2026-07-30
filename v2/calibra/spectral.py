@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["effective_rank", "cca_spectrum", "top_canonical_correlation"]
+__all__ = ["effective_rank", "cca_spectrum", "top_canonical_correlation", "heldout_top_cca"]
 
 
 def effective_rank(x) -> float:
@@ -60,3 +60,48 @@ def cca_spectrum(x: np.ndarray, y: np.ndarray, *, n_components: int = 32) -> np.
 def top_canonical_correlation(x: np.ndarray, y: np.ndarray, *, n_components: int = 32) -> float:
     spectrum = cca_spectrum(x, y, n_components=n_components)
     return float(spectrum[0]) if spectrum.size else float("nan")
+
+
+def _whiten_map(a: np.ndarray, n_components: int):
+    """Return (centre, W) so that ``(a - centre) @ W`` has orthonormal columns."""
+    centre = a.mean(axis=0, keepdims=True)
+    centred = a - centre
+    _, s, vt = np.linalg.svd(centred, full_matrices=False)
+    keep = s > (s.max() * 1e-10) if s.size and s.max() > 0 else np.zeros_like(s, dtype=bool)
+    k = int(min(n_components, int(keep.sum())))
+    if k == 0:
+        return centre, np.zeros((a.shape[1], 0))
+    return centre, (vt[:k].T / s[:k])
+
+
+def heldout_top_cca(x: np.ndarray, y: np.ndarray, *, n_components: int = 32,
+                    seed: int = 42, train_fraction: float = 0.5) -> float:
+    """Top canonical correlation with directions FIT ON TRAIN, SCORED ON HELD-OUT rows.
+
+    In-sample CCA is a multivariate maximum and is badly upward-biased at finite n
+    — quoting it is like reporting a score on questions you already saw. Here the
+    canonical directions are estimated on one split and the correlation is measured
+    on the other, giving an unbiased (and much smaller) absolute number.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    n = len(x)
+    rng = np.random.default_rng(seed)
+    order = rng.permutation(n)
+    cut = int(n * train_fraction)
+    train, test = order[:cut], order[cut:]
+    if len(train) < 10 or len(test) < 10:
+        return float("nan")
+
+    cx, wx = _whiten_map(x[train], n_components)
+    cy, wy = _whiten_map(y[train], n_components)
+    if wx.shape[1] == 0 or wy.shape[1] == 0:
+        return float("nan")
+    ux, uy = (x[train] - cx) @ wx, (y[train] - cy) @ wy
+    a, _, bt = np.linalg.svd(ux.T @ uy, full_matrices=False)
+
+    px = ((x[test] - cx) @ wx) @ a[:, 0]
+    py = ((y[test] - cy) @ wy) @ bt[0]
+    if px.std() < 1e-12 or py.std() < 1e-12:
+        return float("nan")
+    return float(abs(np.corrcoef(px, py)[0, 1]))

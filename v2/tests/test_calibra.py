@@ -135,3 +135,27 @@ def test_summary_reports_observed_against_floor():
                 "recovered_median", "n_patients"):
         assert key in summary
     assert isinstance(summary["observed_above_floor"], bool)
+
+
+# --- held-out CCA: the fix for in-sample capacity inflation -----------------
+
+def test_heldout_cca_is_lower_than_insample_on_noise():
+    """In-sample CCA is a multivariate maximum and is upward-biased at finite n.
+    On pure noise the held-out estimate must not inherit that bias."""
+    from morpheus.v2.calibra.spectral import heldout_top_cca
+    rng = np.random.default_rng(0)
+    x = rng.normal(size=(300, 40))
+    y = rng.normal(size=(300, 40))
+    insample = top_canonical_correlation(x, y, n_components=16)
+    held = heldout_top_cca(x, y, n_components=16, seed=0)
+    assert insample > 0.3, insample                      # capacity inflation is real
+    assert held < insample - 0.15, (insample, held)
+
+
+def test_heldout_cca_recovers_a_planted_signal():
+    from morpheus.v2.calibra.spectral import heldout_top_cca
+    rng = np.random.default_rng(1)
+    z = rng.normal(size=600)
+    x = rng.normal(size=(600, 20)); x[:, 0] += 4 * z
+    y = rng.normal(size=(600, 20)); y[:, 0] += 4 * z
+    assert heldout_top_cca(x, y, n_components=8, seed=1) > 0.6
