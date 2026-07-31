@@ -205,7 +205,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
         targets = None
         target_meta = {"guide_target_status": "unavailable_noncontrol_row_filter_changed_index"}
     x = raw[noncontrol]
-    return MatrixBundle(x=x, genes=genes[finite_cols].tolist(), row_ids=data.obs_names[noncontrol].astype(str).tolist(), targets=targets,
+    return MatrixBundle(x=x, genes=genes.tolist(), row_ids=data.obs_names[noncontrol].astype(str).tolist(), targets=targets,
         meta={"source": str(path), "shape_raw": list(data.shape), "n_control_rows_raw": int(controls.sum()),
               "n_control_rows_used": int(usable_controls.sum()), "n_rows_dropped_nonfinite": int((~finite_rows).sum()),
               "n_rows_dropped_all_zero": int((all_zero_rows & finite_rows).sum()), "n_genes_dropped_nonfinite": int((~finite_cols).sum()),
@@ -407,6 +407,18 @@ def _self_test() -> None:
         try: _load_perturbation(path)
         except ValueError as error: assert "cannot assert delta response" in str(error)
         else: raise AssertionError("control_expr/X inconsistency did not fail E0.a")
+        # Technical duplicate target columns are collapsed to their mean once,
+        # and the target/control semantic check is still applied to that one
+        # canonical gene rather than indexing the pre-aggregation layout.
+        folds = np.asarray([.2, .5, .8]); expected = np.log2(2.0 * folds + 1.0) - np.log2(3.0)
+        valid_obs = pd.DataFrame({"core_control": [False, False, False, True], "control_expr": [2., 2., 2., np.nan],
+                                  "fold_expr": [*folds, np.nan], "pct_expr": [*(folds - 1.0), np.nan]},
+                                 index=pd.Index(["0_A_P1_ENSG000001", "1_A_P2_ENSG000001", "2_A_P3_ENSG000001", "3_non-targeting_non-targeting_non-targeting"], name="gene_transcript"))
+        valid = ad.AnnData(X=np.vstack([np.column_stack([expected, expected, np.ones(3)]), [0., 0., .01]]).astype(np.float32), obs=valid_obs, var=pd.DataFrame({"gene_name": ["A", "A", "B"]}))
+        valid_path = Path(temporary) / "duplicate_valid.h5ad"; valid.write_h5ad(valid_path)
+        duplicate_bundle = _load_perturbation(valid_path)
+        assert duplicate_bundle.genes == ["A", "B"] and duplicate_bundle.meta["n_duplicate_symbols_aggregated"] == 1
+        assert np.allclose(duplicate_bundle.x[:, 0], expected) and duplicate_bundle.meta["delta_status"] == "validated_control_centred"
     # A gate manifest with only one row must fail coverage: this protects
     # against accidentally declaring a run healthy because a new gate was
     # simply never wired into the ledger.
