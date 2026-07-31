@@ -139,6 +139,37 @@ class V2Trainer:
         if self.programme_memory is None:
             self.programme_memory = ProgrammeMemoryBank()
 
+    def liveness_parameter_groups(self) -> dict[str, list[nn.Parameter]]:
+        """Named trainable groups used by the real-batch G2 telemetry.
+
+        These are architectural groups, not merely Adam's single default
+        parameter group: the latter would miss a detached biology head while
+        still reporting a non-zero global norm.
+        """
+        groups = {
+            "wsi": list(self.model.wsi.parameters()),
+            "rna": list(self.model.rna.parameters()),
+            "shared": [self.model.queries, *self.model.blocks.parameters(), *self.model.norm.parameters()],
+            "biology_programme": [*self.model.biology.parameters(), *self.model.programme_mean.parameters(),
+                                    *self.model.programme_log_variance.parameters()],
+            "identity": list(self.model.identity.parameters()),
+            "patient": list(self.model.patient.parameters()),
+        }
+        if self.schedule.objective_profile == "programme_only":
+            return {key: groups[key] for key in ("wsi", "rna", "shared", "biology_programme")}
+        if self.schedule.objective_profile == "identity_only":
+            return {key: groups[key] for key in ("wsi", "rna", "shared", "identity")}
+        return groups
+
+    def _gradient_group_norms(self) -> dict[str, float]:
+        values: dict[str, float] = {}
+        for name, parameters in self.liveness_parameter_groups().items():
+            squared = sum((parameter.grad.detach().float().square().sum()
+                           for parameter in parameters if parameter.grad is not None),
+                          torch.zeros((), device=self.device))
+            values[name] = float(torch.sqrt(squared).detach().cpu())
+        return values
+
     @staticmethod
     def _cosine_consistency(prediction: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         return (1.0 - nn.functional.cosine_similarity(prediction, target.detach(), dim=-1)).mean()
@@ -382,6 +413,8 @@ class V2Trainer:
     def train_epoch(self, loader: Any, epoch: int) -> dict[str, float]:
         self.model.train()
         rows = []
+        first_gradients: dict[str, float] | None = None
+        last_gradients: dict[str, float] | None = None
         for step, batch in enumerate(loader):
             batch = {key: value.to(self.device, non_blocking=True) if isinstance(value, torch.Tensor) else value for key, value in batch.items()}
             self.optimizer.zero_grad(set_to_none=True)
@@ -390,12 +423,21 @@ class V2Trainer:
             if self.gradient_diagnostics_every > 0 and step % self.gradient_diagnostics_every == 0:
                 metrics.update(self._gradient_conflict_metrics())
             loss.backward()
+            group_norms = self._gradient_group_norms()
+            if first_gradients is None:
+                first_gradients = group_norms
+            last_gradients = group_norms
             nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             self.optimizer.step()
             if self.programme_memory is not None and "indices" in batch:
                 self.programme_memory.update(output["z_biology"], batch["indices"])
             rows.append(metrics)
-        return {key: float(np.mean([row[key] for row in rows if key in row])) for key in {name for row in rows for name in row}}
+        result = {key: float(np.mean([row[key] for row in rows if key in row])) for key in {name for row in rows for name in row}}
+        for name, value in (first_gradients or {}).items():
+            result[f"gradient_norm_{name}_first"] = value
+        for name, value in (last_gradients or {}).items():
+            result[f"gradient_norm_{name}_last"] = value
+        return result
 
     @torch.no_grad()
     def evaluate_epoch(self, loader: Any, epoch: int) -> dict[str, float]:

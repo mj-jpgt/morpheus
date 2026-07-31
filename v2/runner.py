@@ -7,6 +7,7 @@ does not call the legacy capped patch-batch helper.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import warnings
 from dataclasses import asdict
@@ -299,6 +300,47 @@ def _selected_checkpoint(output: Path, slide_pretraining: dict[str, object], fin
     raise RuntimeError("no validation checkpoint was selected; refuse to export an unselected last checkpoint")
 
 
+def _parameter_snapshot(trainer: V2Trainer) -> dict[str, list[torch.Tensor]]:
+    return {name: [parameter.detach().cpu().float().clone() for parameter in parameters]
+            for name, parameters in trainer.liveness_parameter_groups().items()}
+
+
+def _parameter_deltas(trainer: V2Trainer, initial: dict[str, list[torch.Tensor]]) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for name, parameters in trainer.liveness_parameter_groups().items():
+        before = initial[name]
+        numerator = sum(((parameter.detach().cpu().float() - reference).square().sum()
+                         for parameter, reference in zip(parameters, before)), torch.zeros(()))
+        denominator = sum((reference.square().sum() for reference in before), torch.zeros(())).clamp_min(1e-12)
+        result[name] = float(torch.sqrt(numerator / denominator))
+    return result
+
+
+def _overfit_programme_head(model: TumorStateV2, loader: UncappedHoptimusBatches, device: str,
+                            steps: int = 300) -> dict[str, float]:
+    """G2.6: verify the actual programme head can memorize one real WSI batch."""
+    batch = next(iter(loader))
+    batch = {key: value.to(device) if isinstance(value, torch.Tensor) else value for key, value in batch.items()}
+    model.eval()
+    with torch.no_grad():
+        features = model(batch, view="wsi")["z_biology"].detach()
+        target = batch["programme_target"].detach()
+        mask = batch.get("programme_target_mask", torch.ones_like(target, dtype=torch.bool)).detach()
+    mean, log_variance = copy.deepcopy(model.programme_mean).to(device), copy.deepcopy(model.programme_log_variance).to(device)
+    optimiser = torch.optim.AdamW([*mean.parameters(), *log_variance.parameters()], lr=1e-2, weight_decay=0.0)
+    def objective() -> torch.Tensor:
+        variance = log_variance(features).clamp(-8, 8)
+        error = (mean(features) - target).square()
+        value = 0.5 * (error * torch.exp(-variance) + variance)
+        return value.masked_select(mask).mean()
+    initial = float(objective().detach().cpu())
+    for _ in range(steps):
+        optimiser.zero_grad(set_to_none=True); loss = objective(); loss.backward(); optimiser.step()
+    final = float(objective().detach().cpu())
+    return {"batch_patients": int(len(features)), "initial_loss": initial, "final_loss": final,
+            "relative_reduction": float((initial - final) / max(abs(initial), 1e-12))}
+
+
 def _trained_states_for_profile(objective_profile: str, semantic_dim: int = 0) -> list[str]:
     """Declare only representations with an explicit gradient path.
 
@@ -321,6 +363,13 @@ def _trained_states_for_profile(objective_profile: str, semantic_dim: int = 0) -
 def run(args: argparse.Namespace) -> Path:
     if args.gradient_diagnostics_every < 0:
         raise ValueError("--gradient-diagnostics-every must be non-negative")
+    if args.loss_warmup_epochs < 0:
+        raise ValueError("--loss-warmup-epochs must be non-negative")
+    if any(value < 0.0 for value in (args.programme_warmup_weight, args.programme_weight,
+                                     args.programme_neighbourhood_weight, args.programme_supcon_weight,
+                                     args.separation_weight, args.variance_weight,
+                                     args.decorrelation_weight)):
+        raise ValueError("loss weights must be non-negative")
     if args.pretrain_epochs < 0:
         raise ValueError("--pretrain-epochs must be non-negative")
     if args.pretrain_epochs and args.pretrain_checkpoint:
@@ -376,11 +425,21 @@ def run(args: argparse.Namespace) -> Path:
         )
     trainer = V2Trainer(
         model, optimizer,
-        V2LossSchedule(objective_profile=args.objective_profile,
-                       decorrelation_after_warmup=args.decorrelation_weight),
+        V2LossSchedule(
+            objective_profile=args.objective_profile,
+            warmup_epochs=args.loss_warmup_epochs,
+            programme_warmup=args.programme_warmup_weight,
+            programme_after_warmup=args.programme_weight,
+            neighbourhood_after_warmup=args.programme_neighbourhood_weight,
+            supcon_after_warmup=args.programme_supcon_weight,
+            separation_after_warmup=args.separation_weight,
+            variance_after_warmup=args.variance_weight,
+            decorrelation_after_warmup=args.decorrelation_weight,
+        ),
         device,
         gradient_diagnostics_every=args.gradient_diagnostics_every,
     )
+    initial_group_parameters = _parameter_snapshot(trainer)
     trained_states = _trained_states_for_profile(args.objective_profile, semantic_dim)
     run_configuration = {
         "seed": args.seed, "epochs": args.epochs, "token_budget": args.token_budget,
@@ -391,6 +450,13 @@ def run(args: argparse.Namespace) -> Path:
         # exports can look provenance-identical even when their optimisation
         # differed, making the rank comparison unauditable.
         "decorrelation_weight": args.decorrelation_weight,
+        "loss_warmup_epochs": args.loss_warmup_epochs,
+        "programme_warmup_weight": args.programme_warmup_weight,
+        "programme_weight": args.programme_weight,
+        "programme_neighbourhood_weight": args.programme_neighbourhood_weight,
+        "programme_supcon_weight": args.programme_supcon_weight,
+        "separation_weight": args.separation_weight,
+        "variance_weight": args.variance_weight,
         "gradient_diagnostics_every": args.gradient_diagnostics_every,
         "objective_profile": args.objective_profile,
         "pretrain_epochs": args.pretrain_epochs, "pretrain_checkpoint": args.pretrain_checkpoint,
@@ -427,6 +493,7 @@ def run(args: argparse.Namespace) -> Path:
         anchor_validation_r10 = float(paired_retrieval_metrics(data._mlp_clip_anchor_wsi[validation], data._mlp_clip_anchor_rna[validation], (10,), labels, labels).get("recall_at_10", float("nan")))
     best_retrieval = best_programme = best_pareto = -float("inf")
     best_retrieval_epoch = best_programme_epoch = best_pareto_epoch = None
+    epoch_rows: list[dict[str, object]] = []
     for epoch in range(start_epoch, args.epochs):
         loader = UncappedHoptimusBatches(data, train, args.token_budget, args.seed + epoch, include_clinical=args.include_clinical)
         metrics = trainer.train_epoch(loader, epoch)
@@ -439,6 +506,7 @@ def run(args: argparse.Namespace) -> Path:
         scheduler.step()
         row = {"epoch": epoch, "learning_rate": scheduler.get_last_lr()[0], "anchor_validation_r10": anchor_validation_r10, **{f"train_{k}": v for k, v in metrics.items()}, **{f"validation_{k}": v for k, v in validation_metrics.items()}, **{f"selection_{k}": v for k, v in selection_metrics.items()}}
         (output / "train_metrics.jsonl").open("a", encoding="utf-8").write(json.dumps(row) + "\n")
+        epoch_rows.append(row)
         trainer.save_checkpoint(output / "last.pt", epoch, loader.state_dict(), manifest, scheduler)
         r10, programme = float(selection_metrics.get("retrieval_r10", float("nan"))), float(selection_metrics.get("programme_mean_pearson", float("nan")))
         if np.isfinite(r10) and r10 > best_retrieval:
@@ -448,6 +516,30 @@ def run(args: argparse.Namespace) -> Path:
         eligible = np.isfinite(r10) and (not np.isfinite(anchor_validation_r10) or r10 >= 0.95 * anchor_validation_r10)
         if eligible and np.isfinite(programme) and programme > best_pareto:
             best_pareto = programme; best_pareto_epoch = epoch; trainer.save_checkpoint(output / "best_pareto.pt", epoch, loader.state_dict(), manifest, scheduler)
+    parameter_deltas = _parameter_deltas(trainer, initial_group_parameters)
+    overfit = _overfit_programme_head(
+        model, UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+                                        include_clinical=args.include_clinical), device,
+    ) if args.objective_profile != "identity_only" else {"status": "not_applicable_identity_only"}
+    last = epoch_rows[-1] if epoch_rows else {}
+    first = epoch_rows[0] if epoch_rows else {}
+    loss_initial, loss_final = float(first.get("train_loss", float("nan"))), float(last.get("train_loss", float("nan")))
+    active_terms = {key.removeprefix("train_"): float(value) for key, value in last.items()
+                    if key.startswith("train_") and key in {"train_programme", "train_decorrelation", "train_neighbourhood", "train_programme_supcon", "train_separation", "train_variance_floor"}}
+    largest_term = max((abs(value) for value in active_terms.values()), default=0.0)
+    liveness = {
+        "parameter_relative_delta": parameter_deltas,
+        "gradient_norms_first": {key.removeprefix("train_gradient_norm_").removesuffix("_first"): value for key, value in first.items() if key.startswith("train_gradient_norm_") and key.endswith("_first")},
+        "gradient_norms_last": {key.removeprefix("train_gradient_norm_").removesuffix("_last"): value for key, value in last.items() if key.startswith("train_gradient_norm_") and key.endswith("_last")},
+        "loss_initial": loss_initial, "loss_final": loss_final,
+        "loss_relative_reduction": float((loss_initial - loss_final) / max(abs(loss_initial), 1e-12)),
+        "tail_loss_slope": float(np.polyfit(np.arange(min(5, len(epoch_rows))),
+                                              [float(row.get("train_loss", float("nan"))) for row in epoch_rows[-min(5, len(epoch_rows)):]], 1)[0])
+        if len(epoch_rows) >= 2 else float("nan"),
+        "active_terms_final": active_terms, "largest_active_term": largest_term,
+        "overfit_one_batch": overfit,
+    }
+    (output / "liveness.json").write_text(json.dumps(liveness, indent=2), encoding="utf-8")
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     (output / "selection.json").write_text(json.dumps({"anchor_validation_r10": anchor_validation_r10, "best_retrieval_r10": best_retrieval, "best_programme_pearson": best_programme, "best_pareto_programme_pearson": best_pareto, "best_retrieval_epoch": best_retrieval_epoch, "best_programme_epoch": best_programme_epoch, "best_pareto_epoch": best_pareto_epoch, "fit_population": "development_train_val" if args.fit_development else "train_only_inner_fit"}, indent=2), encoding="utf-8")
     return _selected_checkpoint(output, slide_pretraining, args.epochs, allow_last=args.fit_development)
@@ -472,6 +564,16 @@ def main() -> None:
                         help="diagnostic objective ablation; preserves data/model while selectively zeroing losses")
     parser.add_argument("--decorrelation-weight", type=float, default=0.04,
                         help="F-R2 biology feature-decorrelation weight; set 0.0 for the collapse-baseline arm of the rank ablation")
+    # Explicit knobs for controlled mechanism experiments.  The defaults
+    # reproduce the canonical V2 schedule; E1 can instead make the compared
+    # objective stationary so its G2 loss-liveness gate is meaningful.
+    parser.add_argument("--loss-warmup-epochs", type=int, default=4)
+    parser.add_argument("--programme-warmup-weight", type=float, default=0.50)
+    parser.add_argument("--programme-weight", type=float, default=1.0)
+    parser.add_argument("--programme-neighbourhood-weight", type=float, default=0.20)
+    parser.add_argument("--programme-supcon-weight", type=float, default=0.20)
+    parser.add_argument("--separation-weight", type=float, default=0.01)
+    parser.add_argument("--variance-weight", type=float, default=0.01)
     parser.add_argument("--pretrain-epochs", type=int, default=0,
                         help="development-train-only slide self-supervision epochs before V2 fine-tuning")
     parser.add_argument("--pretrain-checkpoint", default="",
