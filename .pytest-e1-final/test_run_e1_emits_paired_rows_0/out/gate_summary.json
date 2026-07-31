@@ -1,6 +1,0 @@
-{
-  "experiment": "E1_rank_vs_information",
-  "gates_pass": false,
-  "n_gates": 26,
-  "gate_rows": "C:\\Users\\mobar\\OneDrive\\biorag\\morpheus-rebase\\.pytest-e1-final\\test_run_e1_emits_paired_rows_0\\out\\gate_rows.csv"
-}
