@@ -390,7 +390,7 @@ def _self_test() -> None:
         obs = pd.DataFrame({"core_control": [False, False, False, True], "control_expr": [2., 2., 2., np.nan],
                             "fold_expr": [.1, .1, .1, np.nan], "pct_expr": [-.9, -.9, -.9, np.nan]},
                            index=pd.Index(["0_A_P1_ENSG000001", "1_A_P2_ENSG000001", "2_A_P3_ENSG000001", "3_non-targeting_non-targeting_non-targeting"], name="gene_transcript"))
-        toy = ad.AnnData(X=np.zeros((4, 2), dtype=np.float32), obs=obs, var=pd.DataFrame({"gene_name": ["A", "B"]}))
+        toy = ad.AnnData(X=np.asarray([[0., 1.], [0., 1.], [0., 1.], [0., .01]], dtype=np.float32), obs=obs, var=pd.DataFrame({"gene_name": ["A", "B"]}))
         path = Path(temporary) / "inconsistent.h5ad"; toy.write_h5ad(path)
         try: _load_perturbation(path)
         except ValueError as error: assert "cannot assert delta response" in str(error)
