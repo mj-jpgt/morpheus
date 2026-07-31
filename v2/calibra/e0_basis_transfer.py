@@ -144,22 +144,36 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     if not keep_rows[controls].any():
         raise ValueError(f"{path}: no usable control rows after integrity filtering")
     # The control rows test delta semantics before any optional centring.  The
-    # obs scalars are checked for their documented relation (pct=fold-1), but
-    # are never substituted for a gene-expression control vector.
+    # documented control-expression fields must also agree with the measured
+    # target-gene direction in X; a near-zero centroid by itself is not enough.
     control_centroid = raw[controls & keep_rows][:, finite_cols].mean(axis=0)
     response = raw[(~controls) & keep_rows][:, finite_cols]
     response_norm = np.linalg.norm(response, axis=1)
     centroid_ratio = float(np.linalg.norm(control_centroid) / max(np.median(response_norm), 1e-12))
     fold = data.obs["fold_expr"].to_numpy(dtype=float)
     pct = data.obs["pct_expr"].to_numpy(dtype=float)
+    control_expr = data.obs["control_expr"].to_numpy(dtype=float)
     valid_fold = np.isfinite(fold) & np.isfinite(pct)
     fold_relation_error = float(np.max(np.abs(pct[valid_fold] - (fold[valid_fold] - 1.0)))) if valid_fold.any() else float("inf")
-    matrix_is_delta = centroid_ratio <= 0.10
+    targets, target_meta = _parse_targets(data.obs_names, controls)
+    target_vector_corr = float("nan"); target_vector_coverage = 0.0
+    if targets is not None:
+        symbols = {_symbol(gene): i for i, gene in enumerate(data.var["gene_name"].to_numpy())}
+        raw_noncontrol = np.flatnonzero(~controls)
+        target_cols = np.asarray([symbols.get(target, -1) for target in targets])
+        valid_target = (target_cols >= 0) & np.isfinite(fold[raw_noncontrol]) & (fold[raw_noncontrol] >= 0)
+        target_vector_coverage = float(valid_target.mean())
+        if valid_target.sum() >= 30:
+            rows = raw_noncontrol[valid_target]; columns = target_cols[valid_target]
+            target_vector_corr = float(np.corrcoef(raw[rows, columns], np.log2(fold[rows] + 1.0))[0, 1])
+    control_expr_coverage = float(np.isfinite(control_expr[~controls]).mean())
+    control_expr_nonnegative = bool(np.all(control_expr[~controls][np.isfinite(control_expr[~controls])] >= 0))
+    matrix_is_delta = (centroid_ratio <= 0.10 and fold_relation_error <= 1e-5 and control_expr_coverage >= .80
+                       and control_expr_nonnegative and target_vector_coverage >= .80 and target_vector_corr >= .25)
     if not matrix_is_delta:
         raise ValueError(f"{path}: matrix control centroid ratio={centroid_ratio:.3g}; cannot assert delta response")
     usable_controls = controls & keep_rows
     noncontrol = (~controls) & keep_rows
-    targets, target_meta = _parse_targets(data.obs_names, controls)
     # targets are indexed over raw non-controls, so retain only usable
     # non-controls in the same order.  No invalid non-control rows are silently
     # retained in this dataset, but retain this explicit alignment safeguard.
@@ -172,7 +186,9 @@ def _load_perturbation(path: Path) -> MatrixBundle:
               "n_control_rows_used": int(usable_controls.sum()), "n_rows_dropped_nonfinite": int((~finite_rows).sum()),
               "n_rows_dropped_all_zero": int((all_zero_rows & finite_rows).sum()), "n_genes_dropped_nonfinite": int((~finite_cols).sum()),
               "n_duplicate_symbols": duplicates, "n_perturbation_rows": int(noncontrol.sum()), "control_centroid_ratio": centroid_ratio,
-              "fold_pct_relation_max_abs_error": fold_relation_error, "delta_status": "validated_control_centred" if matrix_is_delta else "FAILED", **target_meta})
+              "fold_pct_relation_max_abs_error": fold_relation_error, "control_expr_coverage": control_expr_coverage,
+              "control_expr_nonnegative": control_expr_nonnegative, "target_vector_coverage": target_vector_coverage,
+              "target_vector_logfold_correlation": target_vector_corr, "delta_status": "validated_control_centred" if matrix_is_delta else "FAILED", **target_meta})
 
 
 def _load_tcga(path: Path, transform: str) -> MatrixBundle:
@@ -278,6 +294,18 @@ def _dictionary_metrics(x: torch.Tensor, targets: list[str] | None, threshold: f
             "guide_retrieval_eligible": eligible, "guide_retrieval_status": "available" if targets else "unavailable"}
 
 
+def _pc1_gate(observed: float, null_p95: float) -> bool:
+    return bool(np.isfinite(observed) and np.isfinite(null_p95) and observed > null_p95)
+
+
+def _shuffle_gate(shuffled: float, null_p95: float) -> bool:
+    return bool(np.isfinite(shuffled) and np.isfinite(null_p95) and shuffled <= null_p95)
+
+
+def _delta_gate(meta: dict[str, object]) -> bool:
+    return meta["delta_status"] == "validated_control_centred"
+
+
 def _split_half(x: torch.Tensor, groups: list[str], q: int, seed: int) -> tuple[torch.Tensor, torch.Tensor, dict[str, object]]:
     """Seeded cancer-stratified split, with every sufficiently large cancer in both halves."""
     if len(groups) != x.shape[0]: raise ValueError("missing TCGA cancer groups for split-half ceiling")
@@ -337,6 +365,11 @@ def _self_test() -> None:
     try: _parse_targets(pd.Index(["bad"], name="gene_transcript"), np.asarray([False]))
     except Exception: raise
     assert _parse_targets(pd.Index(["bad"], name="gene_transcript"), np.asarray([False]))[0] is None
+    # Deliberately corrupted controls must fail the same predicates used by the
+    # live ledger, not merely a nearby toy assertion.
+    assert _pc1_gate(.2, .1) and not _pc1_gate(.1, .1)
+    assert _shuffle_gate(.05, .1) and not _shuffle_gate(.2, .1)
+    assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
     # A gate manifest with only one row must fail coverage: this protects
     # against accidentally declaring a run healthy because a new gate was
     # simply never wired into the ledger.
@@ -352,11 +385,11 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
     p, t, join = context["perturbation"], context["tcga"], context["join"]
     ledger.add("G1.1_no_constant_columns", join["n_constant_columns_dropped"], "0 after explicit drop in evaluated matrix", join["n_matched_evaluated"] > 100, label)
     ledger.add("G1.2_real_gene_join", f"{join['n_left']},{join['n_right']},{join['n_matched_pre_constant']}", ">=0.8*min(left,right)", join["n_matched_pre_constant"] >= .8 * min(join["n_left"], join["n_right"]), label)
-    ledger.add("G1.3_join_not_scrambled", "per-k below observed", "gene-label shuffle < observed", all(context[f"k{k}"]["gene_label_shuffle_overlap"] < context[f"k{k}"]["pc1_removed_overlap"] for k in (10,25,50,100)), label)
+    ledger.add("G1.3_join_not_scrambled", "per-k gene-label shuffle", "all shuffles collapse to matched-spectrum floor", all(_shuffle_gate(context[f"k{k}"]["gene_label_shuffle_overlap"], context[f"k{k}"]["null_p95"]) for k in (10,25,50,100)), label)
     ledger.add("G1.4_scale_sanity", json.dumps({k:t[k] for k in ("raw_max","post_transform_max","post_transform_zero_fraction","post_transform_skew")}), "both transforms recorded", True, label)
     ledger.add("G1.5_explicit_row_filtering", json.dumps({"P_nonfinite":p["n_rows_dropped_nonfinite"],"T_nonfinite":t["n_rows_dropped_nonfinite"],"P_zero":p["n_rows_dropped_all_zero"],"T_zero":t["n_rows_dropped_all_zero"]}), "all drops explicitly counted", True, label)
     ledger.add("G1.6_housekeeping_mapping", ",".join(context["housekeepers_present"]), "all five present", set(context["housekeepers_present"]) == HOUSEKEEPING, label)
-    ledger.add("E0.a_delta_not_absolute", json.dumps({"status":p["delta_status"],"ratio":p["control_centroid_ratio"],"fold_pct_error":p["fold_pct_relation_max_abs_error"]}), "centroid ratio<=0.1; pct=fold-1", p["delta_status"] == "validated_control_centred" and p["fold_pct_relation_max_abs_error"] <= 1e-5, label)
+    ledger.add("E0.a_delta_not_absolute", json.dumps({"status":p["delta_status"],"ratio":p["control_centroid_ratio"],"fold_pct_error":p["fold_pct_relation_max_abs_error"],"control_expr_coverage":p["control_expr_coverage"],"target_logfold_r":p["target_vector_logfold_correlation"]}), "control metadata and X target direction validate delta", _delta_gate(p), label)
     ledger.add("E0.c_orientation", f"P={p['n_perturbation_rows']}x{context['n_shared_genes']};T={t['n_patients_used']}x{context['n_shared_genes']}", "rows=samples, columns=genes", True, label)
     ledger.add("G1.2b_split_composition", json.dumps(context["split"]), "cancer-stratified; imbalance<=1", context["split"]["max_group_count_imbalance"] <= 1, label)
     for who in ("perturbation_health", "tcga_health"):
@@ -375,11 +408,12 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
         r = context[f"k{k}"]; tag = f"k{k}_{label}"
         ledger.add(f"G4.1_positive_control_split_half_{tag}", r["pc1_removed_ceiling"], "> same-path heldout matched-null p95", r["pc1_removed_ceiling"] > r["ceiling_null_p95"], label)
         ledger.add(f"G4.2_negative_control_rotated_P_{tag}", r["null_median"], "near k/n_genes", abs(r["null_median"] - r["theoretical_random_overlap"]) < 0.5 * r["theoretical_random_overlap"], label)
+        ledger.add(f"G4.2b_negative_control_gene_shuffle_{tag}", r["gene_label_shuffle_overlap"], "<= matched-spectrum null p95", _shuffle_gate(r["gene_label_shuffle_overlap"], r["null_p95"]), label)
         ledger.add(f"G4.3_null_sanity_{tag}", json.dumps({"std":r["null_std"],"p95":r["null_p95"]}), "std>0; nondegenerate", r["null_std"] > 0, label)
         ledger.add(f"G4.4_heldout_vs_insample_{tag}", json.dumps({"in":r["pc1_removed_overlap"],"heldout":r["heldout_half_overlap_mean"]}), "reported; no fitted mapping", np.isfinite(r["heldout_half_overlap_mean"]), label)
         ledger.add(f"G4.5_null_resolution_{tag}", 1/(draws+1), "draws>=100", draws >= 100, label)
         ledger.add(f"G4.6_effect_ci_{tag}", json.dumps(r["effect_ci95"]), "lower CI > 0", r["effect_ci95"][0] > 0, label)
-        ledger.add(f"E0.b_pc1_stripped_{tag}", json.dumps({"observed":r["pc1_removed_overlap"],"p":r["null_p"]}), "observed>null p95", r["pc1_removed_overlap"] > r["null_p95"], label)
+        ledger.add(f"E0.b_pc1_stripped_{tag}", json.dumps({"observed":r["pc1_removed_overlap"],"p":r["null_p"]}), "observed>null p95", _pc1_gate(r["pc1_removed_overlap"], r["null_p95"]), label)
         ledger.add(f"E0.d_ceiling_{tag}", r["pc1_removed_ceiling"], ">null p95", r["pc1_removed_ceiling"] > r["null_p95"], label)
         ledger.add(f"E0.e_matched_spectrum_floor_{tag}", r["spectrum_energy_abs_error"], "exact preserved retained energy", r["spectrum_energy_abs_error"] == 0.0, label)
 
@@ -388,15 +422,17 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--k562"); parser.add_argument("--rpe1"); parser.add_argument("--tcga"); parser.add_argument("--tcga-registry"); parser.add_argument("--output")
     parser.add_argument("--draws", type=int, default=100); parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default="cuda")
-    parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[2])); parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[2])); parser.add_argument("--workspace-link"); parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if args.self_test: _self_test(); return
-    if not all((args.k562,args.rpe1,args.tcga,args.tcga_registry,args.output)): parser.error("k562, rpe1, tcga, tcga-registry, and output are required")
+    if not all((args.k562,args.rpe1,args.tcga,args.tcga_registry,args.output,args.workspace_link)): parser.error("k562, rpe1, tcga, tcga-registry, output, and workspace-link are required")
     if args.draws < 100: parser.error("--draws must be >=100 for E0's predeclared floor control")
     started = time.monotonic(); root = Path(args.repo_root).resolve(); output = Path(args.output); output.mkdir(parents=True, exist_ok=True)
     device = torch.device(args.device if args.device == "cpu" or torch.cuda.is_available() else "cpu")
     ledger = GateLedger(output, "E0_E0b", official_log=root / "v2/research/rebase/nature/GATE_LOG.md")
-    source = Path(__file__).resolve(); ledger.add("G0.1_workspace_real", str(source), "resolved source is inside declared git root", root in source.parents, root in source.parents, "remote source identity verified by resolved path")
+    source = Path(__file__).resolve(); workspace_link = Path(args.workspace_link)
+    link_is_real = workspace_link.is_symlink() and workspace_link.resolve() == root and root in source.parents
+    ledger.add("G0.1_workspace_real", f"link={workspace_link};target={workspace_link.resolve() if workspace_link.exists() else 'missing'}", "declared runtime link resolves to exact git root", link_is_real, "Linux symlink is the remote equivalent of the required Windows Junction; prevents stale copied source")
     dirty = _git(root, "status", "--porcelain"); ledger.add("G0.2_code_identity", _git(root,"rev-parse","HEAD"), "clean git worktree", dirty == "", f"dirty={dirty or 'none'}")
     for label, value in (("G0.3_k562_identity",args.k562),("G0.3_rpe1_identity",args.rpe1),("G0.3_tcga_identity",args.tcga),("G0.3_tcga_registry_identity",args.tcga_registry)): ledger.artifact(label, value)
     ledger.add("G0.4_manifest_read", "data-source experiment; no trained artifacts compared", "not applicable, explicitly declared", True, "input identities emitted in input_manifest.json")
