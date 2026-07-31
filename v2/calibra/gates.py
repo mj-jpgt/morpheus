@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -12,9 +11,10 @@ from typing import Any
 class GateLedger:
     columns = ("timestamp_utc", "experiment", "gate", "value", "threshold", "status", "note")
 
-    def __init__(self, output: str | Path, experiment: str):
+    def __init__(self, output: str | Path, experiment: str, *, official_log: str | Path | None = None):
         self.output = Path(output); self.output.mkdir(parents=True, exist_ok=True)
         self.path = self.output / "gate_rows.csv"; self.experiment = experiment
+        self.official_log = Path(official_log) if official_log else None
         self.rows: list[dict[str, Any]] = []
 
     def add(self, gate: str, value: Any, threshold: Any, passed: bool, note: str = "") -> None:
@@ -34,4 +34,16 @@ class GateLedger:
     def write(self) -> bool:
         with self.path.open("w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=self.columns); writer.writeheader(); writer.writerows(self.rows)
+        # The run-local CSV is convenient for machine parsing.  The experiment
+        # protocol also requires an append-only human-readable project ledger;
+        # write the exact same rows there rather than making a second, lossy
+        # summary by hand.
+        if self.official_log:
+            self.official_log.parent.mkdir(parents=True, exist_ok=True)
+            new_file = not self.official_log.exists()
+            with self.official_log.open("a", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=self.columns)
+                if new_file:
+                    writer.writeheader()
+                writer.writerows(self.rows)
         return all(row["status"] == "PASS" for row in self.rows)
