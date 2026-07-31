@@ -84,7 +84,7 @@ def _load_perturbation(path: Path) -> tuple[np.ndarray, list[str], list[str], di
     }
 
 
-def _load_tcga(path: Path) -> tuple[np.ndarray, list[str], dict[str, object]]:
+def _load_tcga(path: Path, transform: str) -> tuple[np.ndarray, list[str], dict[str, object]]:
     frame = pd.read_parquet(path)
     if "patient_id" not in frame:
         raise ValueError("TCGA parquet is missing patient_id")
@@ -93,19 +93,20 @@ def _load_tcga(path: Path) -> tuple[np.ndarray, list[str], dict[str, object]]:
     finite = np.isfinite(x).all(axis=0)
     x = x[:, finite]
     raw_max, raw_min = float(x.max()), float(x.min())
-    # EBPlusPlus-adjusted RSEM retains a small number of negative adjusted
-    # values.  RNA abundance has no negative interpretation, so clip only
-    # those values before the conventional log2(1+x) transform; record the
-    # count rather than silently changing the source scale.
+    # EBPlusPlus adjustment produces a signed residual tail.  Its exact
+    # semantics cannot be inferred from magnitude alone, so primary E0 claims
+    # require concordance of both conservative transforms below.
     n_negative = int((x < 0).sum())
-    x = np.maximum(x, 0.0)
-    # The release is RSEM-scale (max >1e4).  Log2(1+x), then gene-wise
-    # standardisation, removes library-size scale before PCA.
-    x = np.log2(x + 1.0, dtype=np.float32)
+    if transform == "clip_log1p":
+        x = np.log2(np.maximum(x, 0.0) + 1.0, dtype=np.float32)
+    elif transform == "signed_log1p":
+        x = np.sign(x) * np.log2(np.abs(x) + 1.0, dtype=np.float32)
+    else:
+        raise ValueError(f"unknown TCGA transform: {transform}")
     return x, list(np.asarray(genes)[finite]), {
         "source": str(path), "n_patients": int(len(frame)), "n_genes_dropped_nonfinite": int((~finite).sum()),
-        "raw_min": raw_min, "raw_max": raw_max, "n_negative_clipped": n_negative,
-        "transform": "clip_negative_then_log2_1p_then_gene_standardize",
+        "raw_min": raw_min, "raw_max": raw_max, "n_negative_values": n_negative,
+        "transform": f"{transform}_then_gene_standardize",
     }
 
 
@@ -145,11 +146,12 @@ def _dictionary_metrics(x: torch.Tensor, atom_ids: list[str], threshold: float =
         sim = z[start:start + block] @ z.T
         for local, row in enumerate(sim):
             i = start + local; row[i] = -2
-            maximum = max(maximum, float(row.max().cpu()))
-            best = int(row.argmax().cpu())
+            absolute = row.abs()
+            maximum = max(maximum, float(absolute.max().cpu()))
+            best = int(absolute.argmax().cpu())
             if group_sizes[labels[i]] > 1:
                 eligible += 1; hits += int(labels[i] == labels[best])
-            for j in torch.where(row >= threshold)[0].cpu().tolist():
+            for j in torch.where(absolute >= threshold)[0].cpu().tolist():
                 edges += 1; union(i, int(j))
     groups = len({find(i) for i in range(n)})
     return {"dictionary_coherence": maximum, "equivalence_threshold": threshold,
@@ -158,9 +160,9 @@ def _dictionary_metrics(x: torch.Tensor, atom_ids: list[str], threshold: float =
             "guide_retrieval_eligible": eligible}
 
 
-def _context(name: str, perturb: Path, tcga: Path, device: torch.device, draws: int, seed: int) -> dict[str, object]:
+def _context(name: str, perturb: Path, tcga: Path, device: torch.device, draws: int, seed: int, transform: str) -> dict[str, object]:
     p, pg, atom_ids, meta = _load_perturbation(perturb)
-    t, tg, tmeta = _load_tcga(tcga)
+    t, tg, tmeta = _load_tcga(tcga, transform)
     p, t, genes = _align(p, pg, t, tg)
     pt = torch.as_tensor(p, dtype=torch.float32, device=device)
     tt = torch.as_tensor(t, dtype=torch.float32, device=device)
@@ -177,7 +179,9 @@ def _context(name: str, perturb: Path, tcga: Path, device: torch.device, draws: 
     for k in (10, 25, 50, 100):
         observed = _overlap(vp, vt, k)
         stripped = _overlap(vp[:, 1:k + 1], vt[:, 1:k + 1], k)
-        null = _random_overlap(len(genes), vt, k, draws, seed + k)
+        # Same PC-stripped path for observed and null; Haar rotations are the
+        # right-singular-vector component of a spectrum-preserving rotation.
+        null = _random_overlap(len(genes), vt[:, 1:k + 1], k, draws, seed + k)
         out[f"k{k}"] = {"overlap": observed, "pc1_removed_overlap": stripped,
                            "null_median": float(np.median(null)), "null_p95": float(np.quantile(null, .95)),
                            "ceiling": _overlap(ceiling_a, ceiling_b, k),
@@ -194,6 +198,7 @@ def main() -> None:
     parser.add_argument("--draws", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--tcga-transform", choices=("signed_log1p", "clip_log1p"), default="signed_log1p")
     args = parser.parse_args()
     device = torch.device(args.device if args.device == "cpu" or torch.cuda.is_available() else "cpu")
     output = Path(args.output); output.mkdir(parents=True, exist_ok=True)
@@ -202,13 +207,14 @@ def main() -> None:
     for label, path in (("G0.3_k562_identity", args.k562), ("G0.3_rpe1_identity", args.rpe1), ("G0.3_tcga_identity", args.tcga)):
         ledger.artifact(label, path)
     result = {"schema_version": "1.0", "device": str(device), "draws": args.draws,
-              "k562": _context("K562", Path(args.k562), Path(args.tcga), device, args.draws, args.seed),
-              "rpe1": _context("RPE1", Path(args.rpe1), Path(args.tcga), device, args.draws, args.seed + 1000)}
+              "tcga_transform": args.tcga_transform,
+              "k562": _context("K562", Path(args.k562), Path(args.tcga), device, args.draws, args.seed, args.tcga_transform),
+              "rpe1": _context("RPE1", Path(args.rpe1), Path(args.tcga), device, args.draws, args.seed + 1000, args.tcga_transform)}
     for context in (result["k562"], result["rpe1"]):
         label = str(context["context"])
         ledger.add("G1.1_no_nonfinite_columns", context["n_genes_dropped_nonfinite"], "all retained columns finite", True, label)
         ledger.add("G1.2_real_gene_join", context["n_shared_genes"], ">=100", int(context["n_shared_genes"]) >= 100, label)
-        ledger.add("G1.4_scale_sanity", context["tcga"]["raw_max"], "RSEM transformed before PCA", context["tcga"]["transform"] == "clip_negative_then_log2_1p_then_gene_standardize", label)
+        ledger.add("G1.4_scale_sanity", context["tcga"]["raw_max"], "signed RSEM transform before PCA", context["tcga"]["transform"] == f"{args.tcga_transform}_then_gene_standardize", label)
         ledger.add("G1.5_no_allzero_rows", context["n_perturbation_rows"], ">0 retained perturbations", int(context["n_perturbation_rows"]) > 0, label)
         ledger.add("G1.6_gene_symbol_mapping", context["n_shared_genes"], ">=100 shared symbols", int(context["n_shared_genes"]) >= 100, label)
         ledger.add("G3.1_effective_rank", context["effective_rank"], "report", np.isfinite(context["effective_rank"]), label)
