@@ -1,0 +1,27 @@
+timestamp_utc,experiment,gate,value,threshold,status,note
+2026-07-31T12:12:50.244901+00:00,E1_rank_vs_information,G0.2_code_identity,8ef107832b1ae042,module_sha256,PASS,C:\Users\mobar\OneDrive\biorag\morpheus-rebase\v2\calibra\e1_rank_information.py
+2026-07-31T12:12:50.248726+00:00,E1_rank_vs_information,G0.3_before_artifact,size=10395;mtime=1785499970241834400;sha=df44bb63c2c8e870,readable,PASS,C:\Users\mobar\OneDrive\biorag\morpheus-rebase\.pytest-e1-final\test_run_e1_emits_paired_rows_0\before.npz
+2026-07-31T12:12:50.250375+00:00,E1_rank_vs_information,G0.3_after_artifact,size=10368;mtime=1785499970242945700;sha=94fce088843b114b,readable,PASS,C:\Users\mobar\OneDrive\biorag\morpheus-rebase\.pytest-e1-final\test_run_e1_emits_paired_rows_0\after.npz
+2026-07-31T12:12:50.250466+00:00,E1_rank_vs_information,G0.1_registry_provenance,92f26006408c6a6bd9b26129ac398eb7fdc4659b56d17a093d537b8a0536de75,exact_registry_match,PASS,
+2026-07-31T12:12:50.250479+00:00,E1_rank_vs_information,G0.4_matched_manifest,c2e23ace63fa396c345661279af078bce63ee0c80c653d518170b5836a96a6c0,only_decorrelation_differs,PASS,config.decorrelation_weight: 0.0 -> 0.04
+2026-07-31T12:12:50.253476+00:00,E1_rank_vs_information,G0.3_targets,size=4626;mtime=1785499970243997900;sha=078bac48fecbccfd,readable,PASS,C:\Users\mobar\OneDrive\biorag\morpheus-rebase\.pytest-e1-final\test_run_e1_emits_paired_rows_0\targets.npz
+2026-07-31T12:12:50.253730+00:00,E1_rank_vs_information,G1.1_target_nonconstant,0,zero_constant_columns,PASS,
+2026-07-31T12:12:50.253744+00:00,E1_rank_vs_information,G1.2_target_id_join,80,">=0.8*min(80,80)",PASS,
+2026-07-31T12:12:50.253755+00:00,E1_rank_vs_information,G1.5_target_finite,960,all_selected_scores_finite,PASS,
+2026-07-31T12:12:50.413838+00:00,E1_rank_vs_information,G2_liveness,not_applicable,frozen_analysis,PASS,
+2026-07-31T12:12:50.413897+00:00,E1_rank_vs_information,G3.1_effective_rank_before,1.9863517959766863,>0,PASS,
+2026-07-31T12:12:50.413902+00:00,E1_rank_vs_information,G3.2_dead_dimensions_before,0.0,reported;finite_latent,PASS,
+2026-07-31T12:12:50.413907+00:00,E1_rank_vs_information,G3.4_sample_variation_before,8.505949566563343,>0,PASS,
+2026-07-31T12:12:50.413926+00:00,E1_rank_vs_information,G3.6_norm_sanity_before,mean=5.60244;nan=0,finite,PASS,
+2026-07-31T12:12:50.413963+00:00,E1_rank_vs_information,G3.1_effective_rank_after,5.633930053979376,>0,PASS,
+2026-07-31T12:12:50.413970+00:00,E1_rank_vs_information,G3.2_dead_dimensions_after,0.0,reported;finite_latent,PASS,
+2026-07-31T12:12:50.413975+00:00,E1_rank_vs_information,G3.4_sample_variation_after,23.96398855687567,>0,PASS,
+2026-07-31T12:12:50.413988+00:00,E1_rank_vs_information,G3.6_norm_sanity_after,mean=10.4296;nan=0,finite,PASS,
+2026-07-31T12:12:50.419823+00:00,E1_rank_vs_information,G4.1_positive_control,1.0,>=0.5 heldout_directional_cca,PASS,rna_biology
+2026-07-31T12:12:50.420054+00:00,E1_rank_vs_information,G4.2_negative_control,0.15950335494671802,below_positive_control_minus_0.05,PASS,within_cancer_shuffled_pairing
+2026-07-31T12:12:50.420060+00:00,E1_rank_vs_information,G4.3_permutation_null_sane,0.00905360803561338,>0,PASS,
+2026-07-31T12:12:50.424037+00:00,E1_rank_vs_information,G4.4_heldout_vs_insample,0.999676375785769,>=0.25,PASS,
+2026-07-31T12:12:50.424046+00:00,E1_rank_vs_information,G4.5_null_resolution,3,>=100 for headline,FAIL,
+2026-07-31T12:12:50.424050+00:00,E1_rank_vs_information,G4.6_effect_finite,0.9986985202036279,finite_effect_size,PASS,
+2026-07-31T12:12:50.424052+00:00,E1_rank_vs_information,G5_E1_same_run_rank_and_direction_count,both_arms,same_output_run,PASS,
+2026-07-31T12:12:50.424059+00:00,E1_rank_vs_information,G5_E1_finite_detection_floors,before=0.1;after=0.3,both_finite,PASS,

@@ -303,6 +303,7 @@ class V2Trainer:
             "identity": weights["identity"] * identity if "rna" in batch else loss.new_zeros(()),
             "reconstruction": reconstruction_term,
             "separation": separation_term,
+            "decorrelation": decorrelation_term,
             "variance": variance_term,
             **(programme_component_totals or {"programme": programme_total}),
         }

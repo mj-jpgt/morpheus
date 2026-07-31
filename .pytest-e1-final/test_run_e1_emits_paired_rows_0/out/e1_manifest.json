@@ -1,0 +1,37 @@
+{
+  "after_manifest": {
+    "config": {
+      "decorrelation_weight": 0.04,
+      "hidden_dim": 256
+    },
+    "epochs": 8,
+    "seed": 42,
+    "token_budget": 16384
+  },
+  "after_path": "C:\\Users\\mobar\\OneDrive\\biorag\\morpheus-rebase\\.pytest-e1-final\\test_run_e1_emits_paired_rows_0\\after.npz",
+  "allowed_manifest_paths": [
+    "decorrelation_weight",
+    "config.decorrelation_weight",
+    "run_configuration.decorrelation_weight",
+    "source_manifest.configuration.decorrelation_weight"
+  ],
+  "before_manifest": {
+    "config": {
+      "decorrelation_weight": 0.0,
+      "hidden_dim": 256
+    },
+    "epochs": 8,
+    "seed": 42,
+    "token_budget": 16384
+  },
+  "before_path": "C:\\Users\\mobar\\OneDrive\\biorag\\morpheus-rebase\\.pytest-e1-final\\test_run_e1_emits_paired_rows_0\\before.npz",
+  "intervention": {
+    "after": 0.04,
+    "before": 0.0,
+    "path": "config.decorrelation_weight"
+  },
+  "matched_manifest_digest": "c2e23ace63fa396c345661279af078bce63ee0c80c653d518170b5836a96a6c0",
+  "registry_digest": "92f26006408c6a6bd9b26129ac398eb7fdc4659b56d17a093d537b8a0536de75",
+  "targets_path": "C:\\Users\\mobar\\OneDrive\\biorag\\morpheus-rebase\\.pytest-e1-final\\test_run_e1_emits_paired_rows_0\\targets.npz",
+  "targets_patient_digest": "6c55e677056db78b65c9952a35150dff291fe68563f34cb5e1530f4381b5cc5e"
+}

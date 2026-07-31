@@ -45,9 +45,17 @@ therefore unusable on the only data that matters.
 
 The readout is now **direction-matched**: after pushing the spiked targets through
 the identical residualisation, we score ``|corr(X_res u, Y_spiked_res v)|`` -- the
-planted axis itself. Level 0 then reads ~0 (a genuine null, since ``a_new`` is
-constructed orthogonal to ``s``), the curve is monotone, and the floor is a real
+planted axis itself. The curve is then monotone in r_true and the floor is a real
 detection threshold.
+
+Level 0 is *not* zero on real data, and this is a genuine result rather than a
+defect: ``a_new`` is built orthogonal to ``s``, but residualising two orthogonal
+signals through a shared confound design induces a correlation between them
+(~0.08-0.13 for the 99-column cancer+TSS design at n=2,530). How large that induced
+floor is depends on how much of the drawn ``(u, v)`` lies in the design span, so it
+varies draw to draw. The floor is therefore read with a **paired** test -- does a
+draw beat its *own* level-0 value -- which is the point of reusing (u, v) across
+levels within a draw.
 
 Scale warning. The floor is in *single-direction* correlation units. The headline
 real-data number (adjusted / held-out top-CCA) is a *multivariate maximum* over 16
@@ -137,12 +145,21 @@ def _standardise(vector: np.ndarray) -> np.ndarray:
 
 
 def _correlation(a: np.ndarray, b: np.ndarray) -> float:
-    """|Pearson r| between two 1-D scores, via standardisation (no covariance matrix)."""
+    """SIGNED Pearson r between two 1-D scores.
+
+    Signed, not absolute, and that matters. The confound-induced level-0
+    correlation has a random sign, so under |r| a draw whose induced baseline is
+    negative gets *smaller* when the (positive) spike is added -- which destroys
+    the paired comparison the floor depends on and reintroduces NaN floors. The
+    spike is built with a known positive orientation (``a_new = r_true * s + ...``),
+    so the signed statistic is the one that moves predictably with r_true.
+    Magnitudes are taken at reporting time, never before the pairing.
+    """
     a = _standardise(a)
     b = _standardise(b)
     if a.std() < 1e-12 or b.std() < 1e-12:
         return float("nan")
-    return float(abs(np.dot(a, b) / len(a)))
+    return float(np.dot(a, b) / len(a))
 
 
 def spike_targets(x: np.ndarray, y: np.ndarray, r_true: float, *, rng: np.random.Generator,
@@ -284,17 +301,50 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     recovered = np.column_stack([column for column, _ in results])
     observed_matched = float(np.nanmedian([m for _, m in results]))
 
-    # Level 0 is now a genuine null (a_new is constructed orthogonal to s), so the
-    # floor is read directly off the recovered values against the level-0 upper tail.
+    # PAIRED floor. The spike is built orthogonal to s, yet level 0 does NOT read
+    # zero on real data: residualising two orthogonal signals through a shared
+    # confound design induces a correlation between them (~0.08-0.13 for the 99-column
+    # cancer+TSS design). That induced floor is draw-specific -- it depends on how much
+    # of (u, v) lies in the design span -- so an unpaired threshold against the level-0
+    # p90 is the wrong test: it charges every draw the WORST draw's induced baseline
+    # and returns NaN even for spikes that are plainly recovered.
+    #
+    # Because the design is paired (same (u, v) at every level within a draw), the
+    # correct test is a paired one: does this draw's recovered value exceed *its own*
+    # level-0 value? The floor is the smallest level clearing that in
+    # ``recovery_fraction`` of draws -- a paired sign test, which at 50% is chance and
+    # at 80% is detection.
+    #
+    # TWO DIFFERENT FLOORS -- do not conflate them, and do not quote the paired one
+    # as a detection limit.
+    #
+    #   transmission_floor (PAIRED): smallest r_true whose increment over the SAME
+    #     draw's level-0 value is seen in >=recovery_fraction of draws. Pairing
+    #     cancels the draw-specific induced baseline, so this is close to noiseless
+    #     and typically resolves at the finest level on the grid. It answers "does
+    #     the pipeline TRANSMIT a signal of this size, or destroy it?" -- the
+    #     over-residualisation question. It is NOT a statement about statistical
+    #     power, because a real analysis has no paired baseline to subtract.
+    #
+    #   detection_floor (UNPAIRED): smallest r_true whose recovered value clears the
+    #     level-0 90th percentile in >=recovery_fraction of draws. This one carries
+    #     the full draw-to-draw variability an actual single-shot analysis faces, so
+    #     it is the conservative, quotable detection limit.
+    #
     null_reference = float(np.nanpercentile(recovered[0], 90)) if np.isfinite(recovered[0]).any() else 0.0
+    paired_hits = np.full(len(levels), np.nan)
+    unpaired_hits = np.full(len(levels), np.nan)
+    transmission_floor = float("nan")
     detection_floor = float("nan")
     for i, level in enumerate(levels):
+        paired_hits[i] = np.nanmean(recovered[i] > recovered[0])
+        unpaired_hits[i] = np.nanmean(recovered[i] > max(null_reference, 1e-9))
         if level <= 0:
             continue
-        hits = np.nanmean(recovered[i] > max(null_reference, 1e-9))
-        if np.isfinite(hits) and hits >= recovery_fraction:
+        if np.isfinite(paired_hits[i]) and paired_hits[i] >= recovery_fraction                 and not np.isfinite(transmission_floor):
+            transmission_floor = float(level)
+        if np.isfinite(unpaired_hits[i]) and unpaired_hits[i] >= recovery_fraction                 and not np.isfinite(detection_floor):
             detection_floor = float(level)
-            break
 
     median_recovered = np.nanmedian(recovered, axis=1)
     finite = np.isfinite(levels) & np.isfinite(median_recovered)
@@ -311,8 +361,20 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     # null (~1/sqrt(n)), not near 1. A baseline near 1 means the readout is picking
     # up ambient structure instead of the spike -- exactly the defect this fix
     # repairs -- and every floor below it would be meaningless.
-    baseline = float(np.nanmedian(recovered[0]))
+    # Signed median sits near 0 (random sign); the MAGNITUDE is what the gate needs.
+    baseline_signed = float(np.nanmedian(recovered[0]))
+    baseline = float(np.nanmedian(np.abs(recovered[0])))
     null_scale = 3.0 / np.sqrt(max(len(x), 2))
+    # The defect this gate exists to catch is a readout that reports AMBIENT structure
+    # instead of the spike, whose signature is baseline ~= the multivariate top-CCA
+    # (it was 0.97 against an ambient 0.89). Confound-induced baseline is a real but
+    # much smaller effect and must not trip the gate. Hence a two-part bar: the
+    # baseline must be either well under the ambient channel OR small in absolute
+    # terms. The absolute allowance matters when the channel itself is weak, where
+    # "half of ambient" would be an unreasonably tight bar for an effect that has
+    # nothing to do with the defect. 0.15 is set just above what the 99-column
+    # cancer+TSS design induces at n=2,530 (~0.08-0.13).
+    gate_threshold = float(max(0.5 * float(observed), 0.15))
     return SpikeRecoveryResult(levels=levels, recovered=recovered, detection_floor=detection_floor,
                                attenuation_slope=slope, observed=float(observed),
                                n_components=n_components, recovery_fraction=recovery_fraction,
@@ -320,8 +382,14 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
                                meta={"null_reference_p90": null_reference, "n_draws": n_draws,
                                      "n_patients": int(len(x)),
                                      "baseline_recovered_median": baseline,
+                                     "baseline_recovered_median_signed": baseline_signed,
                                      "baseline_null_scale": float(null_scale),
-                                     "baseline_is_null_like": bool(baseline < max(null_scale, 0.05)),
+                                     "baseline_is_null_like": bool(baseline < gate_threshold),
+                                     "baseline_gate_threshold": gate_threshold,
+                                     "paired_hit_rate": paired_hits.tolist(),
+                                     "unpaired_hit_rate": unpaired_hits.tolist(),
+                                     "transmission_floor": transmission_floor,
+                                     "confound_induced_baseline": baseline,
                                      "observed_matched_direction": observed_matched,
                                      "observed_multivariate_top_cca": float(observed),
                                      "baseline_top_cca": float(top_canonical_correlation(

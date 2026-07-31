@@ -1,3 +1,10 @@
+> **SUPERSEDED IN PART — see `PHASE1B_TARGETED_READOUT.md`.**
+> Every `detection_floor` below is NaN because the spike readout was a top-CCA *maximum* while the
+> spike lived on one direction; that is fixed and floors now resolve. **F2 (below) is WITHDRAWN as an
+> objective claim**: the identity head is numerically invariant to molecular supervision
+> (max|diff| 2.6e-04 between `full` and `identity_only`), so it is the frozen MLP-CLIP teacher and
+> F2 restates "the teacher beats our biology head". F1 and the confound-removal check stand.
+
 # CALIBRA Phase 1 — first calibrated measurement
 
 **Cohort:** 2,530 held-out-cancer TCGA patients (21 test cancers, disjoint from the 14 dev cancers).

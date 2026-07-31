@@ -153,6 +153,7 @@ def main() -> None:
                 "unadjusted_top_cca": float(unadjusted[0]) if unadjusted.size else np.nan,
                 "adjusted_top_cca": summary["observed"],
                 "detection_floor": summary["detection_floor"],
+                "transmission_floor": summary["transmission_floor"],
                 "attenuation_slope": summary["attenuation_slope"],
                 "null_reference_p90": summary["null_reference_p90"],
                 "observed_above_floor": float(summary["observed_above_floor"]),
@@ -183,7 +184,7 @@ def main() -> None:
                                  value=float(med), note="spike_recovery_curve"))
             gate = "OK" if summary["baseline_is_null_like"] else "GATE-FAIL(baseline_not_null_like)"
             print(f"[{method}::{state}] adj_cca={summary['observed']:.4f} "
-                  f"floor={summary['detection_floor']} "
+                  f"floor={summary['detection_floor']} trans={summary['transmission_floor']} "
                   f"atten={summary['attenuation_slope']:.3f} "
                   f"base={summary['baseline_recovered_median']:.4f} {gate}", flush=True)
 

@@ -207,6 +207,43 @@ def test_recovery_tracks_the_injected_strength():
     assert 0.5 < result.attenuation_slope <= 1.2, result.attenuation_slope
 
 
+def _confounded(n, strength, seed, n_sites=8):
+    rng = np.random.default_rng(seed)
+    site = rng.integers(0, n_sites, size=n)
+    onehot = np.eye(n_sites)[site]
+    x = rng.normal(size=(n, 20)) + strength * onehot @ rng.normal(size=(n_sites, 20))
+    y = rng.normal(size=(n, 18)) + strength * onehot @ rng.normal(size=(n_sites, 18))
+    design = confound_design(pd.DataFrame({"site": site.astype(str)}), ["site"])
+    return x, y, design
+
+
+def test_floor_survives_a_confound_induced_baseline():
+    """On real data, residualising through a wide confound design induces a non-zero
+    level-0 baseline even though the spike is built orthogonal to the image score.
+    The paired floor must still resolve; an unpaired threshold against the level-0
+    p90 returned NaN here, which is what it did on every real state."""
+    x, y, design = _confounded(n=800, strength=1.0, seed=31)
+    result = spike_recovery_curve(x, y, design, levels=(0.0, 0.05, 0.1, 0.2, 0.4),
+                                  n_draws=12, n_components=8, seed=31)
+    summary = result.summary()
+    assert summary["confound_induced_baseline"] > 0.01, "fixture induces no baseline; test is vacuous"
+    assert np.isfinite(result.detection_floor), (
+        f"paired floor failed at induced baseline {summary['confound_induced_baseline']:.3f}")
+    assert summary["baseline_is_null_like"] is True, summary["confound_induced_baseline"]
+
+
+def test_gate_warns_when_the_induced_baseline_rivals_the_real_signal():
+    """The complement of the test above: the gate must not be decorative. Under an
+    aggressive design (few patients, many strong site levels) the induced baseline
+    grows until it is a substantial fraction of the measurable channel, and at that
+    point a floor is not trustworthy and the run must be flagged."""
+    x, y, design = _confounded(n=500, strength=3.0, seed=32)
+    summary = spike_recovery_curve(x, y, design, levels=(0.0, 0.1, 0.4),
+                                   n_draws=12, n_components=8, seed=32).summary()
+    assert summary["confound_induced_baseline"] > summary["baseline_gate_threshold"]
+    assert summary["baseline_is_null_like"] is False, "gate slept through a pathological baseline"
+
+
 def test_n_jobs_does_not_change_the_numbers():
     """Parallelism must be a wall-clock decision only."""
     x, y = _ambient(n=240, seed=24)
