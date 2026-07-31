@@ -23,6 +23,20 @@ def _manifest(raw: np.lib.npyio.NpzFile) -> dict:
         return {"_invalid": True}
 
 
+def _manifest_summary(value: dict) -> dict:
+    """Keep provenance useful without duplicating patient-level arrays into a log."""
+    if not isinstance(value, dict):
+        return {"_invalid": True}
+    allowed = {
+        "artifact_version", "seed", "epochs", "learning_rate", "lr", "token_budget",
+        "objective_profile", "architecture", "model_config", "split_digest", "cohort_digest",
+        "anchor_teacher_source", "anchor_teacher_sha256", "trained_states",
+    }
+    result = {key: value[key] for key in sorted(allowed & set(value))}
+    result["manifest_keys"] = sorted(value)
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifacts", nargs="+", required=True, type=Path)
@@ -49,7 +63,7 @@ def main() -> None:
         ledger.add("G0.1_artifact_schema", f"{path.name}:{sorted(required - set(raw.files))}", "all required fields", required <= set(raw.files))
         if required <= set(raw.files):
             values = tuple(np.asarray(raw[name]).astype(str) for name in ("patient_ids", "cancers", "split"))
-            artifact_manifest[path.name] = _manifest(raw)
+            artifact_manifest[path.name] = _manifest_summary(_manifest(raw))
             if reference is None:
                 reference = values
             else:
