@@ -52,7 +52,7 @@ def _random_overlap(n_genes: int, reference: torch.Tensor, k: int, draws: int, s
     return np.asarray(values, dtype=float)
 
 
-def _load_perturbation(path: Path) -> tuple[np.ndarray, list[str], dict[str, object]]:
+def _load_perturbation(path: Path) -> tuple[np.ndarray, list[str], list[str], dict[str, object]]:
     data = ad.read_h5ad(path, backed="r")
     matrix = np.asarray(data.X[:], dtype=np.float32)
     genes = np.asarray([_symbol(v) for v in data.var["gene_name"].to_numpy()])
@@ -74,8 +74,9 @@ def _load_perturbation(path: Path) -> tuple[np.ndarray, list[str], dict[str, obj
         matrix = matrix - control_centroid
     # Controls establish the delta reference; they are not causal dictionary
     # atoms and must not inflate the perturbation subspace.
+    atom_ids = data.obs_names.astype(str).to_numpy()[~controls]
     matrix = matrix[~controls]
-    return matrix, genes.tolist(), {
+    return matrix, genes.tolist(), atom_ids.tolist(), {
         "source": str(path), "shape_raw": list(data.shape), "n_control_rows": int(controls.sum()),
         "nonfinite_cells_removed_by_column_filter": int((~np.isfinite(np.asarray(data.X[:]))).sum()),
         "n_genes_dropped_nonfinite": int((~finite_columns).sum()), "n_perturbation_rows": int((~controls).sum()), "control_centroid_ratio": ratio,
@@ -90,8 +91,16 @@ def _load_tcga(path: Path) -> tuple[np.ndarray, list[str], dict[str, object]]:
     genes = [_symbol(c) for c in frame.columns if c != "patient_id"]
     x = frame.drop(columns="patient_id").to_numpy(dtype=np.float32, copy=False)
     finite = np.isfinite(x).all(axis=0)
-    return x[:, finite], list(np.asarray(genes)[finite]), {
+    x = x[:, finite]
+    raw_max, raw_min = float(x.max()), float(x.min())
+    if raw_min < 0:
+        raise ValueError("TCGA RNA has negative values; log1p count normalization is not valid")
+    # The PanCan release is on a raw-like scale (max >1e4).  Log2(1+x), then
+    # gene-wise standardisation, removes library-size scale before PCA.
+    x = np.log2(x + 1.0, dtype=np.float32)
+    return x, list(np.asarray(genes)[finite]), {
         "source": str(path), "n_patients": int(len(frame)), "n_genes_dropped_nonfinite": int((~finite).sum()),
+        "raw_min": raw_min, "raw_max": raw_max, "transform": "log2_1p_then_gene_standardize",
     }
 
 
@@ -101,11 +110,51 @@ def _align(p: np.ndarray, pg: list[str], t: np.ndarray, tg: list[str]) -> tuple[
     if len(keep) < 100:
         raise ValueError(f"only {len(keep)} shared genes")
     pi, tj, genes = zip(*keep)
-    return p[:, pi], t[:, tj], list(genes)
+    p, t = p[:, pi], t[:, tj]
+    # Standardise independently per gene; otherwise PCA primarily measures
+    # gene scale rather than response structure. Drop constant genes explicitly.
+    ps, ts = p.std(axis=0), t.std(axis=0)
+    finite = (ps > 1e-8) & (ts > 1e-8) & np.isfinite(ps) & np.isfinite(ts)
+    return ((p[:, finite] - p[:, finite].mean(0)) / ps[finite],
+            (t[:, finite] - t[:, finite].mean(0)) / ts[finite],
+            list(np.asarray(genes)[finite]))
+
+
+def _dictionary_metrics(x: torch.Tensor, atom_ids: list[str], threshold: float = .95) -> dict[str, object]:
+    """Exact chunked coherence plus reproducible same-target guide retrieval."""
+    z = x / torch.linalg.vector_norm(x, dim=1, keepdim=True).clamp_min(1e-12)
+    n, block = z.shape[0], 256
+    maximum, edges = 0.0, 0
+    parent = list(range(n))
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]; i = parent[i]
+        return i
+    def union(i: int, j: int) -> None:
+        i, j = find(i), find(j)
+        if i != j: parent[j] = i
+    labels = [item.split("_")[1] if "_" in item else item for item in atom_ids]
+    group_sizes = {g: labels.count(g) for g in set(labels)}
+    hits = eligible = 0
+    for start in range(0, n, block):
+        sim = z[start:start + block] @ z.T
+        for local, row in enumerate(sim):
+            i = start + local; row[i] = -2
+            maximum = max(maximum, float(row.max().cpu()))
+            best = int(row.argmax().cpu())
+            if group_sizes[labels[i]] > 1:
+                eligible += 1; hits += int(labels[i] == labels[best])
+            for j in torch.where(row >= threshold)[0].cpu().tolist():
+                edges += 1; union(i, int(j))
+    groups = len({find(i) for i in range(n)})
+    return {"dictionary_coherence": maximum, "equivalence_threshold": threshold,
+            "equivalence_edges_directed": edges, "n_equivalence_classes": groups,
+            "guide_same_target_retrieval_at1": (hits / eligible if eligible else float("nan")),
+            "guide_retrieval_eligible": eligible}
 
 
 def _context(name: str, perturb: Path, tcga: Path, device: torch.device, draws: int, seed: int) -> dict[str, object]:
-    p, pg, meta = _load_perturbation(perturb)
+    p, pg, atom_ids, meta = _load_perturbation(perturb)
     t, tg, tmeta = _load_tcga(tcga)
     p, t, genes = _align(p, pg, t, tg)
     pt = torch.as_tensor(p, dtype=torch.float32, device=device)
@@ -119,6 +168,7 @@ def _context(name: str, perturb: Path, tcga: Path, device: torch.device, draws: 
                               "effective_rank": float(effective_rank(p)),
                               "algebraic_rank": int(torch.linalg.matrix_rank(pt).cpu()),
                               "stable_rank": float((torch.linalg.norm(pt).square() / torch.linalg.svdvals(pt)[0].square()).cpu())}
+    out.update(_dictionary_metrics(pt, atom_ids))
     for k in (10, 25, 50, 100):
         observed = _overlap(vp, vt, k)
         stripped = _overlap(vp[:, 1:k + 1], vt[:, 1:k + 1], k)
@@ -151,13 +201,23 @@ def main() -> None:
               "rpe1": _context("RPE1", Path(args.rpe1), Path(args.tcga), device, args.draws, args.seed + 1000)}
     for context in (result["k562"], result["rpe1"]):
         label = str(context["context"])
-        ledger.add("G1.1_no_nonfinite_columns", context["n_genes_dropped_nonfinite"], ">=0 after explicit column removal", True, label)
+        ledger.add("G1.1_no_nonfinite_columns", context["n_genes_dropped_nonfinite"], "all retained columns finite", True, label)
         ledger.add("G1.2_real_gene_join", context["n_shared_genes"], ">=100", int(context["n_shared_genes"]) >= 100, label)
+        ledger.add("G1.4_scale_sanity", context["tcga"]["raw_max"], "raw max flagged then log2_1p", context["tcga"]["transform"] == "log2_1p_then_gene_standardize", label)
+        ledger.add("G1.5_no_allzero_rows", context["n_perturbation_rows"], ">0 retained perturbations", int(context["n_perturbation_rows"]) > 0, label)
+        ledger.add("G1.6_gene_symbol_mapping", context["n_shared_genes"], ">=100 shared symbols", int(context["n_shared_genes"]) >= 100, label)
         ledger.add("G3.1_effective_rank", context["effective_rank"], "report", np.isfinite(context["effective_rank"]), label)
+        ledger.add("G3.6_norm_finite", context["stable_rank"], "finite", np.isfinite(context["stable_rank"]), label)
+        ledger.add("E0.c_orientation", f"P={context['n_perturbation_rows']}x{context['n_shared_genes']};TCGA={context['tcga']['n_patients']}x{context['n_shared_genes']}", "rows=samples;columns=genes", True, label)
+        ledger.add("E0b_dictionary_coherence", context["dictionary_coherence"], "report", np.isfinite(context["dictionary_coherence"]), label)
+        ledger.add("E0b_equivalence_classes", context["n_equivalence_classes"], ">0", int(context["n_equivalence_classes"]) > 0, label)
+        ledger.add("E0b_guide_retrieval", context["guide_same_target_retrieval_at1"], "finite if eligible", context["guide_retrieval_eligible"] == 0 or np.isfinite(context["guide_same_target_retrieval_at1"]), label)
         for k in (10, 25, 50, 100):
             row = context[f"k{k}"]
             ledger.add(f"G4.1_positive_control_tcga_split_half_k{k}", row["ceiling"], "> null_p95", row["ceiling"] > row["null_p95"], label)
             ledger.add(f"G4.2_negative_control_random_orientation_k{k}", row["null_p95"], "finite", np.isfinite(row["null_p95"]), label)
+            ledger.add(f"G4.3_null_non_degenerate_k{k}", row["null_p95"] - row["null_median"], ">0", row["null_p95"] > row["null_median"], label)
+            ledger.add(f"G4.4_observed_below_ceiling_k{k}", row["overlap"], "<= split-half ceiling", row["overlap"] <= row["ceiling"], label)
             ledger.add(f"E0.a_delta_not_absolute_{label}_k{k}", context["delta_status"], "control-centred or explicit subtraction", True)
             ledger.add(f"E0.b_pc1_stripped_{label}_k{k}", row["pc1_removed_overlap"], "> null_p95", row["pc1_removed_overlap"] > row["null_p95"], label)
             ledger.add(f"E0.d_ceiling_{label}_k{k}", row["ceiling"], "> null_p95", row["ceiling"] > row["null_p95"], label)
