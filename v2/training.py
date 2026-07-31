@@ -317,6 +317,22 @@ class V2Trainer:
         default.
         """
         components = getattr(self, "_last_loss_components", {})
+        # This diagnostic retains the current forward graph while it obtains a
+        # gradient for every declared objective.  On a large ragged WSI batch
+        # that can require several hundred additional MiB.  Telemetry must
+        # never turn an otherwise valid experiment into an OOM failure.  We
+        # therefore record an explicit (rather than silent) skipped sample if
+        # there is insufficient headroom; a dedicated lower-token calibration
+        # pass supplies the actual gradient-cosine measurements.
+        if self.device.startswith("cuda"):
+            free_bytes, total_bytes = torch.cuda.mem_get_info(self.device)
+            minimum_headroom = 768 * 1024 * 1024
+            if free_bytes < minimum_headroom:
+                return {
+                    "gradient_diagnostics_skipped_low_memory": 1.0,
+                    "gradient_diagnostics_free_gib": float(free_bytes / 1024**3),
+                    "gradient_diagnostics_total_gib": float(total_bytes / 1024**3),
+                }
         # Measure conflict at the SHARED TRUNK where the 32 query slots are jointly
         # produced and then split into the identity/biology heads — i.e. the query
         # bank + Query-Former blocks + final norm. The previous set used pre-trunk,
@@ -326,16 +342,24 @@ class V2Trainer:
         shared += [p for p in self.model.blocks.parameters() if p.requires_grad]
         shared += [p for p in self.model.norm.parameters() if p.requires_grad]
         gradients: dict[str, list[torch.Tensor]] = {}
-        for name, component in components.items():
-            if not component.requires_grad or not torch.isfinite(component).all() or component.detach().abs().item() == 0:
-                continue
-            values = torch.autograd.grad(component, shared, retain_graph=True, allow_unused=True)
-            # Preserve parameter alignment across objectives; dropping an
-            # unused gradient would make later zip() comparisons invalid.
-            gradients[name] = [
-                torch.zeros_like(parameter, dtype=torch.float32) if value is None else value.detach().float()
-                for parameter, value in zip(shared, values)
-            ]
+        try:
+            for name, component in components.items():
+                if not component.requires_grad or not torch.isfinite(component).all() or component.detach().abs().item() == 0:
+                    continue
+                values = torch.autograd.grad(component, shared, retain_graph=True, allow_unused=True)
+                # Preserve parameter alignment across objectives; dropping an
+                # unused gradient would make later zip() comparisons invalid.
+                gradients[name] = [
+                    torch.zeros_like(parameter, dtype=torch.float32) if value is None else value.detach().float()
+                    for parameter, value in zip(shared, values)
+                ]
+        except torch.OutOfMemoryError:
+            # Fragmentation can still defeat the preflight estimate.  Release
+            # cached temporary blocks and make the skipped measurement visible
+            # in the epoch log while allowing optimisation to continue.
+            if self.device.startswith("cuda"):
+                torch.cuda.empty_cache()
+            return {"gradient_diagnostics_skipped_oom": 1.0}
         result: dict[str, float] = {}
         cosines: list[float] = []
         names = sorted(gradients)

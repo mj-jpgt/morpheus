@@ -395,6 +395,8 @@ def main() -> None:
     parser.add_argument("--targets", required=False, help="NPZ with frozen RNA target rows")
     parser.add_argument("--feature-key", default="wsi_biology"); parser.add_argument("--target-key", default="targets")
     parser.add_argument("--cancer-key", default="cancers"); parser.add_argument("--development-mask-key", default="development_mask")
+    parser.add_argument("--development-splits", default="train,val",
+                        help="comma-separated artifact split labels comprising the development universe when no explicit mask exists")
     parser.add_argument("--output"); parser.add_argument("--ks", default="5,10,20,50,100"); parser.add_argument("--seeds", default="42,43,44")
     parser.add_argument("--weight-decays", default="0.0001,0"); parser.add_argument("--latent-dim", type=int, default=128); parser.add_argument("--epochs", type=int, default=300)
     parser.add_argument("--device", default="cpu"); parser.add_argument("--official-gate-log"); parser.add_argument("--self-test", action="store_true")
@@ -409,8 +411,11 @@ def main() -> None:
         y, alignment = align_npz_rows(fx["patient_ids"], ty["patient_ids"], _npz_key(ty, args.target_key))
         target_names = ty["target_names"] if "target_names" in ty.files else None
         y, retained_target_names, excluded_random_controls = exclude_random_control_targets(y, target_names)
+        development_splits = tuple(value.strip() for value in args.development_splits.split(",") if value.strip())
+        if not development_splits:
+            raise ValueError("--development-splits must contain at least one split label")
         if args.development_mask_key in fx.files: mask = np.asarray(fx[args.development_mask_key], dtype=bool)
-        elif "split" in fx.files: mask = np.isin(fx["split"].astype(str), ("train", "development", "dev"))
+        elif "split" in fx.files: mask = np.isin(fx["split"].astype(str), development_splits)
         else: raise ValueError("features NPZ requires development_mask or split; E2 will not infer a training universe")
     if len(mask) != len(x) or len(x) != len(y) or len(x) != len(cancers): raise ValueError("NPZ row alignment/mask mismatch")
     started = time.monotonic(); ks = tuple(int(value) for value in args.ks.split(",") if value); seeds = tuple(int(value) for value in args.seeds.split(",") if value); wds = tuple(float(value) for value in args.weight_decays.split(",") if value)
@@ -418,6 +423,7 @@ def main() -> None:
     result["wall_seconds"] = time.monotonic() - started
     manifest = {"features": str(feature_path), "features_sha256": _digest(feature_path), "targets": str(target_path), "targets_sha256": _digest(target_path),
                 "feature_key": args.feature_key, "target_key": args.target_key, "development_mask_key": args.development_mask_key,
+                "development_splits": development_splits,
                 "n_total": int(len(x)), "n_development": int(mask.sum()), "n_targets_retained": int(y.shape[1]),
                 "retained_target_names": retained_target_names.tolist() if retained_target_names is not None else None,
                 "excluded_random_control_targets": excluded_random_controls, "alignment": alignment,
