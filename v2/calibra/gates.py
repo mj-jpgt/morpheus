@@ -22,6 +22,20 @@ class GateLedger:
                           "gate": gate, "value": value, "threshold": threshold,
                           "status": "PASS" if passed else "FAIL", "note": note})
 
+    def observe(self, gate: str, value: Any, expectation: Any, note: str = "") -> None:
+        """Record a SCIENTIFIC OUTCOME, which must never decide whether a run is valid.
+
+        A gate answers "is this run trustworthy"; an observation answers "what did
+        the experiment find". Registering a finding as a gate makes a *true negative*
+        indistinguishable from a broken pipeline -- the run gets marked FAIL and its
+        output quarantined precisely when the science came back "no", which is the
+        one answer we most need to be able to read. Observations are written to the
+        same ledger for provenance but are excluded from ``write()``'s verdict.
+        """
+        self.rows.append({"timestamp_utc": datetime.now(timezone.utc).isoformat(), "experiment": self.experiment,
+                          "gate": gate, "value": value, "threshold": expectation,
+                          "status": "OBSERVED", "note": note})
+
     def artifact(self, gate: str, path: str | Path) -> None:
         p = Path(path); stat = p.stat()
         digest = hashlib.sha256()
@@ -46,4 +60,5 @@ class GateLedger:
                 if new_file:
                     writer.writeheader()
                 writer.writerows(self.rows)
-        return all(row["status"] == "PASS" for row in self.rows)
+        # FAIL is disqualifying; OBSERVED rows are findings and carry no verdict.
+        return not any(row["status"] == "FAIL" for row in self.rows)
