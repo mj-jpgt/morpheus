@@ -25,7 +25,6 @@ import pandas as pd
 import torch
 
 from .gates import GateLedger
-from .spectral import effective_rank
 
 HOUSEKEEPING = {"ACTB", "GAPDH", "TUBB", "RPL13A", "B2M"}
 # Replogle's documented `gene_transcript` index has stable first three fields
@@ -295,6 +294,16 @@ def _align(p: MatrixBundle, t: MatrixBundle) -> tuple[np.ndarray, np.ndarray, li
     return px.astype(np.float32), tx.astype(np.float32), list(genes), {"n_left": len(p.genes), "n_right": len(t.genes), "n_matched_pre_constant": len(matches), "n_constant_columns_dropped": int(constant.sum()), "n_matched_evaluated": len(genes)}
 
 
+def _effective_rank_torch(x: torch.Tensor) -> float:
+    """Roy-Vetterli effective rank computed on the active device."""
+    centred = x - x.mean(dim=0, keepdim=True)
+    singular = torch.linalg.svdvals(centred)
+    singular = singular[singular > 1e-12]
+    if singular.numel() == 0: return 0.0
+    weights = singular / singular.sum()
+    return float(torch.exp(-(weights * torch.log(weights)).sum()).cpu())
+
+
 def _health(x: torch.Tensor) -> dict[str, float]:
     var = x.var(dim=0, unbiased=False); mean_var = var.mean().clamp_min(1e-12)
     dead = float((var < 1e-6 * mean_var).float().mean().cpu())
@@ -304,7 +313,7 @@ def _health(x: torch.Tensor) -> dict[str, float]:
     mask = ~torch.eye(corr.shape[0], dtype=torch.bool, device=x.device)
     duplicate = float((corr[mask].abs() > .99).float().mean().cpu())
     norms = torch.linalg.vector_norm(x, dim=1)
-    return {"effective_rank": float(effective_rank(x)), "dead_fraction": dead, "duplicate_pair_fraction": duplicate,
+    return {"effective_rank": _effective_rank_torch(x), "dead_fraction": dead, "duplicate_pair_fraction": duplicate,
             "min_sample_std": float(x.std(0).min().cpu()), "mean_norm": float(norms.mean().cpu()), "median_norm": float(norms.median().cpu()),
             "n_nonfinite": int((~torch.isfinite(x)).sum().cpu())}
 
@@ -377,7 +386,7 @@ def _context(name: str, p: MatrixBundle, t: MatrixBundle, *, device: torch.devic
     out: dict[str, object] = {"context": name, "n_shared_genes": len(genes), "join": join, "perturbation": p.meta, "tcga": t.meta,
         "housekeepers_present": sorted(HOUSEKEEPING.intersection(genes)), "perturbation_health": p_health, "tcga_health": t_health,
         "rank": {"retained_components": int(sp.numel()), "effective_rank_retained": p_health["effective_rank"],
-                 "stable_rank_retained_lower_bound": float((sp.square().sum() / sp[0].square()).cpu())},
+                 "stable_rank_retained_estimate": float((sp.square().sum() / sp[0].square()).cpu())},
         "dictionary": _dictionary_metrics(pt, p.targets), "split": split_meta}
     for k in (10, 25, 50, 100):
         observed = _overlap(vp, vt, k, 1); ceiling = _overlap(va, vb, k, 1)
@@ -418,6 +427,7 @@ def _self_test() -> None:
     assert _pc1_gate(.2, .1) and not _pc1_gate(.1, .1)
     assert _shuffle_gate(.05, .1) and not _shuffle_gate(.2, .1)
     assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
+    assert 1.0 <= _effective_rank_torch(torch.eye(8)) <= 8.0
     # Exercise the real H5AD loader with deliberately inconsistent X versus
     # (control_expr, fold_expr).  A cosmetic metadata check would pass this;
     # the E0.a data-semantic guard must not.
