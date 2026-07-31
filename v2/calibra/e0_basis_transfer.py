@@ -196,7 +196,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     matrix_is_delta = (centroid_ratio <= 0.10 and fold_relation_error <= 1e-5 and control_expr_coverage >= .80
                        and control_expr_nonnegative and target_vector_coverage >= .80 and target_vector_corr >= .80 and target_vector_mae <= .30)
     if not matrix_is_delta:
-        raise ValueError(f"{path}: cannot assert delta response (centroid_ratio={centroid_ratio:.3g}, control_expr_coverage={control_expr_coverage:.3g}, target_gene_hits={target_gene_hits}, target_coverage={target_vector_coverage:.3g}, target_control_ref_r={target_vector_corr:.3g}, target_control_ref_mae={target_vector_mae:.3g})")
+        raise ValueError(f"{path}: cannot assert delta response (centroid_ratio={centroid_ratio:.3g}, control_expr_coverage={control_expr_coverage:.3g}, target_gene_hits={target_gene_hits}, target_coverage={target_vector_coverage:.3g}, target_control_ref_r={target_vector_corr:.3g}, target_control_ref_mae={target_vector_mae:.3g}, target_examples={(targets or [])[:3]}, gene_examples={genes[:3].tolist()})")
     usable_controls = controls & keep_rows
     noncontrol = (~controls) & keep_rows
     # targets are indexed over raw non-controls, so retain only usable
