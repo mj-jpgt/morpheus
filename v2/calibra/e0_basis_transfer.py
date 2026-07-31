@@ -367,9 +367,17 @@ def _context(name: str, p: MatrixBundle, t: MatrixBundle, *, device: torch.devic
     pt, tt = torch.as_tensor(px, device=device), torch.as_tensor(tx, device=device)
     q = 110; vp, sp = _right_svd(pt, q, seed); vt, _ = _right_svd(tt, q, seed + 1)
     va, vb, split_meta = _split_half(tt, t.groups or [], q, seed + 2)
+    p_latent, t_latent = pt @ vp, tt @ vt
+    p_health, t_health = _health(p_latent), _health(t_latent)
+    # E0 uses randomized rank-q PCA for the principal-angle test.  A full
+    # NumPy SVD here would silently move the run back to CPU for minutes/hours.
+    # Report rank *within that explicitly retained q=110 subspace* instead;
+    # this is the relevant representation health quantity, not a claim about
+    # the uncomputed full matrix rank.
     out: dict[str, object] = {"context": name, "n_shared_genes": len(genes), "join": join, "perturbation": p.meta, "tcga": t.meta,
-        "housekeepers_present": sorted(HOUSEKEEPING.intersection(genes)), "perturbation_health": _health(pt @ vp), "tcga_health": _health(tt @ vt),
-        "rank": {"effective": float(effective_rank(px)), "algebraic": int(torch.linalg.matrix_rank(pt).cpu()), "stable": float((torch.linalg.norm(pt).square() / sp[0].square()).cpu())},
+        "housekeepers_present": sorted(HOUSEKEEPING.intersection(genes)), "perturbation_health": p_health, "tcga_health": t_health,
+        "rank": {"retained_components": int(sp.numel()), "effective_rank_retained": p_health["effective_rank"],
+                 "stable_rank_retained_lower_bound": float((sp.square().sum() / sp[0].square()).cpu())},
         "dictionary": _dictionary_metrics(pt, p.targets), "split": split_meta}
     for k in (10, 25, 50, 100):
         observed = _overlap(vp, vt, k, 1); ceiling = _overlap(va, vb, k, 1)
