@@ -118,6 +118,19 @@ def _parse_targets(index: pd.Index, controls: np.ndarray) -> tuple[list[str] | N
     return targets, {"guide_target_status": "validated_gene_transcript_index", "n_targets": int(len(counts)), "n_replicated_targets": replicated}
 
 
+def _aggregate_duplicate_symbols(x: np.ndarray, genes: np.ndarray) -> tuple[np.ndarray, np.ndarray, int]:
+    """Mean technical duplicate columns once, preventing duplicated-gene weighting."""
+    positions: dict[str, list[int]] = {}
+    for index, gene in enumerate(genes.tolist()): positions.setdefault(str(gene), []).append(index)
+    duplicates = int(sum(len(indices) - 1 for indices in positions.values()))
+    if not duplicates: return x, genes, 0
+    ordered = list(positions)
+    merged = np.empty((x.shape[0], len(ordered)), dtype=np.float32)
+    for index, gene in enumerate(ordered):
+        merged[:, index] = x[:, positions[gene]].mean(axis=1)
+    return merged, np.asarray(ordered), duplicates
+
+
 @dataclass
 class MatrixBundle:
     x: np.ndarray
@@ -135,9 +148,6 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     if not controls.any():
         raise ValueError(f"{path}: no core_control rows")
     genes = np.asarray([_symbol(v) for v in data.var["gene_name"].to_numpy()])
-    duplicates = int(len(genes) - len(set(genes)))
-    if duplicates:
-        raise ValueError(f"{path}: {duplicates} duplicate symbols after canonicalisation; refusing gene reweighting")
     finite_cols = np.isfinite(raw).all(axis=0)
     finite_rows = np.isfinite(raw).all(axis=1)
     all_zero_rows = np.all(np.nan_to_num(raw, nan=0.0) == 0.0, axis=1)
@@ -147,8 +157,10 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     # The control rows test delta semantics before any optional centring.  The
     # documented control-expression fields must also agree with the measured
     # target-gene direction in X; a near-zero centroid by itself is not enough.
-    control_centroid = raw[controls & keep_rows][:, finite_cols].mean(axis=0)
-    response = raw[(~controls) & keep_rows][:, finite_cols]
+    raw = raw[:, finite_cols]; genes = genes[finite_cols]
+    raw, genes, duplicates = _aggregate_duplicate_symbols(raw, genes)
+    control_centroid = raw[controls & keep_rows].mean(axis=0)
+    response = raw[(~controls) & keep_rows]
     response_norm = np.linalg.norm(response, axis=1)
     centroid_ratio = float(np.linalg.norm(control_centroid) / max(np.median(response_norm), 1e-12))
     fold = data.obs["fold_expr"].to_numpy(dtype=float)
@@ -159,7 +171,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     targets, target_meta = _parse_targets(data.obs_names, controls)
     target_vector_corr = float("nan"); target_vector_mae = float("inf"); target_vector_coverage = 0.0
     if targets is not None:
-        symbols = {_symbol(gene): i for i, gene in enumerate(data.var["gene_name"].to_numpy())}
+        symbols = {str(gene): i for i, gene in enumerate(genes)}
         raw_noncontrol = np.flatnonzero(~controls)
         target_cols = np.asarray([symbols.get(target, -1) for target in targets])
         valid_target = (target_cols >= 0) & np.isfinite(fold[raw_noncontrol]) & (fold[raw_noncontrol] >= 0)
@@ -192,12 +204,12 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     if targets is not None and np.any(~keep_rows[~controls]):
         targets = None
         target_meta = {"guide_target_status": "unavailable_noncontrol_row_filter_changed_index"}
-    x = raw[noncontrol][:, finite_cols]
+    x = raw[noncontrol]
     return MatrixBundle(x=x, genes=genes[finite_cols].tolist(), row_ids=data.obs_names[noncontrol].astype(str).tolist(), targets=targets,
         meta={"source": str(path), "shape_raw": list(data.shape), "n_control_rows_raw": int(controls.sum()),
               "n_control_rows_used": int(usable_controls.sum()), "n_rows_dropped_nonfinite": int((~finite_rows).sum()),
               "n_rows_dropped_all_zero": int((all_zero_rows & finite_rows).sum()), "n_genes_dropped_nonfinite": int((~finite_cols).sum()),
-              "n_duplicate_symbols": duplicates, "n_perturbation_rows": int(noncontrol.sum()), "control_centroid_ratio": centroid_ratio,
+              "n_duplicate_symbols_aggregated": duplicates, "n_perturbation_rows": int(noncontrol.sum()), "control_centroid_ratio": centroid_ratio,
               "fold_pct_relation_max_abs_error": fold_relation_error, "control_expr_coverage": control_expr_coverage,
               "control_expr_nonnegative": control_expr_nonnegative, "target_vector_coverage": target_vector_coverage,
               "target_vector_control_referenced_correlation": target_vector_corr, "target_vector_control_referenced_mae": target_vector_mae,
