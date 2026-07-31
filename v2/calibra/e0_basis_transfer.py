@@ -51,6 +51,17 @@ def _git(root: Path, *args: str) -> str:
         return "unavailable"
 
 
+def _meaningful_dirty(root: Path) -> list[str]:
+    """Ignore only protocol-required append-only ledgers, never source changes."""
+    allowed = {"v2/research/rebase/nature/GATE_LOG.md", "v2/research/rebase/nature/EXPERIMENT_LOG.md"}
+    lines = [line for line in _git(root, "status", "--porcelain").splitlines() if line]
+    dirty: list[str] = []
+    for line in lines:
+        path = line[3:].replace("\\", "/") if len(line) > 3 else line
+        if path not in allowed: dirty.append(line)
+    return dirty
+
+
 def _right_svd(x: torch.Tensor, q: int, seed: int) -> tuple[torch.Tensor, torch.Tensor]:
     """Top gene-space right singular vectors and singular values on GPU/CPU."""
     q = min(q, x.shape[0] - 1, x.shape[1] - 1)
@@ -527,7 +538,7 @@ def main() -> None:
     source = Path(__file__).resolve(); workspace_link = Path(args.workspace_link)
     link_is_real = workspace_link.is_symlink() and workspace_link.resolve() == root and root in source.parents
     ledger.add("G0.1_workspace_real", f"link={workspace_link};target={workspace_link.resolve() if workspace_link.exists() else 'missing'}", "declared runtime link resolves to exact git root", link_is_real, "Linux symlink is the remote equivalent of the required Windows Junction; prevents stale copied source")
-    dirty = _git(root, "status", "--porcelain"); ledger.add("G0.2_code_identity", _git(root,"rev-parse","HEAD"), "clean git worktree", dirty == "", f"dirty={dirty or 'none'}")
+    dirty = _meaningful_dirty(root); ledger.add("G0.2_code_identity", _git(root,"rev-parse","HEAD"), "clean source/config worktree (protocol ledgers allowed)", not dirty, f"dirty={dirty or 'none'}")
     for label, value in (("G0.3_k562_identity",args.k562),("G0.3_rpe1_identity",args.rpe1),("G0.3_tcga_identity",args.tcga),("G0.3_tcga_registry_identity",args.tcga_registry)): ledger.artifact(label, value)
     ledger.add("G0.4_manifest_read", "data-source experiment; no trained artifacts compared", "not applicable, explicitly declared", True, "input identities emitted in input_manifest.json")
     p_k, p_r = _load_perturbation(Path(args.k562)), _load_perturbation(Path(args.rpe1))
