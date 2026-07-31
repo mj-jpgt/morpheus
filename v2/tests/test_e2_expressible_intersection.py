@@ -5,13 +5,15 @@ import numpy as np
 
 try:  # Lambda runs this checkout through a ``morpheus`` workspace symlink.
     from morpheus.v2.calibra.e2_expressible_intersection import (
-        classify_rank_curve, construct_synthetic_targets, fit_synthetic_target_transform,
-        grouped_train_test, liveness_gates, train_controlled_head,
+        align_npz_rows, apply_synthetic_target_transform, classify_rank_curve, construct_synthetic_targets,
+        exclude_random_control_targets, fit_synthetic_target_transform, grouped_train_test, liveness_gates,
+        train_controlled_head,
     )
 except ModuleNotFoundError:  # Local checkout direct test path.
     from v2.calibra.e2_expressible_intersection import (
-        classify_rank_curve, construct_synthetic_targets, fit_synthetic_target_transform,
-        grouped_train_test, liveness_gates, train_controlled_head,
+        align_npz_rows, apply_synthetic_target_transform, classify_rank_curve, construct_synthetic_targets,
+        exclude_random_control_targets, fit_synthetic_target_transform, grouped_train_test, liveness_gates,
+        train_controlled_head,
     )
 
 
@@ -47,6 +49,40 @@ def test_synthetic_targets_are_fixed_width_and_train_only_fit():
     assert np.allclose(transform.x_basis, refit.x_basis)
     assert np.allclose(transform.y_basis, refit.y_basis)
     assert np.allclose(transform.residual_beta, refit.residual_beta)
+
+
+def test_test_target_variance_cannot_change_the_fitted_scale():
+    x, y, cancers = _data(); train, test = grouped_train_test(cancers, seed=7)
+    transform = fit_synthetic_target_transform(x[train], y[train], 3)
+    original = apply_synthetic_target_transform(x[test], y[test], transform)
+    # The test labels legitimately change the residual target, but test-wide
+    # standard deviation may not renormalise every held-out output dimension.
+    changed = y[test].copy(); changed[:, 0] *= 1000
+    transformed = apply_synthetic_target_transform(x[test], changed, transform)
+    assert np.allclose(transform.target_scale, fit_synthetic_target_transform(x[train], y[train], 3).target_scale)
+    # All unaffected target columns are bitwise protected from the changed
+    # test-column scale; this catches the former test-std leakage directly.
+    assert np.allclose(original[:, 1:], transformed[:, 1:])
+
+
+def test_patient_alignment_is_identity_based_and_fails_closed():
+    targets = np.array([[20., 21.], [10., 11.], [30., 31.]])
+    aligned, manifest = align_npz_rows(np.array(["A", "B", "C"]), np.array(["B", "A", "C"]), targets)
+    assert np.array_equal(aligned, np.array([[10., 11.], [20., 21.], [30., 31.]]))
+    assert manifest["alignment"] == "target_reordered_to_feature_patient_ids"
+    for target_ids in (np.array(["A", "A", "C"]), np.array(["A", "B", "D"])):
+        try: align_npz_rows(np.array(["A", "B", "C"]), target_ids, targets)
+        except ValueError: continue
+        raise AssertionError("duplicate or unmatched patient identity must fail")
+
+
+def test_random_control_targets_are_excluded_only_when_named():
+    values = np.arange(15., dtype=float).reshape(3, 5)
+    filtered, names, excluded = exclude_random_control_targets(values, np.array(["biology", "RANDOM_CONTROL__A", "immune", "RANDOM_CONTROL__B", "state"]))
+    assert filtered.shape == (3, 3) and names.tolist() == ["biology", "immune", "state"]
+    assert excluded == ["RANDOM_CONTROL__A", "RANDOM_CONTROL__B"]
+    untouched, unnamed, no_excluded = exclude_random_control_targets(values, None)
+    assert np.array_equal(untouched, values) and unnamed is None and no_excluded == []
 
 
 def test_invalid_k_fails_closed():

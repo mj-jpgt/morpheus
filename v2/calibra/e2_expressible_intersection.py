@@ -40,6 +40,7 @@ class SyntheticTargetTransform:
     y_basis: np.ndarray
     singular: np.ndarray
     residual_beta: np.ndarray
+    target_scale: np.ndarray
     k: int
     full_expressible_dim: int
 
@@ -98,8 +99,14 @@ def fit_synthetic_target_transform(features_train: np.ndarray, targets_train: np
         raise ValueError(f"k={k} must lie in [1, {full}]")
     # The pseudoinverse is fit exclusively on the development-training fold.
     beta, *_ = np.linalg.lstsq(xc, yc, rcond=1e-8)
+    # Fit scale once on development-training rows.  Applying a separately
+    # estimated test standard deviation would leak outer-test distributional
+    # information into the target representation.
+    train_signal = (xc @ u[:, :k]) @ vt[:k]
+    train_residual = yc - xc @ beta
+    target_scale = np.maximum((train_signal + train_residual).std(0, keepdims=True), 1e-8)
     return SyntheticTargetTransform(x_mean=x_mean, y_mean=y_mean, x_basis=u[:, :k], y_basis=vt[:k].T,
-                                    singular=singular[:k], residual_beta=beta, k=int(k),
+                                    singular=singular[:k], residual_beta=beta, target_scale=target_scale, k=int(k),
                                     full_expressible_dim=full)
 
 
@@ -115,8 +122,7 @@ def apply_synthetic_target_transform(features: np.ndarray, targets: np.ndarray, 
     signal = (xc @ transform.x_basis) @ transform.y_basis.T
     residual = yc - xc @ transform.residual_beta
     result = signal + residual
-    scale = result.std(0, keepdims=True)
-    return result / np.maximum(scale, 1e-8)
+    return result / transform.target_scale
 
 
 def construct_synthetic_targets(features_train: np.ndarray, targets_train: np.ndarray,
@@ -320,6 +326,42 @@ def _npz_key(raw: Any, requested: str) -> np.ndarray:
     return raw[requested]
 
 
+def align_npz_rows(feature_patient_ids: np.ndarray, target_patient_ids: np.ndarray,
+                   targets: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    """Align target rows to feature order and fail closed on identity ambiguity."""
+    feature_ids = np.asarray(feature_patient_ids).astype(str)
+    target_ids = np.asarray(target_patient_ids).astype(str)
+    values = _finite_2d("targets", targets)
+    if len(feature_ids) != len(set(feature_ids)):
+        raise ValueError("feature NPZ contains duplicate patient_ids")
+    if len(target_ids) != len(set(target_ids)):
+        raise ValueError("target NPZ contains duplicate patient_ids")
+    if len(target_ids) != len(values):
+        raise ValueError("target patient_ids/target rows mismatch")
+    feature_set, target_set = set(feature_ids), set(target_ids)
+    if feature_set != target_set:
+        missing_target, extra_target = sorted(feature_set - target_set), sorted(target_set - feature_set)
+        raise ValueError(f"feature/target patient_ids differ: missing_target={missing_target[:5]} extra_target={extra_target[:5]}")
+    target_order = {patient_id: index for index, patient_id in enumerate(target_ids)}
+    reordered = values[[target_order[patient_id] for patient_id in feature_ids]]
+    return reordered, {"n_patients": int(len(feature_ids)), "alignment": "target_reordered_to_feature_patient_ids",
+                       "patient_ids_sha256": hashlib.sha256("\n".join(feature_ids).encode()).hexdigest()}
+
+
+def exclude_random_control_targets(targets: np.ndarray, target_names: np.ndarray | None) -> tuple[np.ndarray, np.ndarray | None, list[str]]:
+    """Remove declared matched random controls from E2's biological targets."""
+    values = _finite_2d("targets", targets)
+    if target_names is None:
+        return values, None, []
+    names = np.asarray(target_names).astype(str)
+    if names.ndim != 1 or len(names) != values.shape[1]:
+        raise ValueError("target_names must be a one-dimensional array matching target width")
+    keep = ~np.char.startswith(names, "RANDOM_CONTROL__")
+    if not keep.any():
+        raise ValueError("all targets are RANDOM_CONTROL__; no biological E2 target remains")
+    return values[:, keep], names[keep], names[~keep].tolist()
+
+
 def _digest(path: Path) -> str:
     value = hashlib.sha256()
     with path.open("rb") as handle:
@@ -362,7 +404,11 @@ def main() -> None:
     feature_path, target_path, output = Path(args.features), Path(args.targets), Path(args.output); output.mkdir(parents=True, exist_ok=True)
     with np.load(feature_path, allow_pickle=False) as fx, np.load(target_path, allow_pickle=False) as ty:
         x = _npz_key(fx, args.feature_key); cancers = _npz_key(fx, args.cancer_key)
-        y = _npz_key(ty, args.target_key)
+        if "patient_ids" not in fx.files or "patient_ids" not in ty.files:
+            raise ValueError("both NPZ files must expose patient_ids; positional alignment is forbidden")
+        y, alignment = align_npz_rows(fx["patient_ids"], ty["patient_ids"], _npz_key(ty, args.target_key))
+        target_names = ty["target_names"] if "target_names" in ty.files else None
+        y, retained_target_names, excluded_random_controls = exclude_random_control_targets(y, target_names)
         if args.development_mask_key in fx.files: mask = np.asarray(fx[args.development_mask_key], dtype=bool)
         elif "split" in fx.files: mask = np.isin(fx["split"].astype(str), ("train", "development", "dev"))
         else: raise ValueError("features NPZ requires development_mask or split; E2 will not infer a training universe")
@@ -372,9 +418,11 @@ def main() -> None:
     result["wall_seconds"] = time.monotonic() - started
     manifest = {"features": str(feature_path), "features_sha256": _digest(feature_path), "targets": str(target_path), "targets_sha256": _digest(target_path),
                 "feature_key": args.feature_key, "target_key": args.target_key, "development_mask_key": args.development_mask_key,
-                "n_total": int(len(x)), "n_development": int(mask.sum()), "python": sys.version, "platform": platform.platform(), "command": sys.argv}
+                "n_total": int(len(x)), "n_development": int(mask.sum()), "n_targets_retained": int(y.shape[1]),
+                "retained_target_names": retained_target_names.tolist() if retained_target_names is not None else None,
+                "excluded_random_control_targets": excluded_random_controls, "alignment": alignment,
+                "python": sys.version, "platform": platform.platform(), "command": sys.argv}
     (output / "input_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    (output / "e2_result.json").write_text(json.dumps({key: value for key, value in result.items() if key != "rows"}, indent=2), encoding="utf-8")
     _write_rows(output / "e2_rows.csv", result["rows"])
     ledger = GateLedger(output, "E2_expressible_intersection", official_log=args.official_gate_log)
     ledger.artifact("G0.3_feature_identity", feature_path); ledger.artifact("G0.3_target_identity", target_path)
@@ -394,6 +442,11 @@ def main() -> None:
     ledger.add("E2.b_weight_decay_zero_control", len(wd0), ">0 matched rows", bool(wd0), "zero-WD sweep present")
     ledger.add("G0.5_required_gate_coverage", "E2-specific G2/E2a/E2b", "all emitted", bool(result["rows"]), "E2 has no cross-modal G4 claim")
     result["gates_pass"] = ledger.write()
+    failed_gates = [str(row["gate"]) for row in ledger.rows if row["status"] != "PASS"]
+    (output / "e2_result.json").write_text(json.dumps({key: value for key, value in result.items() if key != "rows"}, indent=2), encoding="utf-8")
+    (output / "gate_summary.json").write_text(json.dumps({"experiment": "E2_expressible_intersection", "gates_pass": result["gates_pass"],
+                                                            "n_gate_rows": len(ledger.rows), "failed_gates": failed_gates,
+                                                            "gate_rows": str(ledger.path)}, indent=2), encoding="utf-8")
     print(json.dumps({"output": str(output), "gates_pass": result["gates_pass"], "rank_curve": result["rank_curve"]}, indent=2))
 
 
