@@ -79,7 +79,9 @@ def parse_manifest(raw: np.lib.npyio.NpzFile) -> dict:
 
 def validate_matched_artifacts(before_path: str | Path, after_path: str | Path, *,
                                allowed_manifest_paths: Iterable[str] =
-                               ("decorrelation_weight", "config.decorrelation_weight")) -> dict:
+                               ("decorrelation_weight", "config.decorrelation_weight",
+                                "run_configuration.decorrelation_weight",
+                                "source_manifest.configuration.decorrelation_weight")) -> dict:
     """Hard-stop unless the two E1 arms are the same experiment except the term.
 
     Exact registry equality is stronger than an inner join: silently dropping a
@@ -230,7 +232,9 @@ def run_e1(before_path: str | Path, after_path: str | Path, targets_path: str | 
            state: str = "wsi_biology", partition: str = "test", n_components: int = 32,
            levels: tuple[float, ...] = (0.0, 0.02, 0.05, 0.10, 0.20), n_draws: int = 10,
            n_permutations: int = 100, min_site_count: int = 10, seed: int = 42,
-           allowed_manifest_paths: Iterable[str] = ("decorrelation_weight", "config.decorrelation_weight")) -> pd.DataFrame:
+           allowed_manifest_paths: Iterable[str] = ("decorrelation_weight", "config.decorrelation_weight",
+                                                    "run_configuration.decorrelation_weight",
+                                                    "source_manifest.configuration.decorrelation_weight")) -> pd.DataFrame:
     """Run E1 and atomically emit rows plus protocol/provenance manifests."""
     matched = validate_matched_artifacts(before_path, after_path, allowed_manifest_paths=allowed_manifest_paths)
     target_ids, scores, names, index = _load_targets(targets_path)
@@ -315,7 +319,9 @@ def main() -> None:
     parser.add_argument("--min-site-count", type=int, default=10)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--allowed-manifest-path", action="append",
-                        default=["decorrelation_weight", "config.decorrelation_weight"])
+                        default=["decorrelation_weight", "config.decorrelation_weight",
+                                 "run_configuration.decorrelation_weight",
+                                 "source_manifest.configuration.decorrelation_weight"])
     args = parser.parse_args()
     rows = run_e1(args.before_artifact, args.after_artifact, args.targets, args.output, state=args.state,
                   partition=args.partition, n_components=args.n_components,

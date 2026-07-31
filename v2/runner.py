@@ -386,6 +386,11 @@ def run(args: argparse.Namespace) -> Path:
         "seed": args.seed, "epochs": args.epochs, "token_budget": args.token_budget,
         "hidden_dim": args.hidden_dim, "layers": args.layers, "heads": args.heads,
         "learning_rate": args.learning_rate, "weight_decay": args.weight_decay,
+        # This is the sole intervention in the E1 matched-arm experiment.  It
+        # must be part of the immutable artifact manifest; otherwise a pair of
+        # exports can look provenance-identical even when their optimisation
+        # differed, making the rank comparison unauditable.
+        "decorrelation_weight": args.decorrelation_weight,
         "gradient_diagnostics_every": args.gradient_diagnostics_every,
         "objective_profile": args.objective_profile,
         "pretrain_epochs": args.pretrain_epochs, "pretrain_checkpoint": args.pretrain_checkpoint,
