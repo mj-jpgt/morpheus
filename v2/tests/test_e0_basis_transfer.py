@@ -439,3 +439,23 @@ def test_both_arms_are_processed_identically():
     b, _, _ = _arm_result(x, vt, ceiling=ceiling, n_genes=200, cfg=cfg, draws=100, seed=7, arm="nonresponsive")
     assert a["k10"]["pc1_removed_overlap"] == b["k10"]["pc1_removed_overlap"]
     assert a["k10"]["bootstrap_ci95"] == b["k10"]["bootstrap_ci95"]
+
+
+def test_n_matching_is_symmetric():
+    """Whichever arm is larger must be downsampled. Subsampling only the responsive
+    arm silently sets n_matched=False whenever the control arm is bigger -- which
+    happens as soon as nonresponsive_p is relaxed (K562 at p>0.05: 4251 control vs
+    3132 responsive) -- auto-failing a context for bookkeeping, not science."""
+    from morpheus.v2.calibra.e0_basis_transfer import _energy_arms, TransferConfig
+    cfg = TransferConfig(responsive_p=0.01, nonresponsive_p=0.05)
+    # control arm deliberately LARGER than the responsive arm
+    energy = np.concatenate([np.full(30, 0.001), np.full(120, 0.5)])
+    rows, meta = _energy_arms(energy, cfg=cfg, seed=0)
+    assert len(rows["responsive_matched"]) == len(rows["nonresponsive"]) == 30, meta
+    assert meta["arms_are_n_matched"] is True
+    # and the usual direction still works
+    energy2 = np.concatenate([np.full(200, 0.001), np.full(40, 0.9)])
+    rows2, meta2 = _energy_arms(energy2, cfg=cfg, seed=0)
+    assert len(rows2["responsive_matched"]) == len(rows2["nonresponsive"]) == 40, meta2
+    # subsampled rows must be a genuine subset of the source arm
+    assert set(rows2["responsive_matched"]).issubset(set(rows2["responsive_full"]))

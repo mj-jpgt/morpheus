@@ -303,3 +303,34 @@ works" — still publishable, but escalate before proceeding; the milestone chai
 `v2/research/rebase/METHOD_PLAN.md` (the method + honest ceiling) →
 `v2/research/rebase/nature/NATURE_THESIS.md` (why this direction) →
 `v2/research/rebase/NEAR_COLLISIONS.md` (prior art, incl. the fabricated citations).
+
+---
+
+## CLAIM GUARDS — the caveats that produce good numbers while the claim is wrong
+
+**Enforced in code: `v2/calibra/claim_guards.py`, tested in `tests/test_claim_guards.py` (15 tests).
+Route every claim through `validate_claim()` before it is written up. An inadmissible claim emits
+`metric="status", value=NaN, note="inadmissible_<code>"` — visible, never dropped.**
+
+These are NOT completeness complaints. Partial coverage of biology is normal and is extended by
+adding scales. Each item below is a case where a **causal attribution silently becomes wrong** while
+the numbers look fine — which is the only failure mode a certified catalogue actually has.
+
+| code | the silent failure | what discharges it |
+|---|---|---|
+| **`composition_attribution`** | The dictionary is built from **pure cell-line populations** — no immune cells, stroma, vasculature or architecture, which is much of what an H&E slide shows. In patients, tumour-intrinsic programmes **correlate** with composition (proliferative → immune-cold, mesenchymal → stroma-rich), so the fit succeeds numerically while the coefficients absorb the composition signal the dictionary cannot represent. The catalogue then reports "gene *g* is morphologically legible" when the truth is "*g* correlates with an infiltration pattern, and the pattern is what is visible." **Adding modalities multiplies this rather than fixing it.** | cell-of-origin label (tumour-autonomous / immune-mediated / stromal / composition-driven) from spatial or deconvolution evidence, **or** beating a capacity-matched composition baseline |
+| **`purity_confound`** | TCGA bulk RNA is a **30–90% tumour mixture**; dictionary atoms are pure populations, so coefficients absorb purity — which is also one of the most visually obvious features on a slide. "Morphology predicts molecular state" has a trivial explanation that reproduces the result exactly. **Flagged open since Phase 1 and still not closed.** | purity / mRNAsi in the confound design, effect survives |
+| **`sign_blind`** | `svdvals(Vaᵀ Vb)` is invariant to response sign: an **anti**-aligned effect scores identically to an aligned one. Separately, CRISPRi measures **loss** of function while tumours are largely **gain** of function. A discovery claim can come out inverted. | a signed statistic, plus explicit statement of the knockdown-vs-GoF asymmetry |
+| **`proliferation_deflation`** | The responsive arm is selected on *having a detectable effect*, enriching for essential / ribosome / cell-cycle genes. If E0's alignment is **proliferation matching proliferation**, it is the most generic axis in cancer biology and deflates to near-nothing — while looking identical to a real finding. **Untested.** | re-run with proliferation regressed out or stratified; gap must survive |
+| **`single_platform`** | K562 and RPE1 are different **lineages** but the **same Perturb-seq protocol**. A shared platform artifact replicates across them exactly as readily as shared biology. Cross-lineage agreement rules out "a K562 quirk", **not** "a Perturb-seq quirk". | a perturbation resource on a different platform, or scope the claim to "replicates across lineages within Perturb-seq" |
+| **`no_external_cohort`** | Every morphology result so far is TCGA, with well-documented site/scanner effects. Confound removal was verified for cancer type, **not across cohorts**, so a site-specific artifact survives the current checks intact. | replicate in CPTAC / HEST-1k / equivalent |
+
+**Pinned status (commit `24d1bff`): the E0 result is NOT yet an admissible transfer claim.**
+It is blocked on `proliferation_deflation` and `single_platform`. `test_current_e0_result_is_not_yet_an_admissible_transfer_claim` fails if anyone discharges these, so the project state has to be updated deliberately rather than drifting.
+
+**Ranked by how much each would cost us if it turns out to be the explanation:**
+1. `proliferation_deflation` — cheapest to test, and the one most likely to be true. **Do this first.**
+2. `purity_confound` — cheap, already overdue, and would explain the morphology result outright.
+3. `composition_attribution` — needs the spatial stage; the reason cell-of-origin is non-negotiable there.
+4. `sign_blind` — does not threaten E0's existence, but blocks every per-gene directional claim.
+5. `single_platform` / `no_external_cohort` — scope limits, dischargeable by data we can obtain.

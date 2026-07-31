@@ -560,10 +560,16 @@ def _energy_arms(energy_p: np.ndarray | None, *, cfg: TransferConfig, seed: int)
     responsive_full = np.flatnonzero(finite & (energy_p < cfg.responsive_p))
     nonresponsive = np.flatnonzero(finite & (energy_p > cfg.nonresponsive_p))
     rng = np.random.default_rng(seed)
-    if len(nonresponsive) and len(responsive_full) > len(nonresponsive):
-        matched = np.sort(rng.choice(responsive_full, size=len(nonresponsive), replace=False))
-    else:
-        matched = responsive_full.copy()
+    # SYMMETRIC matching. Subsampling only the responsive arm silently breaks the
+    # decision whenever the control arm is the larger one -- which happens as soon as
+    # nonresponsive_p is relaxed (K562 at p>0.05 has 4251 control vs 3132 responsive),
+    # leaving n_matched False and auto-failing a context for a bookkeeping reason
+    # rather than a scientific one. Downsample whichever arm is larger.
+    target = min(len(responsive_full), len(nonresponsive)) if len(nonresponsive) else len(responsive_full)
+    matched = (np.sort(rng.choice(responsive_full, size=target, replace=False))
+               if len(responsive_full) > target else responsive_full.copy())
+    if len(nonresponsive) > target:
+        nonresponsive = np.sort(rng.choice(nonresponsive, size=target, replace=False))
     meta = {"arm_status": "available", "n_perturbation_rows": int(len(energy_p)),
             "n_energy_p_nonfinite": int((~finite).sum()), "responsive_p_threshold": cfg.responsive_p,
             "nonresponsive_p_threshold": cfg.nonresponsive_p, "arm_subsample_seed": int(seed),
@@ -1004,6 +1010,15 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--k562"); parser.add_argument("--rpe1"); parser.add_argument("--tcga"); parser.add_argument("--tcga-registry"); parser.add_argument("--output")
     parser.add_argument("--draws", type=int, default=100); parser.add_argument("--bootstrap-draws", type=int, default=200)
+    # Exposed for the matched cross-lineage replication: RPE1 has too few
+    # non-responsive perturbations to support the primary q=150 / k<=100 budget, so
+    # the replication runs at a reduced rank on BOTH lineages (an estimator change
+    # makes numbers incomparable across contexts unless it is applied to all of them).
+    parser.add_argument("--ks", default="", help="comma-separated k values (default 10,25,50,100)")
+    parser.add_argument("--q", type=int, default=0, help="randomized-SVD rank budget (default 150)")
+    parser.add_argument("--min-q", type=int, default=0, help="minimum rank candidates (default 101)")
+    parser.add_argument("--nonresponsive-p", type=float, default=0.0, help="control arm: energy_test_p_value > this (default 0.5)")
+    parser.add_argument("--responsive-p", type=float, default=0.0, help="responsive arm: energy_test_p_value < this (default 0.01)")
     parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default="cuda")
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[2])); parser.add_argument("--workspace-link"); parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -1011,7 +1026,21 @@ def main() -> None:
     if not all((args.k562,args.rpe1,args.tcga,args.tcga_registry,args.output,args.workspace_link)): parser.error("k562, rpe1, tcga, tcga-registry, output, and workspace-link are required")
     if args.draws < 100: parser.error("--draws must be >=100 for E0's predeclared floor control")
     if args.bootstrap_draws < 200: parser.error("--bootstrap-draws must be >=200 for a usable percentile interval")
-    cfg = TransferConfig(draws=args.draws, bootstrap_draws=args.bootstrap_draws)
+    base = TransferConfig()
+    ks = tuple(int(v) for v in args.ks.split(",")) if args.ks else base.ks
+    q = args.q or base.q
+    min_q = args.min_q or base.min_q
+    # The rank budget must clear max(offset)+max(k) with a real oversampling margin:
+    # randomized SVD attenuates trailing directions of the observed statistic and the
+    # ceiling but not the exact Haar null, so a thin margin biases against the observation.
+    required = max(base.offsets) + max(ks)
+    if q < required + 10:
+        parser.error(f"--q {q} leaves too little oversampling over max(offset)+max(k)={required}; use >= {required + 10}")
+    if min_q > q:
+        parser.error(f"--min-q {min_q} exceeds --q {q}")
+    cfg = TransferConfig(draws=args.draws, bootstrap_draws=args.bootstrap_draws, ks=ks, q=q, min_q=min_q,
+                         responsive_p=args.responsive_p or base.responsive_p,
+                         nonresponsive_p=args.nonresponsive_p or base.nonresponsive_p)
     started = time.monotonic(); root = Path(args.repo_root).resolve(); output = Path(args.output); output.mkdir(parents=True, exist_ok=True)
     device = torch.device(args.device if args.device == "cpu" or torch.cuda.is_available() else "cpu")
     ledger = GateLedger(output, "E0_E0b", official_log=root / "v2/research/rebase/nature/GATE_LOG.md")

@@ -104,6 +104,10 @@ become visible, where does it manifest, and which modalities independently confi
    infiltration, stromal composition, necrosis/purity, or multi-population interaction. Label each axis
    as *tumour-autonomous / immune-mediated / stromal / composition-driven / neighbourhood-dependent*.
    **Without this, "legible axis" may just mean "cell composition" — see the baseline in §9.**
+   **Enforced:** `claim_guards.composition_attribution` refuses a legibility claim without a
+   cell-of-origin label or a beaten composition baseline. The dictionary is built from pure
+   cell lines, which contain none of the immune/stromal/architectural content an H&E slide is
+   largely made of, so this is a misattribution risk, not a coverage gap.
 4. **Detect spatially conditional effects.** Does the same perturbation have different visible
    consequences at invasive margins vs hypoxic cores vs immune-rich vs necrotic regions, or
    primary vs metastatic?
