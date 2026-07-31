@@ -195,7 +195,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     matrix_is_delta = (centroid_ratio <= 0.10 and fold_relation_error <= 1e-5 and control_expr_coverage >= .80
                        and control_expr_nonnegative and target_vector_coverage >= .80 and target_vector_corr >= .80 and target_vector_mae <= .30)
     if not matrix_is_delta:
-        raise ValueError(f"{path}: matrix control centroid ratio={centroid_ratio:.3g}; cannot assert delta response")
+        raise ValueError(f"{path}: cannot assert delta response (centroid_ratio={centroid_ratio:.3g}, control_expr_coverage={control_expr_coverage:.3g}, target_coverage={target_vector_coverage:.3g}, target_control_ref_r={target_vector_corr:.3g}, target_control_ref_mae={target_vector_mae:.3g})")
     usable_controls = controls & keep_rows
     noncontrol = (~controls) & keep_rows
     # targets are indexed over raw non-controls, so retain only usable
@@ -414,7 +414,7 @@ def _self_test() -> None:
         valid_obs = pd.DataFrame({"core_control": [False, False, False, True], "control_expr": [2., 2., 2., np.nan],
                                   "fold_expr": [*folds, np.nan], "pct_expr": [*(folds - 1.0), np.nan]},
                                  index=pd.Index(["0_A_P1_ENSG000001", "1_A_P2_ENSG000001", "2_A_P3_ENSG000001", "3_non-targeting_non-targeting_non-targeting"], name="gene_transcript"))
-        valid = ad.AnnData(X=np.vstack([np.column_stack([expected, expected, np.ones(3)]), [0., 0., .01]]).astype(np.float32), obs=valid_obs, var=pd.DataFrame({"gene_name": ["A", "A", "B"]}))
+        valid = ad.AnnData(X=np.vstack([np.column_stack([expected - .2, expected + .2, np.ones(3)]), [0., 0., .01]]).astype(np.float32), obs=valid_obs, var=pd.DataFrame({"gene_name": ["A", "A", "B"]}))
         valid_path = Path(temporary) / "duplicate_valid.h5ad"; valid.write_h5ad(valid_path)
         duplicate_bundle = _load_perturbation(valid_path)
         assert duplicate_bundle.genes == ["A", "B"] and duplicate_bundle.meta["n_duplicate_symbols_aggregated"] == 1
