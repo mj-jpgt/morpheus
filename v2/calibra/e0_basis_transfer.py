@@ -14,6 +14,7 @@ import platform
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -156,7 +157,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     valid_fold = np.isfinite(fold) & np.isfinite(pct)
     fold_relation_error = float(np.max(np.abs(pct[valid_fold] - (fold[valid_fold] - 1.0)))) if valid_fold.any() else float("inf")
     targets, target_meta = _parse_targets(data.obs_names, controls)
-    target_vector_corr = float("nan"); target_vector_coverage = 0.0
+    target_vector_corr = float("nan"); target_vector_mae = float("inf"); target_vector_coverage = 0.0
     if targets is not None:
         symbols = {_symbol(gene): i for i, gene in enumerate(data.var["gene_name"].to_numpy())}
         raw_noncontrol = np.flatnonzero(~controls)
@@ -165,11 +166,22 @@ def _load_perturbation(path: Path) -> MatrixBundle:
         target_vector_coverage = float(valid_target.mean())
         if valid_target.sum() >= 30:
             rows = raw_noncontrol[valid_target]; columns = target_cols[valid_target]
-            target_vector_corr = float(np.corrcoef(raw[rows, columns], np.log2(fold[rows] + 1.0))[0, 1])
+            observed_target_effect = raw[rows, columns]
+            # `control_expr` is the measured control baseline and `fold_expr`
+            # is perturbed/control expression.  In this normalized-bulk file,
+            # the matching X entry must therefore equal the log expression
+            # change implied by those two stored quantities.
+            expected_target_effect = np.log2(control_expr[rows] * fold[rows] + 1.0) - np.log2(control_expr[rows] + 1.0)
+            finite_effect = np.isfinite(observed_target_effect) & np.isfinite(expected_target_effect)
+            observed_target_effect, expected_target_effect = observed_target_effect[finite_effect], expected_target_effect[finite_effect]
+            target_vector_coverage = float(len(observed_target_effect) / len(target_cols))
+            if len(observed_target_effect) >= 30:
+                target_vector_corr = float(np.corrcoef(observed_target_effect, expected_target_effect)[0, 1])
+                target_vector_mae = float(np.mean(np.abs(observed_target_effect - expected_target_effect)))
     control_expr_coverage = float(np.isfinite(control_expr[~controls]).mean())
     control_expr_nonnegative = bool(np.all(control_expr[~controls][np.isfinite(control_expr[~controls])] >= 0))
     matrix_is_delta = (centroid_ratio <= 0.10 and fold_relation_error <= 1e-5 and control_expr_coverage >= .80
-                       and control_expr_nonnegative and target_vector_coverage >= .80 and target_vector_corr >= .25)
+                       and control_expr_nonnegative and target_vector_coverage >= .80 and target_vector_corr >= .80 and target_vector_mae <= .30)
     if not matrix_is_delta:
         raise ValueError(f"{path}: matrix control centroid ratio={centroid_ratio:.3g}; cannot assert delta response")
     usable_controls = controls & keep_rows
@@ -188,7 +200,8 @@ def _load_perturbation(path: Path) -> MatrixBundle:
               "n_duplicate_symbols": duplicates, "n_perturbation_rows": int(noncontrol.sum()), "control_centroid_ratio": centroid_ratio,
               "fold_pct_relation_max_abs_error": fold_relation_error, "control_expr_coverage": control_expr_coverage,
               "control_expr_nonnegative": control_expr_nonnegative, "target_vector_coverage": target_vector_coverage,
-              "target_vector_logfold_correlation": target_vector_corr, "delta_status": "validated_control_centred" if matrix_is_delta else "FAILED", **target_meta})
+              "target_vector_control_referenced_correlation": target_vector_corr, "target_vector_control_referenced_mae": target_vector_mae,
+              "delta_status": "validated_control_centred" if matrix_is_delta else "FAILED", **target_meta})
 
 
 def _load_tcga(path: Path, transform: str) -> MatrixBundle:
@@ -370,6 +383,18 @@ def _self_test() -> None:
     assert _pc1_gate(.2, .1) and not _pc1_gate(.1, .1)
     assert _shuffle_gate(.05, .1) and not _shuffle_gate(.2, .1)
     assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
+    # Exercise the real H5AD loader with deliberately inconsistent X versus
+    # (control_expr, fold_expr).  A cosmetic metadata check would pass this;
+    # the E0.a data-semantic guard must not.
+    with tempfile.TemporaryDirectory() as temporary:
+        obs = pd.DataFrame({"core_control": [False, False, False, True], "control_expr": [2., 2., 2., np.nan],
+                            "fold_expr": [.1, .1, .1, np.nan], "pct_expr": [-.9, -.9, -.9, np.nan]},
+                           index=pd.Index(["0_A_P1_ENSG000001", "1_A_P2_ENSG000001", "2_A_P3_ENSG000001", "3_non-targeting_non-targeting_non-targeting"], name="gene_transcript"))
+        toy = ad.AnnData(X=np.zeros((4, 2), dtype=np.float32), obs=obs, var=pd.DataFrame({"gene_name": ["A", "B"]}))
+        path = Path(temporary) / "inconsistent.h5ad"; toy.write_h5ad(path)
+        try: _load_perturbation(path)
+        except ValueError as error: assert "cannot assert delta response" in str(error)
+        else: raise AssertionError("control_expr/X inconsistency did not fail E0.a")
     # A gate manifest with only one row must fail coverage: this protects
     # against accidentally declaring a run healthy because a new gate was
     # simply never wired into the ledger.
@@ -389,7 +414,7 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
     ledger.add("G1.4_scale_sanity", json.dumps({k:t[k] for k in ("raw_max","post_transform_max","post_transform_zero_fraction","post_transform_skew")}), "both transforms recorded", True, label)
     ledger.add("G1.5_explicit_row_filtering", json.dumps({"P_nonfinite":p["n_rows_dropped_nonfinite"],"T_nonfinite":t["n_rows_dropped_nonfinite"],"P_zero":p["n_rows_dropped_all_zero"],"T_zero":t["n_rows_dropped_all_zero"]}), "all drops explicitly counted", True, label)
     ledger.add("G1.6_housekeeping_mapping", ",".join(context["housekeepers_present"]), "all five present", set(context["housekeepers_present"]) == HOUSEKEEPING, label)
-    ledger.add("E0.a_delta_not_absolute", json.dumps({"status":p["delta_status"],"ratio":p["control_centroid_ratio"],"fold_pct_error":p["fold_pct_relation_max_abs_error"],"control_expr_coverage":p["control_expr_coverage"],"target_logfold_r":p["target_vector_logfold_correlation"]}), "control metadata and X target direction validate delta", _delta_gate(p), label)
+    ledger.add("E0.a_delta_not_absolute", json.dumps({"status":p["delta_status"],"ratio":p["control_centroid_ratio"],"fold_pct_error":p["fold_pct_relation_max_abs_error"],"control_expr_coverage":p["control_expr_coverage"],"target_control_ref_r":p["target_vector_control_referenced_correlation"],"target_control_ref_mae":p["target_vector_control_referenced_mae"]}), "X target effect agrees with control_expr x fold_expr reference", _delta_gate(p), label)
     ledger.add("E0.c_orientation", f"P={p['n_perturbation_rows']}x{context['n_shared_genes']};T={t['n_patients_used']}x{context['n_shared_genes']}", "rows=samples, columns=genes", True, label)
     ledger.add("G1.2b_split_composition", json.dumps(context["split"]), "cancer-stratified; imbalance<=1", context["split"]["max_group_count_imbalance"] <= 1, label)
     for who in ("perturbation_health", "tcga_health"):
