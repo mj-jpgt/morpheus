@@ -157,7 +157,14 @@ Also reuse (do **not** reimplement): `v2/honest_metrics.py` (`macro_group_pearso
     `value=NaN`, `note="unavailable_<reason>"`. A missing row reads as "not measured"; a silent
     substitution reads as a lie.
 
-## 5. Your next tasks (Milestone A — everything is already on disk, **no GPU needed**)
+## 5. Your next tasks — **SUPERSEDED, see `HANDOFF_EXPERIMENTS_NOW.md`**
+
+> **⚠ AUTHORITATIVE TASK LIST = `HANDOFF_EXPERIMENTS_NOW.md` (E0, E0b, E1–E5).**
+> The Milestone A1/A2/A3 framing below predates the CLD engine and **overlaps it**:
+> **A1 ≡ E3** (same experiment, do it once), **A2 → E4**, **A3 → E5**.
+> Read §5 below for *context on why* these matter, then execute the E-series. Do not run both.
+
+## 5-legacy. Milestone A context (everything is already on disk, **no GPU needed**)
 
 > ### KEY QUESTION to answer inside A1 — the anchoring caveat
 > `z_identity` is **anchored on the frozen MLP-CLIP teacher with a learned residual of ≈0**

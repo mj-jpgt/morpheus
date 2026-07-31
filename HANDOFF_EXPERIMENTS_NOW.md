@@ -1,9 +1,12 @@
-# HANDOFF — the four experiments to run NOW
+# HANDOFF — the experiments to run NOW (**the authoritative task list**)
 
 **Read `HANDOFF_BUILD_AGENT.md` first** (orientation, the 14-item mistake list, run commands), then
 `v2/research/rebase/ENGINE_CLD.md` (what these experiments are for). Branch: `research/rebase-vision`.
 
-**All four run on data already on disk. No GPU. No downloads.** Each one is decisive and each outcome
+**This file supersedes `HANDOFF_BUILD_AGENT.md` §5 (Milestones A1/A2/A3), which is an older framing of
+the same work: A1 ≡ E3, A2 → E4, A3 → E5. Run the E-series only — never both lists.**
+
+**All of E0–E5 run on data already on disk. No GPU. No downloads.** Each one is decisive and each outcome
 is reportable — including the failures. Run them in the order given; E0 can kill the whole engine, so
 it goes first.
 
@@ -106,7 +109,7 @@ the trained head's effective rank (`calibra.spectral.effective_rank` — **singu
 
 ## E3 — The objective ablation, with the anchoring control (tests F2)
 
-As specified in `HANDOFF_BUILD_AGENT.md` §5-A1. Restated here because it gates the PBS architecture.
+Formerly Milestone A1. Restated here because it gates the PBS architecture.
 
 **Method.** Run the CALIBRA channel measurement on `diagnostic_identity_only_seed42.npz`,
 `diagnostic_programme_only_seed42.npz`, `diagnostic_full_seed42.npz`.
@@ -118,6 +121,32 @@ with a residual of ≈0, so F2 may partly restate "MLP-CLIP beats our biology he
 `programme_only` has **no anchor** — if its biology channel is still weak, the effect is about the
 **objective** (F2 holds, PBS is motivated); if it is strong, F2 was an **anchoring artifact** and PBS
 loses its primary evidence. **Escalate immediately in that case.**
+
+---
+
+## E4 — Encoder breadth / method-invariance (was Milestone A2)
+
+Run the same CALIBRA channel measurement on the four baselines already on disk: `raw_hoptimus_meanstd`,
+`ridge_alignment`, `cca_alignment`, `mlp_clip_seed42`.
+
+**Why it matters:** if a *raw mean-pooled H-Optimus baseline* matches the trained model, then E3's
+effect is not about our objective at all — it is about the frame. That is the headline a calibrated
+bar rewards ("ranking encoders is the wrong question"), and it is a **stronger** result than a
+model-specific finding, not a weaker one. Report the full ladder, not just the winner.
+
+## E5 — Reconcile the multivariate 0.477 with the univariate +0.07 (was Milestone A3)
+
+**This gap is currently unexplained and is a finding in its own right.** On the *same residualised
+data*, compute per-target within-cancer specificity (`honest_metrics.macro_group_pearson`,
+`control_adjusted_specificity`) alongside the multivariate channel.
+
+Requires regenerating matched nulls at 20 draws/target
+(`discovery_targets.build_matched_random_controls`, already defaults to 20) — **the frozen file has
+only 1 draw; do not reuse it.**
+
+**Interpretation:** if the channel is real multivariately but invisible per-target, then per-target
+evaluation — *what essentially the whole field reports* — dilutes a channel that genuinely exists.
+Say that plainly. The two numbers are a maximum and a mean; **report both, never conflate them.**
 
 ---
 
@@ -137,7 +166,10 @@ loses its primary evidence. **Escalate immediately in that case.**
 - `rna_*` states are the positive control (RNA→RNA is circular). If they don't show a strong channel,
   the pipeline is broken, not the model.
 - Verify the workspace is a real junction, not a stale copy, before trusting any run (mistake #2).
-- Do not retrain anything. E0–E3 are all frozen-artifact / on-disk analyses.
+- Do not retrain anything. E0–E5 are all frozen-artifact / on-disk analyses.
+- **Suggested order:** E3 + E4 first (fastest — they reuse the working CALIBRA runner and answer the
+  anchoring question), E0 + E0b in parallel (the crux; TCGA TSV parsing is the slow part), then E1, E5,
+  E2. They are mutually independent; only the *reporting* order in the decision table matters.
 
 ---
 
