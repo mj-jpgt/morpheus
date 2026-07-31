@@ -1,12 +1,16 @@
 # HANDOFF — the experiments to run NOW (**the authoritative task list**)
 
 **Read `HANDOFF_BUILD_AGENT.md` first** (orientation, the 14-item mistake list, run commands), then
-`v2/research/rebase/ENGINE_CLD.md` (what these experiments are for). Branch: `research/rebase-vision`.
+**`HANDOFF_GATES.md`** (the health gates — *mandatory*, they are what stop a technical fault being
+written up as a scientific finding), then `v2/research/rebase/ENGINE_CLD.md` (what these experiments
+are for). Branch: `research/rebase-vision`.
 
 **This file supersedes `HANDOFF_BUILD_AGENT.md` §5 (Milestones A1/A2/A3), which is an older framing of
 the same work: A1 ≡ E3, A2 → E4, A3 → E5. Run the E-series only — never both lists.**
 
-**All of E0–E5 run on data already on disk. No GPU. No downloads.** Each one is decisive and each outcome
+**All of E0–E5 run on data already on disk. No downloads. No retraining.**
+**GPU:** E0/E0b *should* use it (an 11,258×8,248 SVD plus ≥100 null draws is hours on CPU, minutes on
+GPU). E1/E3/E4/E5 are genuinely CPU-fine (2,530×256 frozen embeddings). Milestone D needs it outright. Each one is decisive and each outcome
 is reportable — including the failures. Run them in the order given; E0 can kill the whole engine, so
 it goes first.
 
@@ -167,9 +171,14 @@ Say that plainly. The two numbers are a maximum and a mean; **report both, never
   the pipeline is broken, not the model.
 - Verify the workspace is a real junction, not a stale copy, before trusting any run (mistake #2).
 - Do not retrain anything. E0–E5 are all frozen-artifact / on-disk analyses.
-- **Suggested order:** E3 + E4 first (fastest — they reuse the working CALIBRA runner and answer the
-  anchoring question), E0 + E0b in parallel (the crux; TCGA TSV parsing is the slow part), then E1, E5,
-  E2. They are mutually independent; only the *reporting* order in the decision table matters.
+- **Order: E0 + E0b START FIRST and gate every build decision.** E0 can kill the engine; nothing is
+  built on top of it until it returns. Its long pole is parsing the 1.88 GB TCGA TSV, so E3/E4 (which
+  are independent and take minutes) may run *during* that wait — but **do not interpret or act on any
+  downstream result before E0 reports.** Then E1, E5, E2.
+- **`HANDOFF_GATES.md` is mandatory, not optional.** Run G0–G4 for every experiment plus the
+  experiment-specific G5 gates. **A negative result is reportable only if the positive control (G4.1)
+  passed in the same run.** Log every gate to `v2/research/rebase/nature/GATE_LOG.md`; a missing gate
+  row counts as a FAIL.
 
 ---
 

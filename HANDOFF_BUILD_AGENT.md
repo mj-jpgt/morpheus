@@ -160,6 +160,9 @@ Also reuse (do **not** reimplement): `v2/honest_metrics.py` (`macro_group_pearso
 ## 5. Your next tasks — **SUPERSEDED, see `HANDOFF_EXPERIMENTS_NOW.md`**
 
 > **⚠ AUTHORITATIVE TASK LIST = `HANDOFF_EXPERIMENTS_NOW.md` (E0, E0b, E1–E5).**
+> **⚠ MANDATORY HEALTH GATES = `HANDOFF_GATES.md`.** Governing rule: *a negative result is reportable
+> only if the positive control passed in the same run.* Every failure mode listed there has already
+> happened on this project once.
 > The Milestone A1/A2/A3 framing below predates the CLD engine and **overlaps it**:
 > **A1 ≡ E3** (same experiment, do it once), **A2 → E4**, **A3 → E5**.
 > Read §5 below for *context on why* these matter, then execute the E-series. Do not run both.
