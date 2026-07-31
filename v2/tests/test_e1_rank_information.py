@@ -14,14 +14,15 @@ from morpheus.v2.calibra.e1_rank_information import (
 )
 
 
-def _artifact(path, ids, cancers, split, state, *, decorrelation, extra=None):
+def _artifact(path, ids, cancers, split, state, *, decorrelation, rna_state=None, extra=None):
     manifest = {"seed": 42, "epochs": 8, "token_budget": 16384,
                 "config": {"decorrelation_weight": decorrelation, "hidden_dim": 256}}
     if extra:
         manifest.update(extra)
+    arrays = {} if rna_state is None else {"rna_biology": np.asarray(rna_state, dtype=np.float32)}
     np.savez_compressed(path, patient_ids=np.asarray(ids), cancers=np.asarray(cancers), split=np.asarray(split),
                         trained_states=np.asarray(["wsi_biology"]), manifest_json=np.asarray(json.dumps(manifest)),
-                        wsi_biology=np.asarray(state, dtype=np.float32))
+                        wsi_biology=np.asarray(state, dtype=np.float32), **arrays)
 
 
 def _fixture(tmp_path, n=80):
@@ -34,8 +35,8 @@ def _fixture(tmp_path, n=80):
     low = latent[:, :2] @ rng.normal(size=(2, 16))
     high = latent @ rng.normal(size=(5, 16)) + 0.1 * rng.normal(size=(n, 16))
     before, after, targets = tmp_path / "before.npz", tmp_path / "after.npz", tmp_path / "targets.npz"
-    _artifact(before, ids, cancers, split, low, decorrelation=0.0)
-    _artifact(after, ids, cancers, split, high, decorrelation=0.04)
+    _artifact(before, ids, cancers, split, low, decorrelation=0.0, rna_state=y)
+    _artifact(after, ids, cancers, split, high, decorrelation=0.04, rna_state=y)
     np.savez_compressed(targets, patient_ids=np.asarray(ids), scores=y.astype(np.float32),
                         target_names=np.asarray([f"T{i}" for i in range(y.shape[1])]))
     return before, after, targets
@@ -69,11 +70,21 @@ def test_matched_artifacts_refuse_nonintervention_manifest_difference(tmp_path):
         validate_matched_artifacts(before, after)
 
 
+def test_matched_artifacts_refuse_identical_or_reversed_intervention(tmp_path):
+    before, after, _ = _fixture(tmp_path)
+    with np.load(after, allow_pickle=True) as raw:
+        ids, cancers, split, state = raw["patient_ids"], raw["cancers"], raw["split"], raw["wsi_biology"]
+        rna = raw["rna_biology"]
+    _artifact(after, ids, cancers, split, state, decorrelation=0.0, rna_state=rna)
+    with pytest.raises(ValueError, match="must be 0.0 before and >0.0 after"):
+        validate_matched_artifacts(before, after)
+
+
 def test_run_e1_emits_paired_rows_protocol_and_arrays(tmp_path):
     before, after, targets = _fixture(tmp_path)
     out = tmp_path / "out"
     rows = run_e1(before, after, targets, out, n_components=4, levels=(0.0, .1, .3),
-                  n_draws=3, n_permutations=3, min_site_count=2, seed=4)
+                  n_draws=3, n_permutations=3, n_bootstrap=4, min_site_count=2, seed=4)
     assert {"before", "after", "paired"}.issubset(set(rows["arm"]))
     paired = rows[(rows.arm == "paired") & (rows.metric == "delta_effective_rank")]
     assert len(paired) == 1 and paired.value.iloc[0] > 0
@@ -81,5 +92,14 @@ def test_run_e1_emits_paired_rows_protocol_and_arrays(tmp_path):
     assert (out / "e1_protocol.json").exists()
     assert (out / "e1_manifest.json").exists()
     assert (out / "e1_arrays.npz").exists()
+    assert (out / "gate_summary.json").exists()
     protocol = json.loads((out / "e1_protocol.json").read_text())
     assert protocol["floor_metric"] == "paired_spike_recovery_one_direction_cca"
+    with np.load(out / "e1_arrays.npz") as arrays:
+        assert arrays["patient_bootstrap_deltas"].shape == (4, 2)
+        assert arrays["cancer_cluster_bootstrap_deltas"].shape == (4, 2)
+    # The tiny test deliberately uses only three null draws, so it produces a
+    # diagnostic bundle but cannot be mistaken for a reportable headline run.
+    assert rows.attrs["gates_pass"] is False
+    summary = json.loads((out / "gate_summary.json").read_text())
+    assert summary["gates_pass"] is False
