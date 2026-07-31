@@ -152,6 +152,70 @@ def test_heldout_cca_is_lower_than_insample_on_noise():
     assert held < insample - 0.15, (insample, held)
 
 
+# --- REGRESSION: the targeted-readout defect -------------------------------
+# The first implementation scored recovery with top-CCA, a maximum over all
+# components, while the spike lives on one known direction. On real data the
+# ambient top-CCA sits near 0.97, so every detection floor came back NaN. These
+# three tests reproduce that failure mode on synthetic data and would have caught
+# it before it reached a results file.
+
+def _ambient(n=500, p=24, q=20, n_shared=6, strength=4.0, seed=0):
+    """Paired modalities with STRONG pre-existing multivariate structure, i.e. the
+    regime real data lives in (adjusted top-CCA ~0.9)."""
+    rng = np.random.default_rng(seed)
+    x = rng.normal(size=(n, p))
+    y = rng.normal(size=(n, q))
+    for k in range(n_shared):                       # many shared axes -> high top-CCA
+        z = rng.normal(size=n)
+        x[:, k] += strength * z
+        y[:, k] += strength * z
+    return x, y
+
+
+def test_level_zero_baseline_is_null_like_despite_strong_ambient_signal():
+    """THE regression test. With a heavily structured pair, a max-based readout
+    reports ~0.97 at r_true=0; a targeted readout must report ~0."""
+    x, y = _ambient(seed=21)
+    assert top_canonical_correlation(x, y, n_components=8) > 0.85, "fixture is not ambient-heavy"
+    result = spike_recovery_curve(x, y, np.zeros((len(x), 0)), levels=(0.0, 0.05, 0.2),
+                                  n_draws=8, n_components=8, seed=21)
+    summary = result.summary()
+    baseline = summary["baseline_recovered_median"]
+    assert baseline < 0.15, f"level-0 readout {baseline:.3f} is picking up ambient structure"
+    assert summary["baseline_is_null_like"] is True
+
+
+def test_floor_is_finite_when_ambient_structure_is_strong():
+    """The defect's visible symptom was NaN floors on every real state."""
+    x, y = _ambient(seed=22)
+    result = spike_recovery_curve(x, y, np.zeros((len(x), 0)), levels=(0.0, 0.02, 0.05, 0.1, 0.2),
+                                  n_draws=8, n_components=8, seed=22)
+    assert np.isfinite(result.detection_floor), "floor is NaN under ambient structure (the old bug)"
+    assert 0.0 < result.detection_floor <= 0.2
+
+
+def test_recovery_tracks_the_injected_strength():
+    """Recovered correlation must rise with r_true and stay in its neighbourhood.
+    The old readout was flat at ~0.97 and even went DOWN at the largest spike."""
+    x, y = _ambient(seed=23)
+    levels = (0.0, 0.1, 0.3, 0.6)
+    result = spike_recovery_curve(x, y, np.zeros((len(x), 0)), levels=levels,
+                                  n_draws=8, n_components=8, seed=23)
+    median = np.nanmedian(result.recovered, axis=1)
+    assert np.all(np.diff(median) > 0), f"not monotone in r_true: {median}"
+    assert abs(median[-1] - 0.6) < 0.15, f"r_true=0.6 recovered as {median[-1]:.3f}"
+    assert 0.5 < result.attenuation_slope <= 1.2, result.attenuation_slope
+
+
+def test_n_jobs_does_not_change_the_numbers():
+    """Parallelism must be a wall-clock decision only."""
+    x, y = _ambient(n=240, seed=24)
+    kwargs = dict(levels=(0.0, 0.1, 0.3), n_draws=4, n_components=6, seed=24)
+    serial = spike_recovery_curve(x, y, np.zeros((len(x), 0)), n_jobs=1, **kwargs)
+    parallel = spike_recovery_curve(x, y, np.zeros((len(x), 0)), n_jobs=2, **kwargs)
+    np.testing.assert_allclose(serial.recovered, parallel.recovered, rtol=1e-10, atol=1e-12)
+
+
 def test_heldout_cca_recovers_a_planted_signal():
     from morpheus.v2.calibra.spectral import heldout_top_cca
     rng = np.random.default_rng(1)

@@ -64,6 +64,8 @@ def main() -> None:
     parser.add_argument("--min-site-count", type=int, default=10,
                         help="pool TSS sites with fewer patients into OTHER")
     parser.add_argument("--target-group", default="", help="restrict to one target_group")
+    parser.add_argument("--n-jobs", type=int, default=1,
+                        help="parallel workers; affects wall-clock only, never the numbers")
     args = parser.parse_args()
 
     output = Path(args.output)
@@ -134,13 +136,15 @@ def main() -> None:
 
             unadjusted = cca_spectrum(x, y, n_components=args.n_components)
             result = spike_recovery_curve(x, y, design, levels=levels, n_draws=args.n_draws,
-                                          n_components=args.n_components, seed=args.seed)
+                                          n_components=args.n_components, seed=args.seed,
+                                          n_jobs=args.n_jobs)
             summary = result.summary()
             # The chance level. Without this the adjusted top-CCA is uninterpretable:
             # it is a multivariate maximum and is inflated by capacity alone.
             null = permutation_null(x, y, design, strata=frame["cancer"].to_numpy(),
                                     n_permutations=args.n_permutations,
-                                    n_components=args.n_components, seed=args.seed)
+                                    n_components=args.n_components, seed=args.seed,
+                                    n_jobs=args.n_jobs)
             summary.update(null)
             summaries[f"{method}::{state}"] = summary
 
@@ -152,6 +156,14 @@ def main() -> None:
                 "attenuation_slope": summary["attenuation_slope"],
                 "null_reference_p90": summary["null_reference_p90"],
                 "observed_above_floor": float(summary["observed_above_floor"]),
+                # Targeted-readout diagnostics. baseline_* is the REAL-DATA GATE:
+                # with a direction-matched readout the level-0 value must sit near
+                # the sampling null, not near 1. A baseline near 1 means the readout
+                # is reading ambient structure and every floor below it is void.
+                "baseline_recovered_median": summary["baseline_recovered_median"],
+                "baseline_is_null_like": float(summary["baseline_is_null_like"]),
+                "baseline_null_scale": summary["baseline_null_scale"],
+                "observed_matched_direction": summary["observed_matched_direction"],
                 "permutation_null_median": null["null_median"],
                 "permutation_null_p95": null["null_p95"],
                 "excess_over_null_median": null["excess_over_null_median"],
@@ -169,9 +181,11 @@ def main() -> None:
                 rows.append(_row(method=method, representation_state=state, task="calibra_recovery",
                                  target=f"r_true={level:g}", metric="recovered_median",
                                  value=float(med), note="spike_recovery_curve"))
+            gate = "OK" if summary["baseline_is_null_like"] else "GATE-FAIL(baseline_not_null_like)"
             print(f"[{method}::{state}] adj_cca={summary['observed']:.4f} "
-                  f"floor={summary['detection_floor']} above={summary['observed_above_floor']}",
-                  flush=True)
+                  f"floor={summary['detection_floor']} "
+                  f"atten={summary['attenuation_slope']:.3f} "
+                  f"base={summary['baseline_recovered_median']:.4f} {gate}", flush=True)
 
     frame = pd.DataFrame(rows)
     frame.to_csv(output / "task_rows.csv", index=False)
@@ -181,7 +195,11 @@ def main() -> None:
         "seed": args.seed, "partition": args.partition, "confounds": ["cancer", "tss"],
         "n_permutations": args.n_permutations, "permutation_strata": "cancer",
         "n_targets": int(scores.shape[1]), "target_group": args.target_group or "all_non_control",
-        "recovery_fraction": 0.8,
+        "recovery_fraction": 0.8, "n_jobs": args.n_jobs,
+        "readout": "targeted_single_direction",
+        "readout_note": ("recovery scored on the planted (u,v) axis, not a top-CCA maximum; "
+                         "floor units are single-direction correlation and are NOT comparable "
+                         "to the multivariate adjusted/held-out top-CCA"),
     }, indent=2))
     print(f"[done] {len(frame)} rows -> {output}", flush=True)
 
