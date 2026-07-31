@@ -264,12 +264,18 @@ def _restrict_tcga_to_registry(bundle: MatrixBundle, registry_path: Path) -> Mat
     lookup = dict(zip(registry.patient_id.astype(str), registry[cancer_column].astype(str)))
     groups = [lookup.get(patient) for patient in bundle.row_ids]
     keep = np.asarray([g is not None for g in groups])
-    coverage = float(keep.mean())
-    if coverage < .80:
-        raise ValueError(f"registry coverage {coverage:.3f}<0.80; refuse unstratified ceiling")
+    matrix_coverage = float(keep.mean())
+    registry_coverage = float(len(set(np.asarray(bundle.row_ids)[keep])) / max(1, len(lookup)))
+    # The registry is the declared evaluation universe; it is expected to be a
+    # subset of PanCan RNA.  The join gate must therefore measure how much of
+    # *that* universe was recovered, not penalise the intentionally excluded
+    # PanCan-only patients in the denominator.
+    if registry_coverage < .80:
+        raise ValueError(f"canonical registry coverage {registry_coverage:.3f}<0.80; refuse unstratified ceiling")
     return MatrixBundle(x=bundle.x[keep], genes=bundle.genes, row_ids=np.asarray(bundle.row_ids)[keep].tolist(),
         groups=np.asarray(groups, dtype=object)[keep].astype(str).tolist(), meta={**bundle.meta, "registry_source": str(registry_path),
-        "registry_patients": int(len(registry)), "registry_joined": int(keep.sum()), "registry_coverage": coverage, "n_patients_used": int(keep.sum())})
+        "registry_patients": int(len(registry)), "registry_joined": int(keep.sum()), "registry_coverage": registry_coverage,
+        "full_matrix_registry_overlap": matrix_coverage, "n_patients_used": int(keep.sum())})
 
 
 def _align(p: MatrixBundle, t: MatrixBundle) -> tuple[np.ndarray, np.ndarray, list[str], dict[str, int]]:
