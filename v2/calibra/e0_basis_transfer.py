@@ -410,11 +410,11 @@ def _self_test() -> None:
         # Technical duplicate target columns are collapsed to their mean once,
         # and the target/control semantic check is still applied to that one
         # canonical gene rather than indexing the pre-aggregation layout.
-        folds = np.asarray([.2, .5, .8]); expected = np.log2(2.0 * folds + 1.0) - np.log2(3.0)
-        valid_obs = pd.DataFrame({"core_control": [False, False, False, True], "control_expr": [2., 2., 2., np.nan],
+        folds = np.linspace(.2, .8, 30); expected = np.log2(2.0 * folds + 1.0) - np.log2(3.0)
+        valid_obs = pd.DataFrame({"core_control": [*np.zeros(len(folds), dtype=bool), True], "control_expr": [*np.full(len(folds), 2.), np.nan],
                                   "fold_expr": [*folds, np.nan], "pct_expr": [*(folds - 1.0), np.nan]},
-                                 index=pd.Index(["0_A_P1_ENSG000001", "1_A_P2_ENSG000001", "2_A_P3_ENSG000001", "3_non-targeting_non-targeting_non-targeting"], name="gene_transcript"))
-        valid = ad.AnnData(X=np.vstack([np.column_stack([expected - .2, expected + .2, np.ones(3)]), [0., 0., .01]]).astype(np.float32), obs=valid_obs, var=pd.DataFrame({"gene_name": ["A", "A", "B"]}))
+                                 index=pd.Index([*(f"{i}_A_P{i}_ENSG000001" for i in range(len(folds))), f"{len(folds)}_non-targeting_non-targeting_non-targeting"], name="gene_transcript"))
+        valid = ad.AnnData(X=np.vstack([np.column_stack([expected - .2, expected + .2, np.ones(len(folds))]), [0., 0., .01]]).astype(np.float32), obs=valid_obs, var=pd.DataFrame({"gene_name": ["A", "A", "B"]}))
         valid_path = Path(temporary) / "duplicate_valid.h5ad"; valid.write_h5ad(valid_path)
         duplicate_bundle = _load_perturbation(valid_path)
         assert duplicate_bundle.genes == ["A", "B"] and duplicate_bundle.meta["n_duplicate_symbols_aggregated"] == 1
