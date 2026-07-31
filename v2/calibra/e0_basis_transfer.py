@@ -100,6 +100,15 @@ def _matched_spectrum_rotated_null(
     }
 
 
+def _gene_label_shuffle_null(source: torch.Tensor, target: torch.Tensor, *, k: int, draws: int, seed: int, offset: int = 1) -> np.ndarray:
+    """Preserve the perturbation basis but randomize its gene correspondence."""
+    generator = torch.Generator(device=source.device).manual_seed(seed)
+    return np.asarray([
+        _overlap(source[torch.randperm(source.shape[0], device=source.device, generator=generator)], target, k, offset)
+        for _ in range(draws)
+    ], dtype=np.float64)
+
+
 def _parse_targets(index: pd.Index, controls: np.ndarray) -> tuple[list[str | None] | None, dict[str, object]]:
     """Read the documented gene_transcript index schema, or mark E0b unavailable.
 
@@ -347,8 +356,9 @@ def _pc1_gate(observed: float, null_p95: float) -> bool:
     return bool(np.isfinite(observed) and np.isfinite(null_p95) and observed > null_p95)
 
 
-def _shuffle_gate(shuffled: float, null_p95: float) -> bool:
-    return bool(np.isfinite(shuffled) and np.isfinite(null_p95) and shuffled <= null_p95)
+def _shuffle_gate(observed: float, shuffled_p95: float) -> bool:
+    """True correspondence must beat the gene-label permutation floor."""
+    return bool(np.isfinite(observed) and np.isfinite(shuffled_p95) and observed > shuffled_p95)
 
 
 def _delta_gate(meta: dict[str, object]) -> bool:
@@ -396,12 +406,13 @@ def _context(name: str, p: MatrixBundle, t: MatrixBundle, *, device: torch.devic
         # positive and negative controls use the exact same principal-angle
         # routine, PC stripping, and gene universe.
         ceiling_null, _ = _matched_spectrum_rotated_null(sp, len(genes), vb, k=k, draws=draws, seed=seed + 300 + k, offset=1)
-        generator = torch.Generator(device=device).manual_seed(seed + 700 + k)
-        shuffled = _overlap(vp[torch.randperm(len(genes), device=device, generator=generator)], vt, k, 1)
+        shuffled = _gene_label_shuffle_null(vp, vt, k=k, draws=draws, seed=seed + 700 + k, offset=1)
         heldout_a, heldout_b = _overlap(vp, va, k, 1), _overlap(vp, vb, k, 1)
         effect = observed - null
         out[f"k{k}"] = {"pc1_removed_overlap": observed, "pc1_removed_ceiling": ceiling, "heldout_half_overlap_mean": (heldout_a + heldout_b) / 2,
-            "gene_label_shuffle_overlap": shuffled, "null_median": float(np.median(null)), "null_p95": float(np.quantile(null, .95)), "null_std": float(np.std(null)),
+            "gene_label_shuffle_median": float(np.median(shuffled)), "gene_label_shuffle_p95": float(np.quantile(shuffled, .95)),
+            "gene_label_shuffle_std": float(np.std(shuffled)), "gene_label_shuffle_p": float((1 + np.sum(shuffled >= observed)) / (draws + 1)),
+            "null_median": float(np.median(null)), "null_p95": float(np.quantile(null, .95)), "null_std": float(np.std(null)),
             "ceiling_null_median": float(np.median(ceiling_null)), "ceiling_null_p95": float(np.quantile(ceiling_null, .95)),
             "null_p": float((1 + np.sum(null >= observed)) / (draws + 1)), "effect_vs_null": float(np.mean(effect)),
             "effect_ci95": [float(np.quantile(effect, .025)), float(np.quantile(effect, .975))], "theoretical_random_overlap": k / len(genes), **invariant}
@@ -416,6 +427,7 @@ def _self_test() -> None:
     s = torch.arange(q, 0, -1, dtype=torch.float32)
     null, invariant = _matched_spectrum_rotated_null(s, g, v, k=k, draws=100, seed=3, offset=1)
     assert invariant["spectrum_energy_abs_error"] == 0.0 and null.std() > 0.0
+    assert _gene_label_shuffle_null(v, v, k=k, draws=100, seed=4).std() > 0.0
     try: _matched_spectrum_rotated_null(s[:3], g, v, k=k, draws=100, seed=3, offset=1)
     except ValueError: pass
     else: raise AssertionError("truncated spectrum did not fail")
@@ -425,7 +437,7 @@ def _self_test() -> None:
     # Deliberately corrupted controls must fail the same predicates used by the
     # live ledger, not merely a nearby toy assertion.
     assert _pc1_gate(.2, .1) and not _pc1_gate(.1, .1)
-    assert _shuffle_gate(.05, .1) and not _shuffle_gate(.2, .1)
+    assert _shuffle_gate(.2, .1) and not _shuffle_gate(.05, .1)
     assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
     assert 1.0 <= _effective_rank_torch(torch.eye(8)) <= 8.0
     # Exercise the real H5AD loader with deliberately inconsistent X versus
@@ -467,7 +479,7 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
     p, t, join = context["perturbation"], context["tcga"], context["join"]
     ledger.add("G1.1_no_constant_columns", join["n_constant_columns_dropped"], "0 after explicit drop in evaluated matrix", join["n_matched_evaluated"] > 100, label)
     ledger.add("G1.2_real_gene_join", f"{join['n_left']},{join['n_right']},{join['n_matched_pre_constant']}", ">=0.8*min(left,right)", join["n_matched_pre_constant"] >= .8 * min(join["n_left"], join["n_right"]), label)
-    ledger.add("G1.3_join_not_scrambled", "per-k gene-label shuffle", "all shuffles collapse to matched-spectrum floor", all(_shuffle_gate(context[f"k{k}"]["gene_label_shuffle_overlap"], context[f"k{k}"]["null_p95"]) for k in (10,25,50,100)), label)
+    ledger.add("G1.3_join_not_scrambled", "per-k observed vs gene-label permutation", "observed > shuffled-gene p95", all(_shuffle_gate(context[f"k{k}"]["pc1_removed_overlap"], context[f"k{k}"]["gene_label_shuffle_p95"]) for k in (10,25,50,100)), label)
     ledger.add("G1.4_scale_sanity", json.dumps({k:t[k] for k in ("raw_max","post_transform_max","post_transform_zero_fraction","post_transform_skew")}), "both transforms recorded", True, label)
     ledger.add("G1.5_explicit_row_filtering", json.dumps({"P_nonfinite":p["n_rows_dropped_nonfinite"],"T_nonfinite":t["n_rows_dropped_nonfinite"],"P_zero":p["n_rows_dropped_all_zero"],"T_zero":t["n_rows_dropped_all_zero"]}), "all drops explicitly counted", True, label)
     ledger.add("G1.6_housekeeping_mapping", ",".join(context["housekeepers_present"]), "all five present", set(context["housekeepers_present"]) == HOUSEKEEPING, label)
@@ -490,7 +502,7 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
         r = context[f"k{k}"]; tag = f"k{k}_{label}"
         ledger.add(f"G4.1_positive_control_split_half_{tag}", r["pc1_removed_ceiling"], "> same-path heldout matched-null p95", r["pc1_removed_ceiling"] > r["ceiling_null_p95"], label)
         ledger.add(f"G4.2_negative_control_rotated_P_{tag}", r["null_median"], "near k/n_genes", abs(r["null_median"] - r["theoretical_random_overlap"]) < 0.5 * r["theoretical_random_overlap"], label)
-        ledger.add(f"G4.2b_negative_control_gene_shuffle_{tag}", r["gene_label_shuffle_overlap"], "<= matched-spectrum null p95", _shuffle_gate(r["gene_label_shuffle_overlap"], r["null_p95"]), label)
+        ledger.add(f"G4.2b_negative_control_gene_shuffle_{tag}", json.dumps({"median":r["gene_label_shuffle_median"],"p95":r["gene_label_shuffle_p95"],"p":r["gene_label_shuffle_p"]}), "observed > shuffled-gene p95", _shuffle_gate(r["pc1_removed_overlap"], r["gene_label_shuffle_p95"]), label)
         ledger.add(f"G4.3_null_sanity_{tag}", json.dumps({"std":r["null_std"],"p95":r["null_p95"]}), "std>0; nondegenerate", r["null_std"] > 0, label)
         ledger.add(f"G4.4_heldout_vs_insample_{tag}", json.dumps({"in":r["pc1_removed_overlap"],"heldout":r["heldout_half_overlap_mean"]}), "reported; no fitted mapping", np.isfinite(r["heldout_half_overlap_mean"]), label)
         ledger.add(f"G4.5_null_resolution_{tag}", 1/(draws+1), "draws>=100", draws >= 100, label)
