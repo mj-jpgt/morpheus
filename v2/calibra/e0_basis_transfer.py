@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timezone
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -228,8 +229,10 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     # non-controls in the same order.  No invalid non-control rows are silently
     # retained in this dataset, but retain this explicit alignment safeguard.
     if targets is not None and np.any(~keep_rows[~controls]):
-        targets = None
-        target_meta = {"guide_target_status": "unavailable_noncontrol_row_filter_changed_index"}
+        # Keep target labels in exactly the same non-control row order as X.
+        # This is an explicit, auditable index operation—not an assumption that
+        # filtering never occurred.
+        targets = [target for target, keep in zip(targets, keep_rows[~controls]) if keep]
     x = raw[noncontrol]
     return MatrixBundle(x=x, genes=genes.tolist(), row_ids=data.obs_names[noncontrol].astype(str).tolist(), targets=targets,
         meta={"source": str(path), "shape_raw": list(data.shape), "n_control_rows_raw": int(controls.sum()),
@@ -338,6 +341,21 @@ def _health(x: torch.Tensor) -> dict[str, float]:
             "n_nonfinite": int((~torch.isfinite(x)).sum().cpu())}
 
 
+def _full_dictionary_rank(p: MatrixBundle, device: torch.device) -> dict[str, object]:
+    """Exact full-spectrum E0b rank report for the filtered response dictionary."""
+    x = p.x.astype(np.float32, copy=False)
+    std = x.std(axis=0); keep = np.isfinite(std) & (std > 1e-8)
+    if not keep.all(): x = x[:, keep]
+    x = (x - x.mean(axis=0, keepdims=True)) / x.std(axis=0, keepdims=True)
+    pt = torch.as_tensor(x, device=device)
+    singular = torch.linalg.svdvals(pt)
+    nonzero = singular[singular > singular[0] * 1e-10]
+    weights = nonzero / nonzero.sum()
+    return {"rank_mode": "full_gpu_svd", "n_rows": int(x.shape[0]), "n_genes": int(x.shape[1]), "constant_columns_dropped": int((~keep).sum()),
+            "algebraic_rank": int(nonzero.numel()), "effective_rank": float(torch.exp(-(weights * torch.log(weights)).sum()).cpu()),
+            "stable_rank": float((singular.square().sum() / singular[0].square()).cpu())}
+
+
 def _dictionary_metrics(x: torch.Tensor, targets: list[str | None] | None, threshold: float = .95) -> dict[str, object]:
     z = x / torch.linalg.vector_norm(x, dim=1, keepdim=True).clamp_min(1e-12)
     n, block = z.shape[0], 256; maximum = 0.0; edges = 0
@@ -392,7 +410,7 @@ def _split_half(x: torch.Tensor, groups: list[str], q: int, seed: int) -> tuple[
         "max_group_count_imbalance": int(max(abs(a_counts.reindex(all_counts.index, fill_value=0) - b_counts.reindex(all_counts.index, fill_value=0))))}
 
 
-def _context(name: str, p: MatrixBundle, t: MatrixBundle, *, device: torch.device, draws: int, seed: int) -> dict[str, object]:
+def _context(name: str, p: MatrixBundle, t: MatrixBundle, full_dictionary_rank: dict[str, object], *, device: torch.device, draws: int, seed: int) -> dict[str, object]:
     px, tx, genes, join = _align(p, t)
     pt, tt = torch.as_tensor(px, device=device), torch.as_tensor(tx, device=device)
     q = 110; vp, sp = _right_svd(pt, q, seed); vt, _ = _right_svd(tt, q, seed + 1)
@@ -407,7 +425,7 @@ def _context(name: str, p: MatrixBundle, t: MatrixBundle, *, device: torch.devic
     out: dict[str, object] = {"context": name, "n_shared_genes": len(genes), "join": join, "perturbation": p.meta, "tcga": t.meta,
         "housekeepers_present": sorted(HOUSEKEEPING.intersection(genes)), "perturbation_health": p_health, "tcga_health": t_health,
         "rank": {"retained_components": int(sp.numel()), "effective_rank_retained": p_health["effective_rank"],
-                 "stable_rank_retained_estimate": float((sp.square().sum() / sp[0].square()).cpu())},
+                 "stable_rank_retained_estimate": float((sp.square().sum() / sp[0].square()).cpu()), "dictionary_full": full_dictionary_rank},
         "dictionary": _dictionary_metrics(pt, p.targets), "split": split_meta}
     for k in (10, 25, 50, 100):
         observed = _overlap(vp, vt, k, 1); ceiling = _overlap(va, vb, k, 1)
@@ -451,6 +469,8 @@ def _self_test() -> None:
     assert _shuffle_gate(.2, .1) and not _shuffle_gate(.05, .1)
     assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
     assert 1.0 <= _effective_rank_torch(torch.eye(8)) <= 8.0
+    toy_rank = _full_dictionary_rank(MatrixBundle(np.asarray([[1., 0.], [0., 1.], [1., 1.]], dtype=np.float32), ["A", "B"], ["x", "y", "z"], {}), device)
+    assert toy_rank["rank_mode"] == "full_gpu_svd" and toy_rank["algebraic_rank"] == 2
     # Exercise the real H5AD loader with deliberately inconsistent X versus
     # (control_expr, fold_expr).  A cosmetic metadata check would pass this;
     # the E0.a data-semantic guard must not.
@@ -506,6 +526,8 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
         ledger.add(f"G3.5_site_degeneracy_{prefix}", "unavailable_no_site_labels", "explicitly unavailable", True, label)
         ledger.add(f"G3.6_norm_sanity_{prefix}", json.dumps({"mean":h["mean_norm"],"median":h["median_norm"],"nonfinite":h["n_nonfinite"]}), "zero nonfinite", h["n_nonfinite"] == 0, label)
     d = context["dictionary"]
+    full_rank = context["rank"]["dictionary_full"]
+    ledger.add("E0b_full_dictionary_rank", json.dumps({k:full_rank[k] for k in ("rank_mode","algebraic_rank","effective_rank","stable_rank")}), "full_gpu_svd with finite ranks", full_rank["rank_mode"] == "full_gpu_svd" and all(np.isfinite(full_rank[k]) for k in ("algebraic_rank","effective_rank","stable_rank")), label)
     ledger.add("E0b_dictionary_coherence", d["dictionary_coherence_abs"], "finite", np.isfinite(d["dictionary_coherence_abs"]), label)
     ledger.add("E0b_equivalence_classes", d["n_equivalence_classes"], ">0", d["n_equivalence_classes"] > 0, label)
     ledger.add("E0b_guide_retrieval", d["guide_retrieval_status"], "available or explicit unavailable", d["guide_retrieval_status"] in {"available","unavailable"}, label)
@@ -521,6 +543,15 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
         ledger.add(f"E0.b_pc1_stripped_{tag}", json.dumps({"observed":r["pc1_removed_overlap"],"p":r["null_p"]}), "observed>null p95", _pc1_gate(r["pc1_removed_overlap"], r["null_p95"]), label)
         ledger.add(f"E0.d_ceiling_{tag}", r["pc1_removed_ceiling"], ">null p95", r["pc1_removed_ceiling"] > r["null_p95"], label)
         ledger.add(f"E0.e_matched_spectrum_floor_{tag}", r["spectrum_energy_abs_error"], "exact preserved retained energy", r["spectrum_energy_abs_error"] == 0.0, label)
+
+
+def _append_pending_experiment_log(root: Path, output: Path, result: dict[str, object]) -> None:
+    """Record a completed gate-valid run without pre-empting the adversarial verdict."""
+    log = root / "v2/research/rebase/nature/EXPERIMENT_LOG.md"; log.parent.mkdir(parents=True, exist_ok=True)
+    line = (f"\n## {datetime.now(timezone.utc).isoformat()} — E0/E0b pending adversarial audit\n"
+            f"- Code: `{result['code_sha']}`; device: `{result['device']}`; gates: `PASS`.\n"
+            f"- Output: `{output}`. This entry is a provenance record, not a scientific conclusion until the required adversarial audit is logged.\n")
+    with log.open("a", encoding="utf-8") as handle: handle.write(line)
 
 
 def main() -> None:
@@ -542,12 +573,15 @@ def main() -> None:
     for label, value in (("G0.3_k562_identity",args.k562),("G0.3_rpe1_identity",args.rpe1),("G0.3_tcga_identity",args.tcga),("G0.3_tcga_registry_identity",args.tcga_registry)): ledger.artifact(label, value)
     ledger.add("G0.4_manifest_read", "data-source experiment; no trained artifacts compared", "not applicable, explicitly declared", True, "input identities emitted in input_manifest.json")
     p_k, p_r = _load_perturbation(Path(args.k562)), _load_perturbation(Path(args.rpe1))
+    # E0b is intentionally expensive and exact: two full GPU spectra, once
+    # per cell context, reused across the RNA transform sensitivity analysis.
+    full_dictionary_ranks = {"K562": _full_dictionary_rank(p_k, device), "RPE1": _full_dictionary_rank(p_r, device)}
     results: dict[str, object] = {"schema_version":"2.0", "experiment":"E0_E0b", "device":str(device), "draws":args.draws, "seed":args.seed,
         "command":sys.argv, "code_sha":_git(root,"rev-parse","HEAD"), "code_dirty":dirty, "python":sys.version, "torch":torch.__version__, "cuda":torch.version.cuda, "platform":platform.platform(), "contexts":{}}
     for transform in ("signed_log1p", "clip_log1p"):
         tcga = _restrict_tcga_to_registry(_load_tcga(Path(args.tcga), transform), Path(args.tcga_registry))
         for name, perturb, seed in (("K562",p_k,args.seed),("RPE1",p_r,args.seed+1000)):
-            key = f"{name}_{transform}"; context = _context(name, perturb, tcga, device=device, draws=args.draws, seed=seed)
+            key = f"{name}_{transform}"; context = _context(name, perturb, tcga, full_dictionary_ranks[name], device=device, draws=args.draws, seed=seed)
             results["contexts"][key] = context; _add_gates(ledger, context, key, args.draws)
     # Transform robustness is predeclared: all PC1-stripped effects must stay above their own floor and retain direction.
     concordant = all(c[f"k{k}"]["effect_ci95"][0] > 0 for c in results["contexts"].values() for k in (10,25,50,100))
@@ -558,6 +592,7 @@ def main() -> None:
     results["gates_pass"] = ledger.write()
     (output / "input_manifest.json").write_text(json.dumps({"inputs":{k:results[k] for k in ("command","code_sha","code_dirty","device","draws","seed")},"k562":p_k.meta,"rpe1":p_r.meta},indent=2))
     (output / "e0_basis_transfer.json").write_text(json.dumps(results, indent=2))
+    if results["gates_pass"]: _append_pending_experiment_log(root, output, results)
     print(json.dumps({"output":str(output),"gates_pass":results["gates_pass"],"wall_seconds":results["wall_seconds"]},indent=2), flush=True)
 
 
