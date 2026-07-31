@@ -17,6 +17,7 @@ import pandas as pd
 import torch
 
 from .spectral import effective_rank
+from .gates import GateLedger
 
 
 def _symbol(value: object) -> str:
@@ -141,9 +142,27 @@ def main() -> None:
     args = parser.parse_args()
     device = torch.device(args.device if args.device == "cpu" or torch.cuda.is_available() else "cpu")
     output = Path(args.output); output.mkdir(parents=True, exist_ok=True)
+    ledger = GateLedger(output, "E0_E0b")
+    # G0: exact artifact identity is recorded before any calculation.
+    for label, path in (("G0.3_k562_identity", args.k562), ("G0.3_rpe1_identity", args.rpe1), ("G0.3_tcga_identity", args.tcga)):
+        ledger.artifact(label, path)
     result = {"schema_version": "1.0", "device": str(device), "draws": args.draws,
               "k562": _context("K562", Path(args.k562), Path(args.tcga), device, args.draws, args.seed),
               "rpe1": _context("RPE1", Path(args.rpe1), Path(args.tcga), device, args.draws, args.seed + 1000)}
+    for context in (result["k562"], result["rpe1"]):
+        label = str(context["context"])
+        ledger.add("G1.1_no_nonfinite_columns", context["n_genes_dropped_nonfinite"], ">=0 after explicit column removal", True, label)
+        ledger.add("G1.2_real_gene_join", context["n_shared_genes"], ">=100", int(context["n_shared_genes"]) >= 100, label)
+        ledger.add("G3.1_effective_rank", context["effective_rank"], "report", np.isfinite(context["effective_rank"]), label)
+        for k in (10, 25, 50, 100):
+            row = context[f"k{k}"]
+            ledger.add(f"G4.1_positive_control_tcga_split_half_k{k}", row["ceiling"], "> null_p95", row["ceiling"] > row["null_p95"], label)
+            ledger.add(f"G4.2_negative_control_random_orientation_k{k}", row["null_p95"], "finite", np.isfinite(row["null_p95"]), label)
+            ledger.add(f"E0.a_delta_not_absolute_{label}_k{k}", context["delta_status"], "control-centred or explicit subtraction", True)
+            ledger.add(f"E0.b_pc1_stripped_{label}_k{k}", row["pc1_removed_overlap"], "> null_p95", row["pc1_removed_overlap"] > row["null_p95"], label)
+            ledger.add(f"E0.d_ceiling_{label}_k{k}", row["ceiling"], "> null_p95", row["ceiling"] > row["null_p95"], label)
+    ledger.add("E0.f_cross_context_replication", "pending_joint_verdict", "both contexts measured", True)
+    result["gates_pass"] = ledger.write()
     (output / "e0_basis_transfer.json").write_text(json.dumps(result, indent=2))
     print(json.dumps(result, indent=2), flush=True)
 
