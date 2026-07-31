@@ -352,7 +352,7 @@ def _full_dictionary_rank(p: MatrixBundle, device: torch.device) -> dict[str, ob
     nonzero = singular[singular > singular[0] * 1e-10]
     weights = nonzero / nonzero.sum()
     return {"rank_mode": "full_gpu_svd", "n_rows": int(x.shape[0]), "n_genes": int(x.shape[1]), "constant_columns_dropped": int((~keep).sum()),
-            "algebraic_rank": int(nonzero.numel()), "effective_rank": float(torch.exp(-(weights * torch.log(weights)).sum()).cpu()),
+            "numerical_rank_relative_1e10": int(nonzero.numel()), "effective_rank": float(torch.exp(-(weights * torch.log(weights)).sum()).cpu()),
             "stable_rank": float((singular.square().sum() / singular[0].square()).cpu())}
 
 
@@ -372,10 +372,16 @@ def _dictionary_metrics(x: torch.Tensor, targets: list[str | None] | None, thres
     for start in range(0, n, block):
         sim = z[start:start + block] @ z.T
         for local, row in enumerate(sim):
-            i = start + local; row[i] = -2.0; absolute = row.abs(); maximum = max(maximum, float(absolute.max().cpu()))
-            for j in torch.where(absolute >= threshold)[0].cpu().tolist(): edges += 1; union(i, int(j))
+            i = start + local
+            absolute = row.abs()
+            # Exclude self from every dictionary quantity.  Masking before
+            # `abs()` would turn a negative sentinel back into a high score.
+            coherence = absolute.clone(); coherence[i] = 0.0
+            maximum = max(maximum, float(coherence.max().cpu()))
+            for j in torch.where(coherence >= threshold)[0].cpu().tolist(): edges += 1; union(i, int(j))
+            nearest = coherence.clone(); nearest[i] = -1.0
             if usable_targets and counts[targets[i]] > 1:
-                eligible += 1; hits += int(targets[i] == targets[int(absolute.argmax().cpu())])
+                eligible += 1; hits += int(targets[i] == targets[int(nearest.argmax().cpu())])
     return {"dictionary_coherence_abs": maximum, "equivalence_threshold_abs": threshold, "equivalence_edges_directed": edges,
             "n_equivalence_classes": len({find(i) for i in range(n)}), "guide_same_target_retrieval_at1": hits / eligible if eligible else None,
             "guide_retrieval_eligible": eligible, "guide_retrieval_status": "available" if usable_targets else "unavailable"}
@@ -470,7 +476,11 @@ def _self_test() -> None:
     assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
     assert 1.0 <= _effective_rank_torch(torch.eye(8)) <= 8.0
     toy_rank = _full_dictionary_rank(MatrixBundle(np.asarray([[1., 0.], [0., 1.], [1., 1.]], dtype=np.float32), ["A", "B"], ["x", "y", "z"], {}), device)
-    assert toy_rank["rank_mode"] == "full_gpu_svd" and toy_rank["algebraic_rank"] == 2
+    assert toy_rank["rank_mode"] == "full_gpu_svd" and toy_rank["numerical_rank_relative_1e10"] == 2
+    # Same-target labels deliberately disagree with nearest non-self vectors;
+    # this catches accidental self-neighbour retrieval immediately.
+    self_leak = _dictionary_metrics(torch.tensor([[1., 0.], [0., 1.], [1., 0.], [0., 1.]]), ["A", "A", "B", "B"])
+    assert self_leak["dictionary_coherence_abs"] == 1.0 and self_leak["guide_same_target_retrieval_at1"] == 0.0
     # Exercise the real H5AD loader with deliberately inconsistent X versus
     # (control_expr, fold_expr).  A cosmetic metadata check would pass this;
     # the E0.a data-semantic guard must not.
@@ -527,7 +537,7 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
         ledger.add(f"G3.6_norm_sanity_{prefix}", json.dumps({"mean":h["mean_norm"],"median":h["median_norm"],"nonfinite":h["n_nonfinite"]}), "zero nonfinite", h["n_nonfinite"] == 0, label)
     d = context["dictionary"]
     full_rank = context["rank"]["dictionary_full"]
-    ledger.add("E0b_full_dictionary_rank", json.dumps({k:full_rank[k] for k in ("rank_mode","algebraic_rank","effective_rank","stable_rank")}), "full_gpu_svd with finite ranks", full_rank["rank_mode"] == "full_gpu_svd" and all(np.isfinite(full_rank[k]) for k in ("algebraic_rank","effective_rank","stable_rank")), label)
+    ledger.add("E0b_full_dictionary_rank", json.dumps({k:full_rank[k] for k in ("rank_mode","numerical_rank_relative_1e10","effective_rank","stable_rank")}), "full_gpu_svd with finite ranks", full_rank["rank_mode"] == "full_gpu_svd" and all(np.isfinite(full_rank[k]) for k in ("numerical_rank_relative_1e10","effective_rank","stable_rank")), label)
     ledger.add("E0b_dictionary_coherence", d["dictionary_coherence_abs"], "finite", np.isfinite(d["dictionary_coherence_abs"]), label)
     ledger.add("E0b_equivalence_classes", d["n_equivalence_classes"], ">0", d["n_equivalence_classes"] > 0, label)
     ledger.add("E0b_guide_retrieval", d["guide_retrieval_status"], "available or explicit unavailable", d["guide_retrieval_status"] in {"available","unavailable"}, label)
