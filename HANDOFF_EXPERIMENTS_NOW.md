@@ -45,6 +45,25 @@ negative here is a finding, not a setback — that is the entire point of runnin
 
 ---
 
+## E0b — Dictionary structure: how many directions do we actually have? **[run with E0]**
+
+**Corrects a false claim in an earlier draft** ("~11k directions, so no collapse"). 11,258
+perturbations in ~8k gene dimensions is an **overcomplete, correlated dictionary**, not 11,258
+recoverable directions — many perturbations converge on shared stress / cell-cycle / apoptosis /
+interferon / ribosomal responses.
+
+**Measure and report, on the same `P` built in E0:** algebraic rank; **effective rank**
+(`calibra.spectral.effective_rank` — singular values); stable rank; **dictionary coherence**
+(max off-diagonal |correlation| between atoms); perturbation-retrieval accuracy (can you identify the
+held-out atom from its own response?); and the **number of distinguishable perturbation equivalence
+classes** at a stated correlation threshold.
+
+**Why it matters:** the honest claim is "a genome-scale non-curated dictionary of ~11,000 measured
+perturbations," never "11,000 independent causal directions." Convergent perturbations are **biological
+equivalence under the measurement**, not model collapse — the object of interest is the quotient
+`C / ker(T)`. E0b tells us the size of that quotient, which sets the true ceiling on the catalogue's
+resolution. Report equivalence groups wherever individual gene attribution is not identifiable.
+
 ## E1 — Is the added rank empty? (formalise O1)
 
 **Our strongest owned observation, currently a single anecdote.** Make it a measurement.
@@ -119,3 +138,29 @@ loses its primary evidence. **Escalate immediately in that case.**
   the pipeline is broken, not the model.
 - Verify the workspace is a real junction, not a stale copy, before trusting any run (mistake #2).
 - Do not retrain anything. E0–E3 are all frozen-artifact / on-disk analyses.
+
+---
+
+## Verified prior-art constraints (do not violate these in any write-up)
+
+External review challenged two claims; both were **verified real by direct API lookup**:
+
+- **MoPE** — arXiv **2606.02877v2** (Jun 2026), *Pathway-Structured Privileged Distillation for
+  Deployable Computational Pathology*. Already states the partial-observability problem (don't force
+  histology to reconstruct full transcriptome). **Its answer is to retreat to ~50 curated Hallmark
+  pathways.** So our *problem statement* is not novel — cite MoPE as validating it, and locate our
+  novelty in the *solution* (interventional coordinates + certified legibility), not the diagnosis.
+- **PERISCOPE** — *A genome-wide atlas of human cell morphology*, **Nature Methods 2025**, >20,000
+  genes / >30M cells. A genome-wide gene→morphology catalogue **already exists**. Confirmed: **cultured
+  cells with fluorescent phenotypes, no patient H&E.** So never write "the first genome-scale map of
+  which genes change morphology." Our claim is specifically: *patient tumour H&E*, a *molecularly
+  defined* intervention effect, transferred through a *certified legibility operator*, with *external
+  patient + spatial* certification.
+
+Also real and to be treated as **validation assets, not competitors**: Perturb-map, CRISPRmap,
+Perturb-DBiT (perturbation→tissue morphology in vivo); Webster and CellCap (sparse dictionary learning
+over correlated perturbation effects — cite for the backbone, claim only the legibility operator).
+
+**Banned claims:** "11,000 independent causal directions"; "first genome-wide gene-morphology map";
+"we discovered that H&E cannot observe everything"; any statement that `δ_g` measured in K562 is the
+causal effect of perturbing g *in a patient's tumour* (it is context-specific — write `δ_g(c)`).

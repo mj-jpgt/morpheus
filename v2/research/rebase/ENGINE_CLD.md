@@ -90,24 +90,65 @@ and F2 is the evidence that it is actively harmful (the head trained *for* biolo
 molecular signal than the head trained for retrieval).
 
 **PBS.** Supervise the biology head on **coordinates in the causal dictionary**, restricted to the
-*legible* subset (those directions that exceed the CALIBRA detection floor and pass the confound
-certificate). Three properties hold **by construction**:
+*legible* subspace. Two properties hold by construction: the coordinates are **interventional**, not
+curated; and **we never supervise on directions the input cannot express**.
 
-1. the basis is **causal**, not curated;
-2. it is **high-rank** (~11k directions, so no collapse to a ~50-D manifold);
-3. **we never supervise on directions the input cannot express** — the legibility filter enforces it.
+> ### CORRECTION — it is a DICTIONARY, not a basis, and "no collapse" was wrong
+> `D = [δ₁ … δ_G] ∈ ℝ^{p×G}` with G ≈ 11,000 in p ≈ 8,000 gene dimensions is **overcomplete and
+> highly correlated**. `rank(D) ≤ min(p, G)`, and the *effective* rank is far lower because many
+> perturbations converge on shared stress / cell-cycle / apoptosis / interferon / ribosomal responses.
+> **11,258 perturbations is not 11,258 recoverable directions**, and the earlier claim that PBS is
+> "high-rank so it cannot collapse" was simply false. Claim instead: *a genome-scale, non-curated
+> dictionary of ~11,000 measured perturbations rather than dozens of predefined pathways* — and
+> **report** algebraic rank, effective rank, dictionary coherence, perturbation-retrieval accuracy,
+> and the number of distinguishable perturbation equivalence classes.
+>
+> **Biological convergence is not model collapse.** If disrupting several different mitotic genes all
+> produce the same necrosis/pleomorphism phenotype, that is a fact about the measurement, not a
+> failure. The correct object is the **quotient** `C / ker(T)`, where `C` is intervention-response
+> space and `T` maps molecular perturbation effects to observable morphology; perturbations `g,h` are
+> equivalent when `Tδ_g ≈ Tδ_h` even though `δ_g ≠ δ_h`. We want **no artificial collapse in the source
+> dictionary, but permissible biological convergence in the morphologically distinguishable quotient.**
 
-**The loss.** Supervision over a large, highly correlated dictionary requires sparse coding, not dense
-regression. Proposed objective, per patient:
+> ### CORRECTION — the dictionary is causal only in its experimental context
+> A CRISPRi signature in K562 is an interventional effect **in K562**. Write it honestly as
+> `δ_g(c) = E[Y | do(g), c] − E[Y | do(control), c]`, where `c` is cell type, basal state, genotype and
+> environment. Without a context-transport model the catalogue measures *the H&E-legible component of a
+> reference perturbation signature* — **not** how perturbing that gene would move this patient's tumour.
+> Do not write the stronger sentence. The eventual patient-specific form is `S_ig = ‖Π_L(c_i) δ_g(c_i)‖`.
+
+**The loss — legibility as an OPERATOR, not per-gene weights.** A diagonal vector of per-gene weights
+wrongly assumes each atom is individually visible or invisible. Morphology may express *combinations*:
+neither A nor B individually predictable while a shared A+B programme is highly visible; or two
+individually-predictable atoms mutually indistinguishable. So define a PSD **legibility operator**
+`W ⪰ 0` on intervention-coordinate space, and use the noise-whitened dictionary Gram
+`G_D = Dᵀ Σ⁻¹ D`:
 
 ```
-L_PBS = || Πᴠ(y) − D·a ||²  +  λ₁·‖a‖₁  +  λ₂·Σⱼ wⱼ·|aⱼ|
+L_leg = Σ_i (â_i − a_i)ᵀ W^{1/2} G_D W^{1/2} (â_i − a_i)  +  λ Ω(â_i)
 ```
-where `D` is the (legible) perturbation dictionary, `a` the sparse causal coordinates, `Πᴠ` projection
-onto the certified-visible subspace, and `wⱼ` a **legibility weight** — the inverse of direction *j*'s
-calibrated detection floor, so the model is penalised for spending capacity on directions the channel
-demonstrably cannot carry. The legibility-weighted prior is the novel component; the sparse-coding
-backbone is standard and should be cited as such.
+with `a_i` the tumour's sparse intervention code, `â_i = f_θ(X_i)` the H&E-predicted code, `W`
+retaining only certified recoverable combinations, and `G_D` preventing over-penalisation of
+coordinate errors between near-equivalent atoms. **This operator form is the novel component**; the
+sparse-coding backbone is standard (cite Webster, CellCap) and must not be claimed.
+
+**Ω must not be plain LASSO.** In a highly correlated dictionary LASSO arbitrarily selects one of
+several near-identical atoms, so a gene could be labelled "morphologically consequential" while an
+almost-equivalent gene is dropped on sampling noise. Use elastic-net / group sparsity / graph-fused
+penalties over similar perturbations, plus **stability selection**, and **report perturbation
+equivalence groups whenever individual attribution is not identifiable.**
+
+> ### CRITICAL — avoid circular certification
+> If legibility enters the sparse prior, the pipeline becomes self-fulfilling: estimate g is legible →
+> bias the decomposition toward g → train the image model to predict g → "discover" that g is legible.
+> **This would invalidate the entire catalogue.** Mandatory nested protocol:
+> **A** estimate and *freeze* `D` on perturbation experiments containing no pathology cohort →
+> **B** encode tumour molecular profiles into `a_i` **without using their images** →
+> **C** estimate `W` / the legible subspace on a **discovery fold only**, after confound control →
+> **D** train the final H&E model with `D` and `W` **frozen** →
+> **E** certify on **untouched** patients + CPTAC + spatial.
+> The certificate must rest on data that determined *neither* the dictionary, *nor* the legibility
+> operator, *nor* the prior.
 
 **Prediction (falsifiable):** PBS should (a) not collapse, (b) beat curated-target supervision on the
 calibrated channel, and (c) leave the confounded benchmark roughly unchanged — the last being the point,
@@ -115,11 +156,32 @@ since it is the metric that could not see the difference.
 
 ## 5. Discovery experiments (what the engine produces)
 
-**D1 — genome-scale legibility catalogue.** For each of ~20,000 genes × 21 held-out cancers: is the
-transcriptional consequence of perturbing it morphologically legible, at what calibrated effect size,
-and does it survive the confound certificate. ≈420,000 certified measurements. **Negative entries are
-first-class results** — "gene G is *not* legible above floor 0.03" is a claim nobody in this field can
-currently make, and it tells you which biomarkers will never be readable from a slide.
+**D1 — genome-scale legibility catalogue.** For each gene × cancer, report **two** quantities against
+the certified legible projector `Π_L`, in the noise-whitened metric:
+
+```
+M_g = ‖Π_L δ_g‖_{Σ⁻¹}                    (absolute legible effect magnitude)
+F_g = ‖Π_L δ_g‖²_{Σ⁻¹} / ‖δ_g‖²_{Σ⁻¹}     (fraction of the total effect that is legible)
+```
+The four quadrants are separately meaningful (large M/large F = strong and mostly visible; large
+M/small F = big molecular effect, small visible component; etc.). **Note:** `M_g` needs only `δ_g` and
+`Π_L` — **no sparse coding**. Sparse coding is required for *representing tumours and training the H&E
+model in those coordinates*, not for ranking genes. Keep those two claims separate.
+
+> **Mandatory nuisance control — otherwise the catalogue is a list of essential genes.** Knockouts
+> causing death, cycle arrest, DNA damage, mitochondrial failure or broad stress produce real but
+> uninteresting morphology. Report both `M_g^total` and
+> `M_g^specific = ‖Π_{L ∩ N^⊥} δ_g‖`, where `N` spans generic nuisance responses (viability,
+> proliferation, global stress — definable from DepMap essentiality, which is on disk).
+> A catalogue dominated by essential genes is a negative result about the method, not a discovery.
+
+**Negative entries are first-class** — "gene G is not legible above floor 0.03" is a claim nobody can
+currently make, and it says which biomarkers will never be readable from a slide.
+
+**Per-gene record must include:** source assay + biological context `c`; `M_g^total`, `M_g^specific`,
+`F_g`; the visible modes it loads on and its **equivalence group**; CI and certified lower bound;
+guide-efficiency / off-target sensitivity; sensitivity to viability & proliferation; internal, CPTAC
+and spatial replication status; and **explicitly listed failed tests.**
 
 **D2 — the composition of the visible subspace (tests H1).** Are the legible directions enriched for
 architecture-controlling gene classes (adhesion/ECM/cytoskeleton/proliferation/immune) relative to a
@@ -134,16 +196,34 @@ what separates "a property of the channel" from "an artifact of bulk-RNA averagi
 
 ## 6. Honest accounting of novelty
 
+*Two claims below were externally challenged and then **verified real by direct API lookup** — treat
+them as hard constraints, not opinions.*
+
 | Component | Status |
 |---|---|
-| Sparse coding / dictionary learning | **Borrowed.** Cite, do not claim. |
-| Perturbation atlases as prediction targets | **Crowded.** GEARS/CPA/scGPT-perturb; explicitly not our framing. |
-| "Virtual perturbation from histology" | **Taken.** Retired in `NEAR_COLLISIONS.md`; do not reuse the phrase. |
-| Collapse onto low-rank targets | **Published** (NRC1). Only the *expressible-intersection* refinement (H2) could be new. |
-| Rank ↑ with information flat (O1) | **Ours**, unpublished, and cuts against anti-collapse practice. |
-| Perturbation atlas as a **basis** for decomposing an observational cross-modal channel | **No instance found** in our 15-lane corpus. The candidate novel move. |
-| Legibility-weighted sparse supervision (PBS) | **Novel as far as we know**; depends on the CALIBRA floor existing. |
-| Certified genome-scale legibility catalogue | **Novel**; enabled by CALIBRA, and the reason `kill_feas_T3.md`'s "uncalibratable instrument" objection no longer applies. |
+| Learn coordinates from perturbations, not curated pathways | **Established.** sVAE+ / sparse-mechanism-shift. Cite. |
+| Sparse dictionary learning over correlated gene effects | **Established.** **Webster** (graph-regularised, explicitly handles pleiotropy/correlated effects) and **CellCap** (sparse perturbation→programme with context attention). Cite, do not claim. |
+| "Don't supervise H&E on molecular variation it cannot observe" | **PRIOR ART — VERIFIED.** **MoPE**, arXiv **2606.02877v2**, Jun 2026, *Pathway-Structured Privileged Distillation for Deployable Computational Pathology*. Explicitly states the partial-observability problem. **Its solution is to retreat to ~50 curated Hallmark pathways.** Our problem statement is therefore *not* new — but MoPE **validates** it, and the solution space is open. |
+| Genome-wide gene→morphology catalogue | **PRIOR ART — VERIFIED.** **PERISCOPE**, *A genome-wide atlas of human cell morphology*, **Nature Methods 2025**, >20,000 genes / >30M cells. **But confirmed: cultured cells only — no patient tumour H&E.** So "quantify how much perturbing a gene changes morphology" is *not* novel on its own. |
+| Perturbation→tissue morphology in vivo | **Exists** (Perturb-map, CRISPRmap, Perturb-DBiT). **Validation assets, not competitors** — none learns an H&E supervision objective or a certified pan-cancer legibility catalogue. |
+| Perturbation atlases as prediction targets | **Crowded.** GEARS/CPA/scGPT-perturb; not our framing. |
+| "Virtual perturbation from histology" | **Taken.** Retired in `NEAR_COLLISIONS.md`. |
+| Collapse onto low-rank targets | **Published** (NRC1). Only the expressible-intersection refinement (H2) could be new. |
+| Rank ↑ with information flat (O1) | **Ours**, unpublished; cuts against anti-collapse practice. |
+| **Learning the H&E-legible subspace of an interventional dictionary** | **No precedent found** (ours + external search agree). |
+| **Legibility-*operator* interventional sparse supervision** | **Appears genuinely new.** |
+| **Certified gene-level projection into patient-tumour-visible causal modes** | **Appears highly novel** — but requires the careful causal wording in §4. |
+| "All ~11,000 directions are independent and causal in tumours" | **NOT DEFENSIBLE. Never claim this.** |
+
+**The delta, stated precisely.** MoPE solves partial observability by *retreating to a small curated
+vocabulary*. PERISCOPE builds a genome-wide morphology atlas *in cultured cells with fluorescent
+phenotypes*. Neither derives coordinates from measured interventions, estimates which combinations are
+legible from **routine patient H&E**, restricts supervision to that certified span, and certifies each
+mode and gene across patients, an external cohort and spatial tissue. **That composition is the claim.**
+
+**One-sentence contribution:** *We replace curated molecular supervision with a genome-scale
+intervention dictionary and learn the certified quotient of that dictionary that routine tumour
+morphology can distinguish.*
 
 ## 7. Kill conditions (pre-registered)
 
