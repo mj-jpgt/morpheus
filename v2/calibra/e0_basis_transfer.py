@@ -93,14 +93,19 @@ def _load_tcga(path: Path) -> tuple[np.ndarray, list[str], dict[str, object]]:
     finite = np.isfinite(x).all(axis=0)
     x = x[:, finite]
     raw_max, raw_min = float(x.max()), float(x.min())
-    if raw_min < 0:
-        raise ValueError("TCGA RNA has negative values; log1p count normalization is not valid")
-    # The PanCan release is on a raw-like scale (max >1e4).  Log2(1+x), then
-    # gene-wise standardisation, removes library-size scale before PCA.
+    # EBPlusPlus-adjusted RSEM retains a small number of negative adjusted
+    # values.  RNA abundance has no negative interpretation, so clip only
+    # those values before the conventional log2(1+x) transform; record the
+    # count rather than silently changing the source scale.
+    n_negative = int((x < 0).sum())
+    x = np.maximum(x, 0.0)
+    # The release is RSEM-scale (max >1e4).  Log2(1+x), then gene-wise
+    # standardisation, removes library-size scale before PCA.
     x = np.log2(x + 1.0, dtype=np.float32)
     return x, list(np.asarray(genes)[finite]), {
         "source": str(path), "n_patients": int(len(frame)), "n_genes_dropped_nonfinite": int((~finite).sum()),
-        "raw_min": raw_min, "raw_max": raw_max, "transform": "log2_1p_then_gene_standardize",
+        "raw_min": raw_min, "raw_max": raw_max, "n_negative_clipped": n_negative,
+        "transform": "clip_negative_then_log2_1p_then_gene_standardize",
     }
 
 
@@ -203,7 +208,7 @@ def main() -> None:
         label = str(context["context"])
         ledger.add("G1.1_no_nonfinite_columns", context["n_genes_dropped_nonfinite"], "all retained columns finite", True, label)
         ledger.add("G1.2_real_gene_join", context["n_shared_genes"], ">=100", int(context["n_shared_genes"]) >= 100, label)
-        ledger.add("G1.4_scale_sanity", context["tcga"]["raw_max"], "raw max flagged then log2_1p", context["tcga"]["transform"] == "log2_1p_then_gene_standardize", label)
+        ledger.add("G1.4_scale_sanity", context["tcga"]["raw_max"], "RSEM transformed before PCA", context["tcga"]["transform"] == "clip_negative_then_log2_1p_then_gene_standardize", label)
         ledger.add("G1.5_no_allzero_rows", context["n_perturbation_rows"], ">0 retained perturbations", int(context["n_perturbation_rows"]) > 0, label)
         ledger.add("G1.6_gene_symbol_mapping", context["n_shared_genes"], ">=100 shared symbols", int(context["n_shared_genes"]) >= 100, label)
         ledger.add("G3.1_effective_rank", context["effective_rank"], "report", np.isfinite(context["effective_rank"]), label)
