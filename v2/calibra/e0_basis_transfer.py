@@ -352,7 +352,7 @@ def _full_dictionary_rank(p: MatrixBundle, device: torch.device) -> dict[str, ob
     nonzero = singular[singular > singular[0] * 1e-10]
     weights = nonzero / nonzero.sum()
     return {"rank_mode": "full_gpu_svd", "n_rows": int(x.shape[0]), "n_genes": int(x.shape[1]), "constant_columns_dropped": int((~keep).sum()),
-            "numerical_rank_relative_1e10": int(nonzero.numel()), "effective_rank": float(torch.exp(-(weights * torch.log(weights)).sum()).cpu()),
+            "numerical_rank_relative_1e_minus_10": int(nonzero.numel()), "effective_rank": float(torch.exp(-(weights * torch.log(weights)).sum()).cpu()),
             "stable_rank": float((singular.square().sum() / singular[0].square()).cpu())}
 
 
@@ -476,7 +476,7 @@ def _self_test() -> None:
     assert _delta_gate({"delta_status": "validated_control_centred"}) and not _delta_gate({"delta_status": "FAILED"})
     assert 1.0 <= _effective_rank_torch(torch.eye(8)) <= 8.0
     toy_rank = _full_dictionary_rank(MatrixBundle(np.asarray([[1., 0.], [0., 1.], [1., 1.]], dtype=np.float32), ["A", "B"], ["x", "y", "z"], {}), device)
-    assert toy_rank["rank_mode"] == "full_gpu_svd" and toy_rank["numerical_rank_relative_1e10"] == 2
+    assert toy_rank["rank_mode"] == "full_gpu_svd" and toy_rank["numerical_rank_relative_1e_minus_10"] == 2
     # Same-target labels deliberately disagree with nearest non-self vectors;
     # this catches accidental self-neighbour retrieval immediately.
     self_leak = _dictionary_metrics(torch.tensor([[1., 0.], [0., 1.], [1., 0.], [0., 1.]]), ["A", "A", "B", "B"])
@@ -537,7 +537,7 @@ def _add_gates(ledger: GateLedger, context: dict[str, object], label: str, draws
         ledger.add(f"G3.6_norm_sanity_{prefix}", json.dumps({"mean":h["mean_norm"],"median":h["median_norm"],"nonfinite":h["n_nonfinite"]}), "zero nonfinite", h["n_nonfinite"] == 0, label)
     d = context["dictionary"]
     full_rank = context["rank"]["dictionary_full"]
-    ledger.add("E0b_full_dictionary_rank", json.dumps({k:full_rank[k] for k in ("rank_mode","numerical_rank_relative_1e10","effective_rank","stable_rank")}), "full_gpu_svd with finite ranks", full_rank["rank_mode"] == "full_gpu_svd" and all(np.isfinite(full_rank[k]) for k in ("numerical_rank_relative_1e10","effective_rank","stable_rank")), label)
+    ledger.add("E0b_full_dictionary_rank", json.dumps({k:full_rank[k] for k in ("rank_mode","numerical_rank_relative_1e_minus_10","effective_rank","stable_rank")}), "full_gpu_svd with finite ranks", full_rank["rank_mode"] == "full_gpu_svd" and all(np.isfinite(full_rank[k]) for k in ("numerical_rank_relative_1e_minus_10","effective_rank","stable_rank")), label)
     ledger.add("E0b_dictionary_coherence", d["dictionary_coherence_abs"], "finite", np.isfinite(d["dictionary_coherence_abs"]), label)
     ledger.add("E0b_equivalence_classes", d["n_equivalence_classes"], ">0", d["n_equivalence_classes"] > 0, label)
     ledger.add("E0b_guide_retrieval", d["guide_retrieval_status"], "available or explicit unavailable", d["guide_retrieval_status"] in {"available","unavailable"}, label)
