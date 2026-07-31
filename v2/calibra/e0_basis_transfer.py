@@ -169,11 +169,12 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     valid_fold = np.isfinite(fold) & np.isfinite(pct)
     fold_relation_error = float(np.max(np.abs(pct[valid_fold] - (fold[valid_fold] - 1.0)))) if valid_fold.any() else float("inf")
     targets, target_meta = _parse_targets(data.obs_names, controls)
-    target_vector_corr = float("nan"); target_vector_mae = float("inf"); target_vector_coverage = 0.0
+    target_vector_corr = float("nan"); target_vector_mae = float("inf"); target_vector_coverage = 0.0; target_gene_hits = 0
     if targets is not None:
         symbols = {str(gene): i for i, gene in enumerate(genes)}
         raw_noncontrol = np.flatnonzero(~controls)
         target_cols = np.asarray([symbols.get(target, -1) for target in targets])
+        target_gene_hits = int((target_cols >= 0).sum())
         valid_target = (target_cols >= 0) & np.isfinite(fold[raw_noncontrol]) & (fold[raw_noncontrol] >= 0)
         target_vector_coverage = float(valid_target.mean())
         if valid_target.sum() >= 30:
@@ -195,7 +196,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
     matrix_is_delta = (centroid_ratio <= 0.10 and fold_relation_error <= 1e-5 and control_expr_coverage >= .80
                        and control_expr_nonnegative and target_vector_coverage >= .80 and target_vector_corr >= .80 and target_vector_mae <= .30)
     if not matrix_is_delta:
-        raise ValueError(f"{path}: cannot assert delta response (centroid_ratio={centroid_ratio:.3g}, control_expr_coverage={control_expr_coverage:.3g}, target_coverage={target_vector_coverage:.3g}, target_control_ref_r={target_vector_corr:.3g}, target_control_ref_mae={target_vector_mae:.3g})")
+        raise ValueError(f"{path}: cannot assert delta response (centroid_ratio={centroid_ratio:.3g}, control_expr_coverage={control_expr_coverage:.3g}, target_gene_hits={target_gene_hits}, target_coverage={target_vector_coverage:.3g}, target_control_ref_r={target_vector_corr:.3g}, target_control_ref_mae={target_vector_mae:.3g})")
     usable_controls = controls & keep_rows
     noncontrol = (~controls) & keep_rows
     # targets are indexed over raw non-controls, so retain only usable
@@ -212,6 +213,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
               "n_duplicate_symbols_aggregated": duplicates, "n_perturbation_rows": int(noncontrol.sum()), "control_centroid_ratio": centroid_ratio,
               "fold_pct_relation_max_abs_error": fold_relation_error, "control_expr_coverage": control_expr_coverage,
               "control_expr_nonnegative": control_expr_nonnegative, "target_vector_coverage": target_vector_coverage,
+              "target_gene_hits": target_gene_hits,
               "target_vector_control_referenced_correlation": target_vector_corr, "target_vector_control_referenced_mae": target_vector_mae,
               "delta_status": "validated_control_centred" if matrix_is_delta else "FAILED", **target_meta})
 
