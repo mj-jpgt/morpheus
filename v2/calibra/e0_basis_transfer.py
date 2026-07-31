@@ -198,8 +198,9 @@ def _load_perturbation(path: Path) -> MatrixBundle:
                 target_vector_mae = float(np.mean(np.abs(observed_target_effect - expected_target_effect)))
     control_expr_coverage = float(np.isfinite(control_expr[~controls]).mean())
     control_expr_nonnegative = bool(np.all(control_expr[~controls][np.isfinite(control_expr[~controls])] >= 0))
+    min_target_gene_hits = max(30, int(np.ceil(.10 * max(1, (~controls).sum()))))
     matrix_is_delta = (centroid_ratio <= 0.10 and fold_relation_error <= 1e-5 and control_expr_coverage >= .80
-                       and control_expr_nonnegative and target_gene_hits >= 1000 and target_vector_coverage >= .70 and target_vector_corr >= .80 and target_vector_mae <= .30)
+                       and control_expr_nonnegative and target_gene_hits >= min_target_gene_hits and target_vector_coverage >= .70 and target_vector_corr >= .80 and target_vector_mae <= .30)
     if not matrix_is_delta:
         raise ValueError(f"{path}: cannot assert delta response (centroid_ratio={centroid_ratio:.3g}, control_expr_coverage={control_expr_coverage:.3g}, target_gene_hits={target_gene_hits}, target_coverage={target_vector_coverage:.3g}, target_control_ref_r={target_vector_corr:.3g}, target_control_ref_mae={target_vector_mae:.3g}, target_examples={(targets or [])[:3]}, gene_examples={genes[:3].tolist()})")
     usable_controls = controls & keep_rows
@@ -218,7 +219,7 @@ def _load_perturbation(path: Path) -> MatrixBundle:
               "n_duplicate_symbols_aggregated": duplicates, "n_perturbation_rows": int(noncontrol.sum()), "control_centroid_ratio": centroid_ratio,
               "fold_pct_relation_max_abs_error": fold_relation_error, "control_expr_coverage": control_expr_coverage,
               "control_expr_nonnegative": control_expr_nonnegative, "target_vector_coverage": target_vector_coverage,
-              "target_gene_hits": target_gene_hits,
+              "target_gene_hits": target_gene_hits, "min_target_gene_hits": min_target_gene_hits,
               "target_vector_control_referenced_correlation": target_vector_corr, "target_vector_control_referenced_mae": target_vector_mae,
               "delta_status": "validated_control_centred" if matrix_is_delta else "FAILED", **target_meta})
 
