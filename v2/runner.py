@@ -10,7 +10,7 @@ import argparse
 import copy
 import json
 import warnings
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Iterator
 
@@ -316,29 +316,205 @@ def _parameter_deltas(trainer: V2Trainer, initial: dict[str, list[torch.Tensor]]
     return result
 
 
-def _overfit_programme_head(model: TumorStateV2, loader: UncappedHoptimusBatches, device: str,
-                            steps: int = 300) -> dict[str, float]:
-    """G2.6: verify the actual programme head can memorize one real WSI batch."""
-    batch = next(iter(loader))
-    batch = {key: value.to(device) if isinstance(value, torch.Tensor) else value for key, value in batch.items()}
-    model.eval()
-    with torch.no_grad():
-        features = model(batch, view="wsi")["z_biology"].detach()
-        target = batch["programme_target"].detach()
-        mask = batch.get("programme_target_mask", torch.ones_like(target, dtype=torch.bool)).detach()
-    mean, log_variance = copy.deepcopy(model.programme_mean).to(device), copy.deepcopy(model.programme_log_variance).to(device)
-    optimiser = torch.optim.AdamW([*mean.parameters(), *log_variance.parameters()], lr=1e-2, weight_decay=0.0)
-    def objective() -> torch.Tensor:
-        variance = log_variance(features).clamp(-8, 8)
-        error = (mean(features) - target).square()
-        value = 0.5 * (error * torch.exp(-variance) + variance)
-        return value.masked_select(mask).mean()
-    initial = float(objective().detach().cpu())
-    for _ in range(steps):
-        optimiser.zero_grad(set_to_none=True); loss = objective(); loss.backward(); optimiser.step()
-    final = float(objective().detach().cpu())
-    return {"batch_patients": int(len(features)), "initial_loss": initial, "final_loss": final,
-            "relative_reduction": float((initial - final) / max(abs(initial), 1e-12))}
+def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule,
+                                   loader: UncappedHoptimusBatches, device: str,
+                                   steps: int = 300) -> dict[str, object]:
+    """G2.6 for the Hallmark D1 arm on the real model/trainer path.
+
+    Training copied heads on frozen features is not a liveness test for the
+    slide encoder.  This clone instead runs the exact three-view programme
+    objective through `V2Trainer.step`, including the WSI/RNA/shared/biology
+    groups that D1 compares.  The decorrelation term is omitted here only
+    because it has a batch-statistics floor unrelated to memorisation.
+    """
+    clone = copy.deepcopy(model).to(device)
+    clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
+    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-2, weight_decay=0.0)
+    trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
+    try:
+        fixed_raw = next(iter(loader))
+    except StopIteration as exc:
+        raise RuntimeError("programme_only G2.6 received no real train batch") from exc
+    fixed_batch = {key: value.to(device, non_blocking=True) if isinstance(value, torch.Tensor) else value
+                   for key, value in fixed_raw.items()}
+
+    def objective() -> tuple[torch.Tensor, dict[str, float]]:
+        optimiser.zero_grad(set_to_none=True)
+        loss, metrics, _ = trial.step(fixed_batch, epoch=clone_schedule.warmup_epochs)
+        if not loss.requires_grad:
+            raise RuntimeError("programme_only G2.6 loss is detached from the actual model")
+        return loss, metrics
+
+    initial_loss, initial_metrics = objective()
+    initial = float(initial_loss.detach().cpu())
+    first_gradients: dict[str, float] | None = None
+    for step in range(steps):
+        loss, _ = objective(); loss.backward()
+        gradients = trial._gradient_group_norms()
+        if step == 0:
+            first_gradients = gradients
+            missing = [name for name, value in gradients.items() if value <= 0.0]
+            if missing:
+                raise RuntimeError(f"programme_only G2.6 has detached trainable groups: {missing}")
+        optimiser.step()
+    final_loss, final_metrics = objective()
+    final = float(final_loss.detach().cpu())
+    return {
+        "batch_patients": int(len(fixed_batch["indices"])),
+        "initial_loss": initial, "final_loss": final,
+        "initial_programme": float(initial_metrics.get("programme", float("nan"))),
+        "final_programme": float(final_metrics.get("programme", float("nan"))),
+        "gradient_norms_first": first_gradients or {},
+        "relative_reduction": float((initial - final) / max(abs(initial), 1e-12)),
+        "objective_scope": "actual_v2_encoder_and_programme_path_without_decorrelation_floor",
+    }
+
+
+def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSchedule,
+                                        loader: UncappedHoptimusBatches, device: str,
+                                        steps: int = 300, minimum_memory_keys: int = 16) -> dict[str, object]:
+    """G2.6 for D1 on a clone of the *actual* model and trainer path.
+
+    This deliberately does not train post-hoc linear probes on frozen states.
+    It exercises the WSI encoder, RNA encoder, shared slots, biology head and
+    queue exactly as D1 does, while keeping the experiment model untouched.
+    The rank-spreading regularizer is excluded only from this memorisation
+    check because it has an irreducible batch-statistics floor; the two new
+    D1 terms are the quantities that must be driven near zero.
+    """
+    clone = copy.deepcopy(model).to(device)
+    clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
+    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-2, weight_decay=0.0)
+    trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
+    iterator = iter(loader)
+    priming_batches: list[dict[str, torch.Tensor]] = []
+    observed_ids: set[int] = set()
+    while len(observed_ids) < minimum_memory_keys:
+        try:
+            raw = next(iterator)
+        except StopIteration as exc:
+            raise RuntimeError(
+                f"programme_free G2.6 received fewer than {minimum_memory_keys} distinct real train patients"
+            ) from exc
+        priming_batches.append(raw)
+        observed_ids.update(int(value) for value in raw["indices"].tolist())
+    trial.prime_biology_memory(priming_batches, minimum_unique_keys=minimum_memory_keys)
+    try:
+        fixed_batch = next(iterator)
+    except StopIteration:
+        # A tiny cohort may fit entirely in the queue.  Reusing one real batch
+        # is valid: its matching key is masked and all other queue keys remain
+        # real train-patient negatives.
+        fixed_batch = priming_batches[-1]
+    fixed_batch = {key: value.to(device, non_blocking=True) if isinstance(value, torch.Tensor) else value
+                   for key, value in fixed_batch.items()}
+
+    def one_step(*, update: bool) -> tuple[torch.Tensor, dict[str, float]]:
+        optimiser.zero_grad(set_to_none=True)
+        loss, metrics, _ = trial.step(fixed_batch, epoch=clone_schedule.warmup_epochs)
+        if not loss.requires_grad:
+            raise RuntimeError("programme_free G2.6 loss is detached from the actual model")
+        if update:
+            loss.backward()
+            gradients = trial._gradient_group_norms()
+            missing = [name for name, value in gradients.items() if value <= 0.0]
+            if missing:
+                raise RuntimeError(f"programme_free G2.6 has detached trainable groups: {missing}")
+            optimiser.step()
+        return loss.detach(), metrics
+
+    initial, initial_metrics = one_step(update=False)
+    first_gradients: dict[str, float] | None = None
+    for step in range(steps):
+        optimiser.zero_grad(set_to_none=True)
+        loss, metrics, _ = trial.step(fixed_batch, epoch=clone_schedule.warmup_epochs)
+        loss.backward()
+        gradients = trial._gradient_group_norms()
+        if step == 0:
+            first_gradients = gradients
+            missing = [name for name, value in gradients.items() if value <= 0.0]
+            if missing:
+                raise RuntimeError(f"programme_free G2.6 has detached trainable groups: {missing}")
+        optimiser.step()
+    final, final_metrics = one_step(update=False)
+    initial_value, final_value = float(initial.cpu()), float(final.cpu())
+    return {
+        "batch_patients": int(len(fixed_batch["indices"])),
+        "memory_unique_keys": int(trial.biology_memory.unique_count if trial.biology_memory else 0),
+        "initial_loss": initial_value, "final_loss": final_value,
+        "initial_biology_contrastive": float(initial_metrics.get("biology_contrastive", float("nan"))),
+        "final_biology_contrastive": float(final_metrics.get("biology_contrastive", float("nan"))),
+        "initial_full_consistency": float(initial_metrics.get("biology_full_consistency", float("nan"))),
+        "final_full_consistency": float(final_metrics.get("biology_full_consistency", float("nan"))),
+        "gradient_norms_first": first_gradients or {},
+        "relative_reduction": float((initial_value - final_value) / max(abs(initial_value), 1e-12)),
+        "objective_scope": "actual_v2_encoder_and_biology_path_without_decorrelation_floor",
+    }
+
+
+def _require_programme_free_overfit(result: dict[str, object]) -> None:
+    """Fail closed on D1 G2.6 before the expensive 40-epoch job starts."""
+    initial, final = float(result["initial_loss"]), float(result["final_loss"])
+    reduction = float(result["relative_reduction"])
+    contrastive = float(result["final_biology_contrastive"])
+    consistency = float(result["final_full_consistency"])
+    if not all(np.isfinite(value) for value in (initial, final, reduction, contrastive, consistency)):
+        raise RuntimeError(f"G2.6 programme_free overfit produced non-finite values: {result}")
+    # The G2.6 target is not merely a decreasing curve: the two new D1 terms
+    # must be practically memorised. This is intentionally strict enough that
+    # a detached or tiny loss cannot be carried into a full GPU run.
+    if final > 0.10 or contrastive > 0.10 or consistency > 0.02 or reduction < 0.80:
+        raise RuntimeError(
+            "G2.6 programme_free overfit failed before training: "
+            f"loss={final:.5f}, contrastive={contrastive:.5f}, full_consistency={consistency:.5f}, "
+            f"reduction={reduction:.3f}; expected near-zero terms and >=80% reduction"
+        )
+
+
+def _require_programme_only_overfit(result: dict[str, object]) -> None:
+    """Fail closed on the matched Hallmark-arm G2.6 check."""
+    initial, final, reduction = (float(result[name]) for name in ("initial_loss", "final_loss", "relative_reduction"))
+    programme = float(result["final_programme"])
+    if not all(np.isfinite(value) for value in (initial, final, reduction, programme)):
+        raise RuntimeError(f"G2.6 programme_only overfit produced non-finite values: {result}")
+    # Gaussian NLL can legitimately become negative as fitted variance falls;
+    # hence a small or negative terminal value plus a large reduction is the
+    # appropriate analogue of the contrastive arm's near-zero check.
+    if final > 0.10 or reduction < 0.80:
+        raise RuntimeError(
+            "G2.6 programme_only overfit failed before training: "
+            f"loss={final:.5f}, programme={programme:.5f}, reduction={reduction:.3f}; "
+            "expected a practically memorised actual-model objective"
+        )
+
+
+def _require_d1_liveness(liveness: dict[str, object], profile: str) -> None:
+    """Enforce G2.1--G2.5 for D1 before returning an artifact checkpoint."""
+    deltas = {str(name): float(value) for name, value in dict(liveness["parameter_relative_delta"]).items()}
+    stalled = [name for name, value in deltas.items() if not np.isfinite(value) or value <= 1e-2]
+    if stalled:
+        raise RuntimeError(f"G2.1 failed for {profile}: parameter groups did not move >1e-2: {stalled}")
+    for phase in ("gradient_norms_first", "gradient_norms_last"):
+        gradients = {str(name): float(value) for name, value in dict(liveness[phase]).items()}
+        missing = [name for name, value in gradients.items() if not np.isfinite(value) or value <= 0.0]
+        if missing:
+            raise RuntimeError(f"G2.3 failed for {profile} ({phase}): detached groups {missing}")
+    initial, final, reduction = (float(liveness[name]) for name in ("loss_initial", "loss_final", "loss_relative_reduction"))
+    if not all(np.isfinite(value) for value in (initial, final, reduction)) or reduction < 0.20:
+        raise RuntimeError(f"G2.4 failed for {profile}: final loss did not decrease >=20% ({initial} -> {final})")
+    active = {str(name): float(value) for name, value in dict(liveness["active_terms_final"]).items()}
+    declared = [str(name) for name in liveness["declared_active_terms"]]
+    absent = [name for name in declared if name not in active]
+    largest = float(liveness["largest_active_term"])
+    weak = [name for name, value in active.items() if not np.isfinite(value) or abs(value) < 1e-4 * largest]
+    if absent or not np.isfinite(largest) or largest <= 0.0 or weak:
+        raise RuntimeError(f"G2.2 failed for {profile}: absent={absent}, weak={weak}, largest={largest}")
+    slope = float(liveness["tail_loss_slope"])
+    # A terminal slope more negative than 1% of the initial loss over the
+    # five-epoch tail means the run is visibly still improving; it must be
+    # extended before a comparison is interpreted (G2.5).
+    if np.isfinite(slope) and slope < -0.01 * max(abs(initial), 1e-6):
+        raise RuntimeError(f"G2.5 failed for {profile}: loss still falling at terminal epoch (slope={slope:.5g})")
 
 
 def _trained_states_for_profile(objective_profile: str, semantic_dim: int = 0) -> list[str]:
@@ -350,7 +526,7 @@ def _trained_states_for_profile(objective_profile: str, semantic_dim: int = 0) -
     """
     if objective_profile == "identity_only":
         return ["wsi_identity", "rna_identity", "full_identity"]
-    if objective_profile == "programme_only":
+    if objective_profile in {"programme_only", "programme_free"}:
         return ["wsi_biology", "rna_biology", "full_biology"]
     if objective_profile != "full":
         raise ValueError(f"unknown objective profile {objective_profile!r}")
@@ -374,6 +550,10 @@ def run(args: argparse.Namespace) -> Path:
         raise ValueError("--pretrain-epochs must be non-negative")
     if args.pretrain_epochs and args.pretrain_checkpoint:
         raise ValueError("choose either --pretrain-epochs or --pretrain-checkpoint, not both")
+    if args.objective_profile in {"programme_only", "programme_free"} and not args.fixed_final_epoch:
+        raise ValueError(
+            "D1 diagnostic profiles require --fixed-final-epoch; validation Hallmark selection is prohibited"
+        )
     torch.manual_seed(args.seed); np.random.seed(args.seed)
     data = load_bio_query_data(args.data_config, args.split_file, wsi_mode="hoptimus_patch")
     split_manifest = validate_runtime_split(args.split_file, data.patient_ids, data.cancers, data.split,
@@ -387,9 +567,9 @@ def run(args: argparse.Namespace) -> Path:
         if path:
             optional_manifest[name] = _attach_numeric_table(data, path, name)
     anchor_path = args.mlp_clip_anchor or args.mlp_clip_teacher
-    use_anchor = bool(anchor_path) and args.objective_profile != "programme_only"
+    use_anchor = bool(anchor_path) and args.objective_profile not in {"programme_only", "programme_free"}
     if anchor_path and not use_anchor:
-        warnings.warn("programme_only ignores the MLP-CLIP anchor by design", RuntimeWarning)
+        warnings.warn(f"{args.objective_profile} ignores the MLP-CLIP anchor by design", RuntimeWarning)
     if use_anchor:
         attach_mlp_clip_anchor(data, anchor_path)
     semantic_dim = 0
@@ -439,12 +619,42 @@ def run(args: argparse.Namespace) -> Path:
         device,
         gradient_diagnostics_every=args.gradient_diagnostics_every,
     )
+    biology_memory_keys = 0
+    if args.objective_profile == "programme_free":
+        # Prime on training patients only.  This makes the new contrastive
+        # loss live even when the first real ragged WSI batch has B=1.
+        biology_memory_keys = trainer.prime_biology_memory(
+            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+                                    include_clinical=args.include_clinical),
+            minimum_unique_keys=16,
+        )
+    # Run the decisive G2.6 liveness gate before any long optimization.  It
+    # trains only a deep copy, so no model/optimizer state from the experiment
+    # itself is mutated.
+    d1_overfit: dict[str, object] | None = None
+    if args.objective_profile == "programme_free":
+        d1_overfit = _overfit_programme_free_contrastive(
+            model, trainer.schedule,
+            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+                                    include_clinical=args.include_clinical),
+            device,
+        )
+        _require_programme_free_overfit(d1_overfit)
+    elif args.objective_profile == "programme_only":
+        d1_overfit = _overfit_programme_only_actual(
+            model, trainer.schedule,
+            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+                                    include_clinical=args.include_clinical),
+            device,
+        )
+        _require_programme_only_overfit(d1_overfit)
     initial_group_parameters = _parameter_snapshot(trainer)
     trained_states = _trained_states_for_profile(args.objective_profile, semantic_dim)
     run_configuration = {
         "seed": args.seed, "epochs": args.epochs, "token_budget": args.token_budget,
         "hidden_dim": args.hidden_dim, "layers": args.layers, "heads": args.heads,
         "learning_rate": args.learning_rate, "weight_decay": args.weight_decay,
+        "fixed_final_epoch": bool(args.fixed_final_epoch),
         # This is the sole intervention in the E1 matched-arm experiment.  It
         # must be part of the immutable artifact manifest; otherwise a pair of
         # exports can look provenance-identical even when their optimisation
@@ -459,6 +669,7 @@ def run(args: argparse.Namespace) -> Path:
         "variance_weight": args.variance_weight,
         "gradient_diagnostics_every": args.gradient_diagnostics_every,
         "objective_profile": args.objective_profile,
+        "biology_contrastive_memory_keys_before_train": biology_memory_keys,
         "pretrain_epochs": args.pretrain_epochs, "pretrain_checkpoint": args.pretrain_checkpoint,
         "anchor_path": anchor_path if use_anchor else "", "anchor_requested_but_disabled": bool(anchor_path) and not use_anchor,
         "fit_population": "development_train_val" if args.fit_development else "train_only_inner_fit",
@@ -466,7 +677,8 @@ def run(args: argparse.Namespace) -> Path:
         "snv_features": args.snv_features, "cnv_features": args.cnv_features,
     }
     manifest = {"artifact_version": 4, "protocol": split_manifest["protocol"], "patch_cap": None, "patient_ids": list(data.patient_ids), "cancers": list(data.cancers), "split": list(data.split), "residual_means_fit_on": "train_only", "residual_means": means,
-                "trained_states": list(trainable_state_names(*trained_states)), "selection_metric": "validation_pareto",
+                "trained_states": list(trainable_state_names(*trained_states)),
+                "selection_metric": "fixed_final_epoch" if args.fixed_final_epoch else "validation_pareto",
                 "coordinates": "metadata_validated_or_disabled", "semantic_dim": semantic_dim,
                 "modal_dims": {"clinical": int(data.clinical.shape[1]) if args.include_clinical else 0, "snv": 0 if not hasattr(data, "_v2_snv") else int(data._v2_snv.shape[1]), "cnv": 0 if not hasattr(data, "_v2_cnv") else int(data._v2_cnv.shape[1])},
                 "optional_modalities": optional_manifest, "mlp_clip_anchor": use_anchor,
@@ -501,31 +713,39 @@ def run(args: argparse.Namespace) -> Path:
         if len(validation):
             validation_loader = UncappedHoptimusBatches(data, validation, args.token_budget, args.seed, shuffle=False, include_clinical=args.include_clinical)
             validation_metrics = trainer.evaluate_epoch(validation_loader, epoch)
-            selection_loader = UncappedHoptimusBatches(data, validation, args.token_budget, args.seed, shuffle=False, include_clinical=args.include_clinical)
-            selection_metrics = _validation_selection(model, selection_loader, device, np.asarray(data.cancers))
+            if not args.fixed_final_epoch:
+                selection_loader = UncappedHoptimusBatches(data, validation, args.token_budget, args.seed, shuffle=False, include_clinical=args.include_clinical)
+                selection_metrics = _validation_selection(model, selection_loader, device, np.asarray(data.cancers))
         scheduler.step()
         row = {"epoch": epoch, "learning_rate": scheduler.get_last_lr()[0], "anchor_validation_r10": anchor_validation_r10, **{f"train_{k}": v for k, v in metrics.items()}, **{f"validation_{k}": v for k, v in validation_metrics.items()}, **{f"selection_{k}": v for k, v in selection_metrics.items()}}
         (output / "train_metrics.jsonl").open("a", encoding="utf-8").write(json.dumps(row) + "\n")
         epoch_rows.append(row)
         trainer.save_checkpoint(output / "last.pt", epoch, loader.state_dict(), manifest, scheduler)
         r10, programme = float(selection_metrics.get("retrieval_r10", float("nan"))), float(selection_metrics.get("programme_mean_pearson", float("nan")))
-        if np.isfinite(r10) and r10 > best_retrieval:
+        if not args.fixed_final_epoch and np.isfinite(r10) and r10 > best_retrieval:
             best_retrieval = r10; best_retrieval_epoch = epoch; trainer.save_checkpoint(output / "best_retrieval.pt", epoch, loader.state_dict(), manifest, scheduler)
-        if np.isfinite(programme) and programme > best_programme:
+        if not args.fixed_final_epoch and np.isfinite(programme) and programme > best_programme:
             best_programme = programme; best_programme_epoch = epoch; trainer.save_checkpoint(output / "best_programme.pt", epoch, loader.state_dict(), manifest, scheduler)
         eligible = np.isfinite(r10) and (not np.isfinite(anchor_validation_r10) or r10 >= 0.95 * anchor_validation_r10)
-        if eligible and np.isfinite(programme) and programme > best_pareto:
+        if not args.fixed_final_epoch and eligible and np.isfinite(programme) and programme > best_pareto:
             best_pareto = programme; best_pareto_epoch = epoch; trainer.save_checkpoint(output / "best_pareto.pt", epoch, loader.state_dict(), manifest, scheduler)
     parameter_deltas = _parameter_deltas(trainer, initial_group_parameters)
-    overfit = _overfit_programme_head(
-        model, UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
-                                        include_clinical=args.include_clinical), device,
-    ) if args.objective_profile != "identity_only" else {"status": "not_applicable_identity_only"}
+    liveness_loader = UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+                                                include_clinical=args.include_clinical)
+    overfit = d1_overfit if args.objective_profile in {"programme_only", "programme_free"} else {"status": "not_applicable_identity_only"}
     last = epoch_rows[-1] if epoch_rows else {}
     first = epoch_rows[0] if epoch_rows else {}
     loss_initial, loss_final = float(first.get("train_loss", float("nan"))), float(last.get("train_loss", float("nan")))
-    active_terms = {key.removeprefix("train_"): float(value) for key, value in last.items()
-                    if key.startswith("train_") and key in {"train_programme", "train_decorrelation", "train_neighbourhood", "train_programme_supcon", "train_separation", "train_variance_floor"}}
+    declared_weights = trainer.schedule.weights(max(args.epochs - 1, 0))
+    metric_for_loss = {
+        "programme": "train_programme", "neighbourhood": "train_wsi_neighbourhood",
+        "supcon": "train_wsi_programme_supcon", "separation": "train_separation",
+        "variance": "train_variance_floor", "decorrelation": "train_decorrelation",
+        "biology_contrastive": "train_biology_contrastive",
+        "biology_full_consistency": "train_biology_full_consistency",
+    }
+    active_terms = {name: float(last[metric]) for name, metric in metric_for_loss.items()
+                    if declared_weights.get(name, 0.0) > 0.0 and metric in last}
     largest_term = max((abs(value) for value in active_terms.values()), default=0.0)
     liveness = {
         "parameter_relative_delta": parameter_deltas,
@@ -536,13 +756,16 @@ def run(args: argparse.Namespace) -> Path:
         "tail_loss_slope": float(np.polyfit(np.arange(min(5, len(epoch_rows))),
                                               [float(row.get("train_loss", float("nan"))) for row in epoch_rows[-min(5, len(epoch_rows)):]], 1)[0])
         if len(epoch_rows) >= 2 else float("nan"),
+        "declared_active_terms": [name for name, value in declared_weights.items() if value > 0.0],
         "active_terms_final": active_terms, "largest_active_term": largest_term,
         "overfit_one_batch": overfit,
     }
     (output / "liveness.json").write_text(json.dumps(liveness, indent=2), encoding="utf-8")
+    if args.objective_profile in {"programme_only", "programme_free"}:
+        _require_d1_liveness(liveness, args.objective_profile)
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    (output / "selection.json").write_text(json.dumps({"anchor_validation_r10": anchor_validation_r10, "best_retrieval_r10": best_retrieval, "best_programme_pearson": best_programme, "best_pareto_programme_pearson": best_pareto, "best_retrieval_epoch": best_retrieval_epoch, "best_programme_epoch": best_programme_epoch, "best_pareto_epoch": best_pareto_epoch, "fit_population": "development_train_val" if args.fit_development else "train_only_inner_fit"}, indent=2), encoding="utf-8")
-    return _selected_checkpoint(output, slide_pretraining, args.epochs, allow_last=args.fit_development)
+    (output / "selection.json").write_text(json.dumps({"anchor_validation_r10": anchor_validation_r10, "best_retrieval_r10": best_retrieval, "best_programme_pearson": best_programme, "best_pareto_programme_pearson": best_pareto, "best_retrieval_epoch": best_retrieval_epoch, "best_programme_epoch": best_programme_epoch, "best_pareto_epoch": best_pareto_epoch, "selection": "fixed_final_epoch" if args.fixed_final_epoch else "validation_selected", "fit_population": "development_train_val" if args.fit_development else "train_only_inner_fit"}, indent=2), encoding="utf-8")
+    return _selected_checkpoint(output, slide_pretraining, args.epochs, allow_last=args.fit_development or args.fixed_final_epoch)
 
 
 def main() -> None:
@@ -560,7 +783,7 @@ def main() -> None:
                         help="deprecated compatibility flag; V2.1 uses an explicit anchor residual instead")
     parser.add_argument("--gradient-diagnostics-every", type=int, default=25,
                         help="log objective-gradient cosines every N train batches; 0 disables")
-    parser.add_argument("--objective-profile", choices=("full", "identity_only", "programme_only"), default="full",
+    parser.add_argument("--objective-profile", choices=("full", "identity_only", "programme_only", "programme_free"), default="full",
                         help="diagnostic objective ablation; preserves data/model while selectively zeroing losses")
     parser.add_argument("--decorrelation-weight", type=float, default=0.04,
                         help="F-R2 biology feature-decorrelation weight; set 0.0 for the collapse-baseline arm of the rank ablation")
@@ -589,6 +812,8 @@ def main() -> None:
     parser.add_argument("--resume", default="", help="resume a V2 checkpoint with matching split provenance")
     parser.add_argument("--fit-development", action="store_true",
                         help="final refit on train+validation only; epoch count must already be selected")
+    parser.add_argument("--fixed-final-epoch", action="store_true",
+                        help="emit last.pt after a predeclared epoch count; do not select a checkpoint with programme labels")
     parser.add_argument("--expected-development-cancers", type=int, default=11)
     parser.add_argument("--expected-heldout-cancers", type=int, default=22)
     print(run(parser.parse_args()))

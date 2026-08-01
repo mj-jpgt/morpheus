@@ -11,6 +11,7 @@ import torch
 from torch import nn
 
 from .losses import (feature_decorrelation, gaussian_nll,
+                     paired_infonce_with_memory,
                      programme_neighbourhood_loss,
                      supervised_programme_contrastive, symmetric_infonce,
                      variance_floor, whitened_cross_covariance)
@@ -44,8 +45,8 @@ class V2LossSchedule:
     semantic_warmup: float = 0.10
 
     def __post_init__(self) -> None:
-        if self.objective_profile not in {"full", "identity_only", "programme_only"}:
-            raise ValueError("objective_profile must be full, identity_only, or programme_only")
+        if self.objective_profile not in {"full", "identity_only", "programme_only", "programme_free"}:
+            raise ValueError("objective_profile must be full, identity_only, programme_only, or programme_free")
 
     def weights(self, epoch: int) -> dict[str, float]:
         warmup = epoch < self.warmup_epochs
@@ -71,6 +72,18 @@ class V2LossSchedule:
             # the profile that trains the biology head in isolation.
             return {key: (value if key in {"programme", "neighbourhood", "supcon", "decorrelation"} else 0.0)
                     for key, value in weights.items()}
+        if self.objective_profile == "programme_free":
+            # This is the D1 contrastive replacement arm.  It is deliberately
+            # identical to programme_only with respect to decorrelation, but
+            # receives no curated-programme supervision whatsoever.
+            free = {key: 0.0 for key in weights}
+            free["decorrelation"] = weights["decorrelation"]
+            free["biology_contrastive"] = 1.0
+            # `full_biology` is exported by D1, so it needs a declared
+            # gradient path as well.  This is intentionally a WSI-targeted
+            # consistency loss, not a hidden RNA or Hallmark target.
+            free["biology_full_consistency"] = 1.0
+            return free
         return weights
 
 
@@ -125,6 +138,56 @@ class ProgrammeMemoryBank:
 
 
 @dataclass
+class PairedBiologyMemoryBank:
+    """Detached WSI/RNA keys for D1's real-small-batch symmetric InfoNCE."""
+
+    capacity: int = 4096
+    wsi_states: torch.Tensor | None = None
+    rna_states: torch.Tensor | None = None
+    indices: torch.Tensor | None = None
+    cursor: int = 0
+    size: int = 0
+
+    def _ensure(self, width: int, device: torch.device) -> None:
+        if self.wsi_states is None:
+            self.wsi_states = torch.zeros((self.capacity, width), device=device, dtype=torch.float32)
+            self.rna_states = torch.zeros((self.capacity, width), device=device, dtype=torch.float32)
+            self.indices = torch.full((self.capacity,), -1, device=device, dtype=torch.long)
+
+    @torch.no_grad()
+    def update(self, wsi_states: torch.Tensor, rna_states: torch.Tensor, indices: torch.Tensor) -> None:
+        if wsi_states.shape != rna_states.shape or wsi_states.ndim != 2:
+            raise ValueError("paired biology memory needs aligned WSI/RNA states")
+        self._ensure(wsi_states.shape[1], wsi_states.device)
+        assert self.wsi_states is not None and self.rna_states is not None and self.indices is not None
+        wsi_values = nn.functional.normalize(wsi_states.detach().float(), dim=-1)
+        rna_values = nn.functional.normalize(rna_states.detach().float(), dim=-1)
+        for wsi_state, rna_state, patient_index in zip(wsi_values, rna_values, indices.detach().long()):
+            self.wsi_states[self.cursor].copy_(wsi_state); self.rna_states[self.cursor].copy_(rna_state); self.indices[self.cursor] = patient_index
+            self.cursor = (self.cursor + 1) % self.capacity; self.size = min(self.size + 1, self.capacity)
+
+    def view(self) -> tuple[torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
+        if not self.size or self.wsi_states is None or self.rna_states is None or self.indices is None:
+            return None, None, None
+        return self.wsi_states[:self.size], self.rna_states[:self.size], self.indices[:self.size]
+
+    @property
+    def unique_count(self) -> int:
+        return 0 if self.indices is None else int(torch.unique(self.indices[:self.size]).numel())
+
+    def state_dict(self) -> dict[str, Any]:
+        return {"capacity": self.capacity, "wsi_states": None if self.wsi_states is None else self.wsi_states.detach().cpu(),
+                "rna_states": None if self.rna_states is None else self.rna_states.detach().cpu(),
+                "indices": None if self.indices is None else self.indices.detach().cpu(), "cursor": self.cursor, "size": self.size}
+
+    def load_state_dict(self, state: dict[str, Any], device: str) -> None:
+        self.capacity, self.cursor, self.size = int(state["capacity"]), int(state["cursor"]), int(state["size"])
+        self.wsi_states = None if state["wsi_states"] is None else state["wsi_states"].to(device=device, dtype=torch.float32)
+        self.rna_states = None if state["rna_states"] is None else state["rna_states"].to(device=device, dtype=torch.float32)
+        self.indices = None if state["indices"] is None else state["indices"].to(device=device, dtype=torch.long)
+
+
+@dataclass
 class V2Trainer:
     model: TumorStateV2
     optimizer: torch.optim.Optimizer
@@ -132,12 +195,15 @@ class V2Trainer:
     device: str
     amp_dtype: torch.dtype = torch.bfloat16
     programme_memory: ProgrammeMemoryBank | None = None
+    biology_memory: PairedBiologyMemoryBank | None = None
     gradient_diagnostics_every: int = 25
     decorrelation_bank_capacity: int = 512
 
     def __post_init__(self) -> None:
         if self.programme_memory is None:
             self.programme_memory = ProgrammeMemoryBank()
+        if self.biology_memory is None:
+            self.biology_memory = PairedBiologyMemoryBank()
 
     def liveness_parameter_groups(self) -> dict[str, list[nn.Parameter]]:
         """Named trainable groups used by the real-batch G2 telemetry.
@@ -155,7 +221,7 @@ class V2Trainer:
             "identity": list(self.model.identity.parameters()),
             "patient": list(self.model.patient.parameters()),
         }
-        if self.schedule.objective_profile == "programme_only":
+        if self.schedule.objective_profile in {"programme_only", "programme_free"}:
             return {key: groups[key] for key in ("wsi", "rna", "shared", "biology_programme")}
         if self.schedule.objective_profile == "identity_only":
             return {key: groups[key] for key in ("wsi", "rna", "shared", "identity")}
@@ -225,6 +291,31 @@ class V2Trainer:
                 metrics["programme_supcon"] = float(contrastive.detach())
         return value, metrics, components
 
+    @torch.no_grad()
+    def prime_biology_memory(self, loader: Any, *, minimum_unique_keys: int = 16) -> int:
+        """Seed D1's detached RNA queue before the first optimisation step.
+
+        This is train-only and is needed because the first ragged WSI batch
+        may contain one patient.  Rather than quietly returning a zero InfoNCE
+        loss, the subsequent loss asserts that at least eight negatives exist.
+        """
+        if self.biology_memory is None:
+            raise RuntimeError("biology memory bank is not initialised")
+        was_training = self.model.training
+        self.model.eval()
+        for raw_batch in loader:
+            batch = {key: value.to(self.device, non_blocking=True) if isinstance(value, torch.Tensor) else value
+                     for key, value in raw_batch.items()}
+            out_wsi = self.model(batch, view="wsi")
+            out_rna = self.model(batch, view="rna")
+            self.biology_memory.update(out_wsi["z_biology"], out_rna["z_biology"], batch["indices"])
+            if self.biology_memory.unique_count >= minimum_unique_keys:
+                break
+        self.model.train(was_training)
+        if self.biology_memory.unique_count < minimum_unique_keys:
+            raise RuntimeError(f"programme_free could not prime {minimum_unique_keys} distinct RNA memory keys from the real training loader")
+        return self.biology_memory.size
+
     def step(self, batch: dict[str, torch.Tensor], epoch: int) -> tuple[torch.Tensor, dict[str, float], dict[str, torch.Tensor]]:
         out_wsi = self.model(batch, view="wsi")
         out_rna = self.model(batch, view="rna")
@@ -253,17 +344,42 @@ class V2Trainer:
                 patient = self._cosine_consistency(output["z_patient"], target)
                 loss = loss + weights["patient_consistency"] * patient
                 metrics["patient_consistency"] = float(patient.detach())
+        biology_contrastive_term = output["z_identity"].new_zeros(())
+        biology_full_consistency_term = output["z_identity"].new_zeros(())
+        if weights.get("biology_contrastive", 0.0):
+            if "indices" not in batch:
+                raise RuntimeError("programme_free requires canonical patient indices for its memory-bank negatives")
+            assert self.biology_memory is not None
+            memory_wsi, memory_rna, memory_indices = self.biology_memory.view()
+            contrastive, negatives = paired_infonce_with_memory(
+                out_wsi["z_biology"], out_rna["z_biology"], batch["indices"], memory_wsi, memory_rna, memory_indices,
+            )
+            biology_contrastive_term = weights["biology_contrastive"] * contrastive
+            loss = loss + biology_contrastive_term
+            metrics["biology_contrastive"] = float(contrastive.detach())
+            metrics["biology_contrastive_effective_negatives_min"] = float(negatives.min().detach())
+            metrics["biology_contrastive_effective_negatives_mean"] = float(negatives.float().mean().detach())
+        if weights.get("biology_full_consistency", 0.0):
+            # `full_biology` is an exported state under this profile.  Match it
+            # to the WSI-only biology state with a stopped-gradient target: it
+            # receives a direct gradient without turning the fused RNA input
+            # into a trivial full→RNA objective or reintroducing Hallmarks.
+            biology_full_consistency_term = self._cosine_consistency(output["z_biology"], out_wsi["z_biology"])
+            biology_full_consistency_term = weights["biology_full_consistency"] * biology_full_consistency_term
+            loss = loss + biology_full_consistency_term
+            metrics["biology_full_consistency"] = float(biology_full_consistency_term.detach())
         # Every exported biology state must receive direct supervision.  WSI
         # receives the structural programme losses because it is the primary
         # molecular-prompting view.
         programme_total = output["z_biology"].new_zeros(())
         programme_component_totals: dict[str, torch.Tensor] = {}
         structure_for_all_biology_views = self.schedule.objective_profile == "programme_only"
-        for name, state, structure, scale in (
+        views = () if self.schedule.objective_profile == "programme_free" else (
             ("wsi", out_wsi, True, 1.0),
             ("rna", out_rna, structure_for_all_biology_views, 0.5),
             ("full", output, structure_for_all_biology_views, 1.0),
-        ):
+        )
+        for name, state, structure, scale in views:
             programme_loss, programme_metrics, programme_components = self._programme_loss(state, batch, weights, structure)
             loss = loss + scale * programme_loss
             programme_total = programme_total + scale * programme_loss
@@ -335,9 +451,14 @@ class V2Trainer:
             "reconstruction": reconstruction_term,
             "separation": separation_term,
             "decorrelation": decorrelation_term,
+            "biology_contrastive": biology_contrastive_term,
+            "biology_full_consistency": biology_full_consistency_term,
             "variance": variance_term,
             **(programme_component_totals or {"programme": programme_total}),
         }
+        if weights.get("biology_contrastive", 0.0) and torch.is_grad_enabled() and "indices" in batch:
+            assert self.biology_memory is not None
+            self.biology_memory.update(out_wsi["z_biology"], out_rna["z_biology"], batch["indices"])
         return loss, metrics, output
 
     def _gradient_conflict_metrics(self) -> dict[str, float]:
@@ -464,6 +585,7 @@ class V2Trainer:
             "torch_rng": torch.get_rng_state(),
             "numpy_rng": np.random.get_state(),
             "programme_memory": None if self.programme_memory is None else self.programme_memory.state_dict(),
+            "biology_memory": None if self.biology_memory is None else self.biology_memory.state_dict(),
         }
         torch.save(state, Path(path))
 
@@ -482,4 +604,6 @@ class V2Trainer:
         np.random.set_state(state["numpy_rng"])
         if self.programme_memory is not None and state.get("programme_memory") is not None:
             self.programme_memory.load_state_dict(state["programme_memory"], self.device)
+        if self.biology_memory is not None and state.get("biology_memory") is not None:
+            self.biology_memory.load_state_dict(state["biology_memory"], self.device)
         return state
