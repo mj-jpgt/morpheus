@@ -1,3 +1,8 @@
+> # ⚠ ACTIVE TASK LIST IS NOW `HANDOFF_PHASE_D.md`
+> The E-series (E0–E5) is **closed**. E0/E0b/E3 have run; **F2 is WITHDRAWN** (the identity head
+> is the frozen MLP-CLIP teacher, 2.6e-04). Claims are enforced in `v2/calibra/claim_guards.py`.
+> Read `HANDOFF_PHASE_D.md` §0 for the full context update before anything else.
+
 # HANDOFF — the experiments to run NOW (**the authoritative task list**)
 
 **Read `HANDOFF_BUILD_AGENT.md` first** (orientation, the 14-item mistake list, run commands), then
