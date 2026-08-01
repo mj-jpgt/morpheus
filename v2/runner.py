@@ -674,7 +674,16 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
     # arms use the same setting: their liveness checks are only comparable
     # evidence if they are run identically.
     clone = copy.deepcopy(model).to(device)
-    clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
+    # decorrelation STAYS ON here, unlike the Hallmark arm. Measured at
+    # initialisation on a real 16-patient batch: the WSI biology states are
+    # 0.736 mutually collinear (unit-norm, std 0.031 across patients) against
+    # 0.274 for RNA. InfoNCE cannot separate patients whose WSI vectors nearly
+    # coincide, and decorrelation is the only term opposing that collapse --
+    # zeroing it disabled the anti-collapse force and then graded the collapse,
+    # pinning the contrastive term at chance (ln(80)=4.38; measured 4.27).
+    # Its batch-statistics floor is handled by grading the two D1 terms
+    # directly rather than the total, below.
+    clone_schedule = schedule
     optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
     # The queue is sized to the CHECK, not to training. G2.6 asks "can this model
@@ -749,6 +758,9 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
         "initial_loss": initial_value, "final_loss": final_value,
         "initial_biology_contrastive": float(initial_metrics.get("biology_contrastive", float("nan"))),
         "final_biology_contrastive": float(final_metrics.get("biology_contrastive", float("nan"))),
+        "biology_contrastive_reduction": float(
+            (initial_metrics.get("biology_contrastive", float("nan")) - final_metrics.get("biology_contrastive", float("nan")))
+            / max(abs(initial_metrics.get("biology_contrastive", 1.0)), 1e-12)),
         "initial_full_consistency": float(initial_metrics.get("biology_full_consistency", float("nan"))),
         "final_full_consistency": float(final_metrics.get("biology_full_consistency", float("nan"))),
         "gradient_norms_first": first_gradients or {},
@@ -768,10 +780,16 @@ def _require_programme_free_overfit(result: dict[str, object]) -> None:
     # The G2.6 target is not merely a decreasing curve: the two new D1 terms
     # must be practically memorised. This is intentionally strict enough that
     # a detached or tiny loss cannot be carried into a full GPU run.
-    if final > 0.10 or contrastive > 0.10 or consistency > 0.02 or reduction < 0.80:
+    # `final` is the TOTAL, and with decorrelation active it carries an
+    # irreducible batch-statistics floor unrelated to memorisation. Grade the
+    # two D1 terms themselves, and require the contrastive term -- the one
+    # under test -- to have actually descended.
+    contrastive_reduction = float(result.get("biology_contrastive_reduction", float("nan")))
+    if contrastive > 0.10 or consistency > 0.02 or not np.isfinite(contrastive_reduction) or contrastive_reduction < 0.80:
         raise RuntimeError(
             "G2.6 programme_free overfit failed before training: "
-            f"loss={final:.5f}, contrastive={contrastive:.5f}, full_consistency={consistency:.5f}, "
+            f"loss={final:.5f}, contrastive={contrastive:.5f} (reduction {contrastive_reduction:.3f}), "
+            f"full_consistency={consistency:.5f}, "
             f"reduction={reduction:.3f}; expected near-zero terms and >=80% reduction"
         )
 
