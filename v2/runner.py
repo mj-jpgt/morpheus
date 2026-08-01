@@ -23,7 +23,7 @@ from morpheus.src.training.train_bio_query_former import load_bio_query_data
 
 from .data import DynamicTokenBatchSampler, TrainOnlyStandardizer
 from .model import TumorStateV2, V2ModelConfig
-from .training import V2LossSchedule, V2Trainer
+from .training import PairedBiologyMemoryBank, V2LossSchedule, V2Trainer
 from .contracts import trainable_state_names
 from .plip import canonical_patient_source_digests, load_plip_teacher_cache
 from .preflight import restrict_cohort_to_split, validate_runtime_split
@@ -654,7 +654,8 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
 def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSchedule,
                                         loader: UncappedHoptimusBatches, device: str,
                                         steps: int = 800, minimum_memory_keys: int = 16,
-                                        overfit_patients: int = 16) -> dict[str, object]:
+                                        overfit_patients: int = 16,
+                                        overfit_memory_capacity: int = 64) -> dict[str, object]:
     """G2.6 for D1 on a clone of the *actual* model and trainer path.
 
     This deliberately does not train post-hoc linear probes on frozen states.
@@ -676,6 +677,15 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
     clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
     optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
+    # The queue is sized to the CHECK, not to training. G2.6 asks "can this model
+    # memorise one small batch", and its criterion is contrastive <= 0.10. Against
+    # the training queue's 4096 DETACHED keys -- encoded by the pre-optimisation
+    # model and never refreshed -- that criterion is unreachable by construction:
+    # measured, the term sat at 5.62 with a 0.070 reduction over 800 steps while
+    # full_consistency reached 0.00023. The queue's gradient path is still
+    # exercised (priming below, and the step-0 detached-group check), so nothing
+    # that G2.6 exists to catch is lost by matching the queue to the batch scale.
+    trial.biology_memory = PairedBiologyMemoryBank(capacity=overfit_memory_capacity)
     iterator = iter(loader)
     priming_batches: list[dict[str, torch.Tensor]] = []
     observed_ids: set[int] = set()
