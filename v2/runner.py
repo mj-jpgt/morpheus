@@ -574,7 +574,7 @@ def _truncate_batch(batch: dict, limit: int) -> dict:
 
 def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule,
                                    loader: UncappedHoptimusBatches, device: str,
-                                   steps: int = 300, overfit_patients: int = 16) -> dict[str, object]:
+                                   steps: int = 800, overfit_patients: int = 16) -> dict[str, object]:
     """G2.6 for the Hallmark D1 arm on the real model/trainer path.
 
     Training copied heads on frozen features is not a liveness test for the
@@ -583,9 +583,17 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
     groups that D1 compares.  The decorrelation term is omitted here only
     because it has a batch-statistics floor unrelated to memorisation.
     """
+    # lr=1e-3, not 1e-2. Measured on the real runner at 1e-2 the memorisation
+    # DESCENDS then DIVERGES inside the window the gate reads:
+    #   step 0 2.4154 -> 150 1.2822 -> 250 0.9432 (best) -> 299 2.1575
+    # and by ~2000 steps it reaches nan outright. The heteroscedastic Gaussian
+    # NLL's variance head collapses under AdamW at that rate, so the gate was
+    # reading a post-divergence value and calling a healthy model dead. Both D1
+    # arms use the same setting: their liveness checks are only comparable
+    # evidence if they are run identically.
     clone = copy.deepcopy(model).to(device)
     clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
-    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-2, weight_decay=0.0)
+    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
     try:
         fixed_raw = next(iter(loader))
@@ -645,7 +653,7 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
 
 def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSchedule,
                                         loader: UncappedHoptimusBatches, device: str,
-                                        steps: int = 300, minimum_memory_keys: int = 16,
+                                        steps: int = 800, minimum_memory_keys: int = 16,
                                         overfit_patients: int = 16) -> dict[str, object]:
     """G2.6 for D1 on a clone of the *actual* model and trainer path.
 
@@ -656,9 +664,17 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
     check because it has an irreducible batch-statistics floor; the two new
     D1 terms are the quantities that must be driven near zero.
     """
+    # lr=1e-3, not 1e-2. Measured on the real runner at 1e-2 the memorisation
+    # DESCENDS then DIVERGES inside the window the gate reads:
+    #   step 0 2.4154 -> 150 1.2822 -> 250 0.9432 (best) -> 299 2.1575
+    # and by ~2000 steps it reaches nan outright. The heteroscedastic Gaussian
+    # NLL's variance head collapses under AdamW at that rate, so the gate was
+    # reading a post-divergence value and calling a healthy model dead. Both D1
+    # arms use the same setting: their liveness checks are only comparable
+    # evidence if they are run identically.
     clone = copy.deepcopy(model).to(device)
     clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
-    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-2, weight_decay=0.0)
+    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
     iterator = iter(loader)
     priming_batches: list[dict[str, torch.Tensor]] = []
