@@ -274,8 +274,16 @@ class V2Trainer:
             structure_present = present.clone()
             structure_present[present] = (target_mask[:, real_axis].all(dim=1) if bool(real_axis.any())
                                           else torch.zeros(len(target_mask), dtype=torch.bool, device=target_mask.device))
+        # The SAME padding that broke the row gate also reaches the neighbour
+        # loss as 206 NaN COLUMNS at head_dim=256, and a normalised similarity
+        # over them is NaN for every row -- which is exactly how D2's Hallmark
+        # arm produced `initial_loss: nan` and NaN gradients in all four groups
+        # before a single epoch. Restrict the structure losses to real axes.
+        structure_target = batch["programme_target"]
+        if target_mask is not None and not bool(real_axis.all()):
+            structure_target = structure_target[:, real_axis]
         if include_structure and weights["neighbourhood"] and structure_present.any():
-            neighbourhood = programme_neighbourhood_loss(state["z_biology"][structure_present], batch["programme_target"][structure_present])
+            neighbourhood = programme_neighbourhood_loss(state["z_biology"][structure_present], structure_target[structure_present])
             components["programme_neighbour"] = weights["neighbourhood"] * neighbourhood
             value = value + components["programme_neighbour"]
             metrics["neighbourhood"] = float(neighbourhood.detach())

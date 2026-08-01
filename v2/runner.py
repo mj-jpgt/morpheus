@@ -546,9 +546,35 @@ def _parameter_deltas(trainer: V2Trainer, initial: dict[str, list[torch.Tensor]]
     return result
 
 
+def _truncate_batch(batch: dict, limit: int) -> dict:
+    """Shrink a training batch to `limit` patients for the overfit liveness test.
+
+    "Overfit one batch" is only decisive on a SMALL batch. The token sampler
+    hands out up to ~280 patients here (most patients carry ~30 tokens), and
+    driving a heteroscedastic NLL over 280 x 50 targets to near zero in 300
+    steps is not achievable even for a healthy model -- the real run measured a
+    0.306 reduction against a 0.80 gate. Truncating makes the test strictly
+    harder to pass spuriously: a model that cannot memorise 16 patients is
+    broken beyond argument.
+    """
+    import torch as _torch
+
+    size = len(batch["indices"])
+    if limit >= size:
+        return batch
+    out = {}
+    for key, value in batch.items():
+        if isinstance(value, _torch.Tensor) and value.shape[:1] == (size,):
+            value = value[:limit]
+            if value.ndim >= 2 and value.shape[1] == size:  # [patient, patient] positive masks
+                value = value[:, :limit]
+        out[key] = value
+    return out
+
+
 def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule,
                                    loader: UncappedHoptimusBatches, device: str,
-                                   steps: int = 300) -> dict[str, object]:
+                                   steps: int = 300, overfit_patients: int = 16) -> dict[str, object]:
     """G2.6 for the Hallmark D1 arm on the real model/trainer path.
 
     Training copied heads on frozen features is not a liveness test for the
@@ -567,6 +593,7 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
         raise RuntimeError("programme_only G2.6 received no real train batch") from exc
     fixed_batch = {key: value.to(device, non_blocking=True) if isinstance(value, torch.Tensor) else value
                    for key, value in fixed_raw.items()}
+    fixed_batch = _truncate_batch(fixed_batch, overfit_patients)
 
     def objective() -> tuple[torch.Tensor, dict[str, float]]:
         optimiser.zero_grad(set_to_none=True)
@@ -606,7 +633,8 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
 
 def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSchedule,
                                         loader: UncappedHoptimusBatches, device: str,
-                                        steps: int = 300, minimum_memory_keys: int = 16) -> dict[str, object]:
+                                        steps: int = 300, minimum_memory_keys: int = 16,
+                                        overfit_patients: int = 16) -> dict[str, object]:
     """G2.6 for D1 on a clone of the *actual* model and trainer path.
 
     This deliberately does not train post-hoc linear probes on frozen states.
@@ -642,6 +670,11 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
         fixed_batch = priming_batches[-1]
     fixed_batch = {key: value.to(device, non_blocking=True) if isinstance(value, torch.Tensor) else value
                    for key, value in fixed_batch.items()}
+    # Same truncation as the Hallmark arm: the two D1 liveness checks must be
+    # run at the same batch size or they are not comparable evidence. 16 still
+    # clears the InfoNCE min_negatives=8 floor, and the memory queue is primed
+    # from the full untruncated batches above.
+    fixed_batch = _truncate_batch(fixed_batch, overfit_patients)
 
     def one_step(*, update: bool) -> tuple[torch.Tensor, dict[str, float]]:
         optimiser.zero_grad(set_to_none=True)
