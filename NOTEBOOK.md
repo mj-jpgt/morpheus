@@ -33,10 +33,335 @@ any source, the entry says so.
 | 07:43 | PBS builder — RNA log transform, non-finite genes, missing-RNA exclusion | SETUP |
 | 07:35 | Phase-D orchestration committed to the deployment bundle | SETUP |
 
+Sections: [Publication Plan](#publication-plan) · [Notes to future agents](#notes-to-future-agents) ·
+[Running log](#running-log).
+
+---
+
+# Publication Plan
+
+Four target papers. This section is a map, not a claim: it records which *already measured* things
+would support which paper, and the literal condition that must be true before anything is submitted.
+Nothing below is evidence in itself. Every claim listed here must pass `validate_claim()` in
+`v2/calibra/claim_guards.py` before it is written up; where a blocker is undischarged it is named.
+
+Status vocabulary: **DONE** (measured, artifact on disk), **RUNNING** (started, incomplete),
+**BLOCKED** (cannot proceed until a named failure is diagnosed), **NOT STARTED**.
+
+---
+
+## P1 — Instrument / methods paper (CALIBRA)
+
+**Working title:** *Calibrated auditing of multimodal representation claims: spike-recovery floors for
+morphology–molecular analyses.*
+
+**Claim (one sentence):** A spike-recovery instrument that reports what effect size a given analysis
+*would have missed*, distinguishing a paired **transmission floor** from an unpaired **detection
+floor** — two quantities that are routinely conflated and are not interchangeable.
+
+**Venue class:** methods journal or methods track (Nature Methods / Bioinformatics class), or a
+methods-track ML venue. Not a biology venue: the deliverable is an audit procedure, not a finding
+about tumours.
+
+### Evidence ledger
+
+| evidence item | status | where it lives | what would falsify it |
+|---|---|---|---|
+| The three nested spike-readout defects and their fix: (a) recovery scored with `top_canonical_correlation`, a maximum over 16 components, while the spike lives on one known direction; (b) partial replacement, because `a` was standardised and `y·v` was not; (c) absolute value taken *before* pairing, destroying the paired comparison since induced correlation has random sign | DONE | `HANDOFF_PHASE_D.md` §0; `v2/calibra/` | a post-fix recovery curve that still returns `NaN` on real data, or a fourth defect of the same class found in the same readout |
+| Ambient correlation sits at ~0.97, so every pre-fix detection floor returned `NaN` on real data while all 11 synthetic self-tests passed | DONE | `HANDOFF_PHASE_D.md` §0 | synthetic tests that *do* discriminate the defect (would remove the paper's motivating example) |
+| Confound adjustment does **not** destroy signal — attenuation 0.94–1.23, i.e. ≈1 | DONE | `HANDOFF_PHASE_D.md` §0 | attenuation far from 1 under a differently constructed confound design at comparable rank |
+| **Residualising two orthogonal signals through a shared confound design INDUCES correlation between them** — 0.067–0.140, 99-column cancer+TSS design, n = 2,530. This is the novel methodological observation and the reason the floor is read with a paired test | DONE | `HANDOFF_PHASE_D.md` §0 | induced correlation ≈ 0 at matched design rank and n on a second design, i.e. the effect is specific to this one design rather than to shared residualisation |
+| Two floors exist and are not interchangeable: `transmission_floor` (paired, near-noiseless, never quotable as a detection limit) and `detection_floor` (unpaired, conservative, ≈0.2 WSI) | DONE | `HANDOFF_PHASE_D.md` §0 | a construction where the paired floor is the correct detection limit |
+| Gate-vs-observation separation: `GateLedger.add(gate, value, threshold, passed, …)` for pass/fail vs `GateLedger.observe(gate, value, expectation, …)` for recorded-but-not-graded quantities | DONE | `v2/calibra/gates.py:11,20,25` | a scientific outcome found wired into a pass/fail gate (which would show the separation is not enforced in practice) |
+| `claim_guards` as executable claim admissibility — six blockers, each with mechanism and discharge condition, plus 15 tests | DONE | `v2/calibra/claim_guards.py`; `tests/test_claim_guards.py` | a blocker dischargeable without new evidence, or an unknown claim kind defaulting permissive |
+| Worked liveness-gate failure cases: G2.4 straddling the warmup boundary (17:08); G2.6 reading a post-divergence loss (17:31); G2.6 graded against a 4,096-key stale queue (17:45); G2.6 undecidable at 280 patients (15:31) | DONE | this notebook, entries 15:31–17:45 | — (these are recorded observations, not inferences) |
+| External / second-dataset demonstration of the floors | NOT STARTED | — | the floors do not transfer, or invert, on a second dataset |
+| Written negative-control battery (must-fail controls and must-pass positive controls, run and reported including losses) | NOT STARTED | specification exists in `v2/research/rebase/MULTIMODAL_EXPANSION.md` §9 | any "must fail" control that passes — site/scanner/batch prediction from certified axes, random gene sets clearing the floor, shuffled gene labels leaving attribution intact, or modality-shuffled pairing preserving cross-modal agreement |
+
+### Phase gate
+
+> One external / second-dataset demonstration of both floors has been run **and** the negative-control
+> battery of `MULTIMODAL_EXPANSION.md` §9 has been executed and written up, with every "must fail"
+> control observed to fail and every positive control observed to pass, reported including the ones
+> that go against us.
+
+### Known blockers
+
+- No external cohort has been through the instrument. `claim_guards.no_external_cohort` is
+  undischarged for every morphology result on the project (all TCGA, with documented site and scanner
+  effects).
+- The induced-correlation observation currently rests on **one** design (99-column cancer+TSS) at
+  **one** n (2,530). A methods paper asserting a general phenomenon needs it at a second design rank.
+- The negative-control battery is a specification, not run output.
+
+**Assessment:** least blocked of the four. It is also the only one of the four whose remaining
+evidence does not depend on a GPU run completing.
+
+---
+
+## P2 — "Effective rank does not track molecular information"
+
+**Working title:** *Representation-geometry metrics are uninformative about the molecular channel:
+a two-directional demonstration, and a withdrawn claim.*
+
+**Claim (one sentence):** Representation-geometry metrics used as quality proxies (effective rank,
+per-feature spread) carry no information about the molecular channel, shown in **both** directions —
+rank up with the channel flat, and rank down with the channel unchanged.
+
+**Venue class:** methods/analysis, or a short negative-result or commentary format. The withdrawal of
+F2 is part of the submission, not an omission from it.
+
+### Evidence ledger
+
+| evidence item | status | where it lives | what would falsify it |
+|---|---|---|---|
+| **+107% effective rank at flat within-cancer specificity** | DONE | `HANDOFF_PHASE_D.md` §0 | a protocol-matched measurement in which a rank increase does track specificity |
+| **−17% effective rank (38.48 → 32.06) with the molecular channel unchanged (0.4768 → 0.4748)** | DONE | `HANDOFF_PHASE_D.md` §0 | channel moving with rank under the same protocol |
+| **F2 is WITHDRAWN.** E3 measured `wsi_identity` changing by **2.6e-04** between `full` and `identity_only`, against **1.4e-01** for the biology head: the identity head is the frozen MLP-CLIP teacher passed through, so "molecular supervision degrades the molecular channel" restated a distillation observation | DONE — **the withdrawal is part of the story and must be reported, not hidden** | `HANDOFF_PHASE_D.md` §0 | a trained (not passed-through) identity arm reproducing F2's gap |
+| At initialisation, WSI biology states are **0.7362 mutually collinear (std 0.0314)** against RNA **0.2740 (std 0.0508)** | DONE (supporting, measured 2026-08-01) | measurement of 2026-08-01 | the same statistic at comparable magnitude in both modalities, or a strong dependence on the initialisation seed |
+| D2 seed-42 held-out geometry: arm H effective rank 19.655 vs arm I 10.777, mean feature std 0.01026 vs 0.00464, n = 2,766 test patients — with the channel comparison **not yet run** | RUNNING (descriptive only; not an endpoint) | this notebook, 20:35 | — |
+| Trained objective-ablation arm (D1 `programme_free` vs `programme_only`, 3 seeds, paired bootstrap on the between-arm difference) — the arm F2 never had | BLOCKED | D1; `programme_free` InfoNCE sits at chance, ln(80) = 4.38 against measured 4.27 / 4.33 | the arm training normally and the channel tracking rank |
+
+### Phase gate
+
+> **Either** D1 supplies the trained objective-ablation arm that F2 lacked — both arms trained under
+> one command differing only in `--objective-profile`, seeds 42/43/44, measured with
+> `run_calibra` against `frozen_rna_targets.npz` plus a paired bootstrap on the between-arm
+> difference — **or** the paper is written explicitly as a negative / methodological result on the two
+> existing directions, with the F2 withdrawal reported in full and **no** objective claim made.
+
+Those are genuinely two different papers. The first is "supervision choice does X to the channel";
+the second is "stop using rank as a proxy". Only the second is available today.
+
+### Known blockers
+
+- D1 is blocked at G2.6: the `programme_free` contrastive term does not move off chance at two
+  learning rates an order of magnitude apart, while `full_consistency` in the same objective reaches
+  ~1e-4. Candidate causes recorded at commit `5fe082e`: WSI/RNA pairing after `_truncate_batch`, and
+  ID-aware masking in `paired_infonce_with_memory` possibly excluding the positive.
+- F2's withdrawal removes the only "objectives" framing that was previously drafted; any surviving
+  draft text asserting "molecular supervision degrades the molecular channel" must be deleted.
+- The collinearity datum is measured **at initialisation only**. It does not yet say anything about a
+  trained representation.
+
+---
+
+## P3 — Main biological claim: Perturbation-Basis Supervision (PBS)
+
+**Working title:** *Perturbation-basis supervision: interventional coordinates make tumour morphology
+molecularly legible where curated pathway scores do not.*
+
+**Claim (one sentence):** Supervising morphology on **interventional perturbation coordinates** yields
+molecular legibility that **curated pathway scores do not**.
+
+**Venue class:** high-impact biology / computational biology, conditional on the phase gate. If the
+gate does not clear, there is no P3 in this form.
+
+### Evidence ledger
+
+| evidence item | status | where it lives | what would falsify it |
+|---|---|---|---|
+| E0 feasibility: responsive perturbations align with TCGA expression geometry more than non-responsive ones, `verdict = supported`, K562, at **~10–11% of the achievable ceiling**, paired CI entirely above zero at every k; the non-responsive control absorbs **55%** of the raw overlap at k=100 | DONE | `v2/research/rebase/nature/E0_RESULT.md` | the gap vanishing against a control matched on effect magnitude, or against a non-tumour bulk-RNA target |
+| E0 cross-lineage replication, n-matched at 168 per arm: K562 **+0.0387** vs RPE1 **+0.0394** at k=25 — agreement within 2% across a near-triploid CML line and a near-diploid retinal epithelial line; 4/4 contexts decided; monotone in the preregistered control-threshold sweep | DONE | `v2/research/rebase/nature/E0_REPLICATION_RESULT.md` | divergence between lineages once matched on n, or non-monotone behaviour under the control threshold |
+| The n-matching was load-bearing: uncapped, K562 reads +0.0671 vs +0.0496 — a **35% inflation from sample size alone** that would have been reported as lineage specificity | DONE | `E0_REPLICATION_RESULT.md` §2 | — |
+| E0b: 8,403 perturbations have **effective rank 132.1** (RPE1 113.9), stable rank 17.4, coherence 0.85 — the dictionary's resolution ceiling, and the reason `n_components = 128` | DONE, with the caveat that `n_equivalence_classes` returned *n* and is mis-specified and unusable | `E0_RESULT.md` §5 | a corrected equivalence-class count inconsistent with an effective rank of ~132 |
+| PBS supervision target `pbs_targets_k128_v2.npz` built on the maximal split, dictionary fit on development rows only, `signed_log1p` matching E0's `_load_tcga` | DONE | this notebook, 09:07; `.manifest.json` | a leak of test-split information into the transform or the dictionary fit |
+| Hallmark baseline rebuilt on the same expression source, agreeing with the frozen table at per-set Spearman ≥ 0.99999991 across all 50 sets | DONE | this notebook, 09:01 | — |
+| **D2 head-to-head, arms H and I, 3 seeds, matched by construction via `D2_PAIR_MANIFEST.json`; the paired patient+cancer bootstrap on the H−I difference is the predeclared primary** | RUNNING — seed 42 both arms complete; seed 43 arm H failed G2.6; seed 44 never started; `d2_compare` not run (`compare.log` 0 bytes, no `D2_SEED42_BOOTSTRAP.json`) | this notebook, 20:35 and 20:04 | I ≈ H — overlapping paired-bootstrap CIs |
+| **D2.3 per-axis proliferation / essentiality annotation** — answers the proliferation confound for free, since per-axis gene loadings exist anyway: if every legible axis is proliferation-loaded, that is the deflation, visible without a separate experiment | Target built (128 axes annotated, `pbs_targets_k128_v2.npz.axis_annotations.csv`); **analysis NOT STARTED** | this notebook, 09:07 | every legible axis coming back proliferation-loaded |
+| D3 purity sensitivity — purity into `confound_design` in `v2/calibra/run_calibra.py`, channel reported before and after | NOT STARTED (CPU; no TCGA purity table on disk) | `HANDOFF_PHASE_D.md` §D3 | the channel dying when purity enters the adjustment set (which is a finding, to be reported, not buried) |
+
+### Phase gate
+
+> A D2 `SUCCESS.json` with all gates passed for **all six runs** (2 arms × seeds 42/43/44), **and**
+> non-overlapping paired patient+cancer bootstrap CIs on the H−I difference in the predeclared
+> direction.
+>
+> If **I ≈ H** (overlapping CIs), the interventional dictionary's content already sits inside curated
+> pathways, **the rebase premise is in trouble, and this paper does not exist in this form.** That
+> outcome is escalated per `HANDOFF_PHASE_D.md` §D2.3, not rewritten into a weaker claim.
+
+### Known blockers
+
+1. **E0 remains an INADMISSIBLE `transfer` claim** under `claim_guards`: `proliferation_deflation`
+   and `single_platform` are both undischarged, pinned by
+   `test_current_e0_result_is_not_yet_an_admissible_transfer_claim`. If either is discharged, that
+   test fails and must be updated deliberately.
+2. **Single platform.** Everything perturbational is Replogle Perturb-seq — one protocol (CRISPRi +
+   scRNA-seq), one normalisation, one pseudobulk procedure, one effect-size-monotone
+   `energy_test_p_value`. Two lineages is not two platforms; cross-lineage agreement rules out "a K562
+   quirk", never "a Perturb-seq quirk".
+3. **D2 rests on one seed.** Seed 43 arm H failed G2.6 flat from step 0 (best value at step 0); seed
+   44 was never launched.
+4. **The `d2_compare` interval is not a 95% CI.** It bootstraps an in-sample multivariate top-CCA
+   maximum; the direction of the paired difference is quotable, the width is not.
+5. **The WSI-collinearity confound measured 2026-08-01.** WSI biology states are 0.7362 mutually
+   collinear at initialisation against RNA's 0.2740. A *narrower* PBS representation may therefore
+   reflect resistance to an already-collapsed view rather than dictionary content — so arm I's lower
+   effective rank (10.777 vs 19.655) cannot currently be read as evidence either for or against PBS.
+6. `purity_confound`, `composition_attribution` and `no_external_cohort` are undischarged for any
+   `legible_axis` claim; D3 addresses only the first.
+
+---
+
+## P4 — System paper: promptable multiscale causal observability
+
+**Working title:** *A certified promptable interface over a multiscale causal observability atlas.*
+
+**Claim (one sentence):** A **certified** promptable interface over the representation — natural-language
+queries answered only from axes that carry a certificate, with uncertified axes visible and marked as
+such rather than returned as answers.
+
+**Venue class:** systems / resource paper. **This is the furthest out of the four and should be
+described that way in every planning document: nothing for it has been started.**
+
+### Evidence ledger
+
+| evidence item | status | where it lives | what would falsify it |
+|---|---|---|---|
+| Per-axis certification working end to end: operator estimated on a discovery fold; axes clear the CALIBRA detection floor; confound certificate passed (axes must **fail** to predict site/scanner/batch); replication in untouched patients and ≥1 external cohort; failures exposed alongside successes | NOT STARTED | `MULTIMODAL_EXPANSION.md` §1 (the five-point prerequisite rule) | certified axes that do predict site/scanner/batch |
+| A second target modality — spatial transcriptomics / HEST-1k (stage S2 of the build order) | NOT STARTED | `MULTIMODAL_EXPANSION.md` §2, §5 | S1 axes failing to replicate spatially, or cell-of-origin remaining unresolved |
+| P3 landing (the representation being worth exposing at all) | depends on P3 | see P3 | — |
+| D1's objective repaired (the ablation that says what the supervision is doing) | BLOCKED | see P2 | — |
+| The promptable query layer itself | NOT STARTED | `MULTIMODAL_EXPANSION.md` §8 | — |
+
+### Phase gate
+
+> Per-axis certification working end to end (all five conditions of `MULTIMODAL_EXPANSION.md` §1)
+> **plus** at least one modality beyond bulk RNA.
+
+### Known blockers
+
+- Everything. P4 is downstream of P3 landing, of D1's objective being repaired, and of the multimodal
+  expansion supplying a second modality.
+- The prerequisite rule is not negotiable: *you cannot prompt what you cannot certify.* A fluent
+  interface over an uncertified representation is **worse than no interface**, because it launders
+  uncertainty into prose.
+- The build order S1 → S6 in `MULTIMODAL_EXPANSION.md` §2 must not be reordered, and the copilot is
+  stage S6.
+
+---
+
+## Cross-paper dependency diagram
+
+```mermaid
+graph TD
+  E0["E0 / E0b<br/>basis transfer + replication<br/>DONE"]
+  CAL["CALIBRA instrument<br/>floors, guards, gate ledger<br/>DONE"]
+  EXT["External / 2nd dataset<br/>+ negative-control battery<br/>NOT STARTED"]
+  D1["D1 — programme_free arm<br/>BLOCKED (InfoNCE at chance)"]
+  D2["D2 — H vs I head-to-head<br/>RUNNING (1 of 3 seeds)"]
+  D3["D3 — purity sensitivity<br/>NOT STARTED (CPU)"]
+  SP["Spatial transcriptomics<br/>HEST-1k (S2)<br/>NOT STARTED"]
+
+  P1["P1 — CALIBRA<br/>instrument / methods<br/>INDEPENDENT"]
+  P2["P2 — rank does not track<br/>molecular information"]
+  P3["P3 — PBS<br/>main biological claim"]
+  P4["P4 — promptable<br/>observability system"]
+
+  CAL --> P1
+  EXT --> P1
+  D1 --> P2
+  E0 --> P3
+  D2 --> P3
+  D3 --> P3
+  P3 --> P4
+  D1 --> P4
+  SP --> P4
+
+  classDef done fill:#dff0d8,stroke:#3c763d,color:#1b3a1b;
+  classDef blocked fill:#f2dede,stroke:#a94442,color:#3a1b1b;
+  classDef running fill:#fcf8e3,stroke:#8a6d3b,color:#3a331b;
+  classDef notstarted fill:#eeeeee,stroke:#777777,color:#222222;
+  class E0,CAL done;
+  class D1 blocked;
+  class D2 running;
+  class EXT,D3,SP notstarted;
+```
+
+**Reading it:** P1 has no incoming edge from any pending experiment other than its own remaining
+analysis work — it is independent of the GPU queue. P2 needs D1. P3 needs D2 and D3 (on top of E0,
+already done). P4 needs P3, D1 and spatial.
+
+## Timeline
+
+No calendar dates. Sequencing is expressed as ordered dependencies plus rough effort. GPU effort is
+scaled from the one observed data point: seed 42 arm H finished 18:49 and arm I finished 20:00, i.e.
+roughly **1 h of A100 time per arm** at 40 epochs on the 6,427-patient split.
+
+| paper | phases that must complete, in order | sequencing note |
+|---|---|---|
+| **P1** | (1) external / second-dataset spike demonstration → (2) negative-control battery run per `MULTIMODAL_EXPANSION.md` §9 → (3) write-up | Independent of the GPU queue; both remaining items are analysis-scale and can start **now**, in parallel with D2 training. Rough effort: days of CPU analysis, no training. This is the one that can move while everything else is blocked. |
+| **P2** | (1) diagnose the `programme_free` InfoNCE failure (pairing after `_truncate_batch`; ID-aware masking in `paired_infonce_with_memory`) → (2) D1 both arms × seeds 42/43/44 → (3) `run_calibra` on the 6 artifacts against `frozen_rna_targets.npz` + paired bootstrap → (4) write-up | Entirely gated on the D1 diagnosis, which is a code question, not a compute question — cheap to attempt, unbounded until it lands. Step (2) is ~6 h GPU at the observed per-arm rate. **The fallback path — writing P2 as a negative/methodological result on the two existing directions plus the F2 withdrawal — needs no GPU and is available immediately.** |
+| **P3** | (1) diagnose the seed-43 G2.6 initialisation failure → (2) complete D2 seeds 43 and 44, both arms (~4 h GPU for the four remaining arms at ~1 h each) → (3) `d2_compare` primary readout + paired patient+cancer bootstrap (minutes, CPU) → (4) D2.3 per-axis proliferation/essentiality analysis (CPU, on annotations already built) → (5) D3 purity sensitivity (CPU, **runs in parallel from step 2**; needs the TCGA consensus purity table, or an expression-derived estimate flagged `purity_source="expression_derived"`) → (6) write-up | The critical path is the GPU queue plus the seed-43 diagnosis. D2.3 and D3 cost no GPU and should be run alongside, not after. Step (1) must not be skipped by dropping to one seed — the phase gate requires three. |
+| **P4** | (1) P3 clears its phase gate → (2) D1 objective repaired → (3) spatial modality acquired and S1 axes replicated spatially (stage S2) → (4) per-axis certification end to end, all five conditions → (5) write-up | Strictly after P2 and P3, with a new data acquisition in the middle. Effort is dominated by (3) and (4), neither of which has been scoped. Describe as long-horizon; do not put it on any near-term plan. |
+
+---
+
+# Notes to future agents
+
+Standing instructions for whoever — human or agent — picks this up next.
+
+1. **Log every run, every error and every result here**, with date, time (UTC), the exact command or
+   module, and a *Meaning for the claim* line. An unlogged run is an unrepeatable run. Entries are
+   newest-first; keep the Index table in sync.
+
+2. **Never report a bug fix as a scientific result.** Most of this notebook is infrastructure. A fix
+   licenses nothing — it unblocks measurement. If an entry's *Meaning for the claim* line cannot say
+   what would falsify the thing being claimed, it is not a result.
+
+3. **The gates are fail-closed by design. If a gate blocks, diagnose it — do not relax it.** The
+   canonical case is on 2026-08-01: G2.6 was failing, and the obvious "fix" was to raise the step
+   count. That would have been exactly wrong. At lr 1e-2 the objective descends to 0.9432 by step 250
+   and then *diverges* — the gate at step 299 was reading 2.1575, i.e. grading a post-divergence loss,
+   and by ~2000 steps the heteroscedastic Gaussian NLL reaches `nan` as its variance head collapses
+   under AdamW. More steps would have made it strictly worse. Two earlier hypotheses for the same gate
+   — too few steps, wrong batch composition — were also both wrong. Relaxing a threshold to make a run
+   proceed converts a diagnosable failure into an undiagnosable result.
+   *Corollary:* a gate that cannot fail cleanly certifies nothing (see 15:31: a 280-patient
+   memorisation check was undecidable, not failing), and a gate must emit the evidence it graded (see
+   17:15).
+
+4. **Any claim must pass `validate_claim()` in `v2/calibra/claim_guards.py` before it is written up.**
+   Six blockers are encoded — `composition_attribution`, `purity_confound`, `sign_blind`,
+   `proliferation_deflation`, `single_platform`, `no_external_cohort` — each with the mechanism by
+   which the claim goes wrong *while the numbers look fine*, and the specific evidence that discharges
+   it. An unknown claim kind is inadmissible by default. If a verdict is inadmissible, emit the repo
+   status convention (`value = NaN`, `note = "inadmissible_<code>"`) so it is **visible**, never a
+   silent drop. Discharging a blocker will break
+   `test_current_e0_result_is_not_yet_an_admissible_transfer_claim`; update that test deliberately, as
+   a decision, never as a test repair.
+
+5. **Record measured numbers only.** If a number was not measured, write "pending" or "not measured".
+   Do not interpolate, do not round a remembered figure, do not carry a number across a cohort or
+   estimator change. Where a number came from a session probe that did not persist to disk, say so
+   explicitly (see 20:04). Numbers that must not be quoted at all are listed in
+   `HANDOFF_PHASE_D.md` §4 — `n_equivalence_classes`, the marginal `bootstrap_ci95` as a 95% CI, the
+   `d2_compare` interval width, and anything from F2.
+
+6. **There are two isolated checkouts on the GPU box: `~/morpheus-rebase` and `~/morpheus-rebase-d1`.**
+   This is deliberate. D1 and D2 are being debugged concurrently, and a mid-experiment code change
+   makes seeds incomparable: seeds 42, 43 and 44 of the same arm are only a replication if they ran
+   the same code. Keeping D1's debugging out of the checkout D2 is running from is what preserves that.
+   Do not consolidate them, and do not fix a D1 bug in the D2 checkout while D2 is mid-flight. Related:
+   G0.2 requires a clean committed worktree per run, and every artifact records `git_commit` and
+   `git_dirty` — the seed-42 D2 artifacts record `git_dirty: true`, which is why G0.4 cannot be
+   discharged from disk for them.
+
+7. **Before any GPU run, complete the recursive audit loop in `HANDOFF_PHASE_D.md` §2.** Two prior
+   audits each caught a defect that would have produced a confident, wrong answer, and both defects
+   passed their own test suites. Do not argue an auditor into a GO; fix the code.
+
+---
+
+# Running log
+
 ---
 ## 2026-08-01 20:35 UTC — D2 seed 42: both arms trained 40/40 epochs; held-out representation geometry measured
 **Status:** RESULT
 **Experiment:** D2
+**Logged:** 2026-08-01 20:35 UTC
+**How obtained:** `phase_d d2` from `~/run_d2_final.sh` on the GPU box (seed 42, arms H and I); held-out geometry computed directly from the exported diagnostic artifacts `~/e0_run/d2_final/artifacts/d2_{h,i}_seed42.npz`, `split == "test"` rows only, effective rank as `exp(H(s))` on the singular values of the column-centred patient x feature matrix. Training numbers read from `TRAIN_SUCCESS.json`, `liveness.json`, `selection.json` and `train_metrics.jsonl`.
 
 ### What was run
 `phase_d d2` on the GPU box, arms H (Hallmark supervision) and I (PBS
@@ -119,6 +444,9 @@ feature. This says the two supervision choices leave visibly different geometry 
 the model; it does **not** yet say which one predicts biology better, because the
 comparison test that would answer that has not been run.
 
+### Meaning for the claim
+This licenses a statement about **geometry only**: two supervision targets leave measurably different structure in the held-out slide representation. It does **not** license any statement about which supervision is more molecularly legible, because the predeclared primary readout (`legibility_weighted_grouped_cv` via `d2_compare`, with the paired patient+cancer bootstrap) has not been run and the run rests on one seed of three. It feeds **P3** as the first half of the head-to-head, and **P2** as a further instance of effective rank moving while the molecular channel is unmeasured.
+
 ### Files / commits
 - `~/e0_run/d2_final/d2_h_seed42/` and `~/e0_run/d2_final/d2_i_seed42/`
   (`TRAIN_SUCCESS.json`, `liveness.json`, `selection.json`, `train_metrics.jsonl`)
@@ -132,6 +460,8 @@ comparison test that would answer that has not been run.
 ## 2026-08-01 20:04 UTC — D2 seed 43, arm H: G2.6 is flat from step 0
 **Status:** FAILURE
 **Experiment:** D2
+**Logged:** 2026-08-01 20:04 UTC
+**How obtained:** G2.6 pre-training gate inside the same `phase_d d2` invocation, seed 43 arm H; failure text read verbatim from `~/e0_run/d2_final.log`. The seed-43 vs seed-42 liveness-batch comparison was run in-session and **not persisted to disk**.
 
 ### What was run
 The seed-43 arm of the same `phase_d d2` invocation, launched automatically after
@@ -185,6 +515,9 @@ setup works for the first random start, the problem appears to be where the mode
 happens to start rather than which patients it was given, but that has only been
 checked once and the check was not saved.
 
+### Meaning for the claim
+Licenses nothing scientifically. Its consequence is scheduling: D2 currently rests on a single seed, which is below **P3**'s phase gate of three seeds with non-overlapping paired-bootstrap CIs. Until the initialisation dependence is diagnosed, no D2 number may be quoted as a multi-seed result.
+
 ### Files / commits
 - `~/e0_run/d2_final.log`
 - `~/e0_run/d2_final/d2_h_seed43/` (empty)
@@ -193,6 +526,8 @@ checked once and the check was not saved.
 ## 2026-08-01 17:56 UTC — D1 `programme_free`: the InfoNCE term sits at chance
 **Status:** FAILURE
 **Experiment:** D1
+**Logged:** 2026-08-01 17:56 UTC
+**How obtained:** Three G2.6 runs of the `programme_free` arm on the real runner (`python -m morpheus.v2.runner`, 800 steps, 16-patient truncation), varying only memory-queue size and learning rate; numbers read from `~/e0_run/d1_pf2.log` and `~/e0_run/d1_probe_free.log`.
 
 ### What was run
 Three G2.6 runs of the `programme_free` arm on the real runner, 800 steps each, all
@@ -250,6 +585,9 @@ the same steps, so the model is learning — it just cannot learn this particula
 matching task, which points at how the task is set up rather than at how long it
 was trained.
 
+### Meaning for the claim
+Licenses nothing about objectives. It is the open blocker on D1, and D1 is the experiment that must supply the trained objective-ablation arm F2 never had. It therefore blocks **P2**'s stronger form and is one of the three prerequisites for **P4**. Note what it does *not* say: the model optimises fine (full-consistency reaches ~1e-4 in the same runs), so this is a task-construction problem, not evidence that contrastive supervision fails.
+
 ### Files / commits
 - `5fe082eb696e438bb5421ff6e1cb53d78dfd1be6`
 - `~/e0_run/d1_pf2.log`, `~/e0_run/d1_probe_free.log`
@@ -259,6 +597,8 @@ was trained.
 ## 2026-08-01 17:45 UTC — G2.6 queue sized to the check, not to training
 **Status:** FIX
 **Experiment:** D1
+**Logged:** 2026-08-01 17:45 UTC
+**How obtained:** G2.6 on the real runner, 800 steps, with the training-sized 4,096-key memory queue; code change committed as `0a9c1d9`.
 
 ### What was run
 G2.6 on the real runner, 800 steps, with the training-sized memory queue.
@@ -289,6 +629,9 @@ comparison vectors that were frozen before training started and never updated. N
 healthy model could win that comparison, so the check could not distinguish a
 working model from a broken one. It now compares against a small, current set.
 
+### Meaning for the claim
+Infrastructure only — it licenses nothing scientifically and only makes the gate decidable. It matters to **P1** as a worked example of an instrument whose pass criterion was unreachable by construction, which is exactly the failure mode CALIBRA's floors are designed to expose. It is not a result about the model: the arm still reads chance after the fix.
+
 ### Files / commits
 - `0a9c1d98a3b1ca13c74dd83f2e94b24173bc831c`
 
@@ -296,6 +639,8 @@ working model from a broken one. It now compares against a small, current set.
 ## 2026-08-01 17:31 UTC — the G2.6 overfit gate was reading a post-divergence loss
 **Status:** FIX
 **Experiment:** D1
+**Logged:** 2026-08-01 17:31 UTC
+**How obtained:** The 16-patient memorisation check on the real runner at lr 1e-2, with the per-25-step trajectory instrumentation added at 17:15; committed as `503c36b`.
 
 ### What was run
 The 16-patient memorisation check on the real runner at lr 1e-2, with the trajectory
@@ -336,6 +681,9 @@ numerically unstable, and the check happened to read the number after the
 instability. So the model was passing and being marked as failing. Lowering the
 learning rate makes the run stable across the whole window.
 
+### Meaning for the claim
+Infrastructure only — no scientific claim. Its standing value is the recorded consequence, which is cited in **Notes to future agents**: raising this gate's step count makes it worse, not better, because the heteroscedastic Gaussian NLL diverges to `nan` by ~2000 steps. As a methods exhibit it feeds **P1** (a gate that reads a single terminal number cannot distinguish divergence from failure to learn).
+
 ### Files / commits
 - `503c36b677f1af4206f2f4fb97c23336d5564316`
 
@@ -343,6 +691,8 @@ learning rate makes the run stable across the whole window.
 ## 2026-08-01 17:15 UTC — G2.6 failure message now prints the descent trajectory
 **Status:** FIX
 **Experiment:** infrastructure
+**Logged:** 2026-08-01 17:15 UTC
+**How obtained:** Source change to the G2.6 failure path only (`RuntimeError` message now prints the recorded per-25-step losses); committed as `8a8c1e0`. No experiment was run.
 
 ### What was run
 Change to the G2.6 failure path only; no experiment.
@@ -365,6 +715,9 @@ When the pre-training check fails it now reports the whole learning curve, not j
 the final number, so the failure can be diagnosed from the run itself rather than
 from a separate script that behaves differently.
 
+### Meaning for the claim
+Licenses nothing scientifically; it is pure instrumentation that unblocked the 17:31 and 20:04 diagnoses. It is an illustration for **P1** of the gate-vs-observation separation (`GateLedger.add` vs `GateLedger.observe` in `v2/calibra/gates.py`): a gate must emit the evidence it graded, or its verdict cannot be audited.
+
 ### Files / commits
 - `8a8c1e0b3c5019aa75d50f7456897b17f1105b44`
 
@@ -372,6 +725,8 @@ from a separate script that behaves differently.
 ## 2026-08-01 17:08 UTC — G2.4 compared two different objectives across the warmup boundary
 **Status:** FIX
 **Experiment:** D2
+**Logged:** 2026-08-01 17:08 UTC
+**How obtained:** Re-derivation of the G2.4 criterion against `train_metrics.jsonl` across the `--loss-warmup-epochs 4` boundary, with the post-fix values read from `~/e0_run/d2_final/d2_h_seed42/liveness.json`; committed as `1cc1954`.
 
 ### What was run
 Re-derivation of the G2.4 liveness criterion after the 16:44 failure, plus in-situ
@@ -406,6 +761,9 @@ that was steadily improving looked like it had got worse — and this was only
 discovered after the full forty epochs of GPU time had been spent. The check now
 compares like with like.
 
+### Meaning for the claim
+Infrastructure only — licenses nothing scientifically, and unblocks measurement by making the liveness check compare like with like. As a methods exhibit it feeds **P1**: a health check that straddles a scheduled objective change will fail healthy runs, and here it did so only after forty epochs of GPU time had been spent.
+
 ### Files / commits
 - `1cc19542b15ffbdc51e038dd509a96069776b142`
 - `~/e0_run/d2_final/d2_h_seed42/liveness.json`
@@ -414,6 +772,8 @@ compares like with like.
 ## 2026-08-01 16:47 UTC — Correction: shuffling the G2.6 batch did not fix the D1 gate
 **Status:** FAILURE
 **Experiment:** D1
+**Logged:** 2026-08-01 16:47 UTC
+**How obtained:** The 16:44 shuffled-batch change re-run against the real runner at seed 42; failure text from `~/e0_run/d1_shuffled.log`, compared with `~/e0_run/d1_parallel.log` and the standalone probe trace in `~/e0_run/probe2.log`.
 
 ### What was run
 The shuffled-batch change from 16:44, run against the real runner, seed 42.
@@ -464,6 +824,9 @@ number but nowhere near enough to pass. The change was kept because drawing a te
 batch in patient-ID order gives you a single cancer type, which is wrong regardless,
 but it did not solve the problem it was claimed to solve.
 
+### Meaning for the claim
+Licenses nothing, and retracts a fix claim made three minutes earlier. Its lasting content is a methods point for **P1**: a standalone probe that does not reproduce the runner's objective (probe initial loss 1.358 against the runner's 2.36) cannot be used to certify a fix to the runner.
+
 ### Files / commits
 - `df3976a845c2b01199cb5d330a2fddced20b0c6f`
 - `~/e0_run/d1_shuffled.log`, `~/e0_run/d1_parallel.log`, `~/e0_run/probe2.log`, `~/probe_overfit.py`
@@ -472,6 +835,8 @@ but it did not solve the problem it was claimed to solve.
 ## 2026-08-01 16:44 UTC — G2.6 liveness batch drawn shuffled rather than in identifier order
 **Status:** FIX
 **Experiment:** D1
+**Logged:** 2026-08-01 16:44 UTC
+**How obtained:** Change to how the G2.6 liveness batch is drawn (seeded shuffle instead of identifier order), committed as `f8d0d68`, plus a standalone probe `~/probe_overfit.py` on the real cohort (`~/e0_run/probe2.log`).
 
 ### What was run
 Change to how the G2.6 liveness batch is drawn, plus a standalone probe on the real
@@ -501,6 +866,9 @@ The pre-training check was picking its sixteen test patients in alphabetical ID
 order, which meant they all came from the same cancer type and looked nearly
 identical to the model. The patients are now drawn at random from a fixed seed.
 
+### Meaning for the claim
+Licenses nothing: the measurement quoted here was superseded three minutes later because the probe does not reproduce the runner. The change was retained on its own terms — an identifier-ordered batch is single-cancer — but it is a correctness fix, not a result, and it feeds no paper directly.
+
 ### Files / commits
 - `f8d0d685ca36a0dbdb6531e8c90de642e45d4b0a`
 
@@ -508,6 +876,8 @@ identical to the model. The patients are now drawn at random from a fixed seed.
 ## 2026-08-01 16:44 UTC — D2 arm H failed G2.4 after all 40 epochs had been paid for
 **Status:** FAILURE
 **Experiment:** D2
+**Logged:** 2026-08-01 16:44 UTC
+**How obtained:** `phase_d` run roots `~/e0_run/d2_20260801_153159` and `~/e0_run/d1_20260801_153159` (launched 15:31); failure text read from `~/e0_run/phase_d_20260801_153159.log` and `~/e0_run/phase_d_nohup.log`. Time is the log mtime.
 
 ### What was run
 `phase_d` run root `~/e0_run/d2_20260801_153159` / `~/e0_run/d1_20260801_153159`,
@@ -544,6 +914,9 @@ A full forty-epoch training run completed and was then rejected by a health chec
 that compared the wrong two numbers. Forty epochs of GPU time produced no usable
 result from this launch.
 
+### Meaning for the claim
+Licenses nothing scientifically — no arm produced a usable artifact. Its only bearing is on **P3**'s schedule and on the cost accounting: forty epochs of GPU time were spent and discarded because of a gate defect, which is why the gate re-derivation at 17:08 was treated as urgent.
+
 ### Files / commits
 - `~/e0_run/phase_d_20260801_153159.log`, `~/e0_run/phase_d_nohup.log`
 
@@ -551,6 +924,8 @@ result from this launch.
 ## 2026-08-01 15:31 UTC — NaN structure loss and the undecidable overfit gate
 **Status:** FIX
 **Experiment:** D1 / D2
+**Logged:** 2026-08-01 15:31 UTC
+**How obtained:** Two source fixes to the pre-training G2.6 path (structure losses restricted to real axes; both arms truncated to 16 patients), committed as `9af9287`; padding arithmetic and batch-size reasoning verified on CPU. No GPU time was spent past the gate.
 
 ### What was run
 Two fixes to the pre-training G2.6 gate, following the 10:02 failures. No GPU hours
@@ -587,6 +962,9 @@ the "can it memorise one batch?" check was being given about 280 patients, which
 too many to memorise in 300 steps even for a healthy model — so failing it proved
 nothing. The check now uses 16 patients, where failure is unambiguous.
 
+### Meaning for the claim
+Infrastructure only — it licenses nothing scientifically and only unblocks measurement for both D1 and D2. The second half is a genuine instrument point for **P1**: a memorisation gate given 280 patients and 300 steps is *undecidable* rather than failing, because no healthy model would pass it either — a gate that cannot fail cleanly cannot certify anything.
+
 ### Files / commits
 - `9af928799999495a263bd5ded3f4eb67cc38def1`
 
@@ -594,6 +972,8 @@ nothing. The check now uses 16 patients, where failure is unambiguous.
 ## 2026-08-01 10:02 UTC — G2.6 non-finite for D2 arm H; 0.306 reduction for D1
 **Status:** FAILURE
 **Experiment:** D1 / D2
+**Logged:** 2026-08-01 10:02 UTC
+**How obtained:** `phase_d` run root `~/e0_run/*_20260801_091959` (launched 09:19); both failures read verbatim from `~/e0_run/phase_d_20260801_091959.log`. Time is the log mtime.
 
 ### What was run
 `phase_d` run root `~/e0_run/*_20260801_091959`, launched 09:19. Time given is the
@@ -630,6 +1010,9 @@ not-a-number everywhere, including in all four gradient groups; the other produc
 finite numbers that were nowhere near good enough. No GPU training time was spent,
 which is the point of running the check first.
 
+### Meaning for the claim
+Licenses nothing scientifically. It records the fail-closed gates behaving as designed — no GPU training time was spent on either arm — and it is the observation the 15:31 fixes were derived from.
+
 ### Files / commits
 - `~/e0_run/phase_d_20260801_091959.log`
 
@@ -637,6 +1020,8 @@ which is the point of running the check first.
 ## 2026-08-01 09:18 UTC — legibility-operator alpha grid, and the retained-graph OOM
 **Status:** FIX
 **Experiment:** D1 / D2
+**Logged:** 2026-08-01 09:18 UTC
+**How obtained:** `LegibilityOperator` alpha grid widened to 1–1e6 with a random-CV control fitted alongside the grouped CV, and the retained `initial_loss` graph released in `_overfit_programme_only_actual` (`v2/runner.py:582`); committed as `4ac6519`. Held-out R2 read from the operator fit.
 
 ### What was run
 Two fixes for the 09:08 failures, plus a random-CV control to discriminate between
@@ -679,6 +1064,9 @@ rather than by hand, makes 45 of 50 pathways predictable above chance, though on
 weakly (best R2 +0.16). Separately, the pre-training check was holding on to a full
 computation graph for all 300 steps and ran a 40 GB GPU out of memory.
 
+### Meaning for the claim
+Mostly infrastructure, but it does yield one measured, quotable number: at an interior CV-chosen alpha of 1e4, 45 of 50 Hallmark axes are predictable from the WSI vector above chance with a **maximum held-out R2 of +0.161**. That is a weak legibility ceiling for the Hallmark readout and it bears on **P3**'s baseline arm and on **P1**'s detection-floor framing. The random-CV control ruling out cross-cancer extrapolation as the cause is a small but real methodological datum. The OOM fix licenses nothing.
+
 ### Files / commits
 - `4ac6519d4c14c73fa562327a8612e1813d514a0d`
 
@@ -686,6 +1074,8 @@ computation graph for all 300 steps and ran a 40 GB GPU out of memory.
 ## 2026-08-01 09:08 UTC — legibility operator returned no nonzero axes; D1 OOM'd a 40 GB A100
 **Status:** FAILURE
 **Experiment:** D1 / D2
+**Logged:** 2026-08-01 09:08 UTC
+**How obtained:** `phase_d` run root `~/e0_run/*_20260801_090811`; both tracebacks read verbatim from `~/e0_run/phase_d_20260801_090811.log`.
 
 ### What was run
 `phase_d` run root `~/e0_run/*_20260801_090811`.
@@ -726,6 +1116,9 @@ The experiment stopped twice for unrelated reasons: the linear map from slides t
 pathway scores came back completely empty, and the second arm filled a 40 GB GPU and
 crashed before taking a single optimisation step.
 
+### Meaning for the claim
+Licenses nothing scientifically. Both failures are implementation faults — an under-regularised ridge and a retained autograd graph — diagnosed and fixed ten minutes later. In particular, the empty operator must **not** be read as evidence that slides carry no pathway information.
+
 ### Files / commits
 - `~/e0_run/phase_d_20260801_090811.log`
 
@@ -733,6 +1126,8 @@ crashed before taking a single optimisation step.
 ## 2026-08-01 09:07 UTC — PBS target build (k=128, v2) bound to the maximal split
 **Status:** SETUP
 **Experiment:** D2
+**Logged:** 2026-08-01 09:07 UTC
+**How obtained:** `python -m morpheus.v2.build_pbs_targets` via `~/prepare_phase_d.sh`, writing `~/e0_run/data/pbs_targets_k128_v2.npz`; all quoted values read from `pbs_targets_k128_v2.npz.manifest.json` and `.axis_annotations.csv` (log `~/e0_run/prepare2.log`).
 
 ### What was run
 `morpheus.v2.build_pbs_targets` from `~/prepare_phase_d.sh`, writing
@@ -783,6 +1178,9 @@ with the tumour data, compressed to 128 axes. All the scaling constants are comp
 only from the training cancers, so no held-out cancer information leaks into the
 target.
 
+### Meaning for the claim
+A build, not a result: it licenses nothing on its own. It constructs **P3**'s arm-I supervision target and, critically, the per-axis `proliferation_loading` / `essentiality_loading` annotations that D2.3 uses to answer the proliferation confound without a separate experiment — the blocker `claim_guards.proliferation_deflation` that currently makes E0 an inadmissible transfer claim. Using `signed_log1p`, matching E0's `_load_tcga`, is what lets the PBS dictionary and the E0 basis-transfer result be described as the same expression space.
+
 ### Files / commits
 - `~/e0_run/data/pbs_targets_k128_v2.npz` and `.manifest.json`, `.axis_annotations.csv`
 - `~/prepare_phase_d.sh`, `~/e0_run/prepare2.log`
@@ -791,6 +1189,8 @@ target.
 ## 2026-08-01 09:05 UTC — maximal paired split rebuilt, 6,192 -> 6,427 patients
 **Status:** SETUP
 **Experiment:** infrastructure
+**Logged:** 2026-08-01 09:05 UTC
+**How obtained:** `python -m morpheus.v2.build_paired_split` via `~/prepare_phase_d.sh`, writing `~/e0_run/data/paired_split_maximal.json`; counts and digests read from the split summary (code committed 08:47 as `4a89502`).
 
 ### What was run
 `morpheus.v2.build_paired_split`, writing `~/e0_run/data/paired_split_maximal.json`.
@@ -855,6 +1255,9 @@ keeps the group it was already in, and the newly available patients — mostly m
 are added into their cancer's existing role. This grows the cohort from 6,192 to 6,427
 without letting any patient move between training and held-out.
 
+### Meaning for the claim
+Infrastructure — licenses nothing scientifically. It does fix the population every subsequent **P2** and **P3** number is quoted on (6,427 paired patients; train 3,118 / val 543 / test 2,766) and preserves the 11-train / 21-test cancer partition that makes D2 a cross-cancer generalisation test rather than an in-distribution one. Any result quoted against the older 6,192-patient split is on a different cohort and is not comparable.
+
 ### Files / commits
 - `4a89502391cdc2977cf354532dbb0409874a0ffc`
 - `~/e0_run/data/paired_split_maximal.json`, `~/e0_run/prepare2.log`, `~/prepare_phase_d.sh`
@@ -863,6 +1266,8 @@ without letting any patient move between training and held-out.
 ## 2026-08-01 09:03 UTC — G0.2 failed on a file the previous experiment wrote
 **Status:** FIX
 **Experiment:** infrastructure
+**Logged:** 2026-08-01 09:03 UTC
+**How obtained:** Source change exempting `GATE_LOG.md` from the G0.2 clean-worktree check; committed as `d2b98cb`. Failure observed at 08:52 in `~/e0_run/phase_d_20260801_085200.log`.
 
 ### What was run
 Fix only; the failure was observed at 08:52.
@@ -883,6 +1288,9 @@ starts. The previous run wrote its own gate log into that directory, so the seco
 experiment refused to start because of a file the first experiment had just created.
 That one file is now exempt.
 
+### Meaning for the claim
+Licenses nothing scientifically; it removes a self-inflicted deadlock between two sequential experiments and only unblocks measurement. The provenance guarantee is unchanged — exactly one path is exempt, everything else still blocks.
+
 ### Files / commits
 - `d2b98cb3dcda718fd07b91bad4fb4a1443088953`
 - `~/e0_run/phase_d_20260801_085200.log`
@@ -891,6 +1299,8 @@ That one file is now exempt.
 ## 2026-08-01 09:01 UTC — Hallmark scores rebuilt from the PanCan RNA table
 **Status:** SETUP
 **Experiment:** D2
+**Logged:** 2026-08-01 09:01 UTC
+**How obtained:** ssGSEA over the full PanCan RNA matrix (`h.all.v2024.1.Hs.symbols.gmt`, `min_genes` 10) writing `~/e0_run/data/hallmark_scores_pancan.parquet`; agreement measured as per-gene-set Spearman against the frozen table on the 2,924 shared patients via `~/validate_hallmark.py` (09:02), output `~/e0_run/data/hallmark_rebuild_agreement.csv`.
 
 ### What was run
 ssGSEA scoring of the 50 MSigDB Hallmark gene sets over the full PanCan RNA matrix,
@@ -935,6 +1345,9 @@ coverage. Because swapping the expression source could in principle change the s
 the new and old scores were compared on the 2,924 patients they share: they agree to
 better than one part in ten million for every one of the 50 pathways.
 
+### Meaning for the claim
+This licenses exactly one narrow methods statement, and it is needed for **P3**: changing the expression source under the baseline arm did not change the baseline. With per-gene-set Spearman ≥ 0.99999991 across all 50 sets, arm H is the same Hallmark baseline as before, now covering all 6,427 cohort patients instead of 2,107. It says nothing about whether Hallmark supervision is good — only that the D2 comparison is against an unchanged baseline.
+
 ### Files / commits
 - `~/e0_run/data/hallmark_scores_pancan.parquet` and `.manifest.json`
 - `~/e0_run/data/hallmark_rebuild_agreement.csv`, `~/validate_hallmark.py`
@@ -944,6 +1357,8 @@ better than one part in ten million for every one of the 50 pathways.
 ## 2026-08-01 08:52 UTC — D2 refused: programme supervision did not cover the development fit set
 **Status:** FAILURE
 **Experiment:** D2
+**Logged:** 2026-08-01 08:52 UTC
+**How obtained:** `phase_d` run root `~/e0_run/*_20260801_085200`; traceback read verbatim from `~/e0_run/phase_d_20260801_085200.log` (`v2/runner.py:195`, `_attach_programme_matrix`). Coverage counts measured at 09:02.
 
 ### What was run
 `phase_d` run root `~/e0_run/*_20260801_085200`.
@@ -971,6 +1386,9 @@ were missing for most of the patients it was going to train on. This is the gate
 working as intended — training would otherwise have silently proceeded on a smaller,
 undocumented set of people.
 
+### Meaning for the claim
+Licenses nothing scientifically. It is a coverage gate firing correctly: without it D2 would have trained on an undocumented subset of patients, and any later **P3** number would have referred to a cohort nobody had declared.
+
 ### Files / commits
 - `~/e0_run/phase_d_20260801_085200.log`
 
@@ -978,6 +1396,8 @@ undocumented set of people.
 ## 2026-08-01 07:55 UTC — D2 preflight refused: loaded paired cohort contains unassigned patients
 **Status:** FAILURE
 **Experiment:** D2
+**Logged:** 2026-08-01 07:55 UTC
+**How obtained:** First D2 launch via `~/run_d2.sh` against the original `paired_split.json`; traceback read from `~/e0_run/d2.log` (`v2/preflight.py:40`, `validate_runtime_split`).
 
 ### What was run
 The first D2 launch, `~/run_d2.sh`, against the original `paired_split.json`.
@@ -1008,6 +1428,9 @@ to training or held-out — nearly all of them melanoma cases whose slide featur
 finished processing after the patient list was frozen. Without this check the run
 would have quietly trained on an undeclared subset.
 
+### Meaning for the claim
+Licenses nothing scientifically. It is the fail-closed preflight catching a stale cohort definition — 251 unassigned patients, 232 of them SKCM — and it is the observation that motivated the split rebuild at 09:05.
+
 ### Files / commits
 - `~/e0_run/d2.log`, `~/run_d2.sh`
 
@@ -1015,6 +1438,8 @@ would have quietly trained on an undeclared subset.
 ## 2026-08-01 07:43 UTC — PBS builder: RNA log transform, non-finite genes, missing-RNA exclusion
 **Status:** SETUP
 **Experiment:** D2
+**Logged:** 2026-08-01 07:43 UTC
+**How obtained:** Three consecutive commits to `build_pbs_targets` (`4012a8b`, `9917380`, `e416cf9`) at 07:41/07:42/07:43, verified by the 132-test CPU suite; final effective values read from `pbs_targets_k128_v2.npz.manifest.json`.
 
 ### What was run
 Three consecutive changes to `build_pbs_targets` (07:41, 07:42, 07:43 UTC), each
@@ -1065,6 +1490,9 @@ is off by default, has a hard ceiling, and writes exactly what it did into the
 manifest, so any later comparison can check it is comparing the same patients and the
 same genes.
 
+### Meaning for the claim
+Licenses nothing scientifically — these are provenance controls, not measurements. They are, however, a direct exhibit for **P1**'s argument that caveats belong in code: each of the three would otherwise have been a silent cohort or gene-set change that produced good-looking numbers against a population nobody could reconstruct.
+
 ### Files / commits
 - `4012a8b257cc72df22338aa77fb35653c0c64716` (missing-RNA exclusion)
 - `9917380ef883a3dc0ca3b9d328ef42c5ded5df40` (non-finite gene columns)
@@ -1074,6 +1502,8 @@ same genes.
 ## 2026-08-01 07:35 UTC — Phase-D orchestration committed to the deployment bundle
 **Status:** SETUP
 **Experiment:** infrastructure
+**Logged:** 2026-08-01 07:35 UTC
+**How obtained:** `git commit` of `phase_d.py`, `build_pbs_targets.py`, `d2_compare.py` and their tests after audit (`be66139`); 141 tests green on CPU.
 
 ### What was run
 `phase_d.py`, `build_pbs_targets.py`, `d2_compare.py` and their tests had never been
@@ -1115,6 +1545,9 @@ never been checked in, so the GPU box could not run them. They were audited and
 committed. One limitation is recorded now so it is not forgotten later: the comparison
 script's confidence interval is computed in a way that makes its width unreliable, so
 the direction of the D2 difference may be quoted but the interval width may not.
+
+### Meaning for the claim
+Licenses nothing scientifically; it only makes Phase D runnable on the GPU box. It carries one constraint that binds **P3**'s write-up: `d2_compare` bootstraps an in-sample multivariate top-CCA maximum, so the *direction* of the paired H-vs-I difference may be quoted but **the interval width must never be reported as a 95% CI** — the same class of caveat already recorded for E0's marginal `bootstrap_ci95` (`E0_RESULT.md` §7).
 
 ### Files / commits
 - `be66139e886cbfc01cdc22f7d79021f14301e354`
