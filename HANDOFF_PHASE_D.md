@@ -2,7 +2,10 @@
 
 **Read in this order:** this file → `HANDOFF_GATES.md` (mandatory; G2 *liveness* matters most here because
 Phase D trains) → `v2/research/rebase/ENGINE_CLD.md` (why). Branch `research/rebase-vision`, currently
-`e33a853`. `HANDOFF_EXPERIMENTS_NOW.md` (E0–E5) is **closed** — see §1.
+`e33a853`. `HANDOFF_EXPERIMENTS_NOW.md` (E0–E5) is **closed**.
+
+> **Before any GPU run you MUST complete the recursive audit loop in §2.** Two prior audits each caught a
+> defect that would have produced a confident, wrong answer, and both defects passed their own test suites.
 
 ---
 
@@ -67,125 +70,265 @@ you discharge one, that test fails and you must update it **deliberately**.
 
 ---
 
-## 1. Your tasks, in order
+## 1. THE TASKS — follow these literally
 
-### D1 — The missing arm. **Does molecular supervision help or hurt?**
-
-This question has never been answered because **the arm does not exist on disk.** `identity_only`
-declares no biology states (`v2/runner.py:351`) — by design, since the biology head has no gradient path
-under identity-only losses. So "biology head without programme supervision" was never trained.
-
-**Build a new objective profile `programme_free`** (`v2/training.py:47`, `v2/runner.py:344`):
-- biology head trained with **RNA-paired InfoNCE** — a rank-preserving contrastive signal against the
-  paired RNA view;
-- **no** Hallmark regression, **no** programme neighbour-KL, **no** supcon (these are the diagnosed
-  collapse mechanism: they pin a 256-D head to a ~50-D manifold);
-- declares `wsi_biology`, `rna_biology`, `full_biology`;
-- **no MLP-CLIP anchor** (`runner.py:390` already skips the anchor for `programme_only`; do the same
-  here, or D1 inherits the F2 anchoring artifact and answers nothing).
-
-**The comparison.** `programme_only` (exists) vs `programme_free` (new). **Matched on epochs, LR, seed,
-token budget, batch schedule — verify by diffing `manifest_json`, do not assume.** ≥3 seeds. If they are
-not matched, the result is *suggestive, not causal*, and you say so.
-
-**Measure:** CALIBRA held-out channel (`run_calibra.py` with `--targets-npz frozen_rna_targets.npz` —
-`data.hallmark` is train-fold-only and **constant on the test split**, which is where the original `nan`
-came from), effective rank, and `honest_metrics` within-cancer specificity. **Paired bootstrap on the
-difference** — the F2 write-up had no CI on its headline gap and that is partly how it survived.
-
-**Prediction to pre-register before running:** if `programme_free` ≥ `programme_only` on the molecular
-channel, molecular supervision is not helping and may be harming → F2 is restored *as an objective
-claim* and PBS is motivated. If `programme_only` wins, the collapse story needs rewriting and you
-escalate.
-
-### D2 — PBS head-to-head. **Interventional coordinates vs curated pathways.**
-
-**This is the real test, and it subsumes the proliferation confound.** Hallmark already contains
-proliferation programmes. If our dictionary's only real content is proliferation, it **cannot** beat
-Hallmark — there is nothing left to win on. If it does beat Hallmark, it carries something curated
-pathways lack, which is exactly the claim we want.
-
-**Dictionary resolution — do not use 8,403 atoms.** E0b measured effective rank **132**, and the
-equivalence-class clustering is broken. Use the **top-k right singular vectors of P** (k ≈ 100–132) as the
-supervision basis. Per-gene attribution comes later and requires fixing the clustering first.
-
-**Targets.** Project each patient's RNA onto that basis: `a_i = argmin ‖y_i − D a‖² + λΩ(a)`.
-Reuse `v2/pbs.py` (`ReferenceDictionary`, `LegibilityOperator`, `weighted_code_loss`) — already committed,
-do not reimplement.
-
-**Arms**, identical architecture / budget / seeds (≥3):
-- **H** — biology head regressed onto ~50 Hallmark scores (= current baseline).
-- **I** — biology head regressed onto interventional coordinates `a_i`.
-
-**Report:** held-out CALIBRA channel, effective rank, within-cancer specificity, and the standard
-benchmark. **Plus the field that answers proliferation for free:** per-axis proliferation/essentiality
-loading. You will have per-axis gene loadings anyway — tag every axis. *If every legible axis comes back
-proliferation-loaded, that is the deflation, and you will see it without a separate experiment.*
-
-**Escalate immediately if I ≈ H.** That means the interventional dictionary's content is already inside
-curated pathways, and the central premise of the rebase is in trouble.
-
-### D3 — Purity into the adjustment set. **Do this while D1/D2 train.**
-
-Open since Phase 1, never closed, and it is a **complete alternative explanation** for the
-morphology↔molecular channel: bulk RNA is a 30–90% tumour mixture, dictionary atoms are pure
-populations, so coefficients absorb purity — and purity is one of the most visually obvious features on
-a slide.
-
-**No TCGA purity table is on disk.** (CPTAC has `tumor_purity__washu.parquet` per cohort — relevant later
-for the external cohort, not for TCGA.) Two routes:
-1. **Preferred:** obtain published TCGA consensus purity (ABSOLUTE / PanCanAtlas). Open access; ask.
-2. **Fallback:** compute an ESTIMATE-style stromal+immune score from the expression we hold. **Flag it as
-   expression-derived** and state the partial circularity — you are residualising expression on a
-   quantity computed from that same expression.
-
-Add to `confound_design` in `run_calibra.py`, re-run the Phase-1 channel measurement, and report the
-effect **before and after**. If the channel dies when purity enters, that is a finding, not a failure —
-report it.
+> **Nothing below runs on GPU until §2 (recursive self-audit) returns clean.** Every step here is
+> CPU-verifiable first. A GPU run started on unaudited code is the exact failure this handoff exists to
+> prevent.
 
 ---
 
-## 2. Gates that bite hardest here
+### D1 — The missing arm. *Does molecular supervision help or hurt?*
 
-Phase D **trains**, so the G2 liveness family applies in full and has bitten us before:
-- **G2.6 overfit-one-batch** — if the head cannot memorise one fixed batch, nothing downstream is
-  interpretable. Cheapest decisive test there is; run it first on every new profile.
-- **G2.1** ‖Δθ‖/‖θ‖ > 1e-2 — `feature_decorrelation` once contributed ~1e-6 with a 4e-5 param delta.
-- **G2.2** log **every loss term's magnitude separately**; any term < 1e-4 × the largest is effectively off.
-- **G2.7** guards must fire at the *real* batch size — an `min_batch=8` guard silently no-oped on every
-  real step because uncapped H-Optimus batches hold B≈1–3.
-- **G4.1 positive control** (`rna_*` → RNA targets) **must pass in the same run**, or you have measured
-  nothing. **G1.1**: no constant columns *on the evaluated split*.
-- **G3.1** effective rank via `calibra.spectral.effective_rank` — **singular values**, never covariance
-  eigenvalues (that 6× error reached a paper draft).
+#### D1.0 — Why you must retrain BOTH arms, not reuse the existing one
+
+The three diagnostic artifacts record only this in `source_manifest`:
+`configuration_sha256`, `git_commit`, `git_dirty`, `package`, `package_root`, `source_tree_sha256`.
+
+**No epochs. No learning rate. No token budget. No seed.** And measured:
+- `configuration_sha256` **differs** across all three arms (expected — different profile — but it means
+  the hyperparameters are unverifiable from a hash);
+- `git_dirty` is **True** for all three.
+
+So **G0.4 cannot be discharged from disk.** Do not reuse `diagnostic_programme_only_seed42.npz` as D1's
+baseline. **Train both arms yourself from one command that differs only in `--objective-profile`**, so
+matching holds by construction rather than by hope.
+
+#### D1.1 — Add the `programme_free` objective profile
+
+Six edit sites. All six are required; five will pass tests while the sixth silently breaks the run.
+
+| # | file:line | change |
+|---|---|---|
+| 1 | `v2/training.py:47-48` | add `"programme_free"` to the allowed set in `__post_init__` |
+| 2 | `v2/training.py:69-72` | new branch in `weights()` (contract below) |
+| 3 | `v2/training.py:158-161` | `liveness_parameter_groups` returns **the same groups as `programme_only`**: `("wsi", "rna", "shared", "biology_programme")` |
+| 4 | `v2/runner.py:344-354` | `_trained_states_for_profile` returns **exactly** `["wsi_biology", "rna_biology", "full_biology"]` |
+| 5 | `v2/runner.py:390` | extend `use_anchor` so `programme_free` **also** skips the MLP-CLIP anchor |
+| 6 | `v2/runner.py:563` | add `"programme_free"` to the `--objective-profile` choices tuple |
+
+**Weight contract for `programme_free`** — exact, and asserted in a test before any GPU time:
+
+```
+programme            == 0.0     # no Hallmark Gaussian-NLL regression
+neighbourhood        == 0.0     # the diagnosed collapse mechanism
+supcon               == 0.0     # the diagnosed collapse mechanism
+identity             == 0.0
+fusion_identity      == 0.0
+patient_consistency  == 0.0
+semantic             == 0.0
+decorrelation        == the SAME value programme_only uses
+                        (training.py:69-72 keeps it there; if the arms differ on decorrelation
+                         you are measuring decorrelation, not supervision)
+<new biology contrastive term>  > 0.0
+```
+
+**The replacement objective.** `v2/losses.py:13` already provides
+`symmetric_infonce(left, right, temperature=0.07)`. Wire it as **RNA-paired InfoNCE on the biology
+view**: positives are `(wsi_biology, rna_biology)` of the same patient, negatives are other patients in
+the batch. That is the point — a **rank-preserving contrastive signal** instead of regression onto a
+~50-D target, which is what flattened the head.
+
+**Batch-size trap (G2.7).** Uncapped H-Optimus batches hold **B ≈ 1–3 patients**. InfoNCE at B=1 has no
+negatives and is a silent no-op — exactly how `feature_decorrelation`'s `min_batch=8` guard disabled
+itself on every real step. **Reuse the detached feature-bank ring buffer already built for
+`feature_decorrelation`**, or assert the effective negative count per step and fail loudly below 8.
+
+#### D1.2 — CPU verification, before any GPU
+
+```python
+from morpheus.v2.training import <ScheduleClass>
+free = <ScheduleClass>(objective_profile="programme_free").weights(epoch=99)   # post-warmup
+prog = <ScheduleClass>(objective_profile="programme_only").weights(epoch=99)
+assert free["programme"] == free["neighbourhood"] == free["supcon"] == 0.0
+assert free["decorrelation"] == prog["decorrelation"]      # the arms must differ in ONE thing only
+assert free["identity"] == free["fusion_identity"] == 0.0
+assert free[<new_key>] > 0.0
+from morpheus.v2.runner import _trained_states_for_profile
+assert _trained_states_for_profile("programme_free") == ["wsi_biology", "rna_biology", "full_biology"]
+```
+
+Then, still cheap:
+- **G2.6 overfit-one-batch** on `programme_free` — loss must reach ~0 on a single fixed batch.
+  **If this fails, stop.** Nothing downstream is interpretable.
+- **G2.3** gradient norm of the `biology_programme` group **non-zero at step 1**. Zero means the new loss
+  is detached or its parameters are unregistered.
+- **G2.2** log every loss term separately for 3 epochs; the new contrastive term must be
+  **> 1e-4 x the largest term**. Below that it is off, whatever the total says.
+- **G2.1** `||dtheta||/||theta|| > 1e-2` after a short run.
+
+#### D1.3 — Run
+
+Identical command for both arms, differing **only** in `--objective-profile`. Seeds `42, 43, 44`.
+Record the full argv in the run log.
+
+```
+python -m morpheus.v2.runner --split-file <SPLIT> --output-dir runs/d1_<arm>_seed<S> \
+  --objective-profile {programme_only|programme_free} \
+  --epochs 40 --token-budget 32768 --hidden-dim 512 --layers 4 --heads 8 \
+  --learning-rate 2e-4 --weight-decay 1e-2 --decorrelation-weight 0.04 \
+  --loss-warmup-epochs 4 --seed {42|43|44} --device cuda
+```
+
+**Pass no `--mlp-clip-anchor` and no `--mlp-clip-teacher` to either arm.** With an anchor, D1 inherits
+the exact artifact that killed F2 and answers nothing.
+
+#### D1.4 — Measure
+
+```
+python -m morpheus.v2.calibra.run_calibra --artifacts <the 6 npz> \
+  --targets <frozen_rna_targets.npz> --output runs/d1_calibra \
+  --n-draws 40 --n-components 16 --n-permutations 2000 --n-jobs 30 --seed 42
+```
+
+`--targets` **must** be `frozen_rna_targets.npz`. `data.hallmark` is train-fold-only and **constant on
+the test split** — that is where the original `nan` came from (G1.1).
+
+Report per arm: held-out CCA, `effective_rank`, within-cancer specificity
+(`honest_metrics.macro_group_pearson`, `control_adjusted_specificity`), and a **paired bootstrap on the
+between-arm difference** (`v2/paired_bootstrap.py`). F2's headline gap had no CI, and that is partly how
+it survived into a paper draft.
+
+**Pre-register before running:** *`programme_free` >= `programme_only` on the held-out molecular
+channel.* If so, molecular supervision is not helping -> F2 is restored as an objective claim and PBS is
+motivated. If `programme_only` wins, the collapse story is wrong — **escalate, do not proceed to D2.**
 
 ---
 
-## 3. Do not
+### D2 — PBS head-to-head. *Interventional coordinates vs curated pathways.* **Highest value; run this first if choosing one.**
 
-- Do not cite F2, or the marginal `bootstrap_ci95` as a 95% CI (it is biased low by 0.04–0.09 and flagged
-  `bootstrap_ci95_is_biased_low`; the decision uses the **paired** difference).
-- Do not compare gap magnitudes across E0 runs with different n or q, or `normalised_alignment` across runs.
-- Do not use `n_equivalence_classes`, or claim "11,000 independent causal directions".
+**Why this subsumes the proliferation confound:** Hallmark already contains proliferation programmes. If
+our dictionary's only real content is proliferation, it **cannot** beat Hallmark — there is nothing left
+to win on. A win means it carries something curated pathways lack.
+
+#### D2.1 — Build the dictionary. Reuse `v2/pbs.py`; do not reimplement.
+
+```python
+from morpheus.v2.pbs import ReferenceDictionary, LegibilityOperator, weighted_code_loss
+D = ReferenceDictionary.fit(responses=P, genes=genes, atom_ids=atom_ids, n_components=128)
+codes = D.encode_expression(expression=tcga_rna, genes=tcga_genes)   # exact gene identity is mandatory
+```
+
+- `P` is the K562 perturbation matrix built **exactly as E0 builds it** — reuse
+  `v2.calibra.e0_basis_transfer._load_perturbation`. Do **not** write a second loader.
+- **`n_components = 128`**, with a sensitivity run at 64 and 256. Rationale: E0b measured **effective
+  rank 132.1**. **Do NOT use 8,403 atoms** and **do NOT use `n_equivalence_classes`** — it returned *n*
+  and is mis-specified.
+- Fit `D` on the **dev cancers only**, then encode all patients. Fitting on everything leaks the test
+  split into the supervision target.
+
+#### D2.2 — Two arms, identical but for the supervision target
+
+| arm | target |
+|---|---|
+| **H** | ~50 Hallmark scores (the current baseline; `programme_only` reproduces it) |
+| **I** | the 128-D interventional codes from D2.1 |
+
+Same architecture, epochs, LR, token budget, seeds `42, 43, 44`. **Only the regression target differs.**
+
+#### D2.3 — Report, including the field that answers proliferation for free
+
+Held-out CALIBRA channel, `effective_rank`, within-cancer specificity, standard benchmark — **plus, for
+every axis, its proliferation / essentiality loading.** You will have per-axis gene loadings anyway.
+*If every legible axis comes back proliferation-loaded, that is the deflation, visible without a
+separate experiment.*
+
+**Escalate immediately if I ~= H** (overlapping paired-bootstrap CIs). That means the interventional
+dictionary's content already sits inside curated pathways, and the rebase premise is in trouble.
+
+---
+
+### D3 — Purity into the adjustment set. CPU. Run while D1/D2 train.
+
+Open since Phase 1, and a **complete alternative explanation** for the morphology<->molecular channel.
+
+**No TCGA purity table is on disk.** CPTAC has `tumor_purity__washu.parquet` per cohort under
+`data/raw/hf_tcga_cptac_cgga/cptac/tables/<cohort>/` — that is for the external cohort later, **not** for
+TCGA.
+
+1. **Preferred:** ask for the published TCGA consensus purity (ABSOLUTE / PanCanAtlas). Open access.
+2. **Fallback:** compute an ESTIMATE-style stromal+immune score from the expression we hold. **Emit
+   `purity_source="expression_derived"`** and state the partial circularity in the write-up: you are
+   residualising expression on a quantity computed from that same expression.
+
+Add it to `confound_design` in `v2/calibra/run_calibra.py`, re-run the Phase-1 channel measurement, and
+report the channel **before and after**. **If the channel dies when purity enters, that is a finding —
+report it, do not bury it.**
+
+---
+
+## 2. RECURSIVE SELF-AUDIT — mandatory, before any GPU run
+
+**No GPU job starts until this loop returns clean.** Two prior audits on this project each found a defect
+that would have produced a confident, wrong answer — one where the experiment could **never return a
+negative**, one where a **true negative would have been filed as a crash**. Both passed their own test
+suites at the time.
+
+**The loop.** Max **2** auditor agents at a time; you are the third.
+
+1. Write the code and get your own tests green.
+2. Spawn **one adversarial auditor**. Give it the diff, the tests, this handoff and `HANDOFF_GATES.md`.
+   Instruct it verbatim:
+   > *"Assume this is broken and find the mechanism. Check specifically: a loss term that is silently
+   > off; a guard that no-ops at the real batch size; an arm asymmetry that invalidates the comparison;
+   > leakage of the test split into a fit; a scientific outcome wired into a pass/fail gate; and whether
+   > this design can return a NEGATIVE result at all. Default to BROKEN if uncertain. Return GO or NO-GO
+   > with file:line and a minimal fix."*
+3. **If NO-GO: fix, then return to step 2 with a FRESH auditor.** Repeat until an auditor returns GO.
+   **Do not argue an auditor into a GO — fix the code.**
+4. Optionally spawn a **second** auditor for an independent GO on the fixed code. If the two disagree,
+   treat it as NO-GO and iterate.
+5. **Only then** run on GPU.
+
+**Termination:** stop when a fresh auditor, seeing the code for the first time, returns GO with no
+blockers. If you reach **4 rounds** without a clean GO, **escalate to the mastermind** — that means the
+design is wrong, not the implementation.
+
+**"Sizeable and conceptual" means:** anything that changes a number, a verdict, or what a claim licenses.
+Ignore style. A dead loss term, a leaked split, an unmatched arm, an ungated NaN, or a design that cannot
+produce a negative result are all blockers.
+
+---
+
+## 3. Gates that bite hardest here
+
+Phase D **trains**, so the G2 liveness family applies in full, and every one of these has bitten us:
+- **G2.6 overfit-one-batch** — cheapest decisive test. Run first on every new profile.
+- **G2.1** `||dtheta||/||theta|| > 1e-2` — `feature_decorrelation` once contributed ~1e-6 with a 4e-5
+  parameter delta.
+- **G2.2** every loss term logged **separately**; below 1e-4 x the largest it is effectively off.
+- **G2.7** guards must fire at the **real** batch size (B ~ 1-3, not 8).
+- **G4.1 positive control** (`rna_*` -> RNA targets) must pass **in the same run**, or you measured
+  nothing.
+- **G1.1** no constant columns **on the evaluated split**.
+- **G3.1** `calibra.spectral.effective_rank` — **singular values**, never covariance eigenvalues (a 6x
+  error that reached a paper draft).
+- **G0.2** clean worktree before launching, or provenance fails and the output is quarantined.
+
+## 4. Do not
+- Do not cite F2, or quote the marginal `bootstrap_ci95` as a 95% CI (biased low by 0.04-0.09, flagged
+  `bootstrap_ci95_is_biased_low`; decisions use the **paired** difference).
+- Do not reuse `diagnostic_programme_only_seed42.npz` as D1's baseline (see D1.0).
+- Do not pass an MLP-CLIP anchor to either D1 arm.
+- Do not use `n_equivalence_classes`, 8,403 atoms, or the phrase "11,000 independent causal directions".
+- Do not fit the dictionary on all patients — that leaks the test split.
+- Do not compare gap magnitudes across E0 runs with different n or q.
 - Do not claim E0 shows the alignment is *biological* — both lineages share one platform and one
-  effect-size-monotone statistic; that confound replicates across lineages **because it is biology of
-  essential genes, not of lineage**.
+  effect-size-monotone statistic.
 - Do not run further E0 controls (GTEx, second platform) — superseded by D2.
 
-## 4. Escalate immediately
+## 5. Escalate immediately
 1. G4.1 positive control fails, or G2.6 overfit-one-batch fails.
-2. **D2 returns I ≈ H** — the premise is in trouble.
-3. **D1 returns `programme_only` > `programme_free`** — the collapse story is wrong.
-4. D1's arms cannot be matched on epochs/LR/budget.
-5. The channel vanishes when purity enters (D3) — a finding, but stop and report before building on it.
+2. **D2 returns I ~= H** — the premise is in trouble.
+3. **D1 returns `programme_only` > `programme_free`** — the collapse story is wrong; do not proceed to D2.
+4. The new contrastive term is below 1e-4 x the largest loss term and you cannot fix it.
+5. The channel vanishes when purity enters (D3) — a finding; stop and report before building on it.
+6. **4 audit rounds without a clean GO.**
 
-## 5. Self-audit
-Max **3 agents including yourself**. After each result whose gates pass, spawn **one** adversarial
-auditor instructed to **refute**, defaulting to "artifact" under uncertainty, returning
-ARTIFACT / INCONCLUSIVE / SOUND. Third agent for tiebreak only. ARTIFACT verdicts are logged as
-**defects, not findings**. Log gates to `GATE_LOG.md` and results — including negatives — to
-`EXPERIMENT_LOG.md`. Commit and push per task once gates and audit both pass.
+## 6. Logging and provenance
+Gates -> `v2/research/rebase/nature/GATE_LOG.md`. Results **including negatives** ->
+`v2/research/rebase/nature/EXPERIMENT_LOG.md`. Record device, wall-clock, library versions and the full
+argv per run. Commit and push per task once gates **and** audit both pass. A missing gate row is a FAIL.
 
-**GPU:** required for D1/D2 (this is the first thing on this project that genuinely needs it). D3 is CPU.
-Ask for the SSH login when you need it. Runs must be launched from a **clean worktree** — E0's provenance
-gate fails the run and quarantines output into `FAILED_*.json` otherwise.
+**GPU:** required for D1/D2 — the first thing on this project that genuinely needs it. D3 is CPU. Ask for
+the SSH login when you need it. Launch only from a **clean worktree**.
