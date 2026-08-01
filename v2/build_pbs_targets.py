@@ -166,14 +166,30 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
     split_labels = np.asarray(data.split).astype(str)[retained]
     cancers = np.asarray(getattr(data, "cancers", np.full(len(retained), "NA"))).astype(str)[retained]
     expression = lookup.reindex(patient_ids)[[gene_to_column[gene] for gene in genes]].to_numpy(dtype=np.float32)
+    # Gene-level counterpart of the patient exclusion above. prepare_pancan_rna writes NaN
+    # wherever a gene had zero counts, so a handful of genes are non-finite for some of the
+    # retained patients. Those genes carry no usable signal for THIS cohort; drop them
+    # explicitly, record how many, and re-check the dictionary floor afterwards so the
+    # basis is never quietly built on a thinner gene set than the caller asked for.
+    finite_gene = np.isfinite(expression).all(axis=0)
+    n_nonfinite_genes = int((~finite_gene).sum())
+    if n_nonfinite_genes:
+        if not allow_missing_rna:
+            raise ValueError(f"PBS target RNA has {n_nonfinite_genes} non-finite genes after canonical "
+                             f"patient alignment; pass allow_missing_rna=True to drop them as a recorded deviation")
+        expression = expression[:, finite_gene]
+        genes = [gene for gene, keep_gene in zip(genes, finite_gene.tolist()) if keep_gene]
+        if len(genes) < max(1000, n_components * 4):
+            raise ValueError(f"only {len(genes)} finite genes remain after dropping non-finite columns; "
+                             f"cannot build a stable {n_components}-component PBS dictionary")
     if not np.isfinite(expression).all():
-        raise ValueError("PBS target RNA has non-finite values after canonical patient alignment")
+        raise ValueError("PBS target RNA still has non-finite values after dropping non-finite genes")
     fit_rows = (split_labels == "train" if fit_population == "train" else split_labels != "test")
     transformed_expression, development_mean, development_scale = fit_development_expression_transform(expression, fit_rows)
     # Reference rows are already E0-validated control-centred deltas, so only
     # the development-fitted gene scale applies; centering them at TCGA bulk
     # abundance would erase the intervention interpretation.
-    reference_response = np.asarray(reference.x[:, keep], dtype=np.float32) / development_scale[None, :]
+    reference_response = np.asarray(reference.x[:, keep], dtype=np.float32)[:, finite_gene] / development_scale[None, :]
     dictionary = ReferenceDictionary.fit(reference_response, genes, reference.row_ids, n_components=n_components)
     scores = dictionary.encode_expression(transformed_expression, genes).astype(np.float32)
     if not np.isfinite(scores).all() or np.all(np.std(scores, axis=0) < 1e-8):
@@ -191,6 +207,7 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
         "data_config_sha256": _file_sha256(data_config), "split_file_sha256": _file_sha256(split_file),
         "reference_atoms": len(reference.row_ids), "reference_gene_count": len(reference.genes),
         "overlap_gene_count": len(genes), "overlap_gene_digest": _digest_strings(genes),
+        "nonfinite_genes_dropped": n_nonfinite_genes,
         "canonical_patient_count": int(len(patient_ids)), "patient_id_digest": _digest_strings(patient_ids),
         "split_digest": _digest_strings(split_labels), "target_names": target_names.tolist(),
         "fit_patient_id_digest": _digest_strings(patient_ids[fit_rows]),
