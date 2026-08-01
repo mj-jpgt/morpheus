@@ -1,0 +1,22 @@
+{
+  "levels": [
+    0.0,
+    0.02,
+    0.05,
+    0.1,
+    0.2
+  ],
+  "n_draws": 4,
+  "n_components": 16,
+  "seed": 42,
+  "partition": "test",
+  "confounds": [
+    "cancer",
+    "tss"
+  ],
+  "n_permutations": 60,
+  "permutation_strata": "cancer",
+  "n_targets": 90,
+  "target_group": "all_non_control",
+  "recovery_fraction": 0.8
+}

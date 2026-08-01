@@ -11,3 +11,4 @@ outputs/
 ../data/cache/zenodo/
 ../data/processed/rna/bulkformer/
 ../data/processed/wsi/
+.pytest-e1*/

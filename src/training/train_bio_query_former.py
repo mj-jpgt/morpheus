@@ -82,7 +82,9 @@ def load_bio_query_data(config_path: str, split_file: str | Path, wsi_mode: str 
         patch_paths = [patch_by_patient.get(pid, []) for pid in base.patient_ids]
     elif wsi_mode == "hoptimus_patch":
         hoptimus_store = _open_hoptimus_store(cfg)
-        patch_paths = [[pid] if hoptimus_store.load_patient_tokens(pid, max_tokens=1)[0].shape[0] else [] for pid in base.patient_ids]
+        # Cohort construction is metadata-only.  Do not open the HDF5 feature
+        # store once per patient merely to test token availability.
+        patch_paths = [[pid] if hoptimus_store.patient_token_count(pid) else [] for pid in base.patient_ids]
     elif wsi_mode != "patient":
         raise ValueError(f"Unknown wsi_mode: {wsi_mode}")
     keep = np.ones(len(base.patient_ids), dtype=bool)
