@@ -120,7 +120,7 @@ def annotate_dictionary_axes(dictionary: ReferenceDictionary, output: Path,
 def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
                       perturbation: str, output: str, n_components: int = 128,
                       fit_population: str = "train", gene_annotations: str = "",
-                      allow_missing_rna: bool = False,
+                      allow_missing_rna: bool = False, rna_log_transform: str = "none",
                       max_missing_rna_fraction: float = 0.01) -> dict[str, object]:
     """Create patient-ID keyed PBS codes without fitting on held-out patients."""
     if n_components not in {64, 128, 256}:
@@ -171,6 +171,16 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
     # retained patients. Those genes carry no usable signal for THIS cohort; drop them
     # explicitly, record how many, and re-check the dictionary floor afterwards so the
     # basis is never quietly built on a thinner gene set than the caller asked for.
+    # Declared, not inferred. The prepared PanCan parquet holds raw batch-corrected RSEM,
+    # and fit_development_expression_transform rightly refuses unlogged input. Apply the
+    # SAME transform E0 used (signed_log1p) so the dictionary and the E0 basis-transfer
+    # result describe the same expression space, and record which one was applied.
+    if rna_log_transform == "signed_log1p":
+        expression = np.sign(expression) * np.log2(np.abs(expression) + 1.0)
+    elif rna_log_transform == "clip_log1p":
+        expression = np.log2(np.maximum(expression, 0.0) + 1.0)
+    elif rna_log_transform != "none":
+        raise ValueError(f"unknown rna_log_transform {rna_log_transform!r}")
     finite_gene = np.isfinite(expression).all(axis=0)
     n_nonfinite_genes = int((~finite_gene).sum())
     if n_nonfinite_genes:
@@ -208,6 +218,7 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
         "reference_atoms": len(reference.row_ids), "reference_gene_count": len(reference.genes),
         "overlap_gene_count": len(genes), "overlap_gene_digest": _digest_strings(genes),
         "nonfinite_genes_dropped": n_nonfinite_genes,
+        "rna_log_transform": rna_log_transform,
         "canonical_patient_count": int(len(patient_ids)), "patient_id_digest": _digest_strings(patient_ids),
         "split_digest": _digest_strings(split_labels), "target_names": target_names.tolist(),
         "fit_patient_id_digest": _digest_strings(patient_ids[fit_rows]),
@@ -256,6 +267,8 @@ def main() -> None:
     parser.add_argument("--n-components", type=int, default=128, choices=(64, 128, 256))
     parser.add_argument("--fit-population", default="train", choices=("train", "development"),
                         help="fit train-only for inner diagnostics; rebuild with development for final refit")
+    parser.add_argument("--rna-log-transform", default="none", choices=("none", "signed_log1p", "clip_log1p"),
+                        help="transform applied to the prepared RNA table; use E0's signed_log1p for raw RSEM")
     parser.add_argument("--allow-missing-rna", action="store_true",
                         help="exclude paired patients with no RNA row as a RECORDED cohort deviation")
     parser.add_argument("--max-missing-rna-fraction", type=float, default=0.01,
