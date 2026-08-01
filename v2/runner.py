@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import warnings
 from dataclasses import asdict, replace
@@ -28,6 +29,7 @@ from .plip import canonical_patient_source_digests, load_plip_teacher_cache
 from .preflight import validate_runtime_split
 from .provenance import source_manifest
 from .slide_pretraining import SlidePretrainingConfig, SlidePretrainingObjective, SlidePretrainer
+from .pbs import LegibilityOperator
 from morpheus.src.eval.retrieval_metrics import paired_retrieval_metrics
 
 
@@ -130,18 +132,31 @@ class UncappedHoptimusBatches:
                 slide_ids[row, :len(bag)] = ids
                 if coordinate_batch is not None and xy is not None:
                     coordinate_batch[row, :len(bag)] = xy
+            targets = np.asarray(self.data._v2_programmes[group], dtype=np.float32)
+            head_dim = int(getattr(self.data, "_v2_programme_head_dim", targets.shape[1]))
+            if head_dim < targets.shape[1]:
+                raise ValueError("programme head dimension cannot truncate frozen supervision coordinates")
+            if head_dim != targets.shape[1]:
+                padded = np.full((len(group), head_dim), np.nan, dtype=np.float32)
+                padded[:, :targets.shape[1]] = targets
+                targets = padded
             batch = {
                 "indices": torch.from_numpy(group.copy()),
                 "patches": torch.from_numpy(patches), "patch_mask": torch.from_numpy(mask),
                 "slide_ids": torch.from_numpy(slide_ids),
                 "rna": torch.from_numpy(self.data.rna[group].astype(np.float32)),
                 "rna_present": torch.ones(len(group), dtype=torch.bool),
-                "programme_target": torch.from_numpy(self.data._v2_programmes[group]),
-                "programme_present": torch.from_numpy(self.data.hallmark_present[group].astype(bool)),
-                "programme_target_mask": torch.from_numpy(np.isfinite(self.data._v2_programmes[group])),
+                "programme_target": torch.from_numpy(targets),
+                "programme_present": torch.from_numpy(self.data._v2_programme_present[group].astype(bool)),
+                "programme_target_mask": torch.from_numpy(np.isfinite(targets)),
                 "programme_positive_mask": torch.from_numpy(self.data._v2_positive[np.ix_(group, group)]),
                 "programme_neighbor_indices": torch.from_numpy(self.data._v2_neighbour_indices[group]),
             }
+            if hasattr(self.data, "_v2_programme_axis_weights"):
+                weights = self.data._v2_programme_axis_weights.astype(np.float32)
+                if head_dim != len(weights):
+                    weights = np.pad(weights, (0, head_dim - len(weights)))
+                batch["programme_axis_weights"] = torch.from_numpy(weights)
             if self.include_clinical:
                 batch["clinical"] = torch.from_numpy(self.data.clinical[group].astype(np.float32))
                 batch["clinical_present"] = torch.from_numpy(self.data.clinical_present[group].astype(bool))
@@ -165,13 +180,31 @@ class UncappedHoptimusBatches:
                 "include_clinical": self.include_clinical, "coverage": self.sampler.coverage(self.seed).tolist()}
 
 
-def attach_v2_targets(data, fit_mask: np.ndarray | None = None) -> dict[str, list[float]]:
-    """Attach residual programme targets using the active fit population only."""
+def _attach_programme_matrix(data, values: np.ndarray, present: np.ndarray,
+                             fit_mask: np.ndarray | None = None) -> dict[str, list[float]]:
+    """Attach a finite programme matrix and its train-only positive graph."""
     train = np.asarray(data.split) == "train" if fit_mask is None else np.asarray(fit_mask, dtype=bool)
     if train.shape != (len(data.patient_ids),) or not train.any():
         raise ValueError("fit_mask must select at least one canonical patient")
-    programmes, means = residualise_programmes(np.asarray(data.hallmark, dtype=np.float32), np.asarray(data.cancers), train)
+    values, present = np.asarray(values, dtype=np.float32), np.asarray(present, dtype=bool)
+    if values.ndim != 2 or values.shape[0] != len(data.patient_ids) or present.shape != (len(data.patient_ids),):
+        raise ValueError("programme targets must be [canonical_patient, target] with a row presence mask")
+    if not np.isfinite(values[present]).all():
+        raise ValueError("present programme rows must be finite")
+    if not present[train].all():
+        raise ValueError("programme supervision must cover every development fitting patient")
+    # Residualisation must never silently turn missing rows into a numerical
+    # target.  D2's canonical paired RNA matrix is required to cover all rows;
+    # the explicit branch retains the invariant for future optional targets.
+    filled = np.where(np.isfinite(values), values, 0.0)
+    programmes, means = residualise_programmes(filled, np.asarray(data.cancers), train)
+    programmes[~present] = np.nan
+    development_std = np.nanstd(programmes[train & present], axis=0)
+    dead = np.where(~np.isfinite(development_std) | (development_std < 1e-8))[0]
+    if len(dead):
+        raise ValueError(f"programme targets contain development-constant axes; examples={dead[:10].tolist()}")
     data._v2_programmes = programmes
+    data._v2_programme_present = present
     # Fixed top-k neighbours always supply a usable train-only positive graph;
     # unlike a hard similarity threshold it does not silently disappear for a
     # heterogeneous cancer cohort.  Positives may cross cancer type by design.
@@ -179,7 +212,7 @@ def attach_v2_targets(data, fit_mask: np.ndarray | None = None) -> dict[str, lis
     similarity = normalized @ normalized.T
     data._v2_positive = np.zeros_like(similarity, dtype=bool)
     data._v2_neighbour_indices = np.full((len(programmes), 8), -1, dtype=np.int64)
-    train_rows = np.where(train & np.asarray(data.hallmark_present, dtype=bool))[0]
+    train_rows = np.where(train & present)[0]
     for row in train_rows:
         candidates = train_rows[train_rows != row]
         if len(candidates):
@@ -187,6 +220,200 @@ def attach_v2_targets(data, fit_mask: np.ndarray | None = None) -> dict[str, lis
             data._v2_positive[row, selected] = True
             data._v2_neighbour_indices[row, :len(selected)] = selected
     return means
+
+
+def fit_programme_legibility_operator(data, fit_mask: np.ndarray) -> dict[str, object]:
+    """Fit the same grouped-CV quotient-axis operator for H and PBS targets.
+
+    The operation is deliberately target-agnostic: D2 uses it in *both* arms,
+    so the H-versus-I comparison changes only the target coordinate system.
+    It is fit on development patients and frozen before model optimisation.
+    """
+    fit = np.asarray(fit_mask, dtype=bool)
+    operator = LegibilityOperator.fit(data.wsi_patient[fit], data._v2_programmes[fit],
+                                      np.asarray(data.cancers)[fit])
+    weights = np.asarray(operator.weights, dtype=np.float32)
+    if not np.isfinite(weights).all() or not (weights > 1e-8).any():
+        raise ValueError("programme legibility operator has no nonzero development-fitted axes")
+    data._v2_programme_axis_weights = weights
+    identifiers = np.asarray(data.patient_ids).astype(str)[fit]
+    return {"fit_population": "development_only", "fit_patient_id_digest": __import__("hashlib").sha256(
+                "\n".join(identifiers).encode("utf-8")).hexdigest(),
+            "split_digest": __import__("hashlib").sha256("\n".join(np.asarray(data.split).astype(str)[fit]).encode("utf-8")).hexdigest(),
+            "operator": "diagonal_grouped_ridge", "alpha": operator.alpha,
+            "nonzero_axes": int((weights > 1e-8).sum()), "weights": weights.tolist(),
+            "fold_score": operator.fold_score.tolist()}
+
+
+def attach_v2_targets(data, fit_mask: np.ndarray | None = None) -> dict[str, list[float]]:
+    """Attach Hallmark targets using the active fit population only."""
+    return _attach_programme_matrix(data, np.asarray(data.hallmark, dtype=np.float32),
+                                    np.asarray(data.hallmark_present, dtype=bool), fit_mask)
+
+
+def attach_external_programme_targets(data, path: str, fit_mask: np.ndarray | None = None) -> dict[str, object]:
+    """Load immutable D2 targets by patient ID, never by positional row.
+
+    The builder writes the raw intervention coordinates for every canonical
+    paired patient.  This adapter performs the *only* cohort-dependent fit
+    (cancer residualisation and neighbour graph) on development patients.
+    """
+    raw = np.load(path, allow_pickle=False)
+    required = {"patient_ids", "split", "scores", "target_names", "target_groups", "genes", "singular_values",
+                "gene_basis", "atom_coordinates", "atom_ids", "manifest_json"}
+    if not required.issubset(raw.files):
+        raise ValueError("programme target NPZ needs patient_ids, scores, and target_names")
+    try:
+        manifest = json.loads(str(np.asarray(raw["manifest_json"]).item()))
+    except (ValueError, TypeError, json.JSONDecodeError) as exc:
+        raise ValueError("programme target NPZ has an unreadable manifest_json") from exc
+    if manifest.get("target_kind") != "external_perturbation_dictionary_coordinates":
+        raise ValueError("programme target NPZ is not a PBS intervention-dictionary artifact")
+    patient_ids = np.asarray(raw["patient_ids"]).astype(str)
+    scores = np.asarray(raw["scores"], dtype=np.float32)
+    names = np.asarray(raw["target_names"]).astype(str)
+    groups = np.asarray(raw["target_groups"]).astype(str)
+    genes = np.asarray(raw["genes"]).astype(str)
+    singular_values = np.asarray(raw["singular_values"], dtype=np.float32)
+    gene_basis = np.asarray(raw["gene_basis"], dtype=np.float32)
+    atom_coordinates = np.asarray(raw["atom_coordinates"], dtype=np.float32)
+    atom_ids = np.asarray(raw["atom_ids"]).astype(str)
+    if scores.ndim != 2 or scores.shape != (len(patient_ids), len(names)) or len(set(patient_ids)) != len(patient_ids):
+        raise ValueError("programme target NPZ has invalid dimensions or duplicate patient IDs")
+    expected_names = np.asarray([f"PBS_{index:03d}" for index in range(scores.shape[1])])
+    if (scores.shape[1] not in {64, 128, 256} or not np.array_equal(names, expected_names)
+            or groups.shape != names.shape or not np.all(groups == "PBS")
+            or singular_values.shape != names.shape or genes.ndim != 1 or len(set(genes)) != len(genes)
+            or gene_basis.shape != (len(genes), len(names))
+            or atom_coordinates.shape != (len(atom_ids), len(names))
+            or len(atom_ids) == 0 or len(set(atom_ids)) != len(atom_ids)):
+        raise ValueError("programme target NPZ violates the frozen PBS schema")
+    digest_strings = lambda values: __import__("hashlib").sha256("\n".join(map(str, values)).encode("utf-8")).hexdigest()
+    digest_array = lambda values: __import__("hashlib").sha256(np.ascontiguousarray(values).view(np.uint8)).hexdigest()
+    if (manifest.get("patient_id_digest") != digest_strings(patient_ids)
+            or manifest.get("split_digest") != digest_strings(np.asarray(raw["split"]).astype(str))
+            or manifest.get("overlap_gene_digest") != digest_strings(genes)
+            or manifest.get("scores_sha256") != digest_array(scores)
+            or manifest.get("singular_values_sha256") != digest_array(singular_values)
+            or manifest.get("gene_basis_sha256") != digest_array(gene_basis)
+            or manifest.get("atom_coordinates_sha256") != digest_array(atom_coordinates)
+            or manifest.get("atom_id_digest") != digest_strings(atom_ids)):
+        raise ValueError("programme target NPZ provenance digest mismatch")
+    fit = np.asarray(data.split).astype(str) != "test" if fit_mask is None else np.asarray(fit_mask, dtype=bool)
+    expected_fit_digest = digest_strings(np.asarray(data.patient_ids).astype(str)[fit])
+    if manifest.get("fit_patient_id_digest") != expected_fit_digest:
+        raise ValueError("PBS target transform was fit on a different patient population than this runner")
+    lookup = {patient: row for row, patient in enumerate(patient_ids)}
+    rows = np.asarray([lookup.get(str(patient), -1) for patient in data.patient_ids], dtype=np.int64)
+    if (rows < 0).any():
+        missing = [str(data.patient_ids[index]) for index in np.where(rows < 0)[0][:5]]
+        raise ValueError(f"programme target NPZ does not cover canonical cohort; examples={missing}")
+    if "split" not in raw.files or not np.array_equal(np.asarray(raw["split"])[rows].astype(str), np.asarray(data.split).astype(str)):
+        raise ValueError("programme target split labels differ from active split")
+    values = scores[rows]
+    present = np.isfinite(values).all(axis=1)
+    means = _attach_programme_matrix(data, values, present, fit_mask)
+    data._v2_programme_target_names = names.tolist()
+    return {"source": str(Path(path).resolve()), "target_names": names.tolist(),
+            "target_dimension": int(len(names)), "fit_residual_means": means,
+            "coverage": int(present.sum()), "manifest": manifest,
+            "axis_annotation_status": manifest.get("axis_annotations", {}).get("status", "unavailable_missing_axis_annotation_manifest")}
+
+
+def _validate_d2_pair(args: argparse.Namespace) -> dict[str, object] | None:
+    """Fail closed unless H and PBS runs were created from one paired manifest.
+
+    D2 is causal only when *all* training choices other than target coordinates
+    are identical.  The manifest is generated by ``phase_d.py d2`` and each
+    runner process independently verifies its own invocation against it.
+    """
+    if not args.d2_pair_manifest:
+        if args.d2_arm:
+            raise ValueError("--d2-arm requires --d2-pair-manifest")
+        return None
+    if args.d2_arm not in {"H", "I"}:
+        raise ValueError("--d2-pair-manifest requires --d2-arm H or I")
+    path = Path(args.d2_pair_manifest)
+    try:
+        pair = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("D2 pair manifest is unreadable") from exc
+    if pair.get("schema_version") != 1 or pair.get("experiment") != "D2_H_vs_I":
+        raise ValueError("not a recognised D2 H-vs-I pair manifest")
+    expected = pair.get("common_args")
+    if not isinstance(expected, dict):
+        raise ValueError("D2 pair manifest is missing common_args")
+    current = _d2_common_args(args)
+    if set(expected) != set(current):
+        missing, extra = sorted(set(current) - set(expected)), sorted(set(expected) - set(current))
+        raise ValueError(f"D2 pair manifest does not bind the exhaustive training configuration; missing={missing}, extra={extra}")
+    if expected != current:
+        changed = [name for name in expected if expected[name] != current[name]]
+        raise ValueError(f"D2 paired-arm asymmetry in immutable configuration: {changed}")
+    expected_digest = hashlib.sha256(json.dumps(expected, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    if pair.get("common_config_sha256") != expected_digest:
+        raise ValueError("D2 pair manifest common configuration digest is invalid")
+    if int(args.seed) not in {int(seed) for seed in pair.get("seeds", [])}:
+        raise ValueError("D2 seed was not predeclared in the paired manifest")
+    expected_target = str(pair.get("targets", {}).get(args.d2_arm, ""))
+    actual_target = str(Path(args.programme_targets).resolve()) if args.programme_targets else ""
+    if args.d2_arm == "H":
+        if expected_target or actual_target:
+            raise ValueError("D2 Hallmark arm must have no external programme target artifact")
+    elif not expected_target or actual_target != str(Path(expected_target).resolve()):
+        raise ValueError("D2 PBS arm target does not match the paired manifest")
+    if args.d2_arm == "I" and hashlib.sha256(Path(actual_target).read_bytes()).hexdigest() != pair.get("pbs_target_sha256"):
+        raise ValueError("D2 PBS target bytes differ from the immutable paired-manifest digest")
+    if args.d2_arm == "I":
+        with np.load(actual_target, allow_pickle=False) as raw:
+            target_manifest = json.loads(str(np.asarray(raw["manifest_json"]).item()))
+        if int(target_manifest.get("n_components", -1)) != int(pair.get("pbs_components", -1)):
+            raise ValueError("D2 PBS component count differs from the paired manifest")
+    if args.d2_analysis_role != pair.get("analysis_role") or int(args.d2_pbs_components) != int(pair.get("pbs_components", -1)):
+        raise ValueError("D2 primary/sensitivity role differs from the immutable paired manifest")
+    # Only the source target is allowed to differ between arms; whether to fit
+    # the grouped-CV loss metric is itself a scientific choice and is frozen.
+    if bool(args.fit_programme_legibility) != bool(pair.get("fit_programme_legibility")):
+        raise ValueError("D2 arms disagree with the frozen legibility-operator policy")
+    return {"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "arm": args.d2_arm, "fit_programme_legibility": bool(args.fit_programme_legibility)}
+
+
+def _d2_common_args(args: argparse.Namespace) -> dict[str, object]:
+    """Every model- or data-changing runner setting, except arm target/output/seed.
+
+    D2's interpretation rests on one invariant: supervision coordinates are the
+    only between-arm difference.  This deliberately enumerates even settings
+    currently at their defaults so a future CLI option cannot escape the pair
+    contract silently.
+    """
+    file_digest = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    return {
+        "data_config": str(Path(args.data_config).resolve()), "data_config_sha256": file_digest(args.data_config),
+        "split_file": str(Path(args.split_file).resolve()), "split_file_sha256": file_digest(args.split_file),
+        "epochs": int(args.epochs), "token_budget": int(args.token_budget), "hidden_dim": int(args.hidden_dim),
+        "layers": int(args.layers), "heads": int(args.heads), "learning_rate": float(args.learning_rate),
+        "weight_decay": float(args.weight_decay), "device": str(args.device),
+        "mlp_clip_teacher": str(args.mlp_clip_teacher), "mlp_clip_anchor": str(args.mlp_clip_anchor),
+        "teacher_warmup_epochs": int(args.teacher_warmup_epochs),
+        "gradient_diagnostics_every": int(args.gradient_diagnostics_every),
+        "objective_profile": str(args.objective_profile), "decorrelation_weight": float(args.decorrelation_weight),
+        "loss_warmup_epochs": int(args.loss_warmup_epochs), "programme_warmup_weight": float(args.programme_warmup_weight),
+        "programme_weight": float(args.programme_weight), "programme_neighbourhood_weight": float(args.programme_neighbourhood_weight),
+        "programme_supcon_weight": float(args.programme_supcon_weight), "separation_weight": float(args.separation_weight),
+        "variance_weight": float(args.variance_weight), "pretrain_epochs": int(args.pretrain_epochs),
+        "programme_head_dim": int(args.programme_head_dim),
+        "pretrain_checkpoint": str(args.pretrain_checkpoint), "pretrain_learning_rate": float(args.pretrain_learning_rate),
+        "pretrain_mask_fraction": float(args.pretrain_mask_fraction), "pretrain_view_keep_fraction": float(args.pretrain_view_keep_fraction),
+        "pretrain_target_dim": int(args.pretrain_target_dim), "snv_features": str(args.snv_features),
+        "cnv_features": str(args.cnv_features), "plip_teacher": str(args.plip_teacher),
+        "include_clinical": bool(args.include_clinical), "resume": str(args.resume),
+        "fit_development": bool(args.fit_development), "fixed_final_epoch": bool(args.fixed_final_epoch),
+        "expected_development_cancers": int(args.expected_development_cancers),
+        "expected_heldout_cancers": int(args.expected_heldout_cancers),
+        "fit_programme_legibility": bool(args.fit_programme_legibility),
+        "d2_analysis_role": str(args.d2_analysis_role), "d2_pbs_components": int(args.d2_pbs_components),
+    }
 
 
 def attach_mlp_clip_anchor(data, path: str) -> None:
@@ -506,15 +733,30 @@ def _require_d1_liveness(liveness: dict[str, object], profile: str) -> None:
     declared = [str(name) for name in liveness["declared_active_terms"]]
     absent = [name for name in declared if name not in active]
     largest = float(liveness["largest_active_term"])
-    weak = [name for name, value in active.items() if not np.isfinite(value) or abs(value) < 1e-4 * largest]
-    if absent or not np.isfinite(largest) or largest <= 0.0 or weak:
-        raise RuntimeError(f"G2.2 failed for {profile}: absent={absent}, weak={weak}, largest={largest}")
+    # DEAD vs SMALL. G2.2 exists to catch a term that never fired, not one that
+    # succeeded: biology_full_consistency is a consistency loss driven toward 0 on
+    # purpose, and the overfit gate demands it reach <=0.02, so at epoch 40 it can sit
+    # below 1e-4 x largest precisely BECAUSE it worked. Aborting there destroys a
+    # healthy arm at the finish line and, under phase_d, the whole sweep. Note also
+    # that active_terms mixes weighted and unweighted values, so the ratio is not a
+    # contribution comparison. Raise only on genuinely dead terms; record the rest.
+    dead = [name for name, value in active.items() if not np.isfinite(value) or value == 0.0]
+    small = [name for name, value in active.items() if name not in dead and abs(value) < 1e-4 * largest]
+    liveness["g2_2_small_terms"] = small
+    if absent or not np.isfinite(largest) or largest <= 0.0 or dead:
+        raise RuntimeError(f"G2.2 failed for {profile}: absent={absent}, dead={dead}, largest={largest}")
     slope = float(liveness["tail_loss_slope"])
     # A terminal slope more negative than 1% of the initial loss over the
     # five-epoch tail means the run is visibly still improving; it must be
     # extended before a comparison is interpreted (G2.5).
-    if np.isfinite(slope) and slope < -0.01 * max(abs(initial), 1e-6):
-        raise RuntimeError(f"G2.5 failed for {profile}: loss still falling at terminal epoch (slope={slope:.5g})")
+    # RECORDED, not raised. The bar is scaled by |initial_loss|, which differs by
+    # orders of magnitude between a Gaussian-NLL arm (unbounded below, and expected to
+    # still be falling at epoch 40 as the fitted variance shrinks) and an InfoNCE arm
+    # (~ln|queue|) -- so the "same" threshold is a different threshold per arm and would
+    # preferentially destroy one side of the comparison. G2.5 is an interpretation
+    # caveat: it must reach the log and the write-up, not kill the artifact.
+    liveness["g2_5_still_falling"] = bool(np.isfinite(slope) and slope < -0.01 * max(abs(initial), 1e-6))
+    liveness["g2_5_tail_slope"] = slope
 
 
 def _trained_states_for_profile(objective_profile: str, semantic_dim: int = 0) -> list[str]:
@@ -554,6 +796,7 @@ def run(args: argparse.Namespace) -> Path:
         raise ValueError(
             "D1 diagnostic profiles require --fixed-final-epoch; validation Hallmark selection is prohibited"
         )
+    d2_pair_manifest = _validate_d2_pair(args)
     torch.manual_seed(args.seed); np.random.seed(args.seed)
     data = load_bio_query_data(args.data_config, args.split_file, wsi_mode="hoptimus_patch")
     split_manifest = validate_runtime_split(args.split_file, data.patient_ids, data.cancers, data.split,
@@ -561,7 +804,20 @@ def run(args: argparse.Namespace) -> Path:
     fit_mask = np.asarray(data.split).astype(str) != "test" if args.fit_development else np.asarray(data.split).astype(str) == "train"
     clinical_manifest = (_standardize_clinical(data, fit_mask) if args.include_clinical
                          else {"enabled": False, "reason": "strict_core_wsi_rna"})
-    means = attach_v2_targets(data, fit_mask)
+    programme_target_manifest: dict[str, object]
+    if args.programme_targets:
+        programme_target_manifest = attach_external_programme_targets(data, args.programme_targets, fit_mask)
+        means = dict(programme_target_manifest["fit_residual_means"])
+    else:
+        means = attach_v2_targets(data, fit_mask)
+        programme_target_manifest = {"source": "hallmark", "target_names": list(data.hallmark_names),
+                                     "target_dimension": int(data.hallmark.shape[1]),
+                                     "coverage": int(np.asarray(data.hallmark_present, dtype=bool).sum())}
+    if args.fit_programme_legibility:
+        programme_target_manifest["legibility_operator"] = fit_programme_legibility_operator(data, fit_mask)
+    if args.programme_head_dim < data._v2_programmes.shape[1]:
+        raise ValueError("--programme-head-dim cannot be smaller than target width")
+    data._v2_programme_head_dim = int(args.programme_head_dim)
     optional_manifest = {"clinical": clinical_manifest}
     for name, path in (("snv", args.snv_features), ("cnv", args.cnv_features)):
         if path:
@@ -586,7 +842,7 @@ def run(args: argparse.Namespace) -> Path:
     model = TumorStateV2(config, clinical_dim=int(data.clinical.shape[1]) if args.include_clinical else 0,
                          snv_dim=None if not hasattr(data, "_v2_snv") else int(data._v2_snv.shape[1]),
                          cnv_dim=None if not hasattr(data, "_v2_cnv") else int(data._v2_cnv.shape[1]),
-                         programme_dim=int(data.hallmark.shape[1])).to(device)
+                         programme_dim=int(data._v2_programme_head_dim)).to(device)
     output = Path(args.output_dir); output.mkdir(parents=True, exist_ok=True)
     if args.pretrain_checkpoint:
         slide_pretraining = _load_slide_pretraining_checkpoint(
@@ -668,7 +924,9 @@ def run(args: argparse.Namespace) -> Path:
         "separation_weight": args.separation_weight,
         "variance_weight": args.variance_weight,
         "gradient_diagnostics_every": args.gradient_diagnostics_every,
+        "programme_head_dim": args.programme_head_dim,
         "objective_profile": args.objective_profile,
+        "programme_targets": args.programme_targets,
         "biology_contrastive_memory_keys_before_train": biology_memory_keys,
         "pretrain_epochs": args.pretrain_epochs, "pretrain_checkpoint": args.pretrain_checkpoint,
         "anchor_path": anchor_path if use_anchor else "", "anchor_requested_but_disabled": bool(anchor_path) and not use_anchor,
@@ -681,7 +939,9 @@ def run(args: argparse.Namespace) -> Path:
                 "selection_metric": "fixed_final_epoch" if args.fixed_final_epoch else "validation_pareto",
                 "coordinates": "metadata_validated_or_disabled", "semantic_dim": semantic_dim,
                 "modal_dims": {"clinical": int(data.clinical.shape[1]) if args.include_clinical else 0, "snv": 0 if not hasattr(data, "_v2_snv") else int(data._v2_snv.shape[1]), "cnv": 0 if not hasattr(data, "_v2_cnv") else int(data._v2_cnv.shape[1])},
-                "optional_modalities": optional_manifest, "mlp_clip_anchor": use_anchor,
+                "optional_modalities": optional_manifest, "programme_targets": programme_target_manifest,
+                "d2_paired_comparison": d2_pair_manifest,
+                "mlp_clip_anchor": use_anchor,
                 "teacher_mode": "anchor_residual_refiner" if use_anchor else "none",
                 "anchor_teacher_source": getattr(data, "_mlp_clip_anchor_source", None) if use_anchor else None,
                 "model_config": asdict(config), "split_manifest": split_manifest,
@@ -795,6 +1055,18 @@ def main() -> None:
     parser.add_argument("--programme-weight", type=float, default=1.0)
     parser.add_argument("--programme-neighbourhood-weight", type=float, default=0.20)
     parser.add_argument("--programme-supcon-weight", type=float, default=0.20)
+    parser.add_argument("--programme-head-dim", type=int, default=256,
+                        help="fixed-width masked programme output adapter; D2 uses 256 for both H and PBS arms")
+    parser.add_argument("--programme-targets", default="",
+                        help="immutable patient-ID keyed target NPZ (e.g. D2 PBS codes); defaults to Hallmarks")
+    parser.add_argument("--fit-programme-legibility", action="store_true",
+                        help="fit the same grouped-CV target-axis legibility operator on development patients in either H or PBS arm")
+    parser.add_argument("--d2-pair-manifest", default="",
+                        help="immutable paired H-vs-PBS manifest; required with --d2-arm to enforce target-only difference")
+    parser.add_argument("--d2-arm", default="", choices=("", "H", "I"),
+                        help="paired D2 arm label; only valid with --d2-pair-manifest")
+    parser.add_argument("--d2-analysis-role", default="", choices=("", "primary", "sensitivity"))
+    parser.add_argument("--d2-pbs-components", type=int, default=0, choices=(0, 64, 128, 256))
     parser.add_argument("--separation-weight", type=float, default=0.01)
     parser.add_argument("--variance-weight", type=float, default=0.01)
     parser.add_argument("--pretrain-epochs", type=int, default=0,

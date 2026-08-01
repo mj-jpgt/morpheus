@@ -8,8 +8,23 @@ import torch
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
 from .model import TumorStateV2, V2ModelConfig
 from .runner import (UncappedHoptimusBatches, _attach_numeric_table,
-                     _standardize_clinical, attach_mlp_clip_anchor, attach_v2_targets)
+                     _standardize_clinical, attach_mlp_clip_anchor, attach_v2_targets,
+                     attach_external_programme_targets)
 from .contracts import trainable_state_names
+
+
+def _programme_head_dim(manifest: dict, data) -> int:
+    """Head width the CHECKPOINT was built with, not the raw target width.
+
+    Training widens the programme head to --programme-head-dim (default 256) and
+    pads the target; loading with the raw width (50 Hallmark / 128 PBS) raises
+    "size mismatch for programme_mean.weight" and every export fails after the
+    GPU time is already spent.
+    """
+    recorded = (manifest.get("run_configuration") or {}).get("programme_head_dim")
+    if recorded:
+        return int(recorded)
+    return int(getattr(data, "_v2_programme_head_dim", 0) or data._v2_programmes.shape[1])
 
 
 def main() -> None:
@@ -20,11 +35,36 @@ def main() -> None:
     p.add_argument("--layers", type=int, default=4); p.add_argument("--heads", type=int, default=8); p.add_argument("--device", default="cuda")
     p.add_argument("--semantic-dim", type=int, default=0)
     p.add_argument("--mlp-clip-anchor", default="")
+    p.add_argument("--programme-targets", default="",
+                   help="immutable PBS target artifact required to export a PBS-supervised checkpoint")
     p.add_argument("--snv-features", default=""); p.add_argument("--cnv-features", default="")
     p.add_argument("--diagnostics-output", default="", help="optional JSON sidecar for anchor/slot diagnostics")
-    a = p.parse_args(); data = load_bio_query_data(a.data_config, a.split_file, wsi_mode="hoptimus_patch"); attach_v2_targets(data)
+    a = p.parse_args(); data = load_bio_query_data(a.data_config, a.split_file, wsi_mode="hoptimus_patch")
     checkpoint = torch.load(a.checkpoint, map_location=a.device, weights_only=False)
     manifest = checkpoint.get("manifest", {})
+    fit_mask = (np.asarray(data.split).astype(str) != "test" if manifest.get("fit_population") == "development_train_val"
+                else np.asarray(data.split).astype(str) == "train")
+    programme_manifest = manifest.get("programme_targets", {})
+    if programme_manifest.get("source") == "hallmark":
+        if a.programme_targets:
+            raise ValueError("Hallmark-supervised checkpoint must not be exported with a PBS target artifact")
+        attach_v2_targets(data, fit_mask)
+    else:
+        if not a.programme_targets:
+            raise ValueError("PBS-supervised checkpoint export requires --programme-targets")
+        attached = attach_external_programme_targets(data, a.programme_targets, fit_mask)
+        if int(attached["target_dimension"]) != int(programme_manifest.get("target_dimension", -1)):
+            raise ValueError("PBS target width differs from the training checkpoint")
+        expected_pbs = programme_manifest.get("manifest")
+        if not isinstance(expected_pbs, dict):
+            raise ValueError("PBS-supervised checkpoint lacks immutable target provenance")
+        actual_pbs = attached["manifest"]
+        immutable = ("target_kind", "patient_id_digest", "split_digest", "overlap_gene_digest",
+                     "fit_patient_id_digest", "scores_sha256", "singular_values_sha256",
+                     "gene_basis_sha256", "atom_coordinates_sha256", "atom_id_digest")
+        changed = [key for key in immutable if expected_pbs.get(key) != actual_pbs.get(key)]
+        if changed:
+            raise ValueError(f"PBS export target provenance differs from training checkpoint: {changed}")
     trained = tuple(manifest.get("trained_states", ("wsi_identity", "rna_identity")))
     semantic_dim = int(manifest.get("semantic_dim", a.semantic_dim)); dims = manifest.get("modal_dims", {})
     use_clinical = int(dims.get("clinical", 0)) > 0
@@ -49,7 +89,7 @@ def main() -> None:
                              semantic_dim=semantic_dim, use_mlp_clip_anchor=bool(manifest.get("mlp_clip_anchor", False)))
     model = TumorStateV2(cfg, clinical_dim=int(dims.get("clinical", data.clinical.shape[1])),
                          snv_dim=int(dims.get("snv", 0)) or None, cnv_dim=int(dims.get("cnv", 0)) or None,
-                         programme_dim=int(data.hallmark.shape[1])).to(a.device)
+                         programme_dim=_programme_head_dim(manifest, data)).to(a.device)
     model.load_state_dict(checkpoint["model"]); model.eval()
     widths = {"wsi_identity": 256, "rna_identity": 256, "wsi_biology": 256, "rna_biology": 256,
               "full_identity": 256, "full_biology": 256, "full_patient": 256}

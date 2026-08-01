@@ -253,7 +253,7 @@ class V2Trainer:
             target_mask = target_mask[present]
         programme = gaussian_nll(
             state["programme_mean"][present], state["programme_log_variance"][present],
-            batch["programme_target"][present], target_mask,
+            batch["programme_target"][present], target_mask, batch.get("programme_axis_weights"),
         )
         nll_term = weights["programme"] * programme
         value, metrics = nll_term, {"programme": float(programme.detach())}
@@ -263,8 +263,17 @@ class V2Trainer:
         components: dict[str, torch.Tensor] = {"programme_nll": nll_term}
         structure_present = present
         if target_mask is not None:
+            # Restrict the completeness test to REAL programme axes. The head is
+            # widened to --programme-head-dim and the target padded with NaN, so a
+            # plain .all(dim=1) is False for every row the moment head_dim exceeds
+            # the target width -- which silently disabled neighbour-KL and supcon in
+            # every programme_only run at the default head_dim=256. Those two losses
+            # ARE the diagnosed collapse mechanism, so D1 would have compared the
+            # wrong thing and then aborted at epoch 40 on the G2.2 liveness check.
+            real_axis = target_mask.any(dim=0)
             structure_present = present.clone()
-            structure_present[present] = target_mask.all(dim=1)
+            structure_present[present] = (target_mask[:, real_axis].all(dim=1) if bool(real_axis.any())
+                                          else torch.zeros(len(target_mask), dtype=torch.bool, device=target_mask.device))
         if include_structure and weights["neighbourhood"] and structure_present.any():
             neighbourhood = programme_neighbourhood_loss(state["z_biology"][structure_present], batch["programme_target"][structure_present])
             components["programme_neighbour"] = weights["neighbourhood"] * neighbourhood

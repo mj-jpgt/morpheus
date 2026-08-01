@@ -128,3 +128,37 @@ def test_programme_free_rejects_a_detached_biology_state() -> None:
     # the real overfit/liveness check.
     loss.backward()
     assert trainer._gradient_group_norms()["biology_programme"] == 0.0
+
+
+# --- REGRESSION: the padded-head structure gate ------------------------------
+
+def test_structure_losses_survive_a_padded_programme_head():
+    """--programme-head-dim (default 256) pads the 50-wide Hallmark target with NaN.
+    A plain target_mask.all(dim=1) is then False for EVERY row, which silently
+    disabled neighbour-KL and supcon in every programme_only run -- and those two
+    losses ARE the collapse mechanism D1 exists to test. It then aborted at epoch 40
+    on the G2.2 liveness check, i.e. after the GPU time was already spent."""
+    import numpy as np, torch
+    for head_dim, expected in ((50, 6), (128, 6), (256, 6)):
+        targets = np.random.default_rng(0).normal(size=(6, 50)).astype(np.float32)
+        padded = np.full((6, head_dim), np.nan, dtype=np.float32)
+        padded[:, :50] = targets
+        mask = torch.from_numpy(np.isfinite(padded))
+        real_axis = mask.any(dim=0)
+        gate = mask[:, real_axis].all(dim=1) if bool(real_axis.any()) else torch.zeros(6, dtype=torch.bool)
+        assert int(gate.sum()) == expected, f"head_dim={head_dim} gated {int(gate.sum())}/6 rows"
+        if head_dim > 50:
+            assert int(mask.all(dim=1).sum()) == 0, "fixture must reproduce the original defect"
+
+
+def test_a_row_with_a_genuinely_missing_axis_is_still_excluded():
+    """The fix must not become permissive: a patient missing a REAL Hallmark axis
+    must still be excluded from the structure losses."""
+    import numpy as np, torch
+    padded = np.full((4, 256), np.nan, dtype=np.float32)
+    padded[:, :50] = np.random.default_rng(1).normal(size=(4, 50))
+    padded[2, 7] = np.nan                      # one real axis genuinely missing
+    mask = torch.from_numpy(np.isfinite(padded))
+    real_axis = mask.any(dim=0)
+    gate = mask[:, real_axis].all(dim=1)
+    assert gate.tolist() == [True, True, False, True]
