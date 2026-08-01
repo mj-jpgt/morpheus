@@ -44,23 +44,35 @@ def main() -> None:
     parser.add_argument("--pbs-artifacts", nargs="+", required=True)
     parser.add_argument("--targets", required=True); parser.add_argument("--output", required=True)
     parser.add_argument("--repeats", type=int, default=2000); parser.add_argument("--seed", type=int, default=42)
+    # D1 reuses this exact comparison for programme_only vs programme_free. The
+    # arithmetic is identical; only the arm names change, and a result labelled
+    # "pbs_minus_h" for a D1 run would be a lie in the output file.
+    parser.add_argument("--label-a", default="hallmark", help="name of the reference arm in the output")
+    parser.add_argument("--label-b", default="pbs", help="name of the contrast arm in the output")
+    parser.add_argument("--experiment", default="D2")
     args = parser.parse_args()
+    # The output keys are built from these labels, so a collision would overwrite
+    # an arm's path or point estimate with the other's and still emit valid JSON.
+    reserved = {"n_test", "confounds", "pairs", "experiment", "arm_a", "arm_b"}
+    if args.label_a == args.label_b or {args.label_a, args.label_b} & reserved:
+        raise ValueError(f"--label-a/--label-b must differ and avoid the reserved keys {sorted(reserved)}")
     if len(args.hallmark_artifacts) != len(args.pbs_artifacts):
-        raise ValueError("D2 requires one seed-matched Hallmark/PBS artifact pair")
+        raise ValueError(f"{args.experiment} requires one seed-matched artifact pair per seed")
     target_index, target_scores = _targets(args.targets)
-    result: dict[str, object] = {"pairs": []}
+    result: dict[str, object] = {"experiment": args.experiment, "arm_a": args.label_a,
+                                 "arm_b": args.label_b, "pairs": []}
     for pair_index, (h_path, i_path) in enumerate(zip(args.hallmark_artifacts, args.pbs_artifacts)):
         h, i = _load(h_path), _load(i_path)
         for field in ("patient_ids", "split", "cancers"):
             if not np.array_equal(h[field].astype(str), i[field].astype(str)):
-                raise ValueError(f"H/PBS frozen artifacts disagree on {field}")
+                raise ValueError(f"paired frozen artifacts disagree on {field}")
         test = h["split"].astype(str) == "test"; ids = h["patient_ids"].astype(str)[test]
         rows = np.asarray([target_index.get(identifier, -1) for identifier in ids])
         if (rows < 0).any():
-            raise ValueError("frozen RNA target artifact does not cover a D2 test patient")
+            raise ValueError("frozen RNA target artifact does not cover a held-out test patient")
         y, hx, ix = target_scores[rows], h["wsi_biology"].astype(np.float64)[test], i["wsi_biology"].astype(np.float64)[test]
         if not np.isfinite(y).all() or np.any(np.std(y, axis=0) < 1e-8):
-            raise ValueError("D2 evaluated RNA targets are non-finite or constant")
+            raise ValueError("evaluated RNA targets are non-finite or constant")
         cancers = h["cancers"].astype(str)[test]
         tss, frequent_sites = pooled_tissue_source_site(ids, min_site_count=10)
         def paired_metric(actual: np.ndarray, representation: np.ndarray) -> float:
@@ -76,9 +88,10 @@ def main() -> None:
         residual_i = cross_fitted_residuals(ix, design, seed=args.seed)
         comparison = paired_multivariate_patient_and_cancer_bootstrap(
             paired_metric, residual_y, residual_h, residual_i, cancers, repeats=args.repeats, seed=args.seed + pair_index)
-        result["pairs"].append({"hallmark": str(Path(h_path).resolve()), "pbs": str(Path(i_path).resolve()),
-                                "n_test": int(test.sum()), "point_h": paired_metric(residual_y, residual_h),
-                                "point_i": paired_metric(residual_y, residual_i), "pbs_minus_h": comparison,
+        result["pairs"].append({args.label_a: str(Path(h_path).resolve()), args.label_b: str(Path(i_path).resolve()),
+                                "n_test": int(test.sum()), f"point_{args.label_a}": paired_metric(residual_y, residual_h),
+                                f"point_{args.label_b}": paired_metric(residual_y, residual_i),
+                                f"{args.label_b}_minus_{args.label_a}": comparison,
                                 "confounds": {"columns": ["cancer", "tss"], "min_site_count": 10,
                                               "n_distinct_sites_kept": len(frequent_sites)}})
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)

@@ -22,6 +22,7 @@ import pandas as pd
 
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
 from .calibra.e0_basis_transfer import _load_perturbation
+from .preflight import restrict_cohort_to_split
 from .pbs import ReferenceDictionary
 
 
@@ -121,13 +122,20 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
                       perturbation: str, output: str, n_components: int = 128,
                       fit_population: str = "train", gene_annotations: str = "",
                       allow_missing_rna: bool = False, rna_log_transform: str = "none",
-                      max_missing_rna_fraction: float = 0.01) -> dict[str, object]:
+                      max_missing_rna_fraction: float = 0.01,
+                      restrict_to_split: bool = False) -> dict[str, object]:
     """Create patient-ID keyed PBS codes without fitting on held-out patients."""
     if n_components not in {64, 128, 256}:
         raise ValueError("PBS component sensitivity is predeclared at 64, 128, or 256")
     if fit_population not in {"train", "development"}:
         raise ValueError("PBS fit_population must be train or development")
     data = load_bio_query_data(data_config, split_file, wsi_mode="hoptimus_patch")
+    # The runner derives `fit_patient_id_digest` from the cohort IT trains on. If the
+    # runner restricts to the split and this builder does not, the digests cannot match
+    # and the targets are rejected -- correctly, but only after the training has run.
+    restriction: dict[str, object] = {"enabled": False}
+    if restrict_to_split:
+        data, restriction = restrict_cohort_to_split(data, split_file)
     reference = _load_perturbation(Path(perturbation))
     import pyarrow.parquet as pq
     schema_names = pq.ParquetFile(rna_table).schema_arrow.names
@@ -194,6 +202,13 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
                              f"cannot build a stable {n_components}-component PBS dictionary")
     if not np.isfinite(expression).all():
         raise ValueError("PBS target RNA still has non-finite values after dropping non-finite genes")
+    # `!= "test"` treats an UNASSIGNED patient as development. With a stale split
+    # most unassigned patients belong to held-out cancers, so this would fit the
+    # expression transform on precisely the patients the protocol excludes.
+    if fit_population == "development" and (split_labels == "excluded").any():
+        raise ValueError(
+            f"{int((split_labels == 'excluded').sum())} patients carry no split assignment, and a "
+            f"development fit would silently absorb them; pass --restrict-to-split or rebuild the split")
     fit_rows = (split_labels == "train" if fit_population == "train" else split_labels != "test")
     transformed_expression, development_mean, development_scale = fit_development_expression_transform(expression, fit_rows)
     # Reference rows are already E0-validated control-centred deltas, so only
@@ -239,6 +254,8 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
         "atom_coordinates_sha256": _digest_array(dictionary.atom_coordinates.astype(np.float32)),
         "atom_id_digest": _digest_strings(dictionary.atom_ids),
         "axis_annotations": annotation_manifest,
+        "cohort_restriction": {key: value for key, value in restriction.items() if key != "dropped_patients"},
+        "cohort_restriction_dropped_patients": list(restriction.get("dropped_patients", [])),
     }
     with tempfile.NamedTemporaryFile(dir=output_path.parent, suffix=".npz", delete=False) as handle:
         temporary = Path(handle.name)
@@ -273,6 +290,8 @@ def main() -> None:
                         help="exclude paired patients with no RNA row as a RECORDED cohort deviation")
     parser.add_argument("--max-missing-rna-fraction", type=float, default=0.01,
                         help="refuse if the exclusion exceeds this fraction; beyond it this is a cohort change")
+    parser.add_argument("--restrict-to-split", action="store_true",
+                        help="treat the split file as the authoritative cohort, exactly as the runner does")
     parser.add_argument("--gene-annotations", default="", help="optional gene-level proliferation/essentiality annotation table; missing data is reported unavailable")
     print(json.dumps(build_pbs_targets(**vars(parser.parse_args())), indent=2, sort_keys=True))
 

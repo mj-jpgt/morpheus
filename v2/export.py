@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
+from .preflight import restrict_cohort_to_split, split_file_digest
 from .model import TumorStateV2, V2ModelConfig
 from .runner import (UncappedHoptimusBatches, _attach_numeric_table,
                      _standardize_clinical, attach_mlp_clip_anchor, attach_v2_targets,
@@ -39,9 +40,21 @@ def main() -> None:
                    help="immutable PBS target artifact required to export a PBS-supervised checkpoint")
     p.add_argument("--snv-features", default=""); p.add_argument("--cnv-features", default="")
     p.add_argument("--diagnostics-output", default="", help="optional JSON sidecar for anchor/slot diagnostics")
-    a = p.parse_args(); data = load_bio_query_data(a.data_config, a.split_file, wsi_mode="hoptimus_patch")
+    a = p.parse_args()
     checkpoint = torch.load(a.checkpoint, map_location=a.device, weights_only=False)
     manifest = checkpoint.get("manifest", {})
+    # The cohort comes from the CHECKPOINT, never from a flag. Exporting against a
+    # different split than the model trained on scores a different set of patients,
+    # and a paired comparison would not notice because BOTH arms would be wrong.
+    # The PBS branch below catches it incidentally via its target fit digest; the
+    # Hallmark branch -- which is the whole D1 path -- has no other check.
+    trained_split = manifest.get("split_manifest") or {}
+    if trained_split.get("split_digest") and trained_split["split_digest"] != split_file_digest(a.split_file):
+        raise ValueError(f"--split-file does not match the split this checkpoint was trained on "
+                         f"(expected digest {trained_split['split_digest'][:16]}...)")
+    data = load_bio_query_data(a.data_config, a.split_file, wsi_mode="hoptimus_patch")
+    if (trained_split.get("cohort_restriction") or {}).get("enabled"):
+        data, _ = restrict_cohort_to_split(data, a.split_file)
     fit_mask = (np.asarray(data.split).astype(str) != "test" if manifest.get("fit_population") == "development_train_val"
                 else np.asarray(data.split).astype(str) == "train")
     programme_manifest = manifest.get("programme_targets", {})

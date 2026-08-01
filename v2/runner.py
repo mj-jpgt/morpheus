@@ -26,7 +26,7 @@ from .model import TumorStateV2, V2ModelConfig
 from .training import V2LossSchedule, V2Trainer
 from .contracts import trainable_state_names
 from .plip import canonical_patient_source_digests, load_plip_teacher_cache
-from .preflight import validate_runtime_split
+from .preflight import restrict_cohort_to_split, validate_runtime_split
 from .provenance import source_manifest
 from .slide_pretraining import SlidePretrainingConfig, SlidePretrainingObjective, SlidePretrainer
 from .pbs import LegibilityOperator
@@ -412,6 +412,9 @@ def _d2_common_args(args: argparse.Namespace) -> dict[str, object]:
         "expected_development_cancers": int(args.expected_development_cancers),
         "expected_heldout_cancers": int(args.expected_heldout_cancers),
         "fit_programme_legibility": bool(args.fit_programme_legibility),
+        # The cohort is a data-changing setting: two arms trained on different
+        # patient sets are not a target-only ablation, so it is bound here too.
+        "restrict_to_split": bool(args.restrict_to_split),
         "d2_analysis_role": str(args.d2_analysis_role), "d2_pbs_components": int(args.d2_pbs_components),
     }
 
@@ -799,8 +802,12 @@ def run(args: argparse.Namespace) -> Path:
     d2_pair_manifest = _validate_d2_pair(args)
     torch.manual_seed(args.seed); np.random.seed(args.seed)
     data = load_bio_query_data(args.data_config, args.split_file, wsi_mode="hoptimus_patch")
+    restriction: dict[str, object] = {"enabled": False}
+    if args.restrict_to_split:
+        data, restriction = restrict_cohort_to_split(data, args.split_file)
     split_manifest = validate_runtime_split(args.split_file, data.patient_ids, data.cancers, data.split,
                                             args.expected_development_cancers, args.expected_heldout_cancers)
+    split_manifest["cohort_restriction"] = restriction
     fit_mask = np.asarray(data.split).astype(str) != "test" if args.fit_development else np.asarray(data.split).astype(str) == "train"
     clinical_manifest = (_standardize_clinical(data, fit_mask) if args.include_clinical
                          else {"enabled": False, "reason": "strict_core_wsi_rna"})
@@ -1082,6 +1089,9 @@ def main() -> None:
     parser.add_argument("--plip-teacher", default="", help="checksum-audited frozen PLIP patient target cache")
     parser.add_argument("--include-clinical", action="store_true", help="enable audited clinical tokens; strict core leaves them absent")
     parser.add_argument("--resume", default="", help="resume a V2 checkpoint with matching split provenance")
+    parser.add_argument("--restrict-to-split", action="store_true",
+                        help="treat the split file as the authoritative cohort: drop loaded patients it "
+                             "does not assign, and record every dropped identifier in the manifest")
     parser.add_argument("--fit-development", action="store_true",
                         help="final refit on train+validation only; epoch count must already be selected")
     parser.add_argument("--fixed-final-epoch", action="store_true",

@@ -22,6 +22,7 @@ def _args(manifest, arm="H", targets=""):
         pretrain_epochs=0, pretrain_checkpoint="", pretrain_learning_rate=2e-4, pretrain_mask_fraction=.3,
         pretrain_view_keep_fraction=.7, pretrain_target_dim=128, snv_features="", cnv_features="", plip_teacher="",
         include_clinical=False, resume="", fit_development=True, expected_development_cancers=11, expected_heldout_cancers=22,
+        restrict_to_split=False,
     )
 
 
@@ -43,6 +44,7 @@ def test_d2_pair_manifest_rejects_arm_asymmetry(tmp_path):
               "snv_features": "", "cnv_features": "", "plip_teacher": "", "include_clinical": False,
               "resume": "", "fit_development": True, "expected_development_cancers": 11,
               "expected_heldout_cancers": 22, "fit_programme_legibility": True,
+              "restrict_to_split": False,
               "d2_analysis_role": "primary", "d2_pbs_components": 128}
     manifest = tmp_path / "pair.json"
     manifest.write_text(json.dumps({"schema_version": 1, "experiment": "D2_H_vs_I", "common_args": common,
