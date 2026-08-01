@@ -602,6 +602,7 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
             raise RuntimeError("programme_only G2.6 loss is detached from the actual model")
         return loss, metrics
 
+    trajectory: list[dict[str, float]] = []
     initial_loss, initial_metrics = objective()
     initial = float(initial_loss.detach().cpu())
     # Holding `initial_loss` would pin one full activation graph for all 300
@@ -618,10 +619,21 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
             if missing:
                 raise RuntimeError(f"programme_only G2.6 has detached trainable groups: {missing}")
         optimiser.step()
+        # Record the descent in situ. A single terminal number cannot tell a
+        # dead implementation ("flat from step 0") apart from an unconverged
+        # one ("still falling at the last step") apart from an unstable one
+        # ("fell, then reversed"), and those three demand different responses.
+        if step % 25 == 0 or step == steps - 1:
+            trajectory.append({"step": int(step), "loss": float(loss.detach().cpu())})
     final_loss, final_metrics = objective()
     final = float(final_loss.detach().cpu())
+    tail = [row["loss"] for row in trajectory[-4:]]
     return {
         "batch_patients": int(len(fixed_batch["indices"])),
+        "trajectory": trajectory,
+        "still_descending": bool(len(tail) >= 2 and tail[-1] < tail[0]),
+        "best_loss": float(min(row["loss"] for row in trajectory)) if trajectory else float("nan"),
+        "best_step": int(min(trajectory, key=lambda row: row["loss"])["step"]) if trajectory else -1,
         "initial_loss": initial, "final_loss": final,
         "initial_programme": float(initial_metrics.get("programme", float("nan"))),
         "final_programme": float(final_metrics.get("programme", float("nan"))),
@@ -1047,7 +1059,19 @@ def run(args: argparse.Namespace) -> Path:
     overfit = d1_overfit if args.objective_profile in {"programme_only", "programme_free"} else {"status": "not_applicable_identity_only"}
     last = epoch_rows[-1] if epoch_rows else {}
     first = epoch_rows[0] if epoch_rows else {}
-    loss_initial, loss_final = float(first.get("train_loss", float("nan"))), float(last.get("train_loss", float("nan")))
+    # G2.4 must compare LIKE WITH LIKE. `train_loss` at epoch 0 is a different
+    # objective from `train_loss` at epoch 39: neighbourhood and supcon are off
+    # during the warmup and switch on at --loss-warmup-epochs, so the total
+    # necessarily JUMPS there (measured: 0.528 at epoch 3 -> 5.330 at epoch 4).
+    # Comparing across that boundary made a run that fell 5.33 -> 3.19, a 40%
+    # reduction in the objective it actually optimised, read as "did not
+    # decrease >=20%" and destroyed it after all 40 epochs had been paid for.
+    # Epoch 0 is still recorded; the GATE reads the first comparable epoch.
+    comparable = [row for row in epoch_rows if int(row.get("epoch", 0)) >= int(args.loss_warmup_epochs)]
+    first_comparable = comparable[0] if comparable else first
+    loss_initial = float(first.get("train_loss", float("nan")))
+    loss_initial_comparable = float(first_comparable.get("train_loss", float("nan")))
+    loss_final = float(last.get("train_loss", float("nan")))
     declared_weights = trainer.schedule.weights(max(args.epochs - 1, 0))
     metric_for_loss = {
         "programme": "train_programme", "neighbourhood": "train_wsi_neighbourhood",
@@ -1064,7 +1088,13 @@ def run(args: argparse.Namespace) -> Path:
         "gradient_norms_first": {key.removeprefix("train_gradient_norm_").removesuffix("_first"): value for key, value in first.items() if key.startswith("train_gradient_norm_") and key.endswith("_first")},
         "gradient_norms_last": {key.removeprefix("train_gradient_norm_").removesuffix("_last"): value for key, value in last.items() if key.startswith("train_gradient_norm_") and key.endswith("_last")},
         "loss_initial": loss_initial, "loss_final": loss_final,
-        "loss_relative_reduction": float((loss_initial - loss_final) / max(abs(loss_initial), 1e-12)),
+        "loss_initial_comparable": loss_initial_comparable,
+        "loss_comparable_from_epoch": int(first_comparable.get("epoch", 0)),
+        "loss_warmup_epochs": int(args.loss_warmup_epochs),
+        "loss_relative_reduction_from_epoch_zero": float(
+            (loss_initial - loss_final) / max(abs(loss_initial), 1e-12)),
+        "loss_relative_reduction": float(
+            (loss_initial_comparable - loss_final) / max(abs(loss_initial_comparable), 1e-12)),
         "tail_loss_slope": float(np.polyfit(np.arange(min(5, len(epoch_rows))),
                                               [float(row.get("train_loss", float("nan"))) for row in epoch_rows[-min(5, len(epoch_rows)):]], 1)[0])
         if len(epoch_rows) >= 2 else float("nan"),
