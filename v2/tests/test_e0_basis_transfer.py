@@ -13,6 +13,7 @@ All fixtures are small, synthetic and CPU-only; no GPU and no data files.
 from __future__ import annotations
 
 import numpy as np
+import pytest
 import torch
 
 from morpheus.v2.calibra.e0_basis_transfer import (
@@ -459,3 +460,31 @@ def test_n_matching_is_symmetric():
     assert len(rows2["responsive_matched"]) == len(rows2["nonresponsive"]) == 40, meta2
     # subsampled rows must be a genuine subset of the source arm
     assert set(rows2["responsive_matched"]).issubset(set(rows2["responsive_full"]))
+
+
+def test_arm_max_rows_caps_both_arms_for_cross_context_comparison():
+    """n-matching is WITHIN a context; the cross-lineage claim is ACROSS contexts.
+    At nonresponsive_p=0.2 K562 has 2501 control rows and RPE1 has 168, and measured
+    attenuation from sample size alone is ~38% -- so 'K562 passes, RPE1 fails' would be a
+    sample-size artifact, not lineage specificity. Both arms must be capped at a common n."""
+    from morpheus.v2.calibra.e0_basis_transfer import _energy_arms, TransferConfig
+    energy = np.concatenate([np.full(2000, 0.001), np.full(900, 0.9)])
+    capped = TransferConfig(responsive_p=0.01, nonresponsive_p=0.5, arm_max_rows=168)
+    rows, meta = _energy_arms(energy, cfg=capped, seed=0)
+    assert len(rows["responsive_matched"]) == len(rows["nonresponsive"]) == 168, meta
+    # the pre-subsample pool sizes must survive: in a sweep the arm sizes ARE the run identity
+    assert meta["n_nonresponsive_full"] == 900
+    assert meta["n_responsive_full"] == 2000
+    assert meta["arm_max_rows"] == 168
+    # a cap above the natural minimum must not inflate anything
+    loose = TransferConfig(responsive_p=0.01, nonresponsive_p=0.5, arm_max_rows=100_000)
+    rows2, _ = _energy_arms(energy, cfg=loose, seed=0)
+    assert len(rows2["nonresponsive"]) == 900
+
+
+def test_overlapping_arm_thresholds_are_rejected():
+    """responsive_p >= nonresponsive_p puts the same perturbations in BOTH arms while
+    still reporting arms_are_n_matched=True -- a comparison of a set against itself."""
+    from morpheus.v2.calibra.e0_basis_transfer import _energy_arms, TransferConfig
+    with pytest.raises(ValueError, match="overlap"):
+        _energy_arms(np.linspace(0, 1, 100), cfg=TransferConfig(responsive_p=0.5, nonresponsive_p=0.05), seed=0)

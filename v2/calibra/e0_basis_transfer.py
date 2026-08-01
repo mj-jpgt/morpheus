@@ -88,6 +88,12 @@ class TransferConfig:
     bootstrap_draws: int = 200
     responsive_p: float = 0.01
     nonresponsive_p: float = 0.5
+    # Cap BOTH arms at a common n across contexts. Matching is otherwise only within a
+    # context, while the claim being bought is cross-context: at nonresponsive_p=0.2,
+    # K562 runs at n=2501 and RPE1 at n=168, and measured attenuation from sample size
+    # alone is ~38%. Without this, "K562 passes, RPE1 fails" is a sample-size artifact,
+    # and no gap magnitude is comparable between lineages. 0 = no cap.
+    arm_max_rows: int = 0
 
     @property
     def min_rows(self) -> int:
@@ -555,6 +561,9 @@ def _energy_arms(energy_p: np.ndarray | None, *, cfg: TransferConfig, seed: int)
     """
     if energy_p is None:
         return {}, {"arm_status": "unavailable_no_energy_test_p_value"}
+    if cfg.responsive_p >= cfg.nonresponsive_p:
+        raise ValueError(f"responsive_p {cfg.responsive_p} >= nonresponsive_p {cfg.nonresponsive_p}: "
+                         "arms would overlap, so the control would contain responsive perturbations")
     energy_p = np.asarray(energy_p, dtype=float)
     finite = np.isfinite(energy_p)
     responsive_full = np.flatnonzero(finite & (energy_p < cfg.responsive_p))
@@ -566,6 +575,14 @@ def _energy_arms(energy_p: np.ndarray | None, *, cfg: TransferConfig, seed: int)
     # leaving n_matched False and auto-failing a context for a bookkeeping reason
     # rather than a scientific one. Downsample whichever arm is larger.
     target = min(len(responsive_full), len(nonresponsive)) if len(nonresponsive) else len(responsive_full)
+    # B4: capture pool sizes BEFORE subsampling -- for a threshold sweep the arm sizes are
+    # the run's identity, and rebinding in place made the control pool unrecoverable.
+    n_nonresponsive_full = int(len(nonresponsive))
+    if cfg.arm_max_rows:
+        target = min(target, cfg.arm_max_rows)
+    # Both branches may now fire (previously they were mutually exclusive). Still correct:
+    # the two index pools are disjoint and consecutive draws from one PCG64 stream are
+    # independent.
     matched = (np.sort(rng.choice(responsive_full, size=target, replace=False))
                if len(responsive_full) > target else responsive_full.copy())
     if len(nonresponsive) > target:
@@ -575,6 +592,9 @@ def _energy_arms(energy_p: np.ndarray | None, *, cfg: TransferConfig, seed: int)
             "nonresponsive_p_threshold": cfg.nonresponsive_p, "arm_subsample_seed": int(seed),
             "n_responsive_full": int(len(responsive_full)), "n_responsive_matched": int(len(matched)),
             "n_nonresponsive": int(len(nonresponsive)),
+            "n_nonresponsive_full": n_nonresponsive_full,
+            "arm_max_rows": int(cfg.arm_max_rows),
+            "responsive_p": float(cfg.responsive_p), "nonresponsive_p": float(cfg.nonresponsive_p),
             "arms_are_n_matched": bool(len(matched) == len(nonresponsive) and len(nonresponsive) > 0)}
     return {"responsive_full": responsive_full, "responsive_matched": matched, "nonresponsive": nonresponsive}, meta
 
@@ -1015,10 +1035,11 @@ def main() -> None:
     # the replication runs at a reduced rank on BOTH lineages (an estimator change
     # makes numbers incomparable across contexts unless it is applied to all of them).
     parser.add_argument("--ks", default="", help="comma-separated k values (default 10,25,50,100)")
-    parser.add_argument("--q", type=int, default=0, help="randomized-SVD rank budget (default 150)")
-    parser.add_argument("--min-q", type=int, default=0, help="minimum rank candidates (default 101)")
-    parser.add_argument("--nonresponsive-p", type=float, default=0.0, help="control arm: energy_test_p_value > this (default 0.5)")
-    parser.add_argument("--responsive-p", type=float, default=0.0, help="responsive arm: energy_test_p_value < this (default 0.01)")
+    parser.add_argument("--q", type=int, default=None, help="randomized-SVD rank budget (default 150)")
+    parser.add_argument("--min-q", type=int, default=None, help="minimum rank candidates (default 101)")
+    parser.add_argument("--nonresponsive-p", type=float, default=None, help="control arm: energy_test_p_value > this (default 0.5)")
+    parser.add_argument("--responsive-p", type=float, default=None, help="responsive arm: energy_test_p_value < this (default 0.01)")
+    parser.add_argument("--arm-max-rows", type=int, default=None, help="cap BOTH arms at this n so gaps are comparable ACROSS contexts")
     parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default="cuda")
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[2])); parser.add_argument("--workspace-link"); parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -1028,19 +1049,30 @@ def main() -> None:
     if args.bootstrap_draws < 200: parser.error("--bootstrap-draws must be >=200 for a usable percentile interval")
     base = TransferConfig()
     ks = tuple(int(v) for v in args.ks.split(",")) if args.ks else base.ks
-    q = args.q or base.q
-    min_q = args.min_q or base.min_q
+    if not ks or min(ks) < 2:
+        parser.error(f"--ks {ks} must be positive and >= 2")
+    q = base.q if args.q is None else args.q
     # The rank budget must clear max(offset)+max(k) with a real oversampling margin:
     # randomized SVD attenuates trailing directions of the observed statistic and the
     # ceiling but not the exact Haar null, so a thin margin biases against the observation.
     required = max(base.offsets) + max(ks)
     if q < required + 10:
         parser.error(f"--q {q} leaves too little oversampling over max(offset)+max(k)={required}; use >= {required + 10}")
+    # min_q is the floor _right_svd refuses to go below. Defaulting it to the committed
+    # 101 while q is reduced would just error; defaulting it to 0 would let the SVD
+    # silently degrade rank. Tie it to what the statistic actually needs.
+    if args.min_q is None:
+        min_q = base.min_q if args.q is None else required
+    else:
+        if args.min_q < required:
+            parser.error(f"--min-q {args.min_q} below max(offset)+max(k)={required}; the statistic needs that many components")
+        min_q = args.min_q
     if min_q > q:
         parser.error(f"--min-q {min_q} exceeds --q {q}")
     cfg = TransferConfig(draws=args.draws, bootstrap_draws=args.bootstrap_draws, ks=ks, q=q, min_q=min_q,
-                         responsive_p=args.responsive_p or base.responsive_p,
-                         nonresponsive_p=args.nonresponsive_p or base.nonresponsive_p)
+                         responsive_p=base.responsive_p if args.responsive_p is None else args.responsive_p,
+                         nonresponsive_p=base.nonresponsive_p if args.nonresponsive_p is None else args.nonresponsive_p,
+                         arm_max_rows=0 if args.arm_max_rows is None else args.arm_max_rows)
     started = time.monotonic(); root = Path(args.repo_root).resolve(); output = Path(args.output); output.mkdir(parents=True, exist_ok=True)
     device = torch.device(args.device if args.device == "cpu" or torch.cuda.is_available() else "cpu")
     ledger = GateLedger(output, "E0_E0b", official_log=root / "v2/research/rebase/nature/GATE_LOG.md")
@@ -1059,7 +1091,8 @@ def main() -> None:
     # per cell context, reused across the RNA transform sensitivity analysis.
     full_dictionary_ranks = {"K562": _full_dictionary_rank(p_k, device), "RPE1": _full_dictionary_rank(p_r, device)}
     results: dict[str, object] = {"schema_version":"3.0", "experiment":"E0_E0b", "device":str(device), "draws":args.draws,
-        "bootstrap_draws":args.bootstrap_draws, "seed":args.seed, "config":{"ks":list(cfg.ks),"offsets":list(cfg.offsets),"q":cfg.q,"min_q":cfg.min_q,"primary_offset":cfg.primary_offset},
+        "bootstrap_draws":args.bootstrap_draws, "seed":args.seed, "config":{"ks":list(cfg.ks),"offsets":list(cfg.offsets),"q":cfg.q,"min_q":cfg.min_q,"primary_offset":cfg.primary_offset,
+                   "responsive_p":cfg.responsive_p,"nonresponsive_p":cfg.nonresponsive_p,"arm_max_rows":cfg.arm_max_rows},
         "command":sys.argv, "code_sha":_git(root,"rev-parse","HEAD"), "code_dirty":dirty, "python":sys.version, "torch":torch.__version__, "cuda":torch.version.cuda, "platform":platform.platform(), "contexts":{}}
     for transform in ("signed_log1p", "clip_log1p"):
         tcga = _restrict_tcga_to_registry(_load_tcga(Path(args.tcga), transform), Path(args.tcga_registry))
