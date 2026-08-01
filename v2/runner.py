@@ -932,10 +932,18 @@ def run(args: argparse.Namespace) -> Path:
     # trains only a deep copy, so no model/optimizer state from the experiment
     # itself is mutated.
     d1_overfit: dict[str, object] | None = None
+    # The G2.6 batch is SHUFFLED (deterministically, by seed). Unshuffled, the
+    # loader returns patients in identifier order, so the first 16 are one
+    # cancer -- and after cancer-residualisation their targets are within-cancer
+    # deviations while their slides are near-identical. Measured: that batch
+    # plateaus at a 0.419 reduction by step 800 and then REVERSES to 0.282 by
+    # 1200, while a shuffled batch of the same size reaches 1.217 by step 300.
+    # "Can the encoder separate 16 near-identical same-cancer slides by their
+    # residual noise" is not the question a liveness gate asks.
     if args.objective_profile == "programme_free":
         d1_overfit = _overfit_programme_free_contrastive(
             model, trainer.schedule,
-            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=True,
                                     include_clinical=args.include_clinical),
             device,
         )
@@ -943,7 +951,7 @@ def run(args: argparse.Namespace) -> Path:
     elif args.objective_profile == "programme_only":
         d1_overfit = _overfit_programme_only_actual(
             model, trainer.schedule,
-            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=False,
+            UncappedHoptimusBatches(data, train, args.token_budget, args.seed, shuffle=True,
                                     include_clinical=args.include_clinical),
             device,
         )
