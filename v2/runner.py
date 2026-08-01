@@ -583,7 +583,11 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
     groups that D1 compares.  The decorrelation term is omitted here only
     because it has a batch-statistics floor unrelated to memorisation.
     """
-    # lr=1e-3, not 1e-2. Measured on the real runner at 1e-2 the memorisation
+    # lr=3e-4. Swept against a stalling seed on the real runner at 800 steps:
+    #   3e-3 FAIL (reduction 0.525)  1e-3 FAIL (flat, best at step 0)  3e-4 PASS
+    # The direction is one-sided: lower is more stable. Same pathology as the
+    # divergence recorded below, which was measured at a different seed.
+    # Originally 1e-2. Measured on the real runner at 1e-2 the memorisation
     # DESCENDS then DIVERGES inside the window the gate reads:
     #   step 0 2.4154 -> 150 1.2822 -> 250 0.9432 (best) -> 299 2.1575
     # and by ~2000 steps it reaches nan outright. The heteroscedastic Gaussian
@@ -593,7 +597,7 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
     # evidence if they are run identically.
     clone = copy.deepcopy(model).to(device)
     clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
-    optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
+    optimiser = torch.optim.AdamW(clone.parameters(), lr=3e-4, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
     try:
         fixed_raw = next(iter(loader))
