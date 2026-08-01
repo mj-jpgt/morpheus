@@ -62,3 +62,37 @@ def paired_patient_and_cancer_bootstrap(metric, actual, teacher, challenger, can
     """Return both required uncertainty views under deterministic distinct seeds."""
     return {"patient": paired_bootstrap_difference(metric, actual, teacher, challenger, repeats=repeats, seed=seed, mode="patient"),
             "cancer": paired_bootstrap_difference(metric, actual, teacher, challenger, cancers=cancers, repeats=repeats, seed=seed + 1, mode="cancer")}
+
+
+def paired_multivariate_patient_and_cancer_bootstrap(metric, actual, teacher, challenger, cancers, *, repeats: int = 2000, seed: int = 42) -> dict[str, object]:
+    """Paired row bootstrap for a multivariate channel statistic.
+
+    All inputs are [patient, feature] matrices and are resampled along axis 0
+    with the same indices.  This is intentionally separate from the scalar
+    helper above: accepting matrices there would silently make one-dimensional
+    assumptions inside unrelated probe comparisons.
+    """
+    y, ref, candidate = (np.asarray(value, float) for value in (actual, teacher, challenger))
+    if any(value.ndim != 2 for value in (y, ref, candidate)) or not (len(y) == len(ref) == len(candidate)):
+        raise ValueError("multivariate bootstrap needs aligned finite [patient,feature] matrices")
+    if not all(np.isfinite(value).all() for value in (y, ref, candidate)):
+        raise ValueError("multivariate bootstrap inputs must be finite")
+    labels = np.asarray(cancers).astype(str)
+    if len(labels) != len(y) or len(np.unique(labels)) < 2 or repeats < 100:
+        raise ValueError("multivariate cancer bootstrap needs >=2 cancer labels and >=100 repeats")
+
+    def one(mode: str, local_seed: int) -> dict[str, float]:
+        rng, values = np.random.default_rng(local_seed), []
+        groups = np.unique(labels)
+        for _ in range(repeats):
+            if mode == "patient":
+                index = rng.integers(0, len(y), len(y))
+            else:
+                sampled = rng.choice(groups, len(groups), replace=True)
+                index = np.concatenate([rng.choice(np.flatnonzero(labels == group), int((labels == group).sum()), replace=True)
+                                        for group in sampled])
+            values.append(float(metric(y[index], candidate[index]) - metric(y[index], ref[index])))
+        result = _interval(np.asarray(values, float))
+        result.update({"mode": mode, "repeats": repeats, "point_delta": float(metric(y, candidate) - metric(y, ref))})
+        return result
+    return {"patient": one("patient", seed), "cancer": one("cancer", seed + 1)}

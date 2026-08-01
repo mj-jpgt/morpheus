@@ -158,19 +158,32 @@ def supervised_programme_contrastive(state: torch.Tensor, positive_mask: torch.T
 
 
 def gaussian_nll(mean: torch.Tensor, log_variance: torch.Tensor, target: torch.Tensor,
-                 target_mask: torch.Tensor | None = None) -> torch.Tensor:
+                 target_mask: torch.Tensor | None = None,
+                 axis_weights: torch.Tensor | None = None) -> torch.Tensor:
     """Heteroscedastic Gaussian NLL with optional per-programme availability.
 
     A patient can legitimately lack one RNA-derived programme while retaining
     others.  Reducing over a row-level mask would either discard usable labels
     or silently treat unavailable targets as zeros.
     """
-    value = 0.5 * (log_variance + (target - mean).square() * torch.exp(-log_variance))
     if target_mask is None:
-        return value.mean()
-    if target_mask.shape != value.shape:
+        target_mask = torch.ones_like(target, dtype=torch.bool)
+    if target_mask.shape != target.shape or target.shape != mean.shape or log_variance.shape != mean.shape:
         raise ValueError("target_mask must have the same [batch, programme] shape as Gaussian NLL inputs")
     mask = target_mask.bool()
+    # A padded/absent programme is not the numerical value zero.  Substitute a
+    # detached prediction *before* arithmetic so 0 * NaN cannot contaminate
+    # the weighted reduction used by fixed-width D2 heads.
+    safe_target = torch.where(mask, target, mean.detach())
+    value = 0.5 * (log_variance + (safe_target - mean).square() * torch.exp(-log_variance))
     if not mask.any():
         return value.new_zeros(())
-    return value.masked_select(mask).mean()
+    if axis_weights is None:
+        return value.masked_select(mask).mean()
+    if axis_weights.ndim != 1 or axis_weights.shape[0] != value.shape[1] or not torch.isfinite(axis_weights).all():
+        raise ValueError("axis_weights must be a finite [programme] vector")
+    weights = axis_weights.to(value.device, dtype=value.dtype).clamp_min(0.0)[None, :].expand_as(value)
+    effective = weights * mask
+    if effective.sum() <= 0:
+        raise ValueError("all programme axis weights are zero; supervision would be a silent no-op")
+    return (value * effective).sum() / effective.sum()

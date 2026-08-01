@@ -11,7 +11,16 @@ import numpy as np
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import KFold
 
-__all__ = ["confound_design", "cross_fitted_residuals"]
+__all__ = ["confound_design", "cross_fitted_residuals", "pooled_tissue_source_site"]
+
+
+def pooled_tissue_source_site(patient_ids: np.ndarray, *, min_site_count: int = 10) -> tuple[np.ndarray, set[str]]:
+    """Derive TCGA TSS and pool rare sites exactly once across CALIBRA analyses."""
+    identifiers = np.asarray(patient_ids).astype(str)
+    raw = np.asarray([identifier.split("-")[1] if len(identifier.split("-")) > 1 else "NA" for identifier in identifiers])
+    unique, counts = np.unique(raw, return_counts=True)
+    frequent = {site for site, count in zip(unique, counts) if count >= min_site_count}
+    return np.asarray([site if site in frequent else "OTHER" for site in raw]), frequent
 
 
 def confound_design(frame, columns) -> np.ndarray:
