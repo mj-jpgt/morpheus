@@ -134,6 +134,31 @@ def _runner_command(args: argparse.Namespace, manifest: Path, arm: str, seed: in
     return command
 
 
+def _gate_log_path() -> Path:
+    return Path(__file__).with_name("nature") / "GATE_LOG.md"
+
+
+def _require_clean_worktree(repo: Path) -> None:
+    """G0.2, minus the file these runs write themselves.
+
+    `_append_gate_log` appends to a tracked-by-intent record inside the repo, so
+    a completed D2 leaves the worktree dirty and the very next experiment in the
+    same session fails G0.2 for a change it caused. Every other modification
+    still blocks.
+    """
+    gate_log = _gate_log_path()
+    dirty = [line for line in subprocess.check_output(
+        ["git", "-C", str(repo), "status", "--porcelain"], text=True).splitlines() if line.strip()]
+    try:
+        relative = gate_log.resolve().relative_to(repo.resolve()).as_posix()
+    except ValueError:
+        relative = ""
+    offending = [line for line in dirty if relative not in line.replace("\\", "/")]
+    if offending:
+        raise RuntimeError("G0.2 failed: Phase-D execution requires a clean committed worktree; "
+                           f"offending={offending[:5]}")
+
+
 def _require_target_coverage(split_file: str, targets: str, experiment: str) -> dict:
     """Refuse to start if the frozen RNA targets do not cover the test partition.
 
@@ -181,8 +206,7 @@ def run_d2(args: argparse.Namespace) -> None:
         print(json.dumps({"status": "planned", "pair_manifest": str(manifest_path), "n_commands": len(commands)}, indent=2))
         return
     repo = Path(__file__).resolve().parents[3]
-    if subprocess.check_output(["git", "-C", str(repo), "status", "--porcelain"], text=True).strip():
-        raise RuntimeError("G0.2 failed: Phase-D execution requires a clean committed worktree")
+    _require_clean_worktree(repo)
     if (root / "SUCCESS.json").exists():
         raise RuntimeError(f"refusing an already-complete D2 run root {root}")
     _require_axis_annotation_report(Path(args.pbs_targets).resolve())
@@ -192,7 +216,7 @@ def run_d2(args: argparse.Namespace) -> None:
     if not Path(args.calibra_targets).is_file():
         raise FileNotFoundError(args.calibra_targets)
     coverage = _require_target_coverage(args.split_file, args.calibra_targets, "D2")
-    gate_log = Path(__file__).with_name("nature") / "GATE_LOG.md"
+    gate_log = _gate_log_path()
     _append_gate_log(gate_log, "D2", "target_coverage_of_test_partition",
                      json.dumps(coverage, sort_keys=True), "all test patients covered", "PASS")
     for item in commands:
@@ -363,15 +387,14 @@ def run_d1(args: argparse.Namespace) -> None:
         print(json.dumps({"status": "planned", "pair_manifest": str(manifest_path), "n_commands": len(commands)}, indent=2))
         return
     repo = Path(__file__).resolve().parents[3]
-    if subprocess.check_output(["git", "-C", str(repo), "status", "--porcelain"], text=True).strip():
-        raise RuntimeError("G0.2 failed: Phase-D execution requires a clean committed worktree")
+    _require_clean_worktree(repo)
     if (root / "SUCCESS.json").exists():
         raise RuntimeError(f"refusing an already-complete D1 run root {root}")
     if not args.calibra_targets or not Path(args.calibra_targets).is_file():
         raise RuntimeError("D1 measurement requires --calibra-targets (frozen_rna_targets.npz); "
                            "data.hallmark is train-fold-only and constant on the test split")
     coverage = _require_target_coverage(args.split_file, args.calibra_targets, "D1")
-    gate_log = Path(__file__).with_name("nature") / "GATE_LOG.md"
+    gate_log = _gate_log_path()
     _append_gate_log(gate_log, "D1", "target_coverage_of_test_partition",
                      json.dumps(coverage, sort_keys=True), "all test patients covered", "PASS")
     for item in commands:
@@ -456,8 +479,7 @@ def run_d3(args: argparse.Namespace) -> None:
     if not args.execute:
         print(json.dumps({"status": "planned", "output": str(output)}, indent=2)); return
     repo = Path(__file__).resolve().parents[3]
-    if subprocess.check_output(["git", "-C", str(repo), "status", "--porcelain"], text=True).strip():
-        raise RuntimeError("G0.2 failed: Phase-D execution requires a clean committed worktree")
+    _require_clean_worktree(repo)
     if any((output / name).exists() for name in ("task_rows.csv", "SUCCESS.json", "FAILED.json")):
         raise RuntimeError(f"refusing stale D3 output directory {output}; use a new output path")
     _write_json(output / "D3_INPUT_MANIFEST.json", {"artifacts": [{"path": str(Path(path).resolve()), "sha256": _sha256(Path(path).resolve())} for path in args.artifacts],
@@ -465,7 +487,7 @@ def run_d3(args: argparse.Namespace) -> None:
                                                        "purity": {"path": str(Path(args.purity_table).resolve()), "sha256": _sha256(Path(args.purity_table).resolve())}})
     result = subprocess.run(command, cwd=repo)
     status = "PASS" if result.returncode == 0 else "FAIL"
-    gate_log = Path(__file__).with_name("nature") / "GATE_LOG.md"
+    gate_log = _gate_log_path()
     _append_gate_log(gate_log, "D3", "G4_same_run_rna_positive_and_channel_gates", str(result.returncode), "0", status)
     if result.returncode:
         raise RuntimeError("D3 failed a required CALIBRA gate; do not interpret purity attenuation")
