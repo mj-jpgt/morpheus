@@ -58,3 +58,27 @@ def test_d2_pair_manifest_rejects_arm_asymmetry(tmp_path):
     bad = _args(manifest); bad.fit_programme_legibility = False
     with pytest.raises(ValueError, match="legibility"):
         _validate_d2_pair(bad)
+
+
+def test_pbs_exclusion_must_be_requested_bounded_and_recorded():
+    """The 14 paired patients with no PanCan RNA row are excluded, not silently dropped.
+    Silently changing the cohort would invalidate comparisons against every previously
+    published E0/CALIBRA number with no trace that the people differ."""
+    import inspect
+    from morpheus.v2 import build_pbs_targets as mod
+    source = inspect.getsource(mod.build_pbs_targets)
+    signature = inspect.signature(mod.build_pbs_targets)
+    # opt-in, and off by default
+    assert signature.parameters["allow_missing_rna"].default is False
+    assert signature.parameters["max_missing_rna_fraction"].default == 0.01
+    # refuses without the flag, and refuses beyond the ceiling even with it
+    assert "allow_missing_rna=True to exclude them" in source
+    assert "exceeds the" in source and "cohort change, not an exclusion" in source
+    # every excluded patient is named in the manifest, plus count/fraction/ceiling
+    for field in ("rna_missing_excluded_patients", "rna_missing_excluded_count",
+                  "rna_missing_excluded_fraction", "rna_missing_exclusion_ceiling",
+                  "paired_patient_count_before_exclusion", "cohort_deviation"):
+        assert field in source, f"manifest must record {field}"
+    # the retained view, not the full split, must reach the saved arrays and the fit rows
+    assert "patient_ids=patient_ids, split=split_labels" in source
+    assert "_digest_strings(patient_ids[fit_rows])" in source

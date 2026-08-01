@@ -119,7 +119,9 @@ def annotate_dictionary_axes(dictionary: ReferenceDictionary, output: Path,
 
 def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
                       perturbation: str, output: str, n_components: int = 128,
-                      fit_population: str = "train", gene_annotations: str = "") -> dict[str, object]:
+                      fit_population: str = "train", gene_annotations: str = "",
+                      allow_missing_rna: bool = False,
+                      max_missing_rna_fraction: float = 0.01) -> dict[str, object]:
     """Create patient-ID keyed PBS codes without fitting on held-out patients."""
     if n_components not in {64, 128, 256}:
         raise ValueError("PBS component sensitivity is predeclared at 64, 128, or 256")
@@ -145,14 +147,28 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
     if table["patient_id"].duplicated().any():
         raise ValueError("prepared TCGA RNA parquet contains duplicate canonical patient IDs")
     lookup = table.set_index("patient_id")
-    missing = [str(patient) for patient in data.patient_ids if str(patient) not in lookup.index]
-    if missing:
-        raise ValueError(f"prepared RNA misses {len(missing)} canonical paired patients; examples={missing[:5]}")
-    expression = lookup.reindex(data.patient_ids)[[gene_to_column[gene] for gene in genes]].to_numpy(dtype=np.float32)
+    missing = sorted(str(patient) for patient in data.patient_ids if str(patient) not in lookup.index)
+    # DOCUMENTED EXCLUSION, never a silent drop. A handful of paired patients have no
+    # PanCan RNA row at all, so no target can be built for them. Dropping them quietly
+    # would change the cohort out from under every previously published E0/CALIBRA
+    # number without leaving a trace, so the exclusion must be (a) explicitly requested,
+    # (b) bounded, and (c) recorded patient-by-patient in the manifest.
+    if missing and not allow_missing_rna:
+        raise ValueError(f"prepared RNA misses {len(missing)} canonical paired patients; "
+                         f"examples={missing[:5]}. Pass allow_missing_rna=True to exclude them "
+                         f"as a recorded cohort deviation.")
+    missing_fraction = float(len(missing)) / max(len(data.patient_ids), 1)
+    if missing_fraction > max_missing_rna_fraction:
+        raise ValueError(f"RNA-missing fraction {missing_fraction:.4f} exceeds the "
+                         f"{max_missing_rna_fraction:.4f} ceiling; this is a cohort change, not an exclusion")
+    retained = np.asarray([str(patient) in lookup.index for patient in data.patient_ids], dtype=bool)
+    patient_ids = np.asarray([str(p) for p in data.patient_ids])[retained]
+    split_labels = np.asarray(data.split).astype(str)[retained]
+    cancers = np.asarray(getattr(data, "cancers", np.full(len(retained), "NA"))).astype(str)[retained]
+    expression = lookup.reindex(patient_ids)[[gene_to_column[gene] for gene in genes]].to_numpy(dtype=np.float32)
     if not np.isfinite(expression).all():
         raise ValueError("PBS target RNA has non-finite values after canonical patient alignment")
-    fit_rows = (np.asarray(data.split).astype(str) == "train" if fit_population == "train"
-                else np.asarray(data.split).astype(str) != "test")
+    fit_rows = (split_labels == "train" if fit_population == "train" else split_labels != "test")
     transformed_expression, development_mean, development_scale = fit_development_expression_transform(expression, fit_rows)
     # Reference rows are already E0-validated control-centred deltas, so only
     # the development-fitted gene scale applies; centering them at TCGA bulk
@@ -175,9 +191,18 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
         "data_config_sha256": _file_sha256(data_config), "split_file_sha256": _file_sha256(split_file),
         "reference_atoms": len(reference.row_ids), "reference_gene_count": len(reference.genes),
         "overlap_gene_count": len(genes), "overlap_gene_digest": _digest_strings(genes),
-        "canonical_patient_count": len(data.patient_ids), "patient_id_digest": _digest_strings(data.patient_ids),
-        "split_digest": _digest_strings(data.split.astype(str)), "target_names": target_names.tolist(),
-        "fit_patient_id_digest": _digest_strings(np.asarray(data.patient_ids).astype(str)[fit_rows]),
+        "canonical_patient_count": int(len(patient_ids)), "patient_id_digest": _digest_strings(patient_ids),
+        "split_digest": _digest_strings(split_labels), "target_names": target_names.tolist(),
+        "fit_patient_id_digest": _digest_strings(patient_ids[fit_rows]),
+        # The cohort deviation, recorded patient-by-patient so any downstream comparison
+        # against an E0/CALIBRA number can check it is comparing the same people.
+        "paired_patient_count_before_exclusion": int(len(data.patient_ids)),
+        "rna_missing_excluded_patients": missing,
+        "rna_missing_excluded_count": int(len(missing)),
+        "rna_missing_excluded_fraction": missing_fraction,
+        "rna_missing_exclusion_ceiling": float(max_missing_rna_fraction),
+        "cohort_deviation": ("none" if not missing else
+                             f"{len(missing)} paired patients excluded: no PanCan RNA row exists for them"),
         "code_std_min": float(scores.std(axis=0).min()), "code_std_max": float(scores.std(axis=0).max()),
         "expression_transform": "(bulk_expression-development_train_gene_mean)/development_train_gene_sd; reference_delta/development_train_gene_sd",
         "development_mean_digest": _digest_array(development_mean), "development_scale_digest": _digest_array(development_scale),
@@ -190,7 +215,7 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
     with tempfile.NamedTemporaryFile(dir=output_path.parent, suffix=".npz", delete=False) as handle:
         temporary = Path(handle.name)
     try:
-        np.savez_compressed(temporary, patient_ids=np.asarray(data.patient_ids), split=np.asarray(data.split),
+        np.savez_compressed(temporary, patient_ids=patient_ids, split=split_labels, cancers=cancers,
                             scores=scores, target_names=target_names, target_groups=np.asarray(["PBS"] * len(target_names)),
                             genes=np.asarray(genes), singular_values=dictionary.singular_values.astype(np.float32),
                             gene_basis=dictionary.gene_basis.astype(np.float32),
@@ -214,6 +239,10 @@ def main() -> None:
     parser.add_argument("--n-components", type=int, default=128, choices=(64, 128, 256))
     parser.add_argument("--fit-population", default="train", choices=("train", "development"),
                         help="fit train-only for inner diagnostics; rebuild with development for final refit")
+    parser.add_argument("--allow-missing-rna", action="store_true",
+                        help="exclude paired patients with no RNA row as a RECORDED cohort deviation")
+    parser.add_argument("--max-missing-rna-fraction", type=float, default=0.01,
+                        help="refuse if the exclusion exceeds this fraction; beyond it this is a cohort change")
     parser.add_argument("--gene-annotations", default="", help="optional gene-level proliferation/essentiality annotation table; missing data is reported unavailable")
     print(json.dumps(build_pbs_targets(**vars(parser.parse_args())), indent=2, sort_keys=True))
 
