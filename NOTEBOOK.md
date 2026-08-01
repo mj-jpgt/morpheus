@@ -298,6 +298,712 @@ roughly **1 h of A100 time per arm** at 40 epochs on the 6,427-patient split.
 
 ---
 
+# P1 Completion Plan
+
+P1's phase gate has exactly three open items, and none of them needs a GPU:
+
+- **A. External / second-dataset demonstration of both floors** — NOT STARTED.
+- **B. Negative-control battery of `MULTIMODAL_EXPANSION.md` §9** — NOT STARTED; a specification exists,
+  no run output does.
+- **C. The induced-correlation observation (0.067–0.140) rests on ONE design** (the 99-column
+  cancer+TSS design) at **ONE n** (2,530). A methods paper asserting a general phenomenon needs it at a
+  second design rank, and ideally at a second n.
+
+A and B are independent of data acquisition; C is independent of everything. So the plan is three
+parallel tracks, not a sequence. **Tracks 1 and 2 start immediately and touch no GPU.** Track 3 is
+gated on data arriving and runs last, but it is the highest-leverage item on the whole project.
+
+**The organising constraint: every task below must pay for itself four times.** The negative-control
+battery is not P1 overhead — the "must beat" baselines are *literally* what P3 needs in order to claim
+that PBS beats curated pathway scores, and the site/scanner control is *literally* condition 4 of P4's
+five-point certification rule in `MULTIMODAL_EXPANSION.md` §1. Every task therefore carries an
+**Also serves** field, and a task that cannot fill it should be questioned before it is run.
+
+**A note on the §9 list.** Verified against `v2/research/rebase/MULTIMODAL_EXPANSION.md` §9: there are
+**seven** must-beat baselines, not six. The seventh is **best unimodal model** ("for any multimodal
+claim ... kills all synergy claims"). It is included below. §9 also specifies **three** positive
+controls that must pass, which the phase gate requires as well.
+
+---
+
+## Track 1 — Negative-control battery (CPU, no new data, start immediately)
+
+Discharges phase-gate item **B**. Everything here runs against artifacts that already exist on the GPU
+box; the compute is small enough that "CPU on the GPU box" and "CPU local after a pull" are both
+viable — the `.npz` artifacts are ~6,427 × 256 floats.
+
+**Structural requirement, and it is a P1 exhibit in its own right:** must-fail and must-pass controls
+are *validity* conditions and go through `GateLedger.add(gate, value, threshold, passed, note)`
+(`v2/calibra/gates.py:20`). Must-beat baseline comparisons are *scientific outcomes* and go through
+`GateLedger.observe(gate, value, expectation, note)` (`v2/calibra/gates.py:25`). Wiring "PBS beat
+Hallmark" into a pass/fail gate would make a true negative indistinguishable from a broken pipeline —
+which is the exact separation P1 claims to enforce, so the battery must demonstrate it.
+
+### T1.1 — Build the must-beat baseline target blocks
+
+- **What.** One supervision-target block per §9 must-beat baseline, all bound to the same
+  6,427-patient maximal split and the same `test` partition, so a single instrument scores all of them
+  on one scale. Seven blocks: curated pathway, random dictionary, PCA/NMF expression basis, text-prior,
+  cell-composition (capacity-matched to k=128), zero-parameter naive, best unimodal.
+- **How.**
+  - *Curated pathway* — **already built**: `~/e0_run/data/hallmark_scores_pancan.parquet` (entry 09:01,
+    per-set Spearman ≥ 0.99999991 against the frozen table). Bundle it via
+    `v2/build_discovery_inputs.py` → `v2/discovery_targets.py:build_rna_target_bundle` / `read_gmt`.
+  - *Best unimodal / zero-fitted-parameter representation side* — **already built**:
+    `v2/baseline_exports.py:export_raw_hoptimus_baseline`, `export_ridge_alignment_baseline`,
+    `export_cca_alignment_baseline`, driven by the CLI `python -m morpheus.v2.export_baselines
+    --data-config … --split-file … --output-dir …`.
+  - *Random dictionary* — new module needed: `v2/build_random_dictionary_targets.py`, reusing
+    `v2/build_pbs_targets.py:build_pbs_targets` and `v2/pbs.py:ReferenceDictionary` but substituting
+    size- and spectrum-matched random directions for `δ_g`.
+  - *PCA / NMF expression basis* — new module needed: `v2/build_pca_basis_targets.py`, fit on
+    development rows only via `v2/build_pbs_targets.py:fit_development_expression_transform` so the
+    leak discipline matches PBS exactly.
+  - *Text-prior (GenePT-style)* — new module needed: `v2/build_text_prior_targets.py`. The existing
+    text-embedding plumbing precedent is `v2/text_prototypes.py` and `v2/plip.py`.
+  - *Cell-composition, capacity-matched* — new module needed: `v2/build_composition_targets.py`,
+    emitting exactly `n_components = 128` columns so the comparison is capacity-matched rather than
+    capacity-flattered.
+  - *Zero-parameter naive (cancer-type mean)* — new thin wrapper needed in `v2/baseline_exports.py`
+    (`export_zero_parameter_baseline`), writing through the existing `_write` states path.
+- **Inputs.** `~/e0_run/data/paired_split_maximal.json`; `~/e0_run/data/tcga_pancan_rna.parquet`;
+  `~/e0_run/data/hallmark_scores_pancan.parquet`; `~/e0_run/data/pbs_targets_k128_v2.npz` (for shape,
+  spectrum and axis count to match against); the canonical H-Optimus patch store.
+- **Where it runs.** CPU on the GPU box (the RNA parquet and patch store are already there). Rough
+  effort: the two already-built blocks are free; each new builder is hours of implementation plus
+  minutes to run. The composition and text-prior builders are the two that need an external resource
+  and are the two most likely to slip.
+- **Depends on.** Nothing. Starts now.
+- **Also serves.** **P3 directly and centrally** — the curated-pathway, random-dictionary and
+  composition blocks *are* P3's baseline table; P3's claim is "interventional coordinates beat curated
+  pathway scores", which is unprovable without exactly these. The composition block additionally
+  satisfies the second discharge branch of `claim_guards.composition_attribution`
+  (`_is_discharged` accepts `beats_composition_baseline`), which is undischarged for every P3
+  `legible_axis` claim. **P4** — §1's certification rule requires the axis to beat a composition
+  baseline before it may be exposed. **P2** — gives the rank-vs-channel comparison a set of
+  representations whose geometry and channel are both measured on one protocol.
+
+### T1.2 — Score every baseline through one instrument, one command shape
+
+- **What.** A single ledger in which every baseline of T1.1 is measured with the identical readout,
+  identical confound design, identical partition and identical seed — including the ones we lose.
+- **How.** `python -m morpheus.v2.calibra.run_calibra --artifacts … --targets … --partition test
+  --require-rna-positive-control --require-channel-gates`
+  (`v2/calibra/run_calibra.py:152`), which internally calls
+  `v2/calibra/calibration.py:spike_recovery_curve` and `permutation_null` over
+  `v2/calibra/residualise.py:confound_design` / `cross_fitted_residuals`.
+  `--n-jobs` changes wall-clock only and never the numbers (`calibration.py:_map`).
+- **Inputs.** Every artifact from T1.1; `frozen_rna_targets.npz` (6,427 patients) as the molecular
+  block. Per `HANDOFF_PHASE_D.md` §D1.0 the targets file must be `frozen_rna_targets.npz`, never
+  `data.hallmark`, which is train-fold-only and constant on the held-out split.
+- **Where it runs.** CPU. Rough effort: minutes per artifact per state at the current draw counts;
+  hours if `--n-permutations` is raised to the level T1.6 requires.
+- **Depends on.** T1.1.
+- **Also serves.** **P2** — the same run emits `effective_rank` alongside the channel for each
+  baseline, which is a further, wider sweep of the "rank moves, channel does not" demonstration on
+  representations that were not trained by us. **P3** — this is the baseline table. **P4** — a
+  certificate has to quote a floor measured this way.
+
+### T1.3 — Must-FAIL control 1: site / scanner / batch prediction from certified axes
+
+- **What.** Show that no axis we would certify can predict tissue source site. Currently
+  `v2/calibra/e0_basis_transfer.py:923` records G3.5 as `unavailable_no_site_labels` — but TSS labels
+  *are* derivable, so this is a gap that can be closed today rather than a missing data problem.
+- **How.** New module needed: `v2/calibra/confound_certificate.py`. Derive labels with the existing
+  `v2/calibra/residualise.py:pooled_tissue_source_site` (`min_site_count=10`, rare sites pooled to
+  `OTHER`), then fit a grouped out-of-fold classifier per axis.
+- **Pass criterion (stated in advance so "it failed" is falsifiable).** For every axis, out-of-fold
+  balanced accuracy for TSS must not exceed the 95th percentile of a **label-permutation null** built
+  from ≥1,000 permutations, and the axis's bootstrap CI must include the chance rate. An axis
+  breaching that bar is **not certified** and is reported as a named failure, not dropped.
+- **Inputs.** `~/e0_run/d2_final/artifacts/d2_h_seed42.npz`, `d2_i_seed42.npz` (and any later seeds);
+  patient IDs carry TSS, so no new metadata is required.
+- **Where it runs.** CPU. Rough effort: hours to write, minutes to run per artifact; the permutation
+  null dominates and parallelises trivially.
+- **Depends on.** Nothing. Can start before T1.1.
+- **Also serves.** **P4 — this is condition 4 of the five-point certification rule verbatim**
+  ("confound certificate passed: axes must **fail** to predict site/scanner/batch",
+  `MULTIMODAL_EXPANSION.md` §1). Writing it once for P1 builds P4's certifier. **P3** — every
+  `legible_axis` claim needs it. **P2** — closes G3.5, which is currently unmeasured for the D2 arms,
+  so an "effective rank went up" statement cannot be answered with "your representation is a site code".
+
+### T1.4 — Must-FAIL control 2: random gene sets must not clear the detection floor
+
+- **What.** Random, covariate-matched gene sets pushed through the identical pipeline, and shown not
+  to clear the floor.
+- **How.** The controls already exist: `v2/discovery_targets.py:build_matched_random_controls` emits
+  `RANDOM_CONTROL__<target>__<nn>` columns matched on *training-only* per-gene mean, variance and PC1
+  loading, 20 per target — deliberately stricter than same-size random sets. `run_calibra.py:204` and
+  `e1_rank_information.py:270` currently **exclude** them from the molecular block, correctly, because
+  they would dilute the channel estimate. New flag needed on `v2/calibra/run_calibra.py`:
+  `--score-random-controls`, which scores that excluded block as its own target group instead of
+  discarding it.
+- **Pass criterion.** Report `observed_matched_direction` for each random-control column against the
+  run's own **unpaired** `detection_floor`. The control **fails as required** if the median lies below
+  the floor and **at most 5%** of control columns exceed it; the exact count and the identity of any
+  exceedances are reported. Any exceedance rate above 5% is escalated per `HANDOFF_GATES.md`
+  ("negative control passes ⇒ you are measuring capacity, not signal").
+- **Inputs.** `frozen_rna_targets.npz` (already carries the `RANDOM_CONTROL__` columns); the D2 seed-42
+  artifacts.
+- **Where it runs.** CPU. Rough effort: small code change plus a run of the same order as T1.2.
+- **Depends on.** T1.2 for the floor the controls are graded against.
+- **Also serves.** **P3** — any per-axis or per-gene-set legibility claim is void without it. **P4** —
+  the certifier must refuse an axis whose evidence a random gene set reproduces. **P2** — supplies the
+  chance level for the channel numbers the rank comparison is built on.
+
+### T1.5 — Must-FAIL control 3: shuffled gene labels on the dictionary
+
+- **What.** Permute the gene labels of the dictionary while keeping the directions. The **subspace**
+  statistic must persist; the **per-gene attribution** must collapse. §9 is explicit that these are two
+  different claims and this control is what separates them.
+- **How.** A gene-label shuffle null already exists on the E0 side:
+  `v2/calibra/e0_basis_transfer.py:_gene_label_shuffle_null` (line 204), with the gate at
+  `_shuffle_gate` (line 519) and the ledger row at line 946 — note that row is written with
+  `ledger.observe`, and its recorded caveat (near-identical to the Haar null by construction, so not
+  independent corroboration) must be carried into the write-up. For the **PBS target side** this does
+  not yet exist: new flag needed on `v2/build_pbs_targets.py`: `--shuffle-gene-labels`, permuting the
+  gene axis of `v2/pbs.py:ReferenceDictionary` before projection, then re-running
+  `annotate_dictionary_axes`.
+- **Pass criterion.** Two-part, both required. (i) *Subspace persists*: top-CCA of `wsi_biology`
+  against the shuffled-label targets must lie inside the bootstrap CI of the unshuffled value.
+  (ii) *Attribution collapses*: Spearman between the true and shuffled per-axis gene rankings, taken
+  from `pbs_targets_k128_v2.npz.axis_annotations.csv`, must be ≤ 0.05 with a CI covering zero. If (i)
+  fails the subspace claim is void; if (ii) *passes* — i.e. attribution survives the shuffle — the
+  gene-naming claim is void. Both are reportable failures.
+- **Inputs.** `~/e0_run/data/pbs_targets_k128_v2.npz` + `.manifest.json` + `.axis_annotations.csv`;
+  `~/e0_run/data/tcga_pancan_rna.parquet`.
+- **Where it runs.** CPU. Rough effort: a rebuild of the target file per shuffle draw, minutes each;
+  the code change is small.
+- **Also serves.** **P3** — this is the control that decides whether P3 may name genes at all, or only
+  claim a subspace. That is a difference in the title of the paper. **P4** — the `inspect_gene` tool of
+  §8 cannot ship without it, because a fluent gene-level answer over a shuffle-invariant attribution is
+  exactly the "launders uncertainty into prose" failure P4 forbids.
+- **Depends on.** T1.1 (needs the same target-build path).
+
+### T1.6 — Must-FAIL control 4: modality-shuffled pairing
+
+- **What.** Pair modality *m* of patient *i* with patient *j*; all cross-modal agreement must vanish.
+- **How.** **Already implemented and already run** — `v2/calibra/calibration.py:permutation_null`
+  permutes `y` **within strata** (cancer type) so cancer-level structure is preserved and only the
+  patient-level pairing is destroyed; `run_calibra` invokes it and writes `permutation_p`,
+  `null_median`, `null_p95`, `null_max`, `excess_over_null_median`. The E1 equivalent is
+  `e1_rank_information.py:_direction_null`, logged as `within_cancer_shuffled_pairing`
+  (`e1_rank_information.py:428`). The work here is **not new code, it is resolution**.
+- **Pass criterion.** For every state, the shuffled-pairing statistic must lie within the permutation
+  null's central 90% and `permutation_p` must be ≥ 0.05. Per G4.5 the permutation p is floored at
+  1/(n+1), so `--n-permutations 50` (the current default) cannot support a headline "must fail"
+  statement: raise it to **≥ 1,000** for every number that appears in the paper, and record the
+  resolution alongside the p.
+- **Inputs.** The same artifacts as T1.2.
+- **Where it runs.** CPU. Rough effort: hours of wall-clock at 1,000 permutations across all states;
+  embarrassingly parallel via `--n-jobs`.
+- **Depends on.** T1.2.
+- **Also serves.** **P2** — the withdrawn-F2 story turns on whether a channel difference is real; a
+  degenerate or under-resolved null makes that unanswerable. **P3** — the D2 head-to-head reads the
+  same null. **P4** — certification requires a stated chance level per axis.
+
+### T1.7 — Positive controls that must PASS (all three from §9)
+
+- **What.** (a) RNA-input states predicting RNA-derived targets — circular by construction, must be
+  strong. (b) A held-out known-legible covariate (MSI, TP53, consensus subtype) **excluded from the
+  adjustment set**, recovered at its independently known strength. (c) A synthetic spike above the
+  detection floor, recovered.
+- **How.** (a) **already implemented**: `run_calibra --require-rna-positive-control` fails the stage
+  unless an `rna_*` state clears its same-run pairing null; the E1 form is the
+  `G4.1_positive_control` row at `e1_rank_information.py:420` with a `>=0.5 heldout_directional_cca`
+  bar. (c) **already implemented**: `spike_recovery_curve` reports `paired_hit_rate` and
+  `unpaired_hit_rate` per level. (b) is the gap — new module needed:
+  `v2/calibra/known_covariate_control.py`, plus a `--positive-covariate-table` flag on `run_calibra`;
+  the existing clinical-table hook is `v2/build_discovery_inputs.py --clinical`.
+- **Pass criterion.** (a) as gated today. (b) **the expected strength is written down before the run**
+  from the published literature, and the control passes only if the measured effect's CI covers it —
+  "we recovered something" is not a pass. (c) at every level strictly above the reported
+  `detection_floor`, the hit rate must be ≥ `recovery_fraction` (0.8).
+- **Inputs.** The D2 artifacts; `frozen_rna_targets.npz`; a TCGA clinical table carrying MSI / TP53 /
+  consensus subtype — **not currently confirmed present on disk**, so this is the one Track 1 task with
+  a data dependency.
+- **Where it runs.** CPU. Rough effort: (a) and (c) are already paid for; (b) is hours plus a table.
+- **Also serves.** **All four papers, structurally.** `HANDOFF_GATES.md`'s governing rule is that a
+  negative result is reportable only if the positive control passed in the same run, on the same data,
+  through the same code path. **P2 is a negative-result paper and is therefore entirely dependent on
+  this task**: without (a) passing in the same run, "rank moved and the channel did not" is
+  indistinguishable from a broken pipeline. **P3** needs it for the D2 comparison; **P4** needs it per
+  axis.
+
+### T1.8 — Ledger, write-up, and the losses
+
+- **What.** One append-only row per control in `v2/research/rebase/nature/GATE_LOG.md`
+  (`(experiment, gate, value, threshold, PASS/FAIL)`; a missing row counts as FAIL), and a written
+  battery report including every baseline we lose to.
+- **How.** `v2/calibra/gates.py:GateLedger` with `official_log=` pointed at `GATE_LOG.md` —
+  `add()` for T1.3–T1.7, `observe()` for T1.2's baseline comparisons. New document needed:
+  `v2/research/rebase/nature/NEGATIVE_CONTROL_BATTERY.md`. Every claim in it routed through
+  `v2/calibra/claim_guards.py:validate_claim` first; an inadmissible one emits the repo convention
+  (`value = NaN`, `note = "inadmissible_<code>"`) and stays visible.
+- **Inputs.** All of T1.1–T1.7.
+- **Where it runs.** CPU local. Rough effort: a day of writing once the runs land.
+- **Depends on.** T1.1–T1.7.
+- **Also serves.** **P3** — the baseline table drops straight into P3's results section. **P2** — the
+  same document holds P2's chance levels. **P4** — the pass criteria written here become the
+  certificate schema's fields. **P1** — it *is* phase-gate item B.
+
+### In plain terms
+
+Before we are allowed to say our method works, we have to show it beats every cheap alternative and
+that it fails in all the ways a broken method would fail. The cheap alternatives are: classical
+pathway scores, a randomly generated dictionary, ordinary PCA of the expression data, gene embeddings
+derived from text rather than measurement, a count of what cell types are present, and simply
+predicting the average for that cancer type. The failure checks are: our axes must be **unable** to
+tell which hospital the slide came from, randomly chosen gene sets must **not** score, scrambling
+which gene is which must destroy our ability to name genes while leaving the overall pattern intact,
+and pairing one patient's slide with another patient's RNA must destroy the signal entirely. Each of
+those has a number written down in advance that decides pass or fail, so nobody gets to squint at a
+plot afterwards. Almost half of this machinery is already written and simply needs to be pointed at
+the existing files — and the same runs produce the comparison table the main biology paper needs.
+
+---
+
+## Track 2 — Induced-correlation generalisation (CPU, no new data, start immediately)
+
+Discharges phase-gate item **C**. This is the novel methodological observation in P1 — that
+residualising two *orthogonal* signals through a shared confound design **induces** correlation between
+them — and it currently rests on one design at one n. The falsifier recorded in the evidence ledger is
+"induced correlation ≈ 0 at matched design rank and n on a second design". Track 2 runs exactly that
+test, and it runs entirely on files that already exist.
+
+### T2.1 — Turn the induced correlation into a first-class reported quantity
+
+- **What.** A sweep driver that reports induced correlation as a function of (design, design rank, n,
+  seed) rather than as a by-product of one curve.
+- **How.** The quantity is **already computed and already stored**: `spike_recovery_curve` records it
+  as `meta["confound_induced_baseline"]` / `baseline_recovered_median`, with the signed form as
+  `baseline_recovered_median_signed`, the sampling-null scale as `baseline_null_scale`, and the gate
+  bar as `baseline_gate_threshold` (`v2/calibra/calibration.py:378–396`). What is missing is a driver.
+  New module needed: `v2/calibra/induced_correlation_sweep.py`, calling
+  `residualise.confound_design` + `spike_recovery_curve` at `levels=(0.0,)` only, over a grid, and
+  writing one row per cell.
+- **Inputs.** `~/e0_run/d2_final/artifacts/d2_h_seed42.npz` and `d2_i_seed42.npz`;
+  `frozen_rna_targets.npz`; `~/e0_run/data/paired_split_maximal.json`.
+- **Where it runs.** CPU, either box. Rough effort: hours to write; the level-0-only curve is far
+  cheaper than a full recovery curve, so the whole grid is a small number of CPU-hours with `--n-jobs`.
+- **Depends on.** Nothing. Starts now.
+- **Also serves.** **P3** — `run_calibra` already reports `n_confound_columns`; once induced
+  correlation is a known function of that number, D3's purity-adjusted channel can be read as
+  "confound removed" rather than "design rank increased". **P4** — a floor that is not quoted with its
+  design rank and n is not portable to another cohort, so this defines the certificate's required
+  fields.
+
+### T2.2 — Second (and third) design rank
+
+- **What.** Re-measure induced correlation across designs of clearly different rank, holding n fixed.
+- **How.** All through the one function `v2/calibra/residualise.py:confound_design(frame, columns)`:
+  - `["cancer"]` — cancer only. Materially lower rank than the 99-column design. **Do not assume the
+    column count**: one-hot with `dummy_na=True` gives one column per cancer present in the evaluated
+    partition plus a missingness level, and the actual number is emitted by `run_calibra` as
+    `n_confound_columns` — read it from the run.
+  - `["cancer", "tss"]` — the existing 99-column design, as the anchor.
+  - `["cancer", "tss", "purity"]` — driven by the existing `run_calibra --purity-table
+    --purity-source …` path; numeric columns are standardised and a missingness indicator is added
+    (`residualise.py`), so this is a modest rank increase over the anchor.
+  - `["cancer", "tss", "dx_year"]` — requires a clinical column that is **not confirmed present on
+    disk**. The existing hook is `v2/build_discovery_inputs.py --clinical`. If no such column exists,
+    the purity design above is the third rank point and that substitution is recorded, not silently
+    made.
+- **Inputs.** As T2.1, plus a purity table (also required by P3's D3, which is currently NOT STARTED
+  for exactly this reason — no TCGA purity table on disk).
+- **Where it runs.** CPU. Rough effort: minutes per cell once T2.1 exists.
+- **Depends on.** T2.1.
+- **Also serves.** **P3 — this is D3's confound design, built and characterised once.** D3 asks whether
+  the channel survives purity entering the adjustment set; T2.2 tells you how much of any change is
+  attributable to the design gaining rank rather than to purity being removed, which is the difference
+  between a finding and an artefact. It also hardens the ledger row "confound adjustment does not
+  destroy signal (attenuation 0.94–1.23)", whose stated falsifier is precisely "attenuation far from 1
+  under a differently constructed confound design at comparable rank".
+
+### T2.3 — Second n, in both directions
+
+- **What.** Induced correlation as a function of n at fixed design, spanning **below** the current
+  2,530 and **above** it.
+- **How.** Stratified subsampling by cancer type so cohort composition is held fixed while n moves —
+  an unstratified subsample would confound n with composition. Grid: several points below 2,530, the
+  2,530 anchor, and the **full 6,427-patient maximal cohort** now available from
+  `~/e0_run/data/paired_split_maximal.json` (entry 09:05). Same driver as T2.1; `run_calibra
+  --partition all` reaches the full cohort, `--partition test` the 2,766 held-out patients.
+- **Inputs.** As T2.1.
+- **Where it runs.** CPU. Rough effort: the largest cell dominates; still hours, not days.
+- **Depends on.** T2.1.
+- **Also serves.** **Track 3, decisively** — the n-sweep is what tells us the *minimum n an external
+  cohort must have* for its floor to be estimable at a given design rank. Without it we would size the
+  external cohort by guesswork. **P4** — same argument for any future cohort added to the atlas.
+
+### T2.4 — State the mechanism as a prediction, then try to break it
+
+- **What.** The induced correlation should scale with the design's share of the sample space — roughly
+  with design rank over n. Write that prediction down, fit it across the T2.2 × T2.3 grid, and report
+  the fit **and its residuals**, including if it fails.
+- **How.** Analysis over the sweep table from T2.1–T2.3; no new pipeline.
+- **Inputs.** The sweep table.
+- **Where it runs.** CPU local. Rough effort: hours.
+- **Depends on.** T2.2, T2.3.
+- **Also serves.** **P1's own falsifiability** — it converts "we observed 0.067–0.140 once" into a
+  law with a stated functional form that a reviewer can test on their own data, which is the
+  difference between an anecdote and a methods contribution. **P4** — a predicted floor lets a
+  certificate be issued for a cohort before the cohort is measured.
+
+### T2.5 — Rule out the estimator as the cause
+
+- **What.** Show the induced correlation is a property of shared residualisation, not of *our*
+  residualiser.
+- **How.** Vary the knobs of `v2/calibra/residualise.py:cross_fitted_residuals` — `n_splits` (default
+  5), `alpha` (Ridge, default 1.0) — and re-run the level-0 sweep. The cross-fitting is deliberate
+  (in-sample residualisation removes more than the confound), so if the effect were an artefact of
+  fold count or shrinkage it would move with these.
+- **Inputs.** As T2.1.
+- **Where it runs.** CPU. Rough effort: a multiplier on T2.2's grid; hours.
+- **Depends on.** T2.1.
+- **Also serves.** **P2 and P3** — every channel number on the project passes through this exact
+  function, so a demonstration that the numbers are stable in `n_splits` and `alpha` is a reusable
+  robustness result, not a P1-only one.
+
+### T2.6 — Sweep the floors themselves, not just the baseline
+
+- **What.** Report `transmission_floor` and `detection_floor` (`calibration.py:337–347`) across the
+  same (design rank × n) grid, so both floors are published as functions rather than as two numbers.
+- **How.** Same driver, full `levels` grid instead of level-0 only.
+- **Inputs.** As T2.1.
+- **Where it runs.** CPU. Rough effort: the expensive cell of Track 2; still CPU-hours, parallel.
+- **Depends on.** T2.2, T2.3.
+- **Also serves.** **Track 3 / P1 item A** — the external cohort will sit at a different n and a
+  different design rank, so without this sweep an external floor that differs from TCGA's is
+  uninterpretable: we would not know whether the floors "did not transfer" or simply moved the amount
+  the sweep already predicts. **This task is what makes the external demonstration decidable.**
+  **P3** — the D2 head-to-head is read against a floor. **P4** — the certificate quotes one.
+
+### T2.7 — Write-up
+
+- **What.** New document needed: `v2/research/rebase/nature/INDUCED_CORRELATION.md` — the sweep table,
+  the fitted form, the estimator-robustness result, and both floors as functions.
+- **How.** `GateLedger.observe` for the sweep values (these are findings, not validity conditions);
+  `validate_claim` before any sentence is written.
+- **Depends on.** T2.2–T2.6.
+- **Also serves.** **P1** — phase-gate item C. **P3** — cited by D3. **P4** — the certificate spec.
+
+### In plain terms
+
+When you statistically "remove" a nuisance variable like cancer type or hospital from two different
+measurements, you do not just remove the nuisance — you also, accidentally, make the two leftovers
+look slightly similar to each other, even when they started out completely unrelated. We measured that
+accidental similarity once, on one particular nuisance model, in one particular group of 2,530
+patients, and got somewhere between 0.067 and 0.140. That is an interesting observation but it is not
+yet a general fact about the method. So we repeat it with a smaller nuisance model, with a bigger one,
+and with patient numbers both smaller and larger — up to the full 6,427 we now have — and we write
+down in advance what we think the relationship should look like. If the effect turns out to be
+specific to that one nuisance model, we have to say so, and the headline observation shrinks. If it
+holds, other groups can predict it for their own data before running anything. The same runs also
+tell us how many patients a new hospital's dataset would need before its results mean anything.
+
+---
+
+## Track 3 — External cohort (blocked on data acquisition; runs last)
+
+Discharges phase-gate item **A**. **This is the single highest-leverage item on the project.**
+`claim_guards.no_external_cohort` is undischarged for every morphology result we have, and
+`_is_discharged` clears it as soon as `external_cohorts` is non-empty — one qualifying cohort flips it
+for `legible_axis` and `gene_attribution` claims at once, which is P1's floors, P3's axis claims and
+P4's certification in a single stroke. Honest caveat, verified from `_REQUIREMENTS`: it does **not**
+touch E0's `transfer` claim, which is blocked on `proliferation_deflation` and `single_platform` and
+stays inadmissible regardless.
+
+### T3.1 — Choose the cohort (the actual blocker)
+
+- **What.** Pick one cohort. Left **TBD pending a parallel research task**, but the requirements are
+  fixed and are not negotiable:
+  1. **Paired imaging + molecular on the SAME individuals.** Two separate cohorts, one with slides and
+     one with RNA, is worthless here — the floors are cross-modal and paired by construction.
+  2. **A molecular assay expressible in the reference dictionary's gene space.** Bulk RNA is the clean
+     case. A proteomics-only cohort forces a mapping decision that changes what the claim means, and
+     that decision must be made before download, not after.
+  3. **Open or fast-access licence.** A credentialed application on the critical path converts a
+     bounded task into an unbounded one.
+  4. **Enough n to estimate a floor.** `run_calibra` refuses below 50 paired patients
+     (`insufficient_paired_patients`), but 50 is a floor on *running*, not on *estimating*. The real
+     number comes from **T2.3** — this is why Track 2 must finish before the cohort is finalised.
+  5. **Site / scanner metadata present or derivable**, or the confound certificate of T1.3 — the whole
+     reason to want an external cohort — cannot be computed on it.
+- **How.** A scouting document already exists: `v2/research/rebase/nature/data_external_wsi_outcome.md`
+  (dated 2026-07-29, WebFetch-verified, with COULD-NOT-VERIFY items flagged). It names CPTAC via TCIA
+  as the workhorse tier-A candidate. **Treat it as a shortlist to re-verify, not as a decision.**
+- **Where it runs.** Research task + a human decision. Rough effort: a scouting task, then a download.
+- **Depends on.** T2.3 for the n requirement; a **user decision** for the licence.
+- **Also serves.** Everything downstream in this track.
+
+### T3.2 — Acquire and stage
+
+- **What.** Download, checksum, and stage slides + molecular tables + whatever site metadata exists.
+- **How.** Standard fetch; record SHA-256 (first 16 hex), mtime and size of every input per
+  `HANDOFF_GATES.md` G0.3.
+- **Where it runs.** GPU box (that is where the disk and the patch store live). Rough effort: dominated
+  by transfer volume; the scouting document quotes hundreds of GB per CPTAC collection.
+- **Depends on.** T3.1 and **explicit user approval of the disk budget**.
+- **Also serves.** P2/P3/P4 all consume the same staged cohort.
+
+### T3.3 — Put it through the *identical* preprocessing chain
+
+Any deviation here voids the comparison; the point of an external cohort is that the instrument, not
+the pipeline, is what changed.
+
+- **What / How**, in order:
+  1. **Gene identifier alignment to the reference dictionary space** —
+     `v2/prepare_pancan_rna.py:prepare_pancan_rna` with `_normalise_gene_label`, and the G1.6 assertion
+     that the housekeeping panel `ACTB, GAPDH, TUBB, RPL13A, B2M` survives the intersection. If the
+     housekeepers are missing, the mapping is broken, not the biology. Non-finite gene columns must be
+     handled exactly as they were for TCGA (see the 07:43 entry).
+  2. **The same `signed_log1p` transform E0 and PBS used** —
+     `v2/build_pbs_targets.py --rna-log-transform signed_log1p`, matching
+     `v2/calibra/e0_basis_transfer.py:374`. The transform statistics and the dictionary itself must
+     stay **frozen on TCGA development rows**
+     (`build_pbs_targets.py:fit_development_expression_transform`). Refitting on the external cohort
+     would make it a second discovery cohort rather than a replication. New flag needed on
+     `v2/build_pbs_targets.py`: `--frozen-dictionary <path>` to project without fitting — the existing
+     `--fit-population` only offers `train` / `development`, both of which fit.
+  3. **Patch embedding with H-Optimus-0** into a canonical patch store, `wsi_mode="hoptimus_patch"`,
+     the same store interface `v2/export_baselines.py` validates via `data.hoptimus_store.validate()`.
+     New module needed: `v2/build_external_patch_store.py`. **This is the one GPU-bound step in the
+     entire P1 plan.**
+  4. **A cohort / split manifest** — `python -m morpheus.v2.build_paired_split --data-config … 
+     --source-split … --output …`. For a replication the entire external cohort is held out, so the
+     manifest declares no development rows; `preflight.restrict_cohort_to_split` then makes the split
+     the authoritative cohort.
+  5. **Targets built with the frozen dictionary** — `build_pbs_targets` under (2), plus a Hallmark
+     block over the same expression source for the curated comparator.
+- **Inputs.** T3.2's staged files; `~/e0_run/data/pbs_targets_k128_v2.npz.manifest.json` as the frozen
+  reference to bind against.
+- **Where it runs.** Step 3 on the GPU box; steps 1, 2, 4, 5 CPU. Rough effort: step 3 dominates and is
+  proportional to slide count; the rest is hours.
+- **Depends on.** T3.2.
+- **Also serves.** **P3** — the same targets file is what a PBS replication would use. **P4** — stage
+  S1 of the build order needs an external cohort in exactly this format before S2 (spatial) is
+  meaningful.
+
+### T3.4 — Measure both floors on the external cohort
+
+- **What.** `transmission_floor` and `detection_floor` on the external cohort, quoted **beside** the
+  TCGA values **and beside T2.6's prediction for that cohort's design rank and n**.
+- **How.** `python -m morpheus.v2.calibra.run_calibra` with the same `--levels`, `--n-draws`,
+  `--n-components`, `--min-site-count` and `--seed` as the TCGA runs, plus
+  `--require-rna-positive-control --require-channel-gates`.
+- **Inputs.** T3.3's artifact and targets.
+- **Where it runs.** CPU. Rough effort: same order as T1.2.
+- **Depends on.** T3.3, T2.6.
+- **Falsifier (from the evidence ledger).** The floors do not transfer, or invert. T2.6 is what makes
+  "did not transfer" distinguishable from "moved by the amount design rank and n predict".
+- **Also serves.** **P1** — phase-gate item A. **P2** — makes the rank-does-not-track-channel
+  demonstration a two-cohort result instead of a TCGA-only one, which materially raises the ceiling on
+  where P2 can be submitted. **P3, P4** — see T3.6.
+
+### T3.5 — Re-run the Track 1 must-fail battery on the external cohort
+
+- **What.** T1.3–T1.6 again, on the new cohort.
+- **How.** Same modules, new artifact. T1.3's site/scanner control is the point of the exercise: a
+  site-specific artefact that survived TCGA's within-cohort checks intact is exactly what
+  `claim_guards.no_external_cohort` warns about, and only a second cohort can expose it.
+- **Inputs.** T3.3's artifact.
+- **Where it runs.** CPU. Rough effort: as Track 1.
+- **Depends on.** T3.3, T1.3–T1.6.
+- **Also serves.** **P4** — condition 4 plus the external-replication condition of the five-point rule,
+  both satisfied by one run.
+
+### T3.6 — Discharge the blocker, deliberately
+
+- **What.** Pass `external_cohorts=["<cohort>"]` into `v2/calibra/claim_guards.py:validate_claim` and
+  record the resulting verdict change for every affected claim.
+- **How.** `_is_discharged` requires `len(external_cohorts) >= 1`. Per **Notes to future agents** item
+  4, discharging a blocker is a decision, and any test it breaks is updated deliberately rather than
+  repaired.
+- **Depends on.** T3.4, T3.5.
+- **Also serves.** **P1** (the floors), **P3** (every `legible_axis` and `gene_attribution` claim),
+  **P4** (certification). Explicitly **not** E0's `transfer` claim, which remains inadmissible on
+  `proliferation_deflation` and `single_platform` — and
+  `test_current_e0_result_is_not_yet_an_admissible_transfer_claim` should still pass afterwards. If it
+  does not, something was discharged that we did not intend to discharge.
+
+### In plain terms
+
+Every slide we have ever looked at came from one archive, TCGA, which is known to leave fingerprints
+of which hospital and which scanner produced each slide. That means any result we have could, in
+principle, be a hospital effect wearing a biology costume, and none of our current checks can tell the
+difference, because they were all done inside that same archive. The fix is to run the whole thing on
+slides from somewhere else entirely. It has to be a place where the *same patients* have both slides
+and molecular measurements, the data has to be downloadable without a months-long application, and it
+has to have enough patients — how many is a number Track 2 will produce. Then it has to go through
+exactly the same preparation we used before: same gene naming, same maths on the expression values,
+same slide-image model, same bookkeeping of who is in which group. Nothing may be re-tuned on the new
+data, or it stops being a test and becomes a second experiment. If the instrument reports the same
+sensitivity limits there as here, all four papers get their most serious objection removed at once. If
+it does not, we find that out before a reviewer does.
+
+---
+
+## Dependency and parallelism
+
+```mermaid
+graph TD
+  subgraph T1["Track 1 — negative-control battery (CPU, now)"]
+    T11["T1.1 build 7 must-beat<br/>baseline target blocks"]
+    T12["T1.2 score all through<br/>run_calibra, one scale"]
+    T13["T1.3 must-FAIL: site/scanner<br/>new confound_certificate.py"]
+    T14["T1.4 must-FAIL: random gene sets<br/>RANDOM_CONTROL columns exist"]
+    T15["T1.5 must-FAIL: shuffled gene labels<br/>subspace persists, naming dies"]
+    T16["T1.6 must-FAIL: shuffled pairing<br/>permutation_null, raise to 1000"]
+    T17["T1.7 positive controls x3"]
+    T18["T1.8 GATE_LOG + battery write-up"]
+    T11 --> T12 --> T14 --> T18
+    T12 --> T16 --> T18
+    T11 --> T15 --> T18
+    T13 --> T18
+    T17 --> T18
+  end
+
+  subgraph T2["Track 2 — induced-correlation generalisation (CPU, now)"]
+    T21["T2.1 sweep driver<br/>new induced_correlation_sweep.py"]
+    T22["T2.2 2nd/3rd design rank<br/>cancer-only, +purity, +dx-year"]
+    T23["T2.3 2nd n<br/>subsample and full 6,427"]
+    T24["T2.4 predicted scaling law"]
+    T25["T2.5 estimator robustness<br/>n_splits, alpha"]
+    T26["T2.6 both floors as functions<br/>of design rank and n"]
+    T27["T2.7 INDUCED_CORRELATION.md"]
+    T21 --> T22 --> T24
+    T21 --> T23 --> T24
+    T21 --> T25 --> T27
+    T22 --> T26
+    T23 --> T26
+    T24 --> T27
+    T26 --> T27
+  end
+
+  subgraph T3["Track 3 — external cohort (blocked on data)"]
+    T31["T3.1 choose cohort<br/>TBD - research task + user"]
+    T32["T3.2 acquire and stage<br/>USER: disk + licence"]
+    T33["T3.3 identical preprocessing<br/>genes, signed_log1p, H-Optimus,<br/>build_paired_split"]
+    T34["T3.4 both floors external"]
+    T35["T3.5 re-run must-FAIL battery"]
+    T36["T3.6 discharge no_external_cohort"]
+    T31 --> T32 --> T33 --> T34 --> T36
+    T33 --> T35 --> T36
+  end
+
+  P1G["P1 phase gate<br/>A + B both met"]
+  P2X["P2 — negative-result form<br/>needs same-run positive control"]
+  P3X["P3 — beats curated pathways<br/>+ composition + purity design"]
+  P4X["P4 — per-axis certification<br/>5-point rule, MULTIMODAL_EXPANSION 1"]
+
+  T18 --> P1G
+  T27 --> P1G
+  T34 --> P1G
+
+  T23 -.sizes the cohort.-> T31
+  T26 -.makes external floors decidable.-> T34
+
+  T11 --> P3X
+  T12 --> P3X
+  T22 --> P3X
+  T15 --> P3X
+  T13 --> P4X
+  T15 --> P4X
+  T35 --> P4X
+  T36 --> P4X
+  T17 --> P2X
+  T16 --> P2X
+  T34 --> P2X
+  T36 --> P3X
+
+  classDef now fill:#dff0d8,stroke:#3c763d,color:#1b3a1b;
+  classDef gated fill:#fcf8e3,stroke:#8a6d3b,color:#3a331b;
+  classDef userneeded fill:#f2dede,stroke:#a94442,color:#3a1b1b;
+  classDef paper fill:#eeeeee,stroke:#777777,color:#222222;
+  class T11,T12,T13,T14,T15,T16,T17,T18,T21,T22,T23,T24,T25,T26,T27 now;
+  class T33,T34,T35,T36 gated;
+  class T31,T32 userneeded;
+  class P1G,P2X,P3X,P4X paper;
+```
+
+**Reading it.** Tracks 1 and 2 have no incoming edge from any GPU run, from each other, or from data
+acquisition — both start immediately and run concurrently with whatever the GPU queue is doing. The
+only couplings into Track 3 are informational and both point *forward*: T2.3 sizes the external cohort,
+and T2.6 is what makes an external floor decidable rather than merely different. Track 3's own critical
+path begins with a decision only a human can make. Note how many arrows leave Track 1 for P3 and P4:
+that is the point — the battery is not P1 overhead, it is P3's baseline table and P4's certifier being
+built once.
+
+## What we need from the user
+
+Blunt list. These are the items no agent can do, and the ones where guessing wrong is expensive.
+
+1. **Approve an external cohort family, and approve its download.** Track 3 cannot begin without it,
+   and Track 3 is the item that removes the most serious objection to all four papers.
+   `v2/research/rebase/nature/data_external_wsi_outcome.md` is the shortlist to choose from.
+2. **Decide the credentialed-access question.** If any candidate cohort's molecular or outcome table
+   sits behind an application (dbGaP-class), say whether to start that application now on a slow
+   parallel path, or to restrict the choice to open-tier data only. Do not put an application on the
+   critical path by default.
+3. **Approve a disk budget on the GPU box** for external slides plus the H-Optimus patch store they
+   expand into. The scouting document quotes hundreds of GB per collection *before* embedding.
+4. **Rule on GPU priority.** T3.3 step 3 (patch embedding) is the one GPU-bound task in this plan and
+   it competes with the D1 diagnosis and the D2 seeds 43/44 queue. Say which wins if they collide.
+5. **Decide whether proteomics-only counts.** If the chosen cohort has proteomics but not bulk RNA,
+   the gene-space alignment in T3.3 step 1 changes meaning, and so does the claim. This is a
+   scientific decision, not an engineering one, and it must be made before download.
+6. **Approve the resources for two Track 1 baselines**: a deconvolution reference or CellViT weights
+   for the cell-composition baseline (T1.1), and whether GenePT-style gene embeddings may be used at
+   all given licence/API constraints (T1.1). If either is refused, say so — we will report the
+   baseline as not run rather than substituting a weaker proxy silently.
+7. **Confirm whether a TCGA clinical table exists or should be obtained** carrying purity (needed by
+   T2.2 and by P3's D3, currently NOT STARTED for exactly this reason) and MSI / TP53 / consensus
+   subtype (needed by T1.7's known-legible-covariate positive control). Both are currently absent from
+   disk as far as this notebook records.
+8. **Acknowledge the deliberate-discharge rule.** When T3.6 lands,
+   `test_current_e0_result_is_not_yet_an_admissible_transfer_claim` and any similar pinned test must be
+   updated as a recorded decision, never as a test repair.
+
+## Definition of done — P1
+
+One line per row of the P1 evidence ledger, plus the phase gate, so completion is mechanically
+checkable rather than a matter of opinion.
+
+- [x] The three nested spike-readout defects and their fix — DONE (`HANDOFF_PHASE_D.md` §0; `v2/calibra/`).
+- [x] Ambient correlation ~0.97 and the pre-fix NaN detection floors — DONE (`HANDOFF_PHASE_D.md` §0).
+- [x] Confound adjustment does not destroy signal, attenuation 0.94–1.23 — DONE at the anchor design.
+- [ ] …and re-confirmed at **≥ 2 design ranks**, since the stated falsifier is attenuation far from 1
+      under a differently constructed design at comparable rank — **T2.2**.
+- [ ] Induced correlation measured at **≥ 2 design ranks** and **≥ 2 n**, reported as a function of
+      both, with the estimator ruled out as the cause — **T2.1, T2.2, T2.3, T2.5, T2.7**.
+- [x] Two floors exist and are not interchangeable (`transmission_floor` paired, `detection_floor`
+      unpaired) — DONE on TCGA.
+- [ ] …and both demonstrated on a **second dataset**, quoted against the design-rank/n prediction so
+      "did not transfer" is distinguishable from "moved as predicted" — **T2.6, T3.4**.
+- [x] Gate-vs-observation separation implemented (`GateLedger.add` vs `.observe`) — DONE
+      (`v2/calibra/gates.py:11,20,25`).
+- [ ] …and demonstrated in practice by the battery: every must-fail/must-pass control via `add()`,
+      every baseline comparison via `observe()`, one row each in `GATE_LOG.md` — **T1.8**.
+- [x] `claim_guards` as executable claim admissibility, six blockers, 15 tests — DONE.
+- [ ] …with `no_external_cohort` **discharged** for `legible_axis` and `gene_attribution`, and the
+      pinned E0 `transfer` test still failing as designed — **T3.6**.
+- [x] Worked liveness-gate failure cases (17:08, 17:31, 17:45, 15:31) — DONE, in this notebook.
+- [ ] **External / second-dataset demonstration of both floors** — **Track 3** (T3.1 → T3.4).
+- [ ] **Negative-control battery run and written up, including the losses** — **Track 1** (T1.1 → T1.8):
+  - [ ] must-beat: curated pathway · random dictionary · PCA/NMF · text-prior · cell-composition
+        (capacity-matched) · zero-parameter naive · best unimodal — all seven scored, all reported.
+  - [ ] must-fail: site/scanner prediction · random gene sets · shuffled gene labels · modality-shuffled
+        pairing — each with its pass criterion stated **before** the run and each observed to fail.
+  - [ ] must-pass: RNA→RNA circular control · held-out known-legible covariate at its independently
+        known strength · synthetic spike above the floor recovered — all three observed to pass **in the
+        same run, on the same data, through the same code path**.
+- [ ] **Phase gate met**: item A (external demonstration) **and** item B (battery executed and written
+      up) both true, with every must-fail control observed to fail and every positive control observed
+      to pass, reported including the ones that go against us.
+
+---
+
 # Notes to future agents
 
 Standing instructions for whoever — human or agent — picks this up next.
