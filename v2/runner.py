@@ -763,6 +763,9 @@ def _require_programme_only_overfit(result: dict[str, object]) -> None:
         raise RuntimeError(
             "G2.6 programme_only overfit failed before training: "
             f"loss={final:.5f}, programme={programme:.5f}, reduction={reduction:.3f}; "
+            f"best={result.get('best_loss')} at step {result.get('best_step')}, "
+            f"still_descending={result.get('still_descending')}, "
+            f"trajectory={[(row['step'], round(row['loss'], 4)) for row in result.get('trajectory', [])][::3]}; "
             "expected a practically memorised actual-model objective"
         )
 
