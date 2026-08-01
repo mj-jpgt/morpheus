@@ -577,6 +577,10 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
 
     initial_loss, initial_metrics = objective()
     initial = float(initial_loss.detach().cpu())
+    # Holding `initial_loss` would pin one full activation graph for all 300
+    # steps. At the real token budget that graph is gigabytes, and it was
+    # enough to OOM a 40 GB A100 before the first optimiser step.
+    del initial_loss
     first_gradients: dict[str, float] | None = None
     for step in range(steps):
         loss, _ = objective(); loss.backward()

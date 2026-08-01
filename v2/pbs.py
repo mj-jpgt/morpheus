@@ -72,7 +72,18 @@ class LegibilityOperator:
     fold_score: np.ndarray
 
     @classmethod
-    def fit(cls, wsi: np.ndarray, codes: np.ndarray, cancers: Sequence[str], *, alphas=(.01, .1, 1., 10.)) -> "LegibilityOperator":
+    def fit(cls, wsi: np.ndarray, codes: np.ndarray, cancers: Sequence[str], *,
+            alphas=(1., 10., 100., 1e3, 1e4, 1e5, 1e6)) -> "LegibilityOperator":
+        """Estimate per-axis legibility by grouped-CV held-out R2.
+
+        The alpha grid must reach far beyond unity. `wsi` is a 1536-dimensional
+        standardised patient vector against ~3.7k development rows, so at
+        alpha<=10 the ridge is effectively unregularised: measured on the real
+        cohort, EVERY Hallmark and PBS axis returned a NEGATIVE held-out R2
+        (best -1.28), was clipped to zero, and the run aborted with "no nonzero
+        development-fitted axes". At alpha=1e4 -- an interior optimum, selected
+        by CV rather than assumed -- 45 of 50 Hallmark axes score positive.
+        """
         x, y = _matrix("wsi", wsi), _matrix("codes", codes)
         groups = np.asarray(cancers).astype(str)
         if len(x) != len(y) or len(x) != len(groups) or len(np.unique(groups)) < 2:
