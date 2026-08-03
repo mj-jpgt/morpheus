@@ -321,6 +321,46 @@ def stage_baselines(args) -> None:
     print(f"[baselines] wrote {out}", flush=True)
 
 
+def stage_cohort_control(args) -> None:
+    """Declare how much residual batch signal separates our TCGA patches from HEST spots.
+
+    If a linear classifier tells the two cohorts apart with high AUC, then every downstream
+    result that mixes them has that signal available to it, and saying so is not optional.
+    A within-TCGA split is run as a negative control: if *that* also scores high, the
+    classifier is overfitting and the cross-cohort number means nothing.
+    """
+    import h5py
+
+    rng = np.random.default_rng(args.seed)
+    art = np.load(args.artifact, allow_pickle=False)
+    hest = art["wsi_identity"].astype(np.float32)
+    n = min(args.n_per_cohort, len(hest))
+    hest = hest[rng.choice(len(hest), size=n, replace=False)]
+
+    with h5py.File(args.tcga_store, "r") as handle:
+        store = handle["embeddings"]
+        pick = np.sort(rng.choice(store.shape[0], size=2 * n, replace=False))
+        tcga = store[pick, :].astype(np.float32)
+    tcga = tcga / np.maximum(np.linalg.norm(tcga, axis=1, keepdims=True), 1e-8)
+
+    cross = cohort_classifier_auc(tcga[:n], hest, seed=args.seed)
+    control = cohort_classifier_auc(tcga[:n], tcga[n:2 * n], seed=args.seed)
+    print(f"[cohort] TCGA vs HEST      AUC = {cross:.4f}", flush=True)
+    print(f"[cohort] TCGA vs TCGA (-)  AUC = {control:.4f}", flush=True)
+
+    out = Path(args.output)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    json.dump({"tcga_vs_hest_auc": cross, "tcga_vs_tcga_control_auc": control,
+               "n_per_cohort": int(n), "seed": int(args.seed),
+               "normalisation": "row L2 on both cohorts",
+               "tcga_store": str(args.tcga_store), "artifact": str(args.artifact),
+               "note": "A high cross-cohort AUC means residual batch signal is available to "
+                       "every result that mixes the cohorts and must be declared. The "
+                       "within-TCGA control shows what chance looks like for this classifier."},
+              open(out, "w"), indent=1)
+    print(f"[cohort] wrote {out}", flush=True)
+
+
 def _score(y, prediction, slides, mask) -> dict:
     pooled = pooled_r(y, prediction, mask)
     within = within_slide_r(y, prediction, slides, mask)
@@ -361,6 +401,12 @@ def main() -> None:
     b.add_argument("--artifact", required=True); b.add_argument("--targets", required=True)
     b.add_argument("--output", required=True); b.add_argument("--ridge-alpha", type=float, default=1000.0)
     b.set_defaults(func=stage_baselines)
+
+    c = sub.add_parser("cohort-control")
+    c.add_argument("--artifact", required=True); c.add_argument("--tcga-store", required=True)
+    c.add_argument("--output", required=True); c.add_argument("--n-per-cohort", type=int, default=20000)
+    c.add_argument("--seed", type=int, default=0)
+    c.set_defaults(func=stage_cohort_control)
 
     args = parser.parse_args()
     args.func(args)
