@@ -53,10 +53,10 @@ the queue fill with re-encodings of that same batch, so the negatives become the
 therefore **freezes** the queue at 64 keys. That fix was correct and necessary — measured reduction
 0.054 → 0.394, unique keys 16 → 64.
 
-But a frozen queue is perfectly self-consistent, and training's queue is not: it holds 4,096 keys
-written by an encoder that has moved substantially since the oldest were enqueued. Under a live queue
-the same objective collapses to effective rank ~2 within 150 steps, from an initialisation of 67.55,
-under **every** setting of both regularisers suspected of causing it — including both at zero:
+But a frozen queue supplies a fixed reference frame and training's queue does not: its 4,096 keys are
+written by the query encoder itself, one step behind. Under a live queue the same objective collapses
+to effective rank ~2 within 150 steps, from an initialisation of 67.55, under **every** setting of
+both regularisers suspected of causing it — including both at zero:
 
 | `decorrelation` | `biology_full_consistency` | step 50 | 100 | 150 | 200 | 250 |
 |---|---|---:|---:|---:|---:|---:|
