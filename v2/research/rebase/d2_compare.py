@@ -62,6 +62,42 @@ def _targets(path: str, groups: list[str] | None = None) -> tuple[dict[str, int]
     return {identifier: index for index, identifier in enumerate(ids)}, values
 
 
+def load_deflation_block(npz_path: str, axes_file: str) -> tuple[dict[str, int], np.ndarray, list[str]]:
+    """Patient-level scores for the axes whose subspace is to be regressed out.
+
+    D2.3's remedy for ``claim_guards.proliferation_deflation`` is "re-run with the
+    proliferation programme regressed out". The programme is defined by a list of
+    PBS axes, and it is removed by appending their patient scores to the confound
+    design -- so ``cross_fitted_residuals`` strips that subspace from the targets
+    and from BOTH arms identically. Deleting the axes from the readout block
+    instead would answer a different question (can the arms predict
+    non-proliferation *targets*) and would silently change the pre-registered
+    target set.
+
+    The axis list comes from a file rather than the command line so the exact cut
+    is a durable artifact next to the results.
+    """
+    raw = np.load(npz_path, allow_pickle=False)
+    ids = np.asarray(raw["patient_ids"]).astype(str)
+    names = np.asarray(raw["target_names"]).astype(str)
+    values = np.asarray(raw["scores"], dtype=np.float64)
+    if values.shape != (len(ids), len(names)) or len(set(ids)) != len(ids) or len(set(names)) != len(names):
+        raise ValueError(f"deflation artifact {npz_path} fails ID/axis uniqueness requirements")
+    wanted = [line.strip() for line in Path(axes_file).read_text().splitlines() if line.strip()]
+    if not wanted:
+        raise ValueError(f"deflation axis file {axes_file} is empty; omit --deflate-npz instead")
+    if len(set(wanted)) != len(wanted):
+        raise ValueError(f"deflation axis file {axes_file} lists an axis twice")
+    position = {name: index for index, name in enumerate(names)}
+    missing = sorted(set(wanted) - set(position))
+    if missing:
+        raise ValueError(f"deflation axes absent from {npz_path}: {missing[:5]}")
+    columns = values[:, [position[name] for name in wanted]]
+    if not np.isfinite(columns).all() or np.any(np.std(columns, axis=0) < 1e-8):
+        raise ValueError("deflation axes are non-finite or constant; residualising them is a no-op")
+    return {identifier: index for index, identifier in enumerate(ids)}, columns, wanted
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--hallmark-artifacts", nargs="+", required=True)
@@ -77,7 +113,16 @@ def main() -> None:
     parser.add_argument("--target-groups", nargs="*", default=None,
                         help="restrict the readout to these target_groups (e.g. heldout_pathway "
                              "immune_tme tumour_state). Omit to score every non-control target.")
+    parser.add_argument("--deflate-npz", default="",
+                        help="axis-score artifact (e.g. pbs_targets_k128_v2.npz) whose named axes are "
+                             "regressed out of the targets and BOTH arms before the comparison")
+    parser.add_argument("--deflate-axes-file", default="",
+                        help="text file, one axis name per line, naming the subspace to remove")
+    parser.add_argument("--deflate-label", default="",
+                        help="name of this cut in the output, e.g. prol_top100 or placebo_random")
     args = parser.parse_args()
+    if bool(args.deflate_npz) != bool(args.deflate_axes_file):
+        raise ValueError("--deflate-npz and --deflate-axes-file must be given together")
     # The output keys are built from these labels, so a collision would overwrite
     # an arm's path or point estimate with the other's and still emit valid JSON.
     reserved = {"n_test", "confounds", "pairs", "experiment", "arm_a", "arm_b"}
@@ -86,10 +131,23 @@ def main() -> None:
     if len(args.hallmark_artifacts) != len(args.pbs_artifacts):
         raise ValueError(f"{args.experiment} requires one seed-matched artifact pair per seed")
     target_index, target_scores = _targets(args.targets, args.target_groups)
+    deflate_index, deflate_scores, deflate_names = ({}, None, [])
+    if args.deflate_npz:
+        deflate_index, deflate_scores, deflate_names = load_deflation_block(
+            args.deflate_npz, args.deflate_axes_file)
     result: dict[str, object] = {"experiment": args.experiment, "arm_a": args.label_a,
                                  "arm_b": args.label_b,
                                  "target_groups": args.target_groups or "all_non_control",
-                                 "n_targets": int(target_scores.shape[1]), "pairs": []}
+                                 "n_targets": int(target_scores.shape[1]),
+                                 "deflation": {"enabled": bool(args.deflate_npz),
+                                               "label": args.deflate_label,
+                                               "npz": args.deflate_npz,
+                                               "axes_file": args.deflate_axes_file,
+                                               "n_axes": len(deflate_names),
+                                               "axes": deflate_names,
+                                               "applied_to": "confound design, so removed from the "
+                                                             "targets and BOTH arms identically"},
+                                 "pairs": []}
     for pair_index, (h_path, i_path) in enumerate(zip(args.hallmark_artifacts, args.pbs_artifacts)):
         h, i = _load(h_path), _load(i_path)
         for field in ("patient_ids", "split", "cancers"):
@@ -111,7 +169,16 @@ def main() -> None:
         # Bootstrap the exact residualised matrices.  Confound residualisation
         # is fitted once on held-out rows for both arms identically; resampling
         # then quantifies the paired channel difference rather than re-selecting.
-        design = confound_design(pd.DataFrame({"cancer": cancers, "tss": tss}), ["cancer", "tss"])
+        frame = pd.DataFrame({"cancer": cancers, "tss": tss})
+        columns = ["cancer", "tss"]
+        if deflate_scores is not None:
+            deflate_rows = np.asarray([deflate_index.get(identifier, -1) for identifier in ids])
+            if (deflate_rows < 0).any():
+                raise ValueError("deflation artifact does not cover a held-out test patient")
+            for offset, name in enumerate(deflate_names):
+                frame[name] = deflate_scores[deflate_rows, offset]
+                columns.append(name)
+        design = confound_design(frame, columns)
         residual_y = cross_fitted_residuals(y, design, seed=args.seed)
         residual_h = cross_fitted_residuals(hx, design, seed=args.seed)
         residual_i = cross_fitted_residuals(ix, design, seed=args.seed)
@@ -122,7 +189,9 @@ def main() -> None:
                                 f"point_{args.label_b}": paired_metric(residual_y, residual_i),
                                 f"{args.label_b}_minus_{args.label_a}": comparison,
                                 "confounds": {"columns": ["cancer", "tss"], "min_site_count": 10,
-                                              "n_distinct_sites_kept": len(frequent_sites)}})
+                                              "n_distinct_sites_kept": len(frequent_sites),
+                                              "n_deflated_axes": len(deflate_names),
+                                              "n_design_columns": int(design.shape[1])}})
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output).write_text(json.dumps(result, indent=2), encoding="utf-8")
 
