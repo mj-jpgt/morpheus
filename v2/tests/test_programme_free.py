@@ -267,20 +267,37 @@ def test_decorrelation_is_minimised_by_the_collapse_it_claims_to_prevent() -> No
             > float(variance_floor(healthy, target_std=target)))
 
 
-def test_both_d1_arms_pair_decorrelation_with_a_variance_floor() -> None:
+def test_both_d1_arms_carry_identical_regularisation() -> None:
     """The D1 contrast must measure programme supervision and nothing else.
 
-    Either arm carrying decorrelation without variance collapses; either arm
-    carrying different regularisation from the other makes the comparison
-    measure more than the objective under test.
+    SYMMETRY is the invariant, not any particular weight. An arm carrying
+    different regularisation from the other makes the comparison measure more
+    than the objective under test, whatever the weights happen to be.
+
+    This test previously also asserted `decorrelation > 0` in both arms, on the
+    theory that decorrelation was the anti-collapse force. Measurement falsified
+    that on 2026-08-03, in the opposite direction: `feature_decorrelation` has
+    total collapse as its global minimum (pinned separately below), it collapses
+    the representation at every weight from 0.001 to 4.0 while switching itself
+    off, and a per-dimension variance floor provably cannot stop it because the
+    rank-1 family `z_i = m + a_i*u` satisfies such a floor. Requiring the term to
+    be present is therefore not a safety property, and the assertion is removed.
+
+    What survives is the standing hazard, kept as a CONDITIONAL: decorrelation
+    must never appear without a variance floor beside it.
     """
     free = V2LossSchedule(objective_profile="programme_free", warmup_epochs=0).weights(1)
     only = V2LossSchedule(objective_profile="programme_only", warmup_epochs=0).weights(1)
+    regularisers = ("decorrelation", "variance", "separation")
+    for name in regularisers:
+        assert free[name] == only[name], (
+            f"D1 arms disagree on {name}: programme_free={free[name]} programme_only={only[name]}; "
+            "the contrast would measure regularisation as well as supervision")
     for name, weights in (("programme_free", free), ("programme_only", only)):
-        assert weights["decorrelation"] > 0, name
-        assert weights["variance"] > 0, f"{name} has decorrelation without a variance floor"
-    assert free["decorrelation"] == only["decorrelation"]
-    assert free["variance"] == only["variance"]
+        if weights["decorrelation"] > 0:
+            assert weights["variance"] > 0, (
+                f"{name} carries decorrelation without a variance floor; the covariance penalty is "
+                "minimised by the collapse it claims to prevent")
 
 
 def test_paired_infonce_removes_the_batch_common_direction_by_default() -> None:
