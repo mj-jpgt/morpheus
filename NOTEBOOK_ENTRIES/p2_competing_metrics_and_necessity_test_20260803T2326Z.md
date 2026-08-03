@@ -7,9 +7,10 @@ frozen artifacts and score them **as selection rules**, and run the necessity te
 "necessary but not sufficient" hedge is vulnerable to. Task 1 (prior-art citation-graph sweep) is
 logged separately.
 
-**This entry does not edit `paper/P2_RANK_DRAFT.md` or `NOTEBOOK.md`.** Another agent owns the draft
-and a third is unifying `effective_rank`; the working tree carries their uncommitted changes to
-`v2/calibra/spectral.py` and I have not touched them.
+**This entry does not edit `paper/P2_RANK_DRAFT.md`, `NOTEBOOK.md` or `v2/`.** Another agent owns the
+draft and a third unified `effective_rank` (commit `85c0fa8`); I touched none of their files. Their
+canonical definition — Roy & Vetterli 2007 Definition 1, order 1, column-centred — is exactly the one
+used for every "effective rank" number below, and §4.3 uses their R1/R2/R3 taxonomy.
 
 ---
 
@@ -24,7 +25,9 @@ material so they cannot be buried.
    as its rank advantage. Under §4.8.4 of the draft this is the *first* row of the preregistered
    outcome table — "large rank gap, large channel gap in the same direction" — which that table
    says must be **reported as a negative for this paper's generality, in §4.1 and the abstract, at
-   the same prominence as the instances that dissociate.**
+   the same prominence as the instances that dissociate.** Qualified by §4.3: this is 3/3 under the
+   canonical R1 and under R3, but **2/3 under R2**, the statistic draft §4.8.3 nominates for the D1
+   rank column.
 2. **D1's result also trips a preregistered escalation elsewhere.** `d1_v2/D1_PAIR_MANIFEST.json`
    records `"preregistered_prediction": "programme_free >= programme_only on the held-out molecular
    channel; if programme_only wins, the collapse story is wrong -- escalate, do not proceed to D2"`.
@@ -288,7 +291,33 @@ absolute CCA (0.79–0.85) should not be read as a clean image→molecular chann
 canonical readout is `wsi_biology`. The **rank** measurements on the other views are not affected by
 this circularity, and the instability of the rank *verdict* across views stands on its own.
 
-### 4.3 Held-out ground truth
+### 4.3 The three statistics this repository calls "effective rank" disagree as selection rules
+
+Commit `85c0fa8` ("One effective_rank, ten call sites") establishes that three mutually incompatible
+statistics were in use here under one name: **R1** = Roy–Vetterli, order 1, column-centred (canonical,
+`spectral.py`); **R2** = order-2 participation ratio (`d1_audit.py`); **R3** = R2 on L2-normalised rows
+(`d1_geometry_probe.py`, `training.py`, `runner.py`). All three are computed on the same 12 artifacts,
+same residualisation, same ground truth:
+
+| statistic | D2 s42 | D2 s43 | D2 s44 | D1 s42 | D1 s43 | D1 s44 | D2 | D1 | ALL |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| **R1** canonical (Roy–Vetterli) | OK | **MISS** | **OK** | **OK** | OK | OK | 2/3 | 3/3 | 5/6 |
+| **R2** `d1_audit.py` | OK | **OK** | **MISS** | **MISS** | OK | OK | 2/3 | 2/3 | 4/6 |
+| **R3** `d1_geometry_probe.py` | OK | **OK** | **MISS** | **OK** | OK | OK | 2/3 | 3/3 | 5/6 |
+
+**On 3 of the 6 pairs the three statistics return different verdicts** (D2 s43, D2 s44, D1 s42). So
+"does effective rank track information content" does not have one answer even holding the data,
+the arms and the ground truth fixed — it depends on which of three functions, all of them called
+effective rank in this repository and all of them in use in the published literature, is chosen.
+
+**This directly qualifies §0's bad news item 1.** The draft's §4.8.3 states that D1's rank column
+"will be **statistic R2**". **Under R2, D1 scores 2/3, not 3/3.** The finding that "D1 confirms
+necessity 3/3" holds under R1 and R3 and *not* under the statistic the draft nominated for that
+table. The D1 rows must state which statistic they use, and the honest summary of D1 is "rank
+ordering agrees with the information ordering on 2–3 of 3 seeds depending on the rank statistic",
+not a clean 3/3.
+
+### 4.4 Held-out ground truth
 
 A referee will note the headline CCA is in-sample at a 16-component budget and therefore
 upward-biased. Re-run with `heldout_top_cca` (directions fit on half the patients, scored on the
