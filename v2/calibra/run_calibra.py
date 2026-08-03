@@ -32,6 +32,25 @@ from .spectral import (cca_spectrum, effective_rank, heldout_single_direction_co
                        heldout_top_cca)
 
 
+# Declared provenance of a purity column. ``placebo_rank_matched`` is NOT a
+# purity adjustment: it is the rank-matched negative control for D3. Adding
+# purity adds a column to the confound design, so a channel drop can be the
+# design gaining rank rather than tumour content being removed. The placebo
+# holds the patient set, the design rank and the seed fixed and permutes only
+# the purity VALUES, which isolates the two. It carries its own source label so
+# that a placebo run can never be read back as a real purity-adjusted result.
+_PURITY_SOURCES = ("published_consensus", "absolute", "expression_derived", "placebo_rank_matched")
+
+# Sources whose adjustment cannot be interpreted at face value, and the reason.
+_PURITY_CAVEATS = {
+    "expression_derived": ("expression_derived_from_same_RNA_targets",
+                           "expression_derived_from_same_RNA_targets; interpret as partial-circularity sensitivity only"),
+    "placebo_rank_matched": ("values_permuted_rank_matched_negative_control",
+                             "PLACEBO: purity values permuted across patients; identical design rank and patient set; "
+                             "NOT a purity adjustment, and any 'after' number here is a rank-increase reference only"),
+}
+
+
 def _canonical_tcga_patient(value: object) -> str:
     """Accept a TCGA aliquot/sample ID only by reducing a valid TCGA prefix."""
     text = str(value).strip().upper()
@@ -44,7 +63,7 @@ def _canonical_tcga_patient(value: object) -> str:
 def load_purity_table(path: str, patient_column: str = "", purity_column: str = "", *,
                       units: str = "fraction", source: str = "", reference: str = "") -> tuple[dict[str, float], dict[str, object]]:
     """Read one published/expression-derived purity value per canonical patient."""
-    if source not in {"published_consensus", "absolute", "expression_derived"} or not reference.strip():
+    if source not in _PURITY_SOURCES or not reference.strip():
         raise ValueError("purity source and a concrete method/citation reference are mandatory")
     table = pd.read_parquet(path) if str(path).lower().endswith(".parquet") else pd.read_csv(path, sep=None, engine="python")
     patient_candidates = ([patient_column] if patient_column else []) + ["patient_id", "Patient ID", "bcr_patient_barcode", "sample_id", "Sample"]
@@ -72,7 +91,8 @@ def load_purity_table(path: str, patient_column: str = "", purity_column: str = 
     return records, {"path": str(Path(path).resolve()), "sha256": sha256(Path(path).read_bytes()).hexdigest(),
                      "patient_column": patient, "purity_column": purity, "units_input": units,
                      "units_internal": "fraction", "source": source, "reference": reference,
-                     "circularity": "expression_derived_from_same_RNA_targets" if source == "expression_derived" else "none",
+                     "circularity": _PURITY_CAVEATS.get(source, ("none", ""))[0],
+                     "is_placebo": source == "placebo_rank_matched",
                      "n_canonical_patients": len(records)}
 
 
@@ -265,7 +285,7 @@ def main() -> None:
     parser.add_argument("--purity-table", default="", help="published TCGA consensus/ABSOLUTE or declared expression-derived purity table")
     parser.add_argument("--purity-patient-column", default="")
     parser.add_argument("--purity-column", default="")
-    parser.add_argument("--purity-source", default="", choices=("", "published_consensus", "absolute", "expression_derived"))
+    parser.add_argument("--purity-source", default="", choices=("", *_PURITY_SOURCES))
     parser.add_argument("--purity-units", default="fraction", choices=("fraction", "percent"))
     parser.add_argument("--purity-reference", default="", help="dataset DOI/URL or the declared expression-derived method/version")
     parser.add_argument("--require-rna-positive-control", action="store_true",
@@ -363,9 +383,9 @@ def main() -> None:
                              note=f"source={args.purity_source}"))
             rows.append(_row(method=method, task="calibra", metric="purity_max", value=float(observed_purity.max()),
                              note=f"source={args.purity_source}"))
-            if args.purity_source == "expression_derived":
-                rows.append(_row(method=method, task="calibra", metric="purity_circularity", value=1.0,
-                                 note="expression_derived_from_same_RNA_targets; interpret as partial-circularity sensitivity only"))
+            if args.purity_source in _PURITY_CAVEATS:
+                rows.append(_row(method=method, task="calibra", metric="purity_not_interpretable_at_face_value",
+                                 value=1.0, note=_PURITY_CAVEATS[args.purity_source][1]))
         if mask.sum() < 50:
             rows.append(_unavailable(method, "", "calibra", f"insufficient_paired_patients_{int(mask.sum())}"))
             continue

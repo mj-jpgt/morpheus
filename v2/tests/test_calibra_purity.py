@@ -28,6 +28,29 @@ def test_purity_loader_requires_declared_units_source_and_reference(tmp_path):
         load_purity_table(str(path))
 
 
+def test_placebo_purity_source_is_accepted_but_marked_uninterpretable(tmp_path):
+    """D3's rank-matched negative control must be labelled, never silently purity.
+
+    Adding purity adds a column to the confound design, so a channel drop can be
+    the design gaining rank rather than tumour content being removed. The placebo
+    run isolates the two -- and is only safe if its outputs can never be read
+    back as a real purity adjustment.
+    """
+    path = tmp_path / "placebo.tsv"
+    pd.DataFrame({"patient_id": ["TCGA-AB-1234", "TCGA-CD-5678"], "purity": [.4, .8]}).to_csv(path, sep="\t", index=False)
+    values, manifest = load_purity_table(str(path), source="placebo_rank_matched",
+                                         reference="values permuted with seed 20260803")
+    assert values == {"TCGA-AB-1234": .4, "TCGA-CD-5678": .8}
+    assert manifest["is_placebo"] is True
+    assert manifest["circularity"] == "values_permuted_rank_matched_negative_control"
+    # A real source must NOT be flagged as a placebo.
+    real, real_manifest = load_purity_table(str(path), source="absolute", reference="PanCanAtlas ABSOLUTE")
+    assert real_manifest["is_placebo"] is False
+    assert real_manifest["circularity"] == "none"
+    with pytest.raises(ValueError, match="mandatory"):
+        load_purity_table(str(path), source="placebo", reference="x")
+
+
 def test_evaluated_targets_reject_constant_or_nonfinite_columns():
     with pytest.raises(ValueError, match="constant"):
         validate_evaluated_targets(np.asarray([[1., 3.], [2., 3.]]), np.asarray(["A", "B"]))
