@@ -21,7 +21,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .hest import (EMBED_DIM, FOV_MICRONS, OUTPUT_PX, HestAdapterError, crop_pixels,
+from .hest import (EMBED_DIM, FOV_MICRONS, OUTPUT_PX, HestAdapterError, _atomic_savez, crop_pixels,
                    normalise_expression, per_slide_mean_baseline, pooled_r, select_target_genes,
                    slide_grouped_split, spot_windows, usable_spots, within_slide_r,
                    window_area_ratio, write_spatial_artifact, write_spatial_targets)
@@ -158,7 +158,9 @@ def stage_tile(args) -> None:
             slide.close()
             if vectors.shape != (idx.size, EMBED_DIM) or not np.isfinite(vectors).all():
                 raise HestAdapterError(f"bad embedding block {vectors.shape}")
-            np.savez_compressed(
+            # Atomic: a partially written .npz would otherwise satisfy the resume check on
+            # the next run, and can be read mid-write by a concurrent assemble.
+            _atomic_savez(
                 staging / f"{sid}.npz", embeddings=vectors,
                 spot_ids=np.asarray([f"{sid}__{b}" for b in barcodes[idx]], dtype=str),
                 panel_counts=panel_counts[idx].astype(np.float32),
@@ -261,12 +263,19 @@ def stage_assemble(args) -> None:
     out.mkdir(parents=True, exist_ok=True)
 
     ids, cancers, splits, slides, embeds, counts = [], [], [], [], [], []
+    missing, unreadable = [], []
     for slide_meta in plan["slides"]:
         path = staging / f"{slide_meta['id']}.npz"
         if not path.exists():
+            missing.append(slide_meta["id"])
             print(f"[assemble] SKIP {slide_meta['id']}: not tiled", flush=True)
             continue
-        blob = np.load(path, allow_pickle=False)
+        try:
+            blob = np.load(path, allow_pickle=False)
+        except Exception as exc:
+            unreadable.append(slide_meta["id"])
+            print(f"[assemble] UNREADABLE {slide_meta['id']}: {exc!r}", flush=True)
+            continue
         meta = json.loads(str(blob["meta"]))
         n = len(blob["spot_ids"])
         ids.append(blob["spot_ids"].astype(str))
@@ -277,6 +286,11 @@ def stage_assemble(args) -> None:
         slides.append(np.full(n, str(meta["id"]), dtype=object))
     if not ids:
         raise HestAdapterError("nothing tiled yet")
+    if (missing or unreadable) and not args.allow_partial:
+        raise HestAdapterError(
+            f"refusing to assemble a partial cohort: {len(missing)} untiled {missing}, "
+            f"{len(unreadable)} unreadable {unreadable}. Re-run tile, or pass --allow-partial "
+            f"if a deliberately reduced cohort is what you want.")
     ids = np.concatenate(ids)
     embeds = np.vstack(embeds)
     counts = np.vstack(counts)
@@ -420,6 +434,8 @@ def main() -> None:
     a.add_argument("--plan", required=True); a.add_argument("--staging", required=True)
     a.add_argument("--output", required=True)
     a.add_argument("--n-random-controls", type=int, default=16)
+    a.add_argument("--allow-partial", action="store_true",
+                   help="assemble even though slides are missing or unreadable")
     a.set_defaults(func=stage_assemble)
 
     b = sub.add_parser("baselines")
