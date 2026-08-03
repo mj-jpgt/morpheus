@@ -122,17 +122,32 @@ measured, at full training duration, to collapse to effective rank 1.71 against 
 9.81. A gate that rejects work the harness would have wasted is functioning correctly; the failure was
 in reading it from the wrong place.
 
-**Design rule: a liveness gate must be read from the process that will perform the training, never
-from a harness that reconstructs the setup.** A harness is useful for developing a gate and is
-evidence about the harness. If a gate is expensive enough that one is tempted to rehearse it
-elsewhere, the correct response is to make the real gate cheaper — not to move it.
+**Design rule, in two halves — and the second half is the one usually missing.**
 
-*Provenance: `d1_relaunch`, `queue_size_implicates_the_key_set`.*
+*A liveness gate must be read from the process that will perform the training, never from a harness
+that reconstructs the setup.* A harness is useful for developing a gate, and is evidence about the
+harness. If a gate is expensive enough to tempt rehearsal elsewhere, make the real gate cheaper rather
+than moving it.
+
+*And: a gate that rejects runs a harness would have approved is not too strict — it is the component
+working.* Every arm this gate refused belonged to an objective that we later measured, independently
+and at full training duration, sitting at effective rank 1.71 against the supervised arm's 9.81. The
+gate's strictness saved roughly twelve GPU-hours of training an objective that could not learn. The
+tempting response to a gate that fails two of three seeds is to suspect the gate; here that would have
+been exactly wrong.
+
+Stated as one sentence: **the failure was where we read the gate, not how strict it was.** A rule that
+says only "harnesses mislead" leaves the reader free to conclude that the gate was the problem, which
+in this case would have cost far more than the harness did.
+
+*Provenance: `d1_relaunch`, `queue_size_implicates_the_key_set`,
+`d1a_control_complete_and_gate_fails_2of3_in_runner`.*
 
 ## What this implies for gate design
 
-0. **Read the gate from the process that will train.** Instance 4 is the cheapest of the four
-   to avoid and cost the most: two launches.
+0. **Read the gate from the process that will train — and do not soften a gate that then fails.**
+   Instance 4 is the cheapest of the four to avoid and cost the most: two launches. Both halves
+   matter. The gate that failed 2/3 seeds was correct to; the harness that passed 3/3 was not.
 1. **State what the gate certifies, in the gate.** "This model can memorise 16 patients against a
    frozen key set" is a different sentence from "this objective will learn", and only the first is
    supported. Our gate's own failure text said "expected a practically memorised actual-model
