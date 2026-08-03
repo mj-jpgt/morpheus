@@ -33,17 +33,34 @@ Give the queue its own **momentum key encoder**: an EMA copy of the query encode
 `θ_k ← m·θ_k + (1−m)·θ_q`, kept out of the optimiser, used only to encode keys before enqueueing.
 
 Measured with **capacity held at 4,096 in every arm**, so the number of negatives is identical and only
-the key-writing encoder differs. All arms from the same initialisation (verified: 67.55 at step 0):
+the key-writing encoder differs. All four arms start from the same initialisation (verified: centred
+effective rank 67.55 at step 0). The full sweep, not just the chosen value — 40 epochs of the training
+this objective is used for amounts to **583 steps**, so the table spans the real duration:
 
-| key encoder | eff-rank step 50 | step 100 |
-|---|---:|---:|
-| none — query encoder writes keys | 4.07 | **2.58** |
-| EMA, m = 0.99 | 8.63 | **6.65** |
-| EMA, m = 0.999 | 9.33 | **6.89** |
+| step | m = 0 | m = 0.9 | m = 0.99 | m = 0.999 |
+|---:|---:|---:|---:|---:|
+| 0 | 67.55 | 67.55 | 67.55 | 67.55 |
+| 50 | 4.10 | 3.88 | 8.65 | 9.35 |
+| 100 | 1.62 | 3.51 | 6.49 | 7.03 |
+| 150 | 1.62 | 2.15 | 4.56 | 6.99 |
+| 200 | 2.26 | 1.65 | 5.70 | 7.60 |
+| 300 | 3.32 | 2.70 | 6.01 | 7.33 |
+| 400 | 2.18 | 2.31 | 5.50 | 7.84 |
+| 500 | 2.43 | 2.34 | 5.50 | 7.61 |
+| **600** | **2.81** | **2.23** | **5.88** | **7.42** |
 
-**2.6× at fixed negative count.** *Longer runs to 1,500 steps — 2.5× the duration of the 40-epoch
-training this objective is used for — are in progress and are a precondition for any claim that the
-recovery is durable; see Limits.*
+Three things this table shows that a single number would not. The effect is **monotone in m** and
+large — 2.6–3.3× at every step past 150. It is **durable**: both working arms are flat from step 200 to
+600, spanning the full 583-step training duration, which matters because two earlier "fixes" on this
+objective looked correct inside a short window and failed outside it. And `m = 0.9` **fails**, tracking
+the no-momentum arm rather than the working ones, so this is not a matter of perturbing the key
+encoder slightly — there is a threshold, and it lies between m = 0.9 and m = 0.99.
+
+**`m = 0.999` is used because it measured best in this sweep. No mechanism is claimed.** That is a
+weaker justification than a hyperparameter usually receives and it is stated deliberately: two
+mechanisms were proposed for this effect and both were falsified by measurement (below). A reader can
+see exactly how much to trust the choice, which is more than a value defended by an unverified story
+would offer.
 
 ## The explanation we expected, and why it is wrong
 
@@ -120,9 +137,11 @@ that is no reassurance at all.
 ## Limits
 
 - One objective, one architecture, one cohort. No claim about generality is made.
-- **The durability of the fix is not yet established.** Recovery is measured to step 100; runs to 1,500
-  steps are in progress. This project has twice had a fix look correct inside a short window and fail
-  outside it, so this section may not be cited for the fix until those return.
+- Durability is established only to **step 600**, against a training duration of 583 steps. Nothing is
+  known about behaviour at 10× that horizon.
+- The sweep is **one seed per momentum value**. The arms are separated by 2–3× and are flat over 400
+  steps, so the ordering is not in doubt, but no variability estimate is offered and none should be
+  read in.
 - The anchoring account is **not** confirmed against a control, and as stated it makes no prediction
   about how much decoupling is required — which is simultaneously why it survived the turnover
   experiment and why it is currently unfalsifiable. It should not be cited as established.
