@@ -1176,6 +1176,8 @@ def run(args: argparse.Namespace) -> Path:
         device,
         gradient_diagnostics_every=args.gradient_diagnostics_every,
         biology_key_momentum=args.biology_key_momentum,
+        rank_tripwire_step=args.rank_tripwire_step,
+        rank_tripwire_minimum=args.rank_tripwire_minimum,
     )
     biology_memory_keys = 0
     if args.objective_profile == "programme_free":
@@ -1198,7 +1200,16 @@ def run(args: argparse.Namespace) -> Path:
     # 1200, while a shuffled batch of the same size reaches 1.217 by step 300.
     # "Can the encoder separate 16 near-identical same-cancer slides by their
     # residual noise" is not the question a liveness gate asks.
-    if args.objective_profile == "programme_free":
+    if args.gate_repeats <= 0:
+        # D1 does not gate on G2.6. It stays in the codebase as the capacity check
+        # it validly is -- unchanged threshold, repeats available -- but it cannot
+        # certify the objective D1 trains, because it freezes the queue and the
+        # repair it must certify is about who writes the live queue. The in-run
+        # rank tripwire covers that case in the regime that matters.
+        d1_overfit = {"status": "preflight_gates_disabled",
+                      "rank_tripwire_step": int(args.rank_tripwire_step),
+                      "rank_tripwire_minimum": float(args.rank_tripwire_minimum)}
+    elif args.objective_profile == "programme_free":
         d1_overfit = _repeat_and_reduce(
             lambda index: _overfit_programme_free_contrastive(
                 model, trainer.schedule,
@@ -1211,14 +1222,15 @@ def run(args: argparse.Namespace) -> Path:
         # Second gate, and the one that measures the regime the run executes in.
         # Kept ALONGSIDE G2.6, not instead of it: G2.6 remains a valid capacity
         # check, it simply cannot see a queue-dynamics repair.
-        probe_readings = [
+        probe_readings = [] if args.rank_probe_repeats <= 0 else [
             _training_scale_rank_probe(
                 model, trainer.schedule, data, train, np.where(np.asarray(data.split).astype(str) == "test")[0],
                 args.token_budget, args.seed + index, device, args.biology_key_momentum,
                 steps=args.rank_probe_steps, include_clinical=args.include_clinical)
             for index in range(max(1, int(args.rank_probe_repeats)))
         ]
-        d1_overfit.update(_require_rank_probe(probe_readings, args.rank_probe_minimum))
+        if args.rank_probe_repeats > 0:
+            d1_overfit.update(_require_rank_probe(probe_readings, args.rank_probe_minimum))
     elif args.objective_profile == "programme_only":
         d1_overfit = _overfit_programme_only_actual(
             model, trainer.schedule,
@@ -1424,6 +1436,14 @@ def main() -> None:
                         help="centred effective-rank bar. Measured at 200 steps: the working "
                              "configuration gives 6.92-7.25 and the collapsing one 1.46-1.98, so 4.0 "
                              "sits in an empty band rather than near either distribution.")
+    parser.add_argument("--rank-tripwire-step", type=int, default=0,
+                        help="global optimisation step at which to check centred effective rank on "
+                             "the training representation, aborting the run below --rank-tripwire-"
+                             "minimum. 0 disables. This is an IN-RUN check, not a pre-flight one: it "
+                             "costs nothing on a passing run because it reads compute the run was "
+                             "going to spend, and it cannot be out of scope or disagree with the run "
+                             "because it IS the run.")
+    parser.add_argument("--rank-tripwire-minimum", type=float, default=4.0)
     parser.add_argument("--biology-key-momentum", type=float, default=0.0,
                         help="EMA momentum for the biology key encoder that writes the contrastive "
                              "queue. 0.0 is the historical behaviour, in which the query encoder "

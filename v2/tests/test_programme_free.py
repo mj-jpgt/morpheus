@@ -446,3 +446,40 @@ def test_momentum_key_encoder_is_excluded_from_the_optimiser_and_survives_restor
     assert momentum_trainer.biology_memory.size == before, "step() double-enqueued"
     momentum_trainer.update_biology_keys(_big_batch(n=3, k=8, seed=76), epoch=1)
     assert momentum_trainer.biology_memory.size == before + 3
+
+
+def test_rank_tripwire_aborts_a_collapsed_run_in_flight() -> None:
+    """The tripwire replaces a pre-flight probe, and must actually fire.
+
+    A pre-flight rank probe had to run in the real regime, at the real batch
+    size, for enough steps to see the failure -- at which point it cost 214,000
+    patient-steps against the 124,720 the whole 40-epoch training costs. The
+    tripwire reads compute the run was going to spend anyway, so it is free on a
+    passing run, and it cannot be out of scope because it IS the run.
+    """
+    torch.manual_seed(21)
+    config = V2ModelConfig(patch_dim=8, rna_dim=4, hidden_dim=32, heads=4, layers=1,
+                           local_slots=4, slide_slots=2, patient_slots=2, dropout=0.0)
+    model = TumorStateV2(config, programme_dim=8)
+    trainer = V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                        V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu",
+                        rank_tripwire_step=2, rank_tripwire_minimum=1e6)  # unreachable bar
+    trainer.prime_biology_memory([_big_batch(n=2, k=8, seed=s) for s in range(6)], minimum_unique_keys=9)
+    batches = [_big_batch(n=10, k=8, seed=90 + i) for i in range(4)]
+    with pytest.raises(RuntimeError, match="RANK TRIPWIRE"):
+        trainer.train_epoch(batches, epoch=1)
+
+    # and it must NOT fire when the representation clears the bar
+    torch.manual_seed(21)
+    model = TumorStateV2(config, programme_dim=8)
+    trainer = V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                        V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu",
+                        rank_tripwire_step=2, rank_tripwire_minimum=0.0)
+    trainer.prime_biology_memory([_big_batch(n=2, k=8, seed=s) for s in range(6)], minimum_unique_keys=9)
+    result = trainer.train_epoch([_big_batch(n=10, k=8, seed=90 + i) for i in range(4)], epoch=1)
+    assert "biology_centred_effective_rank" in result, "the rank must be logged every run, not only when it trips"
+    assert result["biology_centred_effective_rank"] > 0
+
+    # disabled by default, so existing callers are unaffected
+    assert V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                     V2LossSchedule(objective_profile="programme_free"), "cpu").rank_tripwire_step == 0

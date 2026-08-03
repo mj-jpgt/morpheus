@@ -358,6 +358,9 @@ def d1_pair_manifest(args: argparse.Namespace) -> dict:
         "programme_supcon_weight": args.programme_supcon_weight, "separation_weight": args.separation_weight,
         "variance_weight": args.variance_weight, "programme_head_dim": args.programme_head_dim,
         "biology_key_momentum": args.biology_key_momentum,
+        "rank_tripwire_step": args.rank_tripwire_step,
+        "rank_tripwire_minimum": args.rank_tripwire_minimum,
+        "preflight_gates": "disabled_for_d1",
         "pretrain_epochs": 0, "pretrain_checkpoint": "",
         "pretrain_learning_rate": args.pretrain_learning_rate, "pretrain_mask_fraction": args.pretrain_mask_fraction,
         "pretrain_view_keep_fraction": args.pretrain_view_keep_fraction, "pretrain_target_dim": args.pretrain_target_dim,
@@ -394,6 +397,9 @@ def _d1_runner_command(args: argparse.Namespace, arm: str, seed: int) -> list[st
                "--separation-weight", str(args.separation_weight), "--variance-weight", str(args.variance_weight),
                "--programme-head-dim", str(args.programme_head_dim),
                "--biology-key-momentum", str(args.biology_key_momentum),
+               "--rank-tripwire-step", str(args.rank_tripwire_step),
+               "--rank-tripwire-minimum", str(args.rank_tripwire_minimum),
+               "--gate-repeats", "0", "--rank-probe-repeats", "0",
                "--gradient-diagnostics-every", str(args.gradient_diagnostics_every),
                "--pretrain-learning-rate", str(args.pretrain_learning_rate), "--pretrain-mask-fraction", str(args.pretrain_mask_fraction),
                "--pretrain-view-keep-fraction", str(args.pretrain_view_keep_fraction), "--pretrain-target-dim", str(args.pretrain_target_dim),
@@ -617,6 +623,10 @@ def main() -> None:
     d1.add_argument("--separation-weight", type=float, default=.01); d1.add_argument("--variance-weight", type=float, default=.01)
     d1.add_argument("--biology-key-momentum", type=float, default=0.0,
                     help="EMA momentum for the biology key encoder; passed identically to BOTH arms")
+    d1.add_argument("--rank-tripwire-step", type=int, default=200)
+    d1.add_argument("--rank-tripwire-minimum", type=float, default=4.0,
+                    help="in-run centred effective-rank bar; D1 gates on this instead of on the "
+                         "pre-flight G2.6, which cannot see a live-queue repair")
     d1.add_argument("--gradient-diagnostics-every", type=int, default=25)
     d1.add_argument("--pretrain-learning-rate", type=float, default=2e-4); d1.add_argument("--pretrain-mask-fraction", type=float, default=.30)
     d1.add_argument("--pretrain-view-keep-fraction", type=float, default=.70); d1.add_argument("--pretrain-target-dim", type=int, default=128)

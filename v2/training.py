@@ -233,6 +233,26 @@ class V2Trainer:
     # (predeclared, then refuted 4/5 with the discriminating prediction
     # inverted). See paper/QUEUE_ANCHORING.md.
     biology_key_momentum: float = 0.0
+    # In-run rank tripwire. 0 disables. Checked at this GLOBAL optimisation step,
+    # on the representation the run is actually producing.
+    #
+    # This replaces a pre-flight rank probe, and the reason is structural rather
+    # than economic. A pre-flight probe has to run in the real regime, at the real
+    # batch size, for enough steps to see the failure -- at which point it IS most
+    # of a training run. Measured here: a 5-repeat pre-flight probe costs 214,000
+    # patient-steps against the 124,720 the whole 40-epoch training costs, i.e.
+    # 170% overhead on every run including the ones that were fine. The tripwire
+    # costs nothing on a passing run, because it reads compute the run was going
+    # to spend anyway, and wastes 200 of 583 steps on a diverging one -- about
+    # 8.5% expected overhead at the measured 25% divergence rate.
+    #
+    # It is also a better instrument. It cannot be out of scope, because it IS the
+    # run: live queue, real batches, the run's own key encoder, config and RNG. And
+    # it cannot disagree with the run, because the reading and the thing judged are
+    # the same object, which removes the need for best-of-N entirely.
+    rank_tripwire_step: int = 0
+    rank_tripwire_minimum: float = 0.0
+    _global_step: int = field(default=0, repr=False, compare=False)
     _biology_key_encoder: TumorStateV2 | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
@@ -537,6 +557,17 @@ class V2Trainer:
                     self._decorr_bank = combined[-self.decorrelation_bank_capacity:]
         for name, value in (("identity", output["z_identity"]), ("biology", output["z_biology"])):
             metrics[f"{name}_feature_std"] = float(value.detach().float().std(dim=0).mean())
+        # Centred effective rank of the WSI biology view: the participation ratio
+        # of the singular values of the mean-centred, L2-normalised states. This
+        # is the quantity that separated a healthy run (6.92-7.25) from a
+        # collapsed one (1.46-1.98); the raw uncentred cosine does not, because a
+        # large shared direction is present and expected in both.
+        if len(out_wsi["z_biology"]) >= 8:
+            with torch.no_grad():
+                states = nn.functional.normalize(out_wsi["z_biology"].detach().float(), dim=-1)
+                singular = torch.linalg.svdvals(states - states.mean(dim=0))
+                metrics["biology_centred_effective_rank"] = float(
+                    (singular.sum() ** 2) / singular.square().sum().clamp_min(1e-12))
         reconstruction_term = output["z_identity"].new_zeros(())
         if weights["rna_reconstruction"] and "rna" in batch:
             present = batch.get("rna_present", torch.ones(len(output["z_identity"]), device=self.device, dtype=torch.bool)).bool()
@@ -694,6 +725,19 @@ class V2Trainer:
             self.optimizer.step()
             with torch.autocast(device_type="cuda", dtype=self.amp_dtype, enabled=self.device.startswith("cuda")):
                 self.update_biology_keys(batch, epoch)
+            self._global_step += 1
+            if (self.rank_tripwire_step and self._global_step == int(self.rank_tripwire_step)
+                    and "biology_centred_effective_rank" in metrics):
+                observed = float(metrics["biology_centred_effective_rank"])
+                metrics["rank_tripwire_observed"] = observed
+                metrics["rank_tripwire_step"] = float(self._global_step)
+                if observed < float(self.rank_tripwire_minimum):
+                    raise RuntimeError(
+                        f"RANK TRIPWIRE: centred effective rank {observed:.3f} at global step "
+                        f"{self._global_step} is below the {self.rank_tripwire_minimum} bar. The "
+                        "biology representation has collapsed in the regime this run actually "
+                        "executes in; the remaining epochs would train a degenerate encoder. "
+                        "Relaunch this seed rather than interpreting its artifacts.")
             if self.programme_memory is not None and "indices" in batch:
                 self.programme_memory.update(output["z_biology"], batch["indices"])
             rows.append(metrics)
