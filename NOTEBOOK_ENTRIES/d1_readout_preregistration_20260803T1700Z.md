@@ -49,6 +49,21 @@ the direction that favours `programme_only`.
 CALIBRA's G4 controls (`--require-rna-positive-control --require-channel-gates`) run inside
 `run_d1` and must pass before any of the above is quoted.
 
+**Implemented, also before the numbers exist**, as `v2/research/rebase/d1_audit.py` (added
+2026-08-03 18:45 while training was at epoch 17/40). It runs the two readouts this run's pipeline
+will not produce, then executes A1–A6 mechanically and writes `D1_AUDIT.json` and
+`D1_READOUT_INDEX.json` into the run root. Two deliberate properties:
+
+* **It refuses to compute any readout if A1 fails.** An incomplete set of runs exits with
+  *"do not compare incomplete arms"* rather than producing a partial comparison.
+* **A3 is not a test against zero.** The null for a 16-component canonical correlation is *not* zero
+  — CCA is biased upward — so "both arms at chance" cannot be tested that way. The testable statement
+  is that random targets must score **below** real ones for both arms and every seed, and even that
+  is marked as necessary-but-not-sufficient: the margin needs a human read, because a control sitting
+  just below the real score is an alarm, not a pass.
+
+A5 is likewise computed and reported but explicitly **not** interpreted, per blocker 5.
+
 ### In plain terms
 
 Half of the standard exam for this experiment is made up of the exact questions one of the two
