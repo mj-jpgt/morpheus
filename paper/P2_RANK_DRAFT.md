@@ -426,8 +426,9 @@ requirement and this was the worst outstanding item on it.
 ### 2.5 What existing work supplies that would have answered our question better
 
 LiDAR proposes a replacement criterion, not merely a critique, and reports Spearman 0.9161 where
-RankMe reaches 0.3174. We have not computed LiDAR on any representation in this paper. `[NOT
-MEASURED.]` A referee is entitled to ask why a paper reporting rank's failure did not evaluate the
+RankMe reaches 0.3174. `[NOT MEASURED — we have not computed LiDAR, or any published alternative
+criterion, on any representation in this paper.]`
+A referee is entitled to ask why a paper reporting rank's failure did not evaluate the
 published alternative; the honest answer is that the alternative was identified during this draft's
 prior-art sweep and computing it requires a labelled probe on every artifact, which has not been run.
 It is named in §5.2 as the most valuable missing measurement.
@@ -651,9 +652,15 @@ would see an 18% drift and conclude the representation was substantially intact.
 **What this does and does not contradict.** It does **not** contradict RankMe: high rank with degraded
 information is precisely the necessary-not-sufficient case RankMe reserves, and LiDAR's noise-dimension
 argument already establishes that high rank can be uninformative. What it adds is a **magnitude**: the
-two quantities move *together* and are miscalibrated by a factor of **3.7**, growing monotonically
-with the damage. That defeats the natural retreat position — "rank is at least a rough guide" — which
-neither the necessary-condition framing nor a correlation coefficient addresses.
+two quantities move *together* and are miscalibrated by a factor of **3.74** over the full sweep
+(17.84% of the rank lost against 66.7% of the channel). Level by level, the ratio (fraction of rank
+retained) / (fraction of channel retained) reads **1.000, 0.990, 1.003, 1.056, 1.171, 1.482, 2.467** —
+essentially 1 for the first two levels and then rising steeply, i.e. rank tracks the channel while
+almost nothing is happening and diverges from it exactly when the damage becomes real. (The dip to
+0.990 at d = 0.091 is a single-seed wobble on a level where the channel changed by 0.001; nothing is
+claimed about strict monotonicity of the ratio.) That defeats the natural retreat position — "rank is
+at least a rough guide" — which neither the necessary-condition framing nor a correlation coefficient
+addresses.
 
 **Why it is nonetheless the second-strongest instance.** Three properties no other instance has
 together. (i) It is a **dose–response over seven monotone levels**, not a two-point comparison.
@@ -717,9 +724,14 @@ effective rank (34.12 against 28.77) and still loses by −0.1089 with both CIs 
 - **It was not designed to produce this conclusion.** The rank column exists because it is audit check
   A5 of a predeclared post-training checklist whose instruction reads *"reported, **not
   interpreted**"* (`NOTEBOOK.md:1114`), added for an unrelated worry — that WSI biology states are
-  ~0.736 mutually collinear at initialisation, so a narrower rank might reflect resistance to an
+  strongly mutually collinear at initialisation, so a narrower rank might reflect resistance to an
   already-collapsed view. The numbers were recorded before anyone asked whether they would order
-  correctly.
+  correctly. *(Two values for that collinearity appear in this evidence base and are not the same
+  measurement: **0.7362 (std 0.0314)** against RNA's 0.2740 on the full cohort, measured 2026-08-01
+  and recorded at `NOTEBOOK.md:121`; and **0.80** for WSI against 0.62 for RNA on the fixed
+  16-patient gate batch, `NOTEBOOK_ENTRIES/g26_rank_collapse_diagnosis_20260803T0500Z.md`. The A5
+  note quotes the second. Nothing in this paper depends on which is used, but they should not be
+  quoted interchangeably.)*
 - **It contains its own within-seed control.** Seed 44's arms are equal in rank and differ by −0.1226
   in channel — a matched-rank pair with a large, interval-backed information difference. That single
   line is the cleanest refutation of "rank explains the gap" in this evidence base.

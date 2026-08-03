@@ -174,8 +174,10 @@ it by a factor that grows with the damage, over a monotone seven-level sweep on 
   axes must be scaled as percentage change from their own d = 0 value**, or the panel understates the
   divergence. Mark the half-loss point at d ≈ 0.68.
 - (b) The same data as a single ratio curve — (fraction of rank retained) / (fraction of channel
-  retained) — rising from 1.00 to 2.46 across the sweep. One line, one message: a rank monitor
-  under-reports the loss by a factor that grows with the loss.
+  retained) — **1.000, 0.990, 1.003, 1.056, 1.171, 1.482, 2.467** across the seven levels. One line,
+  one message: the ratio sits at ~1 while almost nothing is happening and rises steeply exactly when
+  the damage becomes real. Do **not** describe the curve as monotone — the 0.990 at d = 0.091 is a
+  single-seed wobble on a level where the channel moved by 0.001.
 - (c) The instrument's own controls over the same levels, to close off "the readout degraded":
   attenuation (1.130, 0.985, 1.003, 1.057, 1.014, 0.855, 0.863) with a reference line at 1, and the
   raw channel ratio as a faint second line to show how much the null correction matters (permutation
