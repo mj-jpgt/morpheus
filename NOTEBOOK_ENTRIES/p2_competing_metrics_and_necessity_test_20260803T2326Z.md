@@ -185,6 +185,16 @@ loses D1. α-ReQ's 4/6 is squeezed out of α differences its own authors would c
 all 12 artifacts sit far outside its "Goldilocks zone" (§6.2). Nothing here is significant at n = 6,
 and that limitation belongs in the paper.
 
+### The design cannot establish that a selection rule works — only that it is perfect
+
+Exact two-sided binomial at n = 6: a **perfect 6/6 gives p = 0.031**, 5/6 gives 0.219, 4/6 gives
+0.688. So the matched-pair design (2 experiments × 3 seeds) has just enough power to detect a
+*flawless* rule and none at all to detect a merely good one. **No conclusion of the form "metric X is
+better than metric Y" can be drawn from these six pairs**, in either direction, and the paper must
+say so rather than letting 5/6 vs 4/6 do rhetorical work. This is the main reason §4's variance
+decomposition — which uses magnitudes and estimates the nuisance term from 8 within-arm degrees of
+freedom — should carry the argument instead.
+
 ### The D2 s44 "hit" is not a hit
 
 Patient-subsampling (80%, 40 draws) gives the measurement noise of each metric **given a fixed
@@ -354,6 +364,18 @@ instance (strictly in scope, kills usefulness, does not formally break necessity
 the H44/I43 pair as a **supporting** necessity counterexample with its scope stated, rather than as
 the load-bearing one. Claiming it as an in-scope necessity violation is the one place in this
 analysis where the paper could be caught overreaching.
+
+**And it is partially pre-empted.** The companion prior-art sweep
+(`NOTEBOOK_ENTRIES/p2_prior_art_citation_graph_sweep_20260803T2326Z.md`, §2 A1) found that Aldeneh,
+Thilak, Higuchi, Theobald & Likhomanenko, *"Towards Automatic Assessment of Self-Supervised Speech
+Models using Rank"*, **ICASSP 2025** (DOI `10.1109/ICASSP49660.2025.10889651`, arXiv:2409.10787) already
+reports, verbatim, that *"rank does not reliably predict the best-performing layer for specific
+downstream tasks, **as lower-ranked layers can outperform higher-ranked ones**"* — a published
+low-rank/high-information instance, in a peer-reviewed venue, co-authored by LiDAR's first author. It
+varies **layer depth within one trained encoder** rather than comparing separately trained runs, so
+it is not the same regime, but **this section must be written as corroborating that result in a new
+regime, not as discovering the configuration.** A version of §5.3 that presents low-rank/high-
+information as novel is not submittable.
 
 ### 5.4 Standing instruction for future artifacts
 
