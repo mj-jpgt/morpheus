@@ -1037,11 +1037,16 @@ shuffle permutes basis rows after the fit — and is a build-integrity check, no
 
 The subspace persists, and that is damaging:
 
-| shuffle seed | held-out top-CCA, true | shuffled | paired difference | CI95 of difference |
+| shuffle seed | held-out top-CCA, true | shuffled | paired difference (**true − shuffled**) | CI95 of difference |
 |---|---:|---:|---:|---|
 | 1 | 0.5411 | 0.5600 | −0.0189 | [−0.0489, +0.0384] |
 | 2 | 0.5411 | 0.5360 | +0.0051 | [−0.0564, +0.0418] |
 | 3 | 0.5411 | 0.4771 | +0.0640 | [−0.0260, +0.0988] |
+
+*Direction note: the ledger logs this quantity as `T1.5_shuffled_minus_true` (seed 1: **+**0.0189),
+i.e. with the opposite sign convention to the source markdown table, which labels its column only
+"paired difference". This draft states the direction explicitly; the two records agree once the
+convention is named.*
 
 *Provenance: `TRACK1_NEGATIVE_CONTROLS.md` §T1.5; 500-patient bootstrap; the true value's own CI95 is
 [0.4874, 0.5962]. Build integrity: the unshuffled reconstruction matches the frozen scores at
