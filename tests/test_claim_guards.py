@@ -10,9 +10,17 @@ a *causal attribution* silently becomes wrong.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
-from morpheus.v2.calibra.claim_guards import CAVEATS, validate_claim
+from morpheus.v2.calibra.claim_guards import (CAVEATS, CLAIM_EVIDENCE_PATH, evidence_digest,
+                                              load_claim_evidence, validate_claim,
+                                              validate_recorded_claim)
+
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+_EVIDENCE = _REPO_ROOT / CLAIM_EVIDENCE_PATH
 
 
 def _fully_evidenced(kind: str) -> dict:
@@ -125,18 +133,99 @@ def test_unknown_claim_kind_is_inadmissible_by_default():
     assert verdict.notes and "unknown claim kind" in verdict.notes[0]
 
 
-def test_current_e0_result_is_not_yet_an_admissible_transfer_claim():
-    """Pin the ACTUAL state of the project as of the E0 run (commit 24d1bff).
+def test_the_recorded_e0_claim_is_still_inadmissible():
+    """The project's REAL claim state, read from the evidence file rather than pinned here.
 
-    E0 returned 'supported' for K562 at ~10% of ceiling. That is a real result, but it is
-    not yet a publishable transfer claim: proliferation was never controlled, and RPE1 --
-    even once decidable -- is the same platform. If someone discharges these, this test
-    fails and must be updated deliberately rather than drifting."""
-    e0 = {"kind": "transfer", "proliferation_controlled": False,
-          "platforms": ["perturb_seq_crispri", "perturb_seq_crispri"]}
-    verdict = validate_claim(e0)
-    assert not verdict.admissible
+    This replaces a hardcoded fixture that encoded one verdict. The guard could not
+    catch anything then: nothing in production built a claim dict, so 'discharging a
+    blocker' meant editing this test to say so. Now the state is data with provenance
+    and the guard reads it.
+
+    E0 remains inadmissible because `single_platform` stands -- K562 and RPE1 are two
+    lineages on ONE Perturb-seq protocol. If someone adds a genuinely different
+    platform this fails and must be updated deliberately."""
+    verdict = validate_recorded_claim("E0_basis_transfer_K562", _EVIDENCE, _REPO_ROOT)
+    assert not verdict.admissible, "the guard stopped biting; this refactor must not loosen it"
+    assert "single_platform" in {b.code for b in verdict.blockers}
+
+
+def test_missing_or_unreadable_evidence_is_inadmissible_never_permissive(tmp_path):
+    """The same default that already governs an unknown claim kind. An absent record
+    must not read as 'nothing blocking'."""
+    verdict = validate_recorded_claim("E0_basis_transfer_K562", tmp_path / "nope.json", tmp_path)
+    assert not verdict.admissible and verdict.blockers
+    claims, notes = load_claim_evidence(tmp_path / "nope.json", tmp_path)
+    assert claims == {} and notes and "unreadable" in notes[0]
+
+
+def test_a_silently_edited_value_is_caught_by_the_digest(tmp_path):
+    """Not tamper-proofing -- tamper EVIDENCE. Changing a value without recomputing
+    the digest voids the whole record, so the change cannot be silent."""
+    entry = tmp_path / "entry.md"; entry.write_text("x")
+    evidence = {"proliferation_controlled": {"value": True, "run": "r", "entry": "entry.md", "commit": "abc1234"}}
+    evidence["sha256"] = evidence_digest(evidence)
+    path = tmp_path / "e.json"
+    document = {"claims": {"C": {"kind": "transfer", "evidence": evidence}}}
+    path.write_text(json.dumps(document))
+    claims, notes = load_claim_evidence(path, tmp_path)
+    assert claims["C"]["proliferation_controlled"] is True and not notes
+
+    document["claims"]["C"]["evidence"]["proliferation_controlled"]["value"] = "tampered"
+    path.write_text(json.dumps(document))
+    claims, notes = load_claim_evidence(path, tmp_path)
+    assert "proliferation_controlled" not in claims["C"]
+    assert any("digest mismatch" in note for note in notes)
+
+
+@pytest.mark.parametrize("broken,reason", [
+    ({"value": True, "entry": "entry.md", "commit": "abc1234"}, "no run"),
+    ({"value": True, "run": "r", "commit": "abc1234"}, "does not exist"),
+    ({"value": True, "run": "r", "entry": "absent.md", "commit": "abc1234"}, "does not exist"),
+    ({"value": True, "run": "r", "entry": "entry.md"}, "not a git hash"),
+    ({"value": True, "run": "r", "entry": "entry.md", "commit": "not-a-hash"}, "not a git hash"),
+    (True, "not an evidence record"),
+])
+def test_evidence_without_resolvable_provenance_is_treated_as_absent(tmp_path, broken, reason):
+    """'Somebody typed True' must not discharge anything. This is the whole point."""
+    (tmp_path / "entry.md").write_text("x")
+    evidence = {"proliferation_controlled": broken}
+    evidence["sha256"] = evidence_digest(evidence)
+    path = tmp_path / "e.json"
+    path.write_text(json.dumps({"claims": {"C": {"kind": "transfer", "evidence": evidence}}}))
+    claims, notes = load_claim_evidence(path, tmp_path)
+    assert "proliferation_controlled" not in claims["C"]
+    assert any(reason in note for note in notes), notes
+    assert "proliferation_deflation" in {b.code for b in validate_claim(claims["C"]).blockers}
+
+
+def test_REFACTOR_FALSIFIER_a_claim_cannot_be_discharged_by_editing_values_alone(tmp_path):
+    """The falsifier pre-declared for this refactor itself.
+
+    If a claim can be made admissible by writing the desired answers into the
+    evidence file with no analysis and no provenance, the evidence file is just the
+    old hardcoded fixture in a new location and the refactor has FAILED.
+    """
+    evidence = {
+        "proliferation_controlled": {"value": True},
+        "platforms": {"value": ["a", "b"]},
+        "purity_in_adjustment_set": {"value": True},
+        "composition_control": {"value": {"beats_composition_baseline": True}},
+        "statistic_is_signed": {"value": True},
+        "external_cohorts": {"value": ["CPTAC"]},
+    }
+    evidence["sha256"] = evidence_digest(evidence)          # digest honestly recomputed
+    path = tmp_path / "e.json"
+    path.write_text(json.dumps({"claims": {"C": {"kind": "transfer", "evidence": evidence}}}))
+    verdict = validate_recorded_claim("C", path, tmp_path)
+    assert not verdict.admissible, "REFACTOR FAILED: values alone discharged a claim"
     assert {b.code for b in verdict.blockers} == {"proliferation_deflation", "single_platform"}
+
+
+def test_the_shipped_evidence_file_is_internally_consistent():
+    """Every record's digest matches and every claimed entry file exists, or CI says so."""
+    claims, notes = load_claim_evidence(_EVIDENCE, _REPO_ROOT)
+    assert claims, "the shipped evidence file produced no claims"
+    assert not notes, notes
 
 
 def test_every_caveat_explains_its_silent_failure_mode():

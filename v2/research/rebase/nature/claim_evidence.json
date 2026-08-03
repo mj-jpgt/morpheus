@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "note": "The project's recorded claim state, read by claim_guards.validate_recorded_claim. Before this file existed validate_claim read evidence from NOWHERE: nothing in production built a claim dict and E0's admissibility lived only as a hardcoded fixture in tests/test_claim_guards.py, so the guard could only restate a decision somebody had already made. Every field here carries a run, a notebook entry and a commit; a field whose provenance does not resolve is treated as ABSENT, so writing `true` into this file discharges nothing. The per-record sha256 is tamper-EVIDENCE, not tamper-proofing: it makes a changed value impossible to change SILENTLY, which is what review can catch.",
+  "claims": {
+    "E0_basis_transfer_K562": {
+      "kind": "transfer",
+      "description": "E0/E0b basis transfer: K562 Replogle perturbation-response subspace aligns with TCGA bulk RNA more than non-responsive perturbations do. Gap +0.0727 at k=10, ~10-11% of the split-half ceiling. INADMISSIBLE: single_platform stands.",
+      "evidence": {
+        "proliferation_controlled": {
+          "value": true,
+          "run": "~/e0_run/d3/e0_prolif/e0_proliferation_stratified.json",
+          "entry": "NOTEBOOK_ENTRIES/e0_proliferation_stratification_result_20260803T1530Z.md",
+          "commit": "bfe4569",
+          "how": "claim_guards remedy #2: responsive arm stratified by proliferation loading. The premise is real (responsive perturbations 3.01x enriched for proliferation targets, Fisher p=1.1e-13) but removing every one of them retains 91.4-98.3% of the gap and clears E0's own decision at 8/8 cells; a size-matched random placebo retains within 0.4-7.9 percentage points.",
+          "scope": "K562 only, both transforms, k in {10,25,50,100}. RPE1 UNDECIDABLE and not run. Stratified by TARGET GENE identity, which does not remove proliferation SIGNAL from the surviving perturbations' response profiles."
+        },
+        "platforms": {
+          "value": [
+            "perturb_seq_crispri",
+            "perturb_seq_crispri"
+          ],
+          "run": "runs/e0_20260731",
+          "entry": "v2/research/rebase/nature/E0_RESULT.md",
+          "commit": "24d1bff",
+          "how": "K562 and RPE1 are different LINEAGES on the SAME Perturb-seq CRISPRi protocol. Two lineages on one protocol is one platform, so this does NOT discharge single_platform."
+        },
+        "sha256": "e73d1c0a07c60ec656f37077ce0c8cdc2380cdad6f5c43406f7822843bb66f6e"
+      }
+    },
+    "morphology_to_pbs_axis_legibility": {
+      "kind": "legible_axis",
+      "description": "Morphology (wsi_biology) reads PBS molecular axes on TCGA held-out patients. INADMISSIBLE: composition_attribution and no_external_cohort both stand.",
+      "evidence": {
+        "purity_in_adjustment_set": {
+          "value": true,
+          "run": "~/e0_run/d3/main_absolute{,_seed43,_seed44} and ~/e0_run/d3/placebo_rank_matched",
+          "entry": "NOTEBOOK_ENTRIES/d3_purity_result_20260803T1330Z.md",
+          "commit": "33aef55",
+          "how": "Real PanCanAtlas ABSOLUTE purity (DNA-derived, sha256 f430a975...) in confound_design. Channel retains 92.6-98.9% of excess over null in 6/6 artifact-seed cells; a rank-matched placebo moves it by at most +0.0018.",
+          "scope": "TCGA test split, n=2650 complete-case, 90 non-control RNA targets, 16 components."
+        },
+        "sha256": "b8d6a2eb21735f8e7dc07ea72369469e75d58ee73c98b56522f7437d34e21f18"
+      }
+    }
+  }
+}
