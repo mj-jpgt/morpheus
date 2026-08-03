@@ -210,6 +210,12 @@ SVD_ALLOWLIST = {
     "v2/discovery_targets.py",                   # PCA basis
     "v2/pbs.py",                                 # perturbation-basis construction
     "v2/research/rebase/d1_geometry_probe.py",   # torch.linalg.matrix_rank, a HARD rank
+    # Deliberately reimplements the RETIRED pre-2026-08-04 absolute-1e-12-cut R1, and
+    # only that, so the claim "replacing the absolute cut with a relative one moved no
+    # historical value" is checkable rather than asserted. It is an analysis script, is
+    # imported by nothing, and its function is named `legacy_r1_absolute_cut` precisely
+    # so it can never be mistaken for the live definition.
+    "v2/research/rebase/rank_recompute_all_instances.py",
     "v2/calibra/claim_guards.py",                # the token appears only in prose
     "tests/test_claim_guards.py",                # ditto
     "v2/tests/test_effective_rank_canonical.py", # this file, which names the tokens
