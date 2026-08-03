@@ -574,7 +574,7 @@ def _truncate_batch(batch: dict, limit: int) -> dict:
 
 def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule,
                                    loader: UncappedHoptimusBatches, device: str,
-                                   steps: int = 800, overfit_patients: int = 16) -> dict[str, object]:
+                                   steps: int = 2400, overfit_patients: int = 16) -> dict[str, object]:
     """G2.6 for the Hallmark D1 arm on the real model/trainer path.
 
     Training copied heads on frozen features is not a liveness test for the
@@ -670,7 +670,7 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
 
 def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSchedule,
                                         loader: UncappedHoptimusBatches, device: str,
-                                        steps: int = 800, minimum_memory_keys: int = 16,
+                                        steps: int = 2400, minimum_memory_keys: int = 16,
                                         overfit_patients: int = 16,
                                         overfit_memory_capacity: int = 64,
                                         freeze_memory: bool = True) -> dict[str, object]:
@@ -722,6 +722,19 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
     clone_schedule = replace(schedule, decorrelation_after_warmup=0.0, variance_after_warmup=0.0)
     optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
+    # 2400 steps, not 800. The criterion is unchanged; the budget is not part of
+    # it. Measured after the centring fix, failures at 800 are mid-descent, not
+    # stalls -- the same seed and batch keep falling if allowed to:
+    #   seed 43, budget  8192:  0.1766 @800 -> 0.0477 @1600  (pre-clipping)
+    #   seed 43, budget  8192:  0.0121 @800 -> 0.0047 @2400  (clipped)
+    #   seed 42, budget 32768:  0.6304 @800 -> 0.0185 @2400
+    #   seed 42, in-runner:     0.1954 @800  -- the failure that forced this
+    # This cannot rescue a model that genuinely cannot memorise: a collapsed
+    # biology head sits at exactly ln(16)=2.7726 indefinitely, measured flat from
+    # step 2500 to 5000 in the original sweep, so extra steps buy it nothing.
+    # Both arms use the same budget: their liveness checks are only comparable
+    # evidence if they are run identically.
+    #
     # The queue is sized to the CHECK, not to training. G2.6 asks "can this model
     # memorise one small batch", and its criterion is contrastive <= 0.10. Against
     # the training queue's 4096 DETACHED keys -- encoded by the pre-optimisation
@@ -787,9 +800,16 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
 
     initial, initial_metrics = one_step(update=False)
     first_gradients: dict[str, float] | None = None
+    # Record the descent, as the Hallmark arm already does. A single terminal
+    # number cannot separate "dead from step 0" from "still falling at the last
+    # step" from "fell, then reversed", and this gate has produced all three.
+    trajectory: list[dict[str, float]] = []
     for step in range(steps):
         optimiser.zero_grad(set_to_none=True)
         loss, metrics, _ = trial.step(fixed_batch, epoch=clone_schedule.warmup_epochs)
+        if step % 50 == 0 or step == steps - 1:
+            trajectory.append({"step": int(step),
+                               "contrastive": float(metrics.get("biology_contrastive", float("nan")))})
         loss.backward()
         gradients = trial._gradient_group_norms()
         if step == 0:
@@ -821,6 +841,8 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
         "final_full_consistency": float(final_metrics.get("biology_full_consistency", float("nan"))),
         "gradient_norms_first": first_gradients or {},
         "relative_reduction": float((initial_value - final_value) / max(abs(initial_value), 1e-12)),
+        "trajectory": trajectory,
+        "steps": int(steps),
         "objective_scope": "actual_v2_encoder_and_biology_path_without_decorrelation_floor",
     }
 
