@@ -41,6 +41,19 @@ disjoint sets of *patients*. It returned 0.903, which reads as "the classifier o
 the cross-cohort AUC is meaningless" — the opposite of the truth. Shuffling after the read
 fixes it.
 
+**Wiring verified, with a cost warning.** `run_calibra` accepts the artifact: it passes
+`validate_artifact`, satisfies every required key on both the artifact and target side, clears
+the ≥50-paired-patient gate, and proceeds into `_channel_measurement` →
+`spike_recovery_curve` → `top_canonical_correlation` (confirmed by py-spy, mid-SVD). So the
+contract is genuinely satisfied, not merely superficially shaped.
+
+But CALIBRA's cost model was written for ~10³ patients, and this cohort is 53,217 test
+**spots**. At `--n-draws 2 --n-components 8 --n-permutations 5` it was still running after 20
+minutes at ~1,300% CPU — repeated SVDs of a 53,217×1536 matrix — and was starving the three
+co-tenant D2 trainings, so it was stopped. A full CALIBRA sweep on spot-level data is a
+deliberate multi-hour job and should be run on a subsample or with a spot-aware variant, not
+as a smoke test. Flagging this before anyone schedules it casually.
+
 **A protocol correction.** H-Optimus-0's timm `pretrained_cfg` is 224 px at `crop_pct` 0.875,
 `crop_mode` center, so `create_transform` centre-crops our 256 px patch to 224. The encoder
 therefore sees **112 µm, not the 128 µm we cut**, and the window/assay area ratio against a
