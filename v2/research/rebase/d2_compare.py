@@ -27,12 +27,36 @@ def _load(path: str):
     return raw
 
 
-def _targets(path: str) -> tuple[dict[str, int], np.ndarray]:
+def _targets(path: str, groups: list[str] | None = None) -> tuple[dict[str, int], np.ndarray]:
     raw = np.load(path, allow_pickle=False)
     ids = np.asarray(raw["patient_ids"]).astype(str); values = np.asarray(raw["scores"], dtype=np.float64)
     names = np.asarray(raw["target_names"]).astype(str)
-    keep = ~np.char.startswith(names, "RANDOM_CONTROL__")
+    if groups:
+        # `hallmark_in_training` is 50 of the 90 non-control targets and is the
+        # Hallmark arm's OWN supervision. Scoring both arms on it hands one arm a
+        # structural advantage, so the fair contrast restricts to groups neither
+        # arm was trained on. Kept opt-in so the unrestricted number stays quotable.
+        #
+        # Selection is BY GROUP ONLY here, deliberately. The `RANDOM_CONTROL__`
+        # name-prefix drop below is the default "all non-control" behaviour;
+        # applying it on top of an explicit group request made
+        # `--target-groups random_control` select nothing and raise, so the
+        # negative control -- the one readout that proves the instrument is not
+        # manufacturing a channel out of noise -- could not be run at all.
+        # The prefix and the `random_control` group label are in exact
+        # correspondence in the frozen artifact (all 90 prefixed names are the
+        # 90 rows of that group and no others), so for every non-control group
+        # this is identical to the previous mask.
+        available = np.asarray(raw["target_groups"]).astype(str)
+        unknown = sorted(set(groups) - set(available.tolist()))
+        if unknown:
+            raise ValueError(f"unknown target groups {unknown}; available: {sorted(set(available.tolist()))}")
+        keep = np.isin(available, list(groups))
+    else:
+        keep = ~np.char.startswith(names, "RANDOM_CONTROL__")
     values, names = values[:, keep], names[keep]
+    if not values.shape[1]:
+        raise ValueError(f"target-group selection {groups} left no targets")
     if values.ndim != 2 or values.shape != (len(ids), len(names)) or len(set(ids)) != len(ids) or len(set(names)) != len(names):
         raise ValueError("frozen RNA target table fails D2 ID/target uniqueness requirements")
     return {identifier: index for index, identifier in enumerate(ids)}, values
@@ -50,6 +74,9 @@ def main() -> None:
     parser.add_argument("--label-a", default="hallmark", help="name of the reference arm in the output")
     parser.add_argument("--label-b", default="pbs", help="name of the contrast arm in the output")
     parser.add_argument("--experiment", default="D2")
+    parser.add_argument("--target-groups", nargs="*", default=None,
+                        help="restrict the readout to these target_groups (e.g. heldout_pathway "
+                             "immune_tme tumour_state). Omit to score every non-control target.")
     args = parser.parse_args()
     # The output keys are built from these labels, so a collision would overwrite
     # an arm's path or point estimate with the other's and still emit valid JSON.
@@ -58,9 +85,11 @@ def main() -> None:
         raise ValueError(f"--label-a/--label-b must differ and avoid the reserved keys {sorted(reserved)}")
     if len(args.hallmark_artifacts) != len(args.pbs_artifacts):
         raise ValueError(f"{args.experiment} requires one seed-matched artifact pair per seed")
-    target_index, target_scores = _targets(args.targets)
+    target_index, target_scores = _targets(args.targets, args.target_groups)
     result: dict[str, object] = {"experiment": args.experiment, "arm_a": args.label_a,
-                                 "arm_b": args.label_b, "pairs": []}
+                                 "arm_b": args.label_b,
+                                 "target_groups": args.target_groups or "all_non_control",
+                                 "n_targets": int(target_scores.shape[1]), "pairs": []}
     for pair_index, (h_path, i_path) in enumerate(zip(args.hallmark_artifacts, args.pbs_artifacts)):
         h, i = _load(h_path), _load(i_path)
         for field in ("patient_ids", "split", "cancers"):
