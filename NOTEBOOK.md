@@ -1060,6 +1060,78 @@ Standing instructions for whoever — human or agent — picks this up next.
 
 ---
 
+# Post-D2 sequence — audit, then the next claim
+
+*Added 2026-08-03. Standing plan: D2 finishes → audit → next training. Do not start the next
+training before the audit clears; a contaminated D2 poisons everything that cites it.*
+
+## Stage 1 — D2 audit (CPU, ~1 h, blocking)
+
+The audit is not a formality. The previous D2 headline (PBS −0.10 vs Hallmark, 3/3 seeds) was **not
+interpretable**, because 50 of the 90 scored targets were `hallmark_in_training` — one arm's own
+supervision. Every item below must be green before any D2 number is quoted.
+
+| # | check | passes if | why it can fail |
+|---|---|---|---|
+| A1 | all six runs have `TRAIN_SUCCESS.json` with every gate passed | 6/6 | seed 43 arm H previously failed G2.6 |
+| A2 | **stratified readout** on `heldout_pathway + immune_tme + tumour_state` (40 targets neither arm trained on) | the H−I direction is unchanged from the unrestricted run | if the gap collapses here, the unrestricted −0.10 was measuring whose training targets were on the exam |
+| A3 | **negative control**: `--target-groups random_control` (90 targets) | both arms ≈ chance | a channel on random controls means the instrument manufactures signal from noise, and **every** number on the project is void |
+| A4 | seed agreement | all three seeds same sign, CIs overlapping each other | one-seed-driven results are not results |
+| A5 | effective rank per seed, both arms | reported, **not interpreted** | blocker 5: WSI states are ~0.736 collinear at init, so arm I's narrower rank may reflect resistance to an already-collapsed view rather than dictionary content |
+| A6 | seed-42 re-export reproduces the pre-loss point estimates (H 0.5861 / PBS 0.4762 unrestricted) | within noise | a mismatch means the reconstituted environment is not the one that produced the original numbers |
+
+**Outcome handling — read this before interpreting.** The predeclared phase gate anticipated two
+outcomes: PBS beats Hallmark (proceed), or `I ≈ H` with overlapping CIs (*"the rebase premise is in
+trouble and this paper does not exist in this form"*). The measured result is a **third outcome the
+gate did not enumerate: PBS decisively worse, CIs excluding zero in the wrong direction.**
+
+That is not licence to reframe. Per the gate's own instruction it is **escalated to the user, not
+rewritten into a weaker claim.** If A2 confirms the gap on untrained targets, the honest reading is
+that a 128-D interventional dictionary is a *worse* supervision target than 50 curated gene sets for
+morphology→molecular alignment — a clean negative result, publishable as such, and P3's headline
+hypothesis is refuted by its own predeclared test.
+
+## Stage 2 — the CPU work that needs no new training (run during/after the audit)
+
+- **D2.3 — per-axis proliferation / essentiality.** Target is already built (128 axes annotated in
+  `pbs_targets_k128_v2.npz.axis_annotations.csv`); the analysis has never been run. This discharges
+  the `proliferation_deflation` blocker *for free*, because the per-axis gene loadings already exist.
+  Falsifier: every legible axis coming back proliferation-loaded.
+- **D3 — purity sensitivity.** Put purity into `confound_design` in `v2/calibra/run_calibra.py` and
+  report the channel before and after. No TCGA consensus purity table is on disk; an
+  expression-derived estimate is acceptable **only** if flagged `purity_source="expression_derived"`.
+  If the channel dies when purity enters the adjustment set, that is a finding to report, not bury.
+- **T1.3 adjusted arm** (in flight) — the highest-stakes number outstanding. If the site certificate
+  also fails *after* cancer+TSS adjustment, our adjustment does not remove what it claims to and
+  every adjusted number on this project is in question. Nothing downstream may be quoted until this
+  resolves.
+
+## Stage 3 — the next training: D1 (GPU, ~6 h)
+
+D1 (`programme_only` vs `programme_free`) is the next and only queued GPU job. It is worth more than
+D2 was, because it does three things at once:
+
+1. supplies **P2**'s primary evidence (rank does not track molecular information);
+2. supplies the **biology head trained without programme supervision** — the arm `PHASE1B` says
+   exists nowhere on disk, which is what makes the withdrawn F2 question answerable again;
+3. feeds **P4**.
+
+**Entry condition: G2.6 must pass on its own merits.** Two stacked defects have already been found
+and fixed here (queue self-cancellation; decorrelation-driven collapse). The threshold is not to be
+relaxed — the inputs are demonstrably separable (H-Optimus off-diagonal cosine 0.3265, RNA 0.0587),
+so a failure is a real defect every time.
+
+Launch shape once green: 2 arms × seeds 42/43/44, concurrently on the 80 GB card (each run uses
+~6 GB and is data-loading bound), outputs under `~/e0_run/` which is persistent storage.
+
+## Stage 4 — after D1
+
+`d2_compare` with `--label-a programme_only --label-b programme_free --experiment D1`, the same
+stratified/negative-control audit as Stage 1, then the P2 write-up. P4 stays out of scope: it needs
+spatial data that has not been acquired.
+
+---
+
 # Running log
 
 > **Logging convention (added 2026-08-02).** Concurrent agents must NOT edit this file directly —
