@@ -473,20 +473,56 @@ def run_d1(args: argparse.Namespace) -> None:
                      "PASS" if result.returncode == 0 else "FAIL")
     if result.returncode:
         raise RuntimeError("D1 CALIBRA G4 controls failed; no D1 result is valid")
-    comparison = [sys.executable, "-m", "morpheus.v2.research.rebase.d2_compare",
-                  "--hallmark-artifacts", *exports["P"], "--pbs-artifacts", *exports["F"],
-                  "--targets", str(Path(args.calibra_targets).resolve()),
-                  "--output", str(root / "D1_PAIRED_BOOTSTRAP.json"), "--repeats", str(args.bootstrap_repeats),
-                  "--label-a", "programme_only", "--label-b", "programme_free", "--experiment", "D1"]
-    result = subprocess.run(comparison, cwd=repo)
-    _append_gate_log(gate_log, "D1", "paired_patient_and_cancer_bootstrap", str(result.returncode), "0",
-                     "PASS" if result.returncode == 0 else "FAIL")
-    if result.returncode:
-        raise RuntimeError("D1 paired bootstrap failed; F2's headline gap had no CI and that is how it survived")
+    # THREE readouts, not one. `d2_compare` with --target-groups omitted scores
+    # every non-control target -- all 90 of hallmark_in_training (50) +
+    # heldout_pathway (24) + immune_tme (8) + tumour_state (8). D1's
+    # `programme_only` arm trains on data.hallmark, i.e. on exactly those 50, so
+    # the unrestricted readout puts one arm's own supervision on 56% of the exam,
+    # in the direction that flatters it. Emitting only that file, under the most
+    # authoritative name in the run root and referenced from SUCCESS.json, is how
+    # D2's headline became uninterpretable (Stage-1 audit, item A2).
+    #
+    # The stratified readout over the 40 targets NEITHER arm trained on is the
+    # D1 result. random_control is the negative control both arms must fail.
+    readouts = [
+        ("stratified", ["--target-groups", "heldout_pathway", "immune_tme", "tumour_state"],
+         "D1_PAIRED_BOOTSTRAP_STRATIFIED.json"),
+        ("random_control", ["--target-groups", "random_control"],
+         "D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json"),
+        ("unrestricted", [], "D1_PAIRED_BOOTSTRAP.json"),
+    ]
+    for name, groups, filename in readouts:
+        comparison = [sys.executable, "-m", "morpheus.v2.research.rebase.d2_compare",
+                      "--hallmark-artifacts", *exports["P"], "--pbs-artifacts", *exports["F"],
+                      "--targets", str(Path(args.calibra_targets).resolve()),
+                      "--output", str(root / filename), "--repeats", str(args.bootstrap_repeats),
+                      "--label-a", "programme_only", "--label-b", "programme_free",
+                      "--experiment", "D1", *groups]
+        result = subprocess.run(comparison, cwd=repo)
+        _append_gate_log(gate_log, "D1", f"paired_patient_and_cancer_bootstrap_{name}",
+                         str(result.returncode), "0", "PASS" if result.returncode == 0 else "FAIL")
+        if result.returncode:
+            raise RuntimeError(f"D1 paired bootstrap ({name}) failed; F2's headline gap had no CI "
+                               "and that is how it survived")
+    # Make the run root self-describing, so a reader who never saw the notebook
+    # still learns which file is the result and which is contaminated.
+    _write_json(root / "D1_READOUT_INDEX.json", {
+        "headline": "D1_PAIRED_BOOTSTRAP_STRATIFIED.json",
+        "headline_rationale": "the 40 targets neither arm trained on: heldout_pathway, immune_tme, tumour_state",
+        "negative_control": "D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json",
+        "negative_control_requirement": "both arms at chance; a channel here voids every number on the project",
+        "secondary_do_not_headline": "D1_PAIRED_BOOTSTRAP.json",
+        "secondary_caveat": "scores all 90 non-control targets, of which 50 are hallmark_in_training -- "
+                            "programme_only's own supervision. Quote only with this caveat attached.",
+        "preregistered": "NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md",
+    })
     _write_json(root / "SUCCESS.json", {"pair_manifest_sha256": _sha256(manifest_path),
                                         "calibra_targets_sha256": _sha256(Path(args.calibra_targets).resolve()),
                                         "artifacts": exports, "g4_calibra_passed": True,
-                                        "paired_bootstrap": str(root / "D1_PAIRED_BOOTSTRAP.json")})
+                                        "readout_index": str(root / "D1_READOUT_INDEX.json"),
+                                        "paired_bootstrap_headline": str(root / "D1_PAIRED_BOOTSTRAP_STRATIFIED.json"),
+                                        "paired_bootstrap_negative_control": str(root / "D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json"),
+                                        "paired_bootstrap_unrestricted_contaminated": str(root / "D1_PAIRED_BOOTSTRAP.json")})
 
 
 def run_d3(args: argparse.Namespace) -> None:
