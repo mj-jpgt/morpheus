@@ -154,7 +154,7 @@ def stage_tile(args) -> None:
                 raise HestAdapterError("no spot survived the usable/on-slide filters")
             crop = crop_pixels(mpp, FOV_MICRONS)
             vectors = _embed_windows(slide, corners[idx], crop, render_patch, model, transform,
-                                     torch, args.device, args.batch_size)
+                                     torch, args.device, args.batch_size, args.readers)
             slide.close()
             if vectors.shape != (idx.size, EMBED_DIM) or not np.isfinite(vectors).all():
                 raise HestAdapterError(f"bad embedding block {vectors.shape}")
@@ -191,19 +191,40 @@ def _load_encoder(device: str):
 
 
 def _embed_windows(slide, corners, crop_px, render_patch, model, transform, torch,
-                   device: str, batch_size: int) -> np.ndarray:
+                   device: str, batch_size: int, readers: int = 12) -> np.ndarray:
+    """Embed one slide's windows, overlapping slide I/O with GPU work.
+
+    Reading a 744x744 level-0 region off NFS costs ~155 ms cold, so a serial loop is
+    I/O-bound at ~6 spots/s -- six hours for this cohort.  ``openslide_read_region`` is
+    thread-safe and releases the GIL, so the reads are issued from a small thread pool while
+    the GPU works on the previous batch.  Patch order is preserved, so the embedding rows
+    still line up with ``corners``.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
     out = []
-    for start in range(0, len(corners), batch_size):
-        images = [render_patch(slide, int(x), int(y), crop_px)
-                  for x, y in corners[start:start + batch_size]]
-        batch = torch.stack([transform(im) for im in images]).to(device)
-        with torch.inference_mode(), torch.autocast("cuda", dtype=torch.float16,
-                                                    enabled=device.startswith("cuda")):
-            values = model(batch)
-        if isinstance(values, (tuple, list)):
-            values = values[0]
-        out.append(values.detach().float().cpu().numpy())
+    with ThreadPoolExecutor(max_workers=readers) as pool:
+        pending = None
+        for start in range(0, len(corners), batch_size):
+            chunk = corners[start:start + batch_size]
+            future = pool.map(lambda c: render_patch(slide, int(c[0]), int(c[1]), crop_px), chunk)
+            if pending is not None:
+                out.append(_forward(model, transform, torch, list(pending), device))
+            pending = future
+        if pending is not None:
+            out.append(_forward(model, transform, torch, list(pending), device))
     return np.concatenate(out, axis=0).astype(np.float32) if out else np.zeros((0, EMBED_DIM), np.float32)
+
+
+def _forward(model, transform, torch, images, device: str) -> np.ndarray:
+    """One H-Optimus-0 batch, in exactly the precision the TCGA store used."""
+    batch = torch.stack([transform(im) for im in images]).to(device)
+    with torch.inference_mode(), torch.autocast("cuda", dtype=torch.float16,
+                                                enabled=device.startswith("cuda")):
+        values = model(batch)
+    if isinstance(values, (tuple, list)):
+        values = values[0]
+    return values.detach().float().cpu().numpy()
 
 
 # --- stage: assemble ------------------------------------------------------------------
@@ -326,6 +347,8 @@ def main() -> None:
     t.add_argument("--root", required=True); t.add_argument("--plan", required=True)
     t.add_argument("--output", required=True); t.add_argument("--device", default="cuda")
     t.add_argument("--batch-size", type=int, default=32)
+    t.add_argument("--readers", type=int, default=12,
+                   help="threads issuing slide reads; the stage is NFS-latency bound, not GPU bound")
     t.set_defaults(func=stage_tile)
 
     a = sub.add_parser("assemble")
