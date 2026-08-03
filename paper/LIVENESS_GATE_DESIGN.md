@@ -1,4 +1,4 @@
-# What a liveness gate certifies — and three ways we learned it certifies less than we assumed
+# What a liveness gate certifies — and four ways we learned it certifies less than we assumed
 
 *Draft section, 2026-08-03. Companion to `P1_CALIBRA_DRAFT.md`, which asks what an **analysis** would
 have missed; this asks what a **training gate** would have missed. Every number traces to a named
@@ -46,7 +46,7 @@ The gate answered the first and was read as answering the second.
 
 ## Instance 3 — the gate removed the dynamic that causes the failure
 
-This is the sharpest of the three, because the removal was deliberate and documented.
+The subtlest of the four, because the removal was deliberate, documented, and correct on its own terms.
 
 The objective uses a queue of detached negative keys. Replaying one batch against a *live* queue makes
 the queue fill with re-encodings of that same batch, so the negatives become the queries; the gate
@@ -66,19 +66,32 @@ under **every** setting of both regularisers suspected of causing it — includi
 | 0.0 | 0.1 | 2.97 | 2.00 | 2.50 | — | — |
 | 0.0 | 0.0 | 2.98 | 1.98 | 1.86 | — | — |
 
-The pathology is therefore not in the objective's weighting. The leading hypothesis — under test as of
-this writing — is the mechanism MoCo (He et al., 2020) was introduced to address: a rapidly-changing
-key encoder makes queued keys mutually inconsistent, and the cheapest escape from an inconsistent key
-set is to stop distinguishing anything. `PairedBiologyMemoryBank.update()` enqueues keys from the
-current encoder every step with no momentum, which is the configuration MoCo contrasts against.
+The pathology is therefore not in the objective's weighting. It is in the key set: giving the queue its
+own slowly-moving EMA encoder, **at fixed capacity 4096 so the negative count is unchanged**, raises
+effective rank from 2.58 to 6.89 by step 100.
+
+The mechanism is *not* the one we predicted, and the check that established this is the part worth
+copying. We expected MoCo's account (He et al., 2020) — a long queue holding keys written by a
+substantially different encoder — and predicted in advance that a momentum encoder would flatten the
+measured key-staleness curve. It did not. Measured directly, the queue turns over completely every
+**19 steps** (214-patient batches into 4,096 slots), so no key is ever meaningfully old; and
+key-to-encoder agreement fails to predict rank, the best-agreeing arm (0.908) having *lower* rank than
+the worst-agreeing one (0.441). The capacity sweep's healthiest arm holds the *freshest* keys of all,
+being fully overwritten every step.
+
+What the evidence supports instead is that a queue written by the query encoder lets the loss be
+reduced by moving queries and keys *together*, and that a decoupled key encoder removes that escape.
+We report the fix as effective and the mechanism as open, rather than attaching a familiar explanation
+that our own measurement contradicts.
 
 The gate froze the queue to remove a *known* pathology, and in doing so removed the *unknown* one.
 
-*Provenance: `d1b_premise_fails_all_five_arms_collapse`; queue-capacity sweep in progress.*
+*Provenance: `d1b_premise_fails_all_five_arms_collapse`, `queue_size_implicates_the_key_set`,
+`momentum_rescues_rank_but_staleness_is_not_the_mechanism`.*
 
 ## Instance 4 — the gate was read from a re-implementation of itself
 
-The sharpest instance, and the cheapest to avoid.
+The sharpest of the four, and the cheapest to have avoided.
 
 To decide whether the objective was ready to launch, we ran the gate function
 (`_overfit_programme_free_contrastive`) from a standalone harness that reconstructed its inputs:
@@ -118,20 +131,22 @@ elsewhere, the correct response is to make the real gate cheaper — not to move
    objective" — accurate, and read as more than it said.
 2. **A gate's regime must match the run's in every dimension the run's failure can live in.** Ours
    differed in three simultaneously: duration (800 vs 40 epochs), problem size (16 vs 3,118 patients),
-   and key-set dynamics (frozen vs live). Each hid a distinct failure.
-3. **Simplifications made to defeat one pathology are the first place to look for the next.** Every
-   one of the three above came from a change that was correct on its own terms.
+   and key-set dynamics (frozen vs live). Each hid a distinct failure — and a fourth hid in the gap
+   between the gate and a faithful re-implementation of it.
+3. **Simplifications made to defeat one pathology are the first place to look for the next.** Each
+   of instances 1–3 came from a change that was correct on its own terms.
 4. **A gate that cannot fail on the training pathology should not be quoted as evidence about it.**
    The strongest version: report alongside each gate the dynamics it removes, so a reader can see
    what it cannot see.
 
 ## Honest limits of this section
 
-- Instance 3's *cause* is a live hypothesis, not a result. The queue-capacity sweep that would
-  implicate or exonerate the key set is running; the momentum-encoder fix is not implemented and not
-  tested. If the sweep clears the queue, the objective itself becomes the candidate and this section's
-  third instance still stands as stated — the gate did not predict training health — but its
-  mechanism paragraph must be rewritten.
+- Instance 3's *cause* is established only as far as "the key set, not the objective's weighting".
+  The specific mechanism is open: MoCo's staleness account was predicted, tested and **falsified**
+  here, and no replacement has been confirmed. The proposed alternative — that a query-written queue
+  permits query/key co-movement — is consistent with the measurements but has not itself been tested
+  against a control.
+- Whether the momentum fix holds beyond 100 steps, or at 40 epochs, is not measured.
 - All four instances come from one objective on one architecture. We do not claim a general rate at
   which liveness gates mislead; we claim the failure mode is real, recurred three times in two days
   once we looked for it, and is cheap to test for.
