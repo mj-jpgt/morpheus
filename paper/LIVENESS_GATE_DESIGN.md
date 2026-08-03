@@ -98,21 +98,29 @@ To decide whether the objective was ready to launch, we ran the gate function
 cohort, split, schedule, model. Three seeds passed with margin, so the run was launched. The gate then
 failed *inside the runner*.
 
-For the identical seed and the identical 2,400-step budget, the same gate function returned:
+For identical seeds and the identical 2,400-step budget, the same gate function returned:
 
-| | `programme_free` seed 43 |
-|---|---|
-| standalone harness | **0.0047** |
-| inside the runner | **0.50883** |
+| seed | standalone harness | inside the runner |
+|---|---:|---:|
+| 42 | 0.01871 | passed |
+| 43 | 0.01206 | **0.50883** ✗ |
+| 44 | 0.05666 | **2.14122** ✗ |
 
-Two orders of magnitude, against a threshold of 0.10 — a pass and a decisive fail. Nothing about
-either measurement is incorrect. The runner reaches the gate having constructed the model from the
+**Three of three pass in the harness; one of three in the runner.** Seed 44's in-runner value is close
+to the chance value ln(16) = 2.7726 — not a marginal miss. The harness did not merely give optimistic
+numbers, it *inverted the verdict* on two of three seeds. Nothing about either measurement is
+incorrect. The runner reaches the gate having constructed the model from the
 full experiment configuration and having consumed a different quantity of RNG, so
 `copy.deepcopy(model)` starts the memorisation loop from a different initialisation and different
 dropout draws. The harness reproduced the gate's *code* and not the gate's *caller*.
 
-This cost two launches: one aborted at the first run, and one that lost an arm mid-experiment after
-three arms had already trained to completion.
+This cost two launches: one aborted at the first run, and one that lost **two of three** contrastive
+arms mid-experiment after three arms had already trained to completion.
+
+The gate was right and the harness was wrong: the arms it refused belong to an objective independently
+measured, at full training duration, to collapse to effective rank 1.71 against the supervised arm's
+9.81. A gate that rejects work the harness would have wasted is functioning correctly; the failure was
+in reading it from the wrong place.
 
 **Design rule: a liveness gate must be read from the process that will perform the training, never
 from a harness that reconstructs the setup.** A harness is useful for developing a gate and is
