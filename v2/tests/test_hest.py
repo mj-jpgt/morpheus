@@ -135,12 +135,33 @@ def test_spot_key_makes_the_repos_tss_deriver_recover_the_slide():
 
 def test_adapter_constants_match_the_tcga_extractor():
     """REGRESSION GUARD: the whole cohort is only comparable because the field of view is
-    identical to the TCGA store.  If either side is edited alone, this fails."""
-    from morpheus.v2.research.dilution import extract_normal_patches as tcga
+    identical to the TCGA store.  If either side is edited alone, this fails.
 
-    assert float(tcga.FOV_MICRONS) == FOV_MICRONS, (tcga.FOV_MICRONS, FOV_MICRONS)
-    assert int(tcga.OUTPUT_PX) == OUTPUT_PX, (tcga.OUTPUT_PX, OUTPUT_PX)
-    assert int(tcga.JPEG_QUALITY) == 75 and int(tcga.JPEG_SUBSAMPLING) == 2
+    The constants are read from the source with `ast` rather than imported.
+    `extract_normal_patches` imports Pillow, which is only needed to *cut* patches
+    and is absent from the training venv -- so importing it made this guard raise
+    `ModuleNotFoundError` on the box.  Skipping on a missing optional dependency
+    would have been worse than the failure: a guard that silently stops running is
+    precisely the failure mode this repository keeps being bitten by.  Parsing the
+    literals keeps it live in every environment.
+    """
+    import ast
+    from pathlib import Path
+
+    source = Path(__file__).resolve().parents[1] / "research" / "dilution" / "extract_normal_patches.py"
+    assert source.is_file(), f"the TCGA extractor moved; this guard is now vacuous: {source}"
+    tcga = {}
+    for node in ast.parse(source.read_text(encoding="utf-8")).body:
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    tcga[target.id] = node.value.value
+    for name in ("FOV_MICRONS", "OUTPUT_PX", "JPEG_QUALITY", "JPEG_SUBSAMPLING"):
+        assert name in tcga, f"{name} is no longer a module-level literal in {source.name}"
+
+    assert float(tcga["FOV_MICRONS"]) == FOV_MICRONS, (tcga["FOV_MICRONS"], FOV_MICRONS)
+    assert int(tcga["OUTPUT_PX"]) == OUTPUT_PX, (tcga["OUTPUT_PX"], OUTPUT_PX)
+    assert int(tcga["JPEG_QUALITY"]) == 75 and int(tcga["JPEG_SUBSAMPLING"]) == 2
 
 
 # --- expression -----------------------------------------------------------------------
