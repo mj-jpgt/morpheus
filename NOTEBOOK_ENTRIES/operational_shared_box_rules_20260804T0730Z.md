@@ -1,8 +1,8 @@
-## 2026-08-04 07:30 UTC — Operational rules for the shared box: two resource errors of the same class, one day apart
+## 2026-08-04 07:30 UTC — Operational rules: three errors of one class — a reading that looks like an answer and isn't
 
 **Logged:** 2026-08-04 07:30 UTC. **How obtained:** two of my own mistakes on the A100
-(`150.136.45.194`), both caught and both cheap, recorded because they are the same error twice and the
-second was avoidable given the first.
+(`150.136.45.194`), all caught and all cheap, recorded because they are the same error three times and each
+was avoidable given the one before.
 
 ### Technical
 
@@ -49,6 +49,28 @@ relaunch once and killed a set of runs I meant to keep once. Match on the interp
 ```
 ps -eo pid,comm,args | awk '$2=="python" && /momentum_test/ {print $1}'
 ```
+
+**5. A reading that looks like an answer and isn't — the most dangerous of the three.** Checking
+whether the new in-run rank tripwire had fired, I queried `rank_tripwire_observed` and got an empty
+list for every run. That reads as a confident negative: *the gate never triggered*. It was wrong. The
+runner prefixes epoch metrics with `train_`, so the key is `train_rank_tripwire_observed`, and the
+tripwire had fired and logged on every run that reached step 200.
+
+Had I stopped there I would have reported an inert gate — the exact failure this project has spent two
+days learning to detect. This is worse than the thread and memory errors above, because **an empty
+result looks like data**. A missing file raises; a wrong key returns `[]`, and `[]` is
+indistinguishable from "measured, found nothing" unless you check.
+
+The rule: *when a query returns nothing, confirm the query can return something before believing the
+nothing.* Concretely — list the keys that exist before asserting a key's absence means anything:
+
+```python
+print(sorted({k for row in rows for k in row}))   # what IS there
+```
+
+All three errors in this entry are the same class: a measurement that appeared to answer the question
+and did not. Threads made a fast test look slow; unchecked GPU memory made a launch look safe; a
+mistyped key made a working gate look dead.
 
 ### In plain terms
 
