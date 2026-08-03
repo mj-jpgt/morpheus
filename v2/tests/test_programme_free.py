@@ -350,6 +350,9 @@ def test_g26_grades_the_uncentred_contrastive_number() -> None:
                         V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu")
     batches = [_big_batch(n=2, k=8, seed=seed) for seed in range(6)]
     trainer.prime_biology_memory(batches, minimum_unique_keys=9)
+    # Frozen so the queue the metric saw is the queue this test recomputes with;
+    # a live queue absorbs the batch at the end of the step.
+    trainer.freeze_biology_memory = True
     batch = _big_batch(n=2, k=8, seed=99)
     _, metrics, _ = trainer.step(batch, epoch=1)
     assert "biology_contrastive" in metrics and "biology_contrastive_centred" in metrics
