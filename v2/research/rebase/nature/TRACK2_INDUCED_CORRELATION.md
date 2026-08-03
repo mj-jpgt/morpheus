@@ -201,7 +201,45 @@ For the structureless `gaussian_k99` arm the relative spread looks enormous (1.7
 0.0010–0.0079; relative spread is meaningless there and is reported only so its meaninglessness is
 explicit.
 
-## 8. Recorded substitutions and what is not done
+## 8. T2.6 — both floors as functions of (design rank × n), and the result changes cohort sizing
+
+Full level grid (0.0 … 0.50, 40 draws, 2 seeds), same driver, so the floors cannot come from a second
+implementation.
+
+| design | n | k_eff | induced | **detection floor** | transmission floor | attenuation | ambient top-CCA |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| cancer | 1,000 | 30.9 | 0.0847 | **0.25** | 0.01 | 1.124 | 0.684 |
+| cancer | 2,530 | 31.0 | 0.0857 | **0.30** | 0.01 | 1.109 | 0.668 |
+| cancer | 6,427 | 31.0 | 0.0844 | **0.30** | 0.01 | 1.099 | 0.663 |
+| cancer + tss_pool50 | 1,000 | 30.9 | 0.0847 | 0.25 | 0.01 | 1.124 | 0.684 |
+| cancer + tss_pool50 | 2,530 | 31.0 | 0.0857 | 0.30 | 0.01 | 1.109 | 0.668 |
+| cancer + tss_pool50 | 6,427 | 50.0 | 0.0842 | 0.30 | 0.01 | 1.101 | 0.663 |
+| cancer + tss_pool10 | 1,000 | 45.3 | 0.0799 | 0.25 | 0.01 | 1.112 | 0.683 |
+| cancer + tss_pool10 | 2,530 | 102.3 | 0.0774 | 0.25 | 0.01 | 1.091 | 0.664 |
+| cancer + tss_pool10 | 6,427 | 215.1 | 0.0811 | 0.25 | 0.01 | 1.086 | 0.660 |
+| cancer + tss_pool1 | 1,000 | 316.6 | 0.0806 | 0.25 | 0.01 | 1.070 | 0.677 |
+| cancer + tss_pool1 | 2,530 | 446.2 | 0.0790 | 0.30 | 0.01 | 1.086 | 0.661 |
+| cancer + tss_pool1 | 6,427 | 579.9 | 0.0831 | 0.30 | 0.01 | 1.080 | 0.654 |
+| **gaussian_k99** | 1,000 | 99.0 | 0.0097 | **0.050** | 0.01 | 1.000 | 0.877 |
+| **gaussian_k99** | 2,530 | 99.0 | 0.0040 | **0.015** | 0.01 | 1.000 | 0.860 |
+| **gaussian_k99** | 6,427 | 99.0 | 0.0014 | **0.010** | 0.01 | 1.001 | 0.863 |
+
+**The detection floor is set by the induced correlation, not by n.** For every real design it sits at
+0.25–0.30 and *does not improve* as n goes from 1,000 to 6,427 — a 6.4× increase in sample size buys
+nothing. For the structureless Gaussian design of comparable rank it falls 0.050 → 0.015 → 0.010, i.e.
+roughly like the sampling scale, exactly as it should when there is nothing structural to hit.
+
+This is the most operationally consequential result in Track 2. **An external cohort cannot buy a lower
+floor by recruiting more patients**, if its confound design explains both modalities the way cancer type
+does here. What lowers the floor is reducing `R_x·R_y/√k_eff_shared` — i.e. a cohort whose nuisance
+structure is less predictive of both modalities — not a bigger n. Track 3's cohort sizing must be
+written against the induced-correlation prediction (P3), not against a power calculation in n.
+
+The transmission floor is 0.01 — the finest level on the grid — in every cell, so it is censored from
+below and should be reported as "≤ 0.01", not "= 0.01". Attenuation is 1.07–1.12 for real designs and
+1.000 for the Gaussian control across all n.
+
+## 9. Recorded substitutions and what is not done
 
 * **No TCGA purity table exists on either machine.** The `["cancer","tss","purity"]` rank point named in
   the plan could not be built. An expression-derived surrogate was rejected because it is computed from
@@ -209,10 +247,10 @@ explicit.
   effect under study. Replaced by `dx_year` (numeric and categorical) and `age` from the TCGA PanCan
   clinical mirror, plus the TSS pooling threshold, which moves rank over an order of magnitude while
   holding the *kind* of confound fixed. Recorded, not silently substituted.
-* **T2.6 (both floors as functions of design rank × n)** was still running when this document was
-  written; the level-0 grid above is complete, the full-level grid lands in
-  `p1_evidence/track2/floors_rows.csv`.
-* **Second representation (d2_i)** sweep queued, not complete.
+* **Second representation (d2_i)** sweep queued, not complete — the whole grid is one artifact
+  (`d2_h_seed42`) and one state (`wsi_biology`), with three seeds per cell.
+* Both floors are **censored** at the grid edges: transmission at 0.01 (finest level tested) and, in the
+  dilution run, detection at the grid's top. Report as inequalities.
 * Single artifact (`d2_h_seed42`), single state (`wsi_biology`) for the main grid; three seeds per cell.
 
 ---
