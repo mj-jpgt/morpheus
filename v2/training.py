@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from torch import nn
 
+from .calibra.spectral import RANK_VARIANTS, effective_rank
 from .losses import (feature_decorrelation, gaussian_nll,
                      paired_infonce_with_memory, population_offset,
                      programme_neighbourhood_loss,
@@ -557,17 +558,22 @@ class V2Trainer:
                     self._decorr_bank = combined[-self.decorrelation_bank_capacity:]
         for name, value in (("identity", output["z_identity"]), ("biology", output["z_biology"])):
             metrics[f"{name}_feature_std"] = float(value.detach().float().std(dim=0).mean())
-        # Centred effective rank of the WSI biology view: the participation ratio
-        # of the singular values of the mean-centred, L2-normalised states. This
-        # is the quantity that separated a healthy run (6.92-7.25) from a
-        # collapsed one (1.46-1.98); the raw uncentred cosine does not, because a
-        # large shared direction is present and expected in both.
+        # Rank of the WSI biology view. Both columns come from the ONE implementation
+        # in `calibra/spectral.py`; this block previously carried its own inline copy.
+        #
+        # `biology_centred_effective_rank` keeps the R3 variant -- order-2 participation
+        # ratio on L2-normalised rows -- because the tripwire's abort threshold (4.0)
+        # was calibrated against it: R3 separated a healthy run (6.92-7.25) from a
+        # collapsed one (1.46-1.98). Silently switching the statistic under a live
+        # abort threshold would change which runs are killed. The canonical Roy &
+        # Vetterli value is logged beside it as `biology_effective_rank_canonical` so
+        # the threshold can be recalibrated on evidence rather than by assumption.
         if len(out_wsi["z_biology"]) >= 8:
             with torch.no_grad():
-                states = nn.functional.normalize(out_wsi["z_biology"].detach().float(), dim=-1)
-                singular = torch.linalg.svdvals(states - states.mean(dim=0))
-                metrics["biology_centred_effective_rank"] = float(
-                    (singular.sum() ** 2) / singular.square().sum().clamp_min(1e-12))
+                states = out_wsi["z_biology"].detach().float()
+                metrics["biology_centred_effective_rank"] = effective_rank(
+                    states, variant=RANK_VARIANTS["R3"])
+                metrics["biology_effective_rank_canonical"] = effective_rank(states)
         reconstruction_term = output["z_identity"].new_zeros(())
         if weights["rna_reconstruction"] and "rna" in batch:
             present = batch.get("rna_present", torch.ones(len(output["z_identity"]), device=self.device, dtype=torch.bool)).bool()

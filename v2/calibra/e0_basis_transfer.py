@@ -45,6 +45,7 @@ import pandas as pd
 import torch
 
 from .gates import GateLedger
+from .spectral import effective_rank
 
 HOUSEKEEPING = {"ACTB", "GAPDH", "TUBB", "RPL13A", "B2M"}
 # Replogle's documented `gene_transcript` index has stable first three fields
@@ -430,13 +431,12 @@ def _align(p: MatrixBundle, t: MatrixBundle) -> tuple[np.ndarray, np.ndarray, li
 
 
 def _effective_rank_torch(x: torch.Tensor) -> float:
-    """Roy-Vetterli effective rank computed on the active device."""
-    centred = x - x.mean(dim=0, keepdim=True)
-    singular = torch.linalg.svdvals(centred)
-    singular = singular[singular > 1e-12]
-    if singular.numel() == 0: return 0.0
-    weights = singular / singular.sum()
-    return float(torch.exp(-(weights * torch.log(weights)).sum()).cpu())
+    """Alias kept for call-site stability. The definition lives in `spectral.py`.
+
+    `spectral.effective_rank` computes torch inputs on-device without a host
+    transfer, so this is the same computation it always was, minus the duplicate.
+    """
+    return effective_rank(x)
 
 
 def _health(x: torch.Tensor) -> dict[str, float]:
@@ -472,12 +472,14 @@ def _full_dictionary_rank(p: MatrixBundle, device: torch.device) -> dict[str, ob
     relative_tolerance = float(max(x.shape) * np.finfo(np.float32).eps)
     nonzero = singular[singular > singular[0] * relative_tolerance]
     if nonzero.numel() == 0: nonzero = singular[:1]
-    weights = nonzero / nonzero.sum()
     return {"rank_mode": f"full_{device.type}_svd_float64", "n_rows": int(x.shape[0]), "n_genes": int(x.shape[1]),
             "constant_columns_dropped": int((~keep).sum()), "rank_relative_tolerance": relative_tolerance,
             "rank_tolerance_basis": "max(n,p)*finfo(float32).eps on a float64 spectrum",
             "numerical_rank": int(nonzero.numel()), "max_possible_rank": int(min(x.shape)),
-            "effective_rank": float(torch.exp(-(weights * torch.log(weights)).sum()).cpu()),
+            # `x` is already column-standardised above, so centring again is a no-op;
+            # `centre=False` says so rather than paying for it. The tolerance override
+            # is what keeps `effective_rank <= numerical_rank` true by construction.
+            "effective_rank": effective_rank(pt, centre=False, tolerance=relative_tolerance),
             "stable_rank": float((singular.square().sum() / singular[0].square()).cpu())}
 
 

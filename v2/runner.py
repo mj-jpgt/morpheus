@@ -21,6 +21,7 @@ import torch
 
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
 
+from .calibra.spectral import RANK_VARIANTS, effective_rank
 from .data import DynamicTokenBatchSampler, TrainOnlyStandardizer
 from .model import TumorStateV2, V2ModelConfig
 from .training import PairedBiologyMemoryBank, V2LossSchedule, V2Trainer
@@ -938,11 +939,13 @@ def _training_scale_rank_probe(model: TumorStateV2, schedule: V2LossSchedule, da
     clone.eval()
     with torch.no_grad():
         states = clone(probe_batch, view="wsi")["z_biology"].float()
-    states = nn.functional.normalize(states, dim=-1)
-    singular = torch.linalg.svdvals(states - states.mean(dim=0))
     del clone, trial
     torch.cuda.empty_cache() if device.startswith("cuda") else None
-    return float((singular.sum() ** 2) / (singular.square().sum()))
+    # Statistic R3 (centred + row-normalised, order 2), NOT the canonical R1. Named
+    # explicitly rather than reimplemented inline: the 4.0 bar in `_require_rank_probe`
+    # was calibrated against R3 readings (6.92-7.25 healthy, 1.46-1.98 collapsed) and
+    # changing the statistic under it would change which runs are admitted.
+    return effective_rank(states, variant=RANK_VARIANTS["R3"])
 
 
 def _require_rank_probe(readings: list[float], minimum: float) -> dict[str, object]:

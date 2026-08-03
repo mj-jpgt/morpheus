@@ -16,6 +16,8 @@ import argparse, json, subprocess, sys
 from pathlib import Path
 import numpy as np
 
+from morpheus.v2.calibra.spectral import CANONICAL, RANK_VARIANTS, effective_rank
+
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("run_root")
 parser.add_argument("--targets", required=True, help="frozen_rna_targets.npz")
@@ -146,17 +148,25 @@ check("A4_seed_agreement", len(strat_signs) == 1 and all(overlap),
                      "p_improve": d["patient"]["p_improve"]} for d in ds]})
 
 # ---------------------------------------------------------------- A5 effective rank
-def effective_rank(path: str) -> float:
+# This check previously carried its own inline definition -- the order-2 participation
+# ratio (Sum sigma)^2 / Sum sigma^2, statistic R2 of paper/P2_RANK_DRAFT.md 3.1 -- which
+# is NOT Roy & Vetterli's effective rank and is systematically LOWER than it. It now
+# calls the one canonical implementation. R2 is reported alongside so that this table
+# can be read against the historical D1-A numbers, but the headline column is R1.
+def _rank_of_artifact(path: str) -> dict[str, float]:
     z = np.load(path, allow_pickle=True)
     x = np.asarray(z["wsi_biology"], float)[np.asarray(z["split"]).astype(str) == "test"]
-    sv = np.linalg.svd(x - x.mean(0), compute_uv=False)
-    return float((sv.sum() ** 2) / (sv ** 2).sum())
+    return {name: effective_rank(x, variant=RANK_VARIANTS[name]) for name in ("R1", "R2", "R3")}
 
 
-ranks = {f"seed{s}": {"programme_only": effective_rank(P[i]), "programme_free": effective_rank(F[i])}
+ranks = {f"seed{s}": {"programme_only": _rank_of_artifact(P[i]),
+                      "programme_free": _rank_of_artifact(F[i])}
          for i, s in enumerate(SEEDS)}
 check("A5_effective_rank_reported", True,
       {"effective_rank": ranks,
+       "canonical": "R1 = " + CANONICAL.label + " (Roy & Vetterli 2007 Definition 1, column-centred). "
+                    "R2/R3 are order-2 Hill numbers of the same spectrum, retained only for "
+                    "comparability with pre-2026-08-05 numbers; they are always <= R1.",
        "note": "REPORTED, NOT INTERPRETED (blocker 5). WSI states are ~0.80 collinear at init, so a "
                "narrower rank may reflect resistance to an already-collapsed view rather than "
                "dictionary content."})

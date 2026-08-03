@@ -16,6 +16,7 @@ import sys
 import numpy as np, torch, torch.nn.functional as F
 from torch import nn
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
+from morpheus.v2.calibra.spectral import RANK_VARIANTS, effective_rank
 from morpheus.v2.preflight import restrict_cohort_to_split
 from morpheus.v2.runner import attach_v2_targets, UncappedHoptimusBatches, _truncate_batch
 from morpheus.v2.model import TumorStateV2, V2ModelConfig
@@ -72,21 +73,23 @@ def geometry():
         r = model(probe, view="rna")["z_biology"].float()
     model.train()
     wn, rn = F.normalize(w, dim=-1), F.normalize(r, dim=-1)
-    sv = torch.linalg.svdvals(wn - wn.mean(0))
     eye = torch.eye(NP, dtype=torch.bool, device="cuda")
-    return (float((sv.sum() ** 2) / (sv ** 2).sum()), float(wn.std(0).mean()),
-            float((rn @ rn.T)[~eye].mean()))
+    # R3 (the historical probe statistic), reported beside canonical R1 so this
+    # script's numbers can be read against both the older probes and the paper.
+    return (effective_rank(w, variant=RANK_VARIANTS["R3"]), effective_rank(w),
+            float(wn.std(0).mean()), float((rn @ rn.T)[~eye].mean()))
 
 
 print(f"decorrelation={DECORR}  consistency={CONSIST}  steps={STEPS}  probe patients={NP}", flush=True)
-print(f"{'step':>6}{'eff-rank':>10}{'feat-std':>10}{'rna-rna':>9}{'contrastive':>13}{'decorr':>10}", flush=True)
+print(f"{'step':>6}{'R3(hist)':>10}{'R1(canon)':>11}{'feat-std':>10}{'rna-rna':>9}{'contrastive':>13}{'decorr':>10}", flush=True)
 step = 0
 while step < STEPS:
     for raw in UncappedHoptimusBatches(data, train_idx, 8192, SEED + step, shuffle=True):
         batch = {k: (v.cuda(non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in raw.items()}
         if step % 50 == 0:
-            er, sd, rr = geometry()
-            print(f"{step:>6}{er:>10.2f}{sd:>10.4f}{rr:>9.4f}{last_c if step else float('nan'):>13.4f}"
+            er, er1, sd, rr = geometry()
+            print(f"{step:>6}{er:>10.2f}{er1:>11.2f}{sd:>10.4f}{rr:>9.4f}"
+                  f"{last_c if step else float('nan'):>13.4f}"
                   f"{last_d if step else float('nan'):>10.2f}", flush=True)
         opt.zero_grad(set_to_none=True)
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
@@ -99,6 +102,7 @@ while step < STEPS:
         step += 1
         if step >= STEPS:
             break
-er, sd, rr = geometry()
-print(f"{step:>6}{er:>10.2f}{sd:>10.4f}{rr:>9.4f}{last_c:>13.4f}{last_d:>10.2f}", flush=True)
-print(f"\nDONE decorrelation={DECORR} final_eff_rank={er:.2f} rna_rna={rr:.4f}", flush=True)
+er, er1, sd, rr = geometry()
+print(f"{step:>6}{er:>10.2f}{er1:>11.2f}{sd:>10.4f}{rr:>9.4f}{last_c:>13.4f}{last_d:>10.2f}", flush=True)
+print(f"\nDONE decorrelation={DECORR} final_R3={er:.2f} final_R1_canonical={er1:.2f} "
+      f"rna_rna={rr:.4f}", flush=True)

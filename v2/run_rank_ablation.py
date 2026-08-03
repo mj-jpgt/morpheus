@@ -27,19 +27,10 @@ import numpy as np
 import torch
 
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
+from morpheus.v2.calibra.spectral import effective_rank  # the one implementation
 from morpheus.v2.model import TumorStateV2, V2ModelConfig
 from morpheus.v2.runner import UncappedHoptimusBatches, attach_v2_targets
 from morpheus.v2.training import V2LossSchedule, V2Trainer
-
-
-def effective_rank(x: torch.Tensor) -> float:
-    x = x - x.mean(dim=0, keepdim=True)
-    singular = torch.linalg.svdvals(x.double())
-    singular = singular[singular > 1e-12]
-    if singular.numel() == 0:
-        return 0.0
-    p = singular / singular.sum()
-    return float(torch.exp(-(p * p.log()).sum()))
 
 
 @torch.no_grad()

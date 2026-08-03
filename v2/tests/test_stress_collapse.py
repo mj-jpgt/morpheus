@@ -16,23 +16,9 @@ from __future__ import annotations
 import torch
 
 from morpheus.v2 import losses as L
+from morpheus.v2.calibra.spectral import effective_rank  # the one implementation
 from morpheus.v2.model import TumorStateV2, V2ModelConfig
 from morpheus.v2.training import V2LossSchedule, V2Trainer
-
-
-def effective_rank(x: torch.Tensor) -> float:
-    """Roy-Vetterli effective rank: exp(entropy of L1-normalised singular values).
-
-    Computed on the column-centred batch (feature covariance spectrum). Returns
-    0.0 for an all-constant batch.
-    """
-    x = x - x.mean(dim=0, keepdim=True)
-    singular = torch.linalg.svdvals(x.double())
-    singular = singular[singular > 1e-12]
-    if singular.numel() == 0:
-        return 0.0
-    p = singular / singular.sum()
-    return float(torch.exp(-(p * p.log()).sum()))
 
 
 def _config(hidden: int = 32, anchor: bool = False) -> V2ModelConfig:

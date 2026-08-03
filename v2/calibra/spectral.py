@@ -1,32 +1,195 @@
 """Spectral utilities for CALIBRA: effective rank and cross-fitted CCA.
 
-Single source of truth for `effective_rank` (previously duplicated in
-`v2/tests/test_stress_collapse.py` and `v2/run_rank_ablation.py`).
+**Single source of truth for `effective_rank`.** This module holds the ONLY
+implementation in the repository. Three mutually incompatible statistics were
+previously implemented under that one name (`spectral.py`, `d1_audit.py`,
+`d1_geometry_probe.py`), plus byte-identical torch duplicates in
+`run_rank_ablation.py`, `test_stress_collapse.py` and `e0_basis_transfer.py` and
+a fourth variant inline in `training.py`. They are now all this function, and
+`v2/tests/test_effective_rank_canonical.py` fails if a second definition
+reappears anywhere in the tree.
 """
 from __future__ import annotations
 
+from typing import NamedTuple
+
 import numpy as np
 
-__all__ = ["effective_rank", "cca_spectrum", "top_canonical_correlation", "heldout_top_cca",
+__all__ = ["effective_rank", "RankVariant", "CANONICAL", "RANK_VARIANTS", "cca_spectrum",
+           "top_canonical_correlation", "heldout_top_cca",
            "heldout_single_direction_correlation"]
 
 
-def effective_rank(x) -> float:
-    """Roy-Vetterli effective rank: exp(entropy of L1-normalised singular values).
+class RankVariant(NamedTuple):
+    """A named preprocessing + statistic choice, so a deviation cannot be silent."""
+    centre: bool
+    normalise_rows: bool
+    order: int
 
-    Accepts a numpy array or anything exposing ``.detach().cpu().numpy()``
-    (e.g. a torch tensor). Column-centres first. Returns 0.0 for a constant batch.
+    @property
+    def label(self) -> str:
+        return (f"{'centred' if self.centre else 'uncentred'}"
+                f"{'+rownorm' if self.normalise_rows else ''}"
+                f"|order{self.order}")
+
+
+#: The canonical definition. Every call site uses this unless it names a deviation.
+#:
+#: Both source papers were re-verified at full text on 2026-08-05 (Roy & Vetterli
+#: from the Zenodo PDF of DOI 10.5281/zenodo.40328, pp. 606-610; RankMe from
+#: arXiv:2210.02885v3), and the verification changes what can be claimed:
+#:
+#: - ``order=1`` -> Roy & Vetterli Definition 1 exactly, ``erank(A) = exp{H(p)}``,
+#:   ``H = -sum p_k log p_k``, ``p_k = sigma_k / ||sigma||_1``, natural log, and
+#:   Property 1 ``1 <= erank(A) <= rank(A) <= Q``. This is the published statistic
+#:   and the one RankMe adopts; it is the only variant comparable to any number
+#:   outside this repository. The other two statistics in this repository are
+#:   order-2 Hill numbers of the same spectrum and are NOT effective rank.
+#: - ``centre=True`` -> the SVD is taken of the COLUMN-CENTRED matrix. **This is a
+#:   deliberate deviation and must be stated wherever a value is quoted.** Roy &
+#:   Vetterli take the SVD of the raw matrix A ("a complex-valued non-all-zero
+#:   matrix A of size M x N whose singular value decomposition is given by
+#:   A = UDV*") with no preprocessing anywhere in the paper; RankMe is silent on
+#:   centring and applies none. We centre because for a representation the column
+#:   mean is a rank-1 component carrying no between-sample information, and the
+#:   collapse family documented on this project is ``z_i = m + a_i * u`` (one shared
+#:   offset plus one direction), whose uncentred effective rank is ~2 and whose
+#:   centred effective rank is ~1. Uncentred rank charges the mean vector as a
+#:   dimension. It is also what the majority of this project's quoted values used,
+#:   so centring is the choice that keeps the historical record recomputable.
+#: - ``normalise_rows=False`` -> rows are used at their own norms. Row L2
+#:   normalisation appears in neither source paper, discards norm variation that is
+#:   part of the representation, and changes the statistic's response to collapse.
+#:
+#: Not reconciled, and no number here is comparable to a published RankMe value:
+#: RankMe uses ``p_k = sigma_k/||sigma||_1 + eps`` with eps OUTSIDE the division
+#: (verified at glyph coordinates in the v3 PDF), so its p_k sum to
+#: ``1 + min(N,K)*eps`` rather than to 1 and its statistic is not exp of a Shannon
+#: entropy; the paper never states the eps used in that equation. Roy & Vetterli
+#: use no eps at all, only the convention ``0 log 0 = 0``.
+CANONICAL = RankVariant(centre=True, normalise_rows=False, order=1)
+
+#: The three historical statistics of `paper/P2_RANK_DRAFT.md` §3.1, expressed as
+#: variants of the one function, so that they can be measured side by side.
+RANK_VARIANTS = {
+    "R1": CANONICAL,                                                   # spectral.py
+    "R2": RankVariant(centre=True, normalise_rows=False, order=2),     # d1_audit.py
+    "R3": RankVariant(centre=True, normalise_rows=True, order=2),      # d1_geometry_probe.py, training.py
+    "R1_uncentred": RankVariant(centre=False, normalise_rows=False, order=1),
+    "R1_rownorm": RankVariant(centre=True, normalise_rows=True, order=1),
+    "R2_uncentred": RankVariant(centre=False, normalise_rows=False, order=2),
+}
+
+#: Singular values are retained when ``sigma > sigma_max * max(n, p) * eps`` -- the
+#: standard LAPACK/numpy relative rank cut at float64, matching the argument already
+#: made at `e0_basis_transfer.py:_full_dictionary_rank`. Roy & Vetterli adopt the
+#: ``0 log 0 = 0`` convention and set no tolerance; RankMe adds ``eps`` OUTSIDE the
+#: normalisation, ``p_k = sigma_k/||sigma||_1 + eps``. This implementation previously
+#: used an ABSOLUTE cut of 1e-12, which breaks the scale invariance the statistic
+#: otherwise has -- multiplying the matrix by 1e-9 changed the answer. No value in
+#: this repository is comparable to a published RankMe number under any of the three.
+EPS = float(np.finfo(np.float64).eps)
+
+#: A matrix whose post-preprocessing spectrum is this small relative to its own
+#: pre-preprocessing scale is degenerate and scores 0.0. This replaces the old
+#: absolute 1e-12 (which was implicitly relative to O(1) data) with the same number
+#: made scale-invariant, so that a representation collapsed to within float noise
+#: still reports 0 rather than the dimensionality of the noise.
+DEGENERACY_TOLERANCE = 1e-12
+
+
+def _finalise(singular, order: int, exp, log, total, square_sum):
+    """Shared tail: L1-normalise the retained spectrum and take the Hill number."""
+    if order == 1:
+        p = singular / total
+        return float(exp(-(p * log(p)).sum()))
+    if order == 2:
+        # (sum sigma)^2 / sum sigma^2 == 1 / sum p^2, the order-2 Hill number of the
+        # same distribution. Because Hill numbers are non-increasing in the order,
+        # this is <= the order-1 value for every matrix, with equality iff the
+        # spectrum is flat. That is why R2/R3 read systematically lower than R1 and
+        # why the two must never be compared.
+        return float((total ** 2) / square_sum)
+    raise ValueError(f"order must be 1 or 2, got {order!r}")
+
+
+def effective_rank(x, *, centre: bool = CANONICAL.centre,
+                   normalise_rows: bool = CANONICAL.normalise_rows,
+                   order: int = CANONICAL.order,
+                   tolerance: float | None = None,
+                   variant: RankVariant | None = None) -> float:
+    """Effective rank of a sample x feature matrix. Canonical = Roy & Vetterli, centred.
+
+    Roy & Vetterli, "The effective rank: a measure of effective dimensionality",
+    EUSIPCO 2007, Definition 1::
+
+        erank(A) = exp(H(p_1, ..., p_Q)),  H = -sum p_k log p_k,  p_k = sigma_k / ||sigma||_1
+
+    Defaults are ``CANONICAL`` and every call site should use them. The keyword
+    ``tolerance`` overrides the relative singular-value cut, expressed as a fraction
+    of the largest singular value. It exists for exactly one call site --
+    `e0_basis_transfer._full_dictionary_rank`, which reports the effective rank
+    beside a numerical rank taken at the FLOAT32 storage precision of its data and
+    must use the same cut for both or the two disagree. Leave it None everywhere else.
+
+    The other keyword
+    arguments exist so that the three historical statistics of this repository can
+    be measured against each other in one place, and so that a call site that must
+    deviate (there is exactly one: the in-run rank tripwire in `training.py`, whose
+    abort threshold was calibrated on ``R3``) has to say so in the call.
+
+    Accepts a numpy array or a torch tensor. Torch inputs are computed on-device in
+    float64 without a host transfer, because the training tripwire evaluates this
+    every optimisation step; `test_effective_rank_canonical.py` asserts the two
+    backends agree. Returns 0.0 when nothing survives the tolerance cut (e.g. a
+    constant batch after centring).
     """
-    if hasattr(x, "detach"):
-        x = x.detach().cpu().numpy()
-    x = np.asarray(x, dtype=np.float64)
-    x = x - x.mean(axis=0, keepdims=True)
-    singular = np.linalg.svd(x, compute_uv=False)
-    singular = singular[singular > 1e-12]
+    if variant is not None:
+        centre, normalise_rows, order = variant.centre, variant.normalise_rows, variant.order
+
+    if hasattr(x, "detach") and hasattr(x, "device"):  # torch tensor: stay on device
+        import torch
+        value = x.detach().to(torch.float64)
+        if value.ndim != 2:
+            raise ValueError(f"effective_rank expects a 2-D matrix, got shape {tuple(value.shape)}")
+        if normalise_rows:
+            value = value / torch.linalg.vector_norm(value, dim=-1, keepdim=True).clamp_min(1e-300)
+        scale = float(torch.linalg.matrix_norm(value))
+        if centre:
+            value = value - value.mean(dim=0, keepdim=True)
+        singular = torch.linalg.svdvals(value)
+        if singular.numel() == 0 or float(singular[0]) <= scale * DEGENERACY_TOLERANCE:
+            return 0.0
+        cut = max(value.shape) * EPS if tolerance is None else float(tolerance)
+        singular = singular[singular > singular[0] * cut]
+        if singular.numel() == 0:
+            return 0.0
+        return _finalise(singular, order, torch.exp, torch.log,
+                         singular.sum(), singular.square().sum())
+
+    value = np.asarray(x, dtype=np.float64)
+    if value.ndim != 2:
+        raise ValueError(f"effective_rank expects a 2-D matrix, got shape {value.shape}")
+    if normalise_rows:
+        norms = np.linalg.norm(value, axis=-1, keepdims=True)
+        value = value / np.maximum(norms, 1e-300)
+    scale = float(np.linalg.norm(value))
+    if centre:
+        value = value - value.mean(axis=0, keepdims=True)
+    singular = np.linalg.svd(value, compute_uv=False)
+    if singular.size == 0 or singular[0] <= scale * DEGENERACY_TOLERANCE:
+        return 0.0
+    cut = max(value.shape) * EPS if tolerance is None else float(tolerance)
+    singular = singular[singular > singular[0] * cut]
     if singular.size == 0:
         return 0.0
-    p = singular / singular.sum()
-    return float(np.exp(-(p * np.log(p)).sum()))
+    return _finalise(singular, order, np.exp, np.log,
+                     singular.sum(), np.square(singular).sum())
+
+
+def effective_rank_all_variants(x) -> dict[str, float]:
+    """Every named variant of `RANK_VARIANTS` on one matrix, for side-by-side reporting."""
+    return {name: effective_rank(x, variant=variant) for name, variant in RANK_VARIANTS.items()}
 
 
 def _whiten(a: np.ndarray, n_components: int, eps: float = 1e-8):

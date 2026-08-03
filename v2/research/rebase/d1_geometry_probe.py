@@ -13,6 +13,7 @@ usage: geom_probe.py <n_patients>
 """
 import sys
 import numpy as np, torch, torch.nn.functional as F
+from morpheus.v2.calibra.spectral import CANONICAL, RANK_VARIANTS, effective_rank
 from morpheus.src.training.train_bio_query_former import load_bio_query_data
 from morpheus.v2.preflight import restrict_cohort_to_split
 from morpheus.v2.runner import attach_v2_targets, UncappedHoptimusBatches, _truncate_batch
@@ -34,7 +35,7 @@ batch = {k: (v.cuda() if isinstance(v, torch.Tensor) else v) for k, v in batch.i
 n = len(batch["indices"])
 eye = torch.eye(n, dtype=torch.bool, device="cuda")
 print(f"held-out test patients in probe: {n}\n")
-print(f"{'arm':<20}{'epoch':>6}{'wsi-wsi cos':>13}{'rna-rna cos':>13}{'eff-rank':>10}{'feat-std':>10}{'rank@1e-3':>11}")
+print(f"{'arm':<20}{'epoch':>6}{'wsi-wsi cos':>13}{'rna-rna cos':>13}{'R1(canon)':>11}{'R3(hist)':>10}{'feat-std':>10}{'rank@1e-3':>11}")
 import os
 ARMS = os.environ.get("ARMS", "p:programme_only:42,f:programme_free:42")
 for spec in ARMS.split(","):
@@ -48,12 +49,19 @@ for spec in ARMS.split(","):
         w = model(batch, view="wsi")["z_biology"].float()
         r = model(batch, view="rna")["z_biology"].float()
     wn, rn = F.normalize(w, dim=-1), F.normalize(r, dim=-1)
-    sv = torch.linalg.svdvals(wn - wn.mean(0))
-    erank = float((sv.sum() ** 2) / (sv ** 2).sum())
+    # R1 is the canonical statistic and is computed on the RAW states: row L2
+    # normalisation is part of the historical R3 variant, not of the definition.
+    canonical = effective_rank(w)
+    historical_r3 = effective_rank(w, variant=RANK_VARIANTS["R3"])
     hard = int(torch.linalg.matrix_rank(wn.cpu(), tol=1e-3))
     print(f"{tag+chr(32)+chr(115)+sd:<20}{int(ck['epoch']):>6}{float((wn@wn.T)[~eye].mean()):>13.4f}"
-          f"{float((rn@rn.T)[~eye].mean()):>13.4f}{erank:>10.2f}{float(wn.std(0).mean()):>10.4f}{hard:>11d}")
+          f"{float((rn@rn.T)[~eye].mean()):>13.4f}{canonical:>11.2f}{historical_r3:>10.2f}"
+          f"{float(wn.std(0).mean()):>10.4f}{hard:>11d}")
     del model, ck
     torch.cuda.empty_cache()
-print("\nisotropic per-feature std for d=256 is 0.0625; eff-rank is the participation")
-print("ratio of the centred singular values (max = n_patients).")
+print(f"\nisotropic per-feature std for d=256 is 0.0625.")
+print(f"R1(canon) = {CANONICAL.label}: Roy & Vetterli effective rank on the raw centred states.")
+print(f"R3(hist)  = {RANK_VARIANTS['R3'].label}: the order-2 participation ratio on L2-normalised")
+print("            rows that this probe used before 2026-08-05, and which produced the 9.81 / 1.71")
+print("            numbers quoted in paper/P2_RANK_DRAFT.md 4.8.2. It is always <= R1 and is NOT")
+print("            effective rank. Do not compare the two columns across tables.")
