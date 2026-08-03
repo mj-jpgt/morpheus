@@ -237,3 +237,40 @@ def test_a_live_queue_turns_the_replayed_batch_into_its_own_negatives() -> None:
     frozen = _replay_queue_alignment(freeze=True)
     assert live > 0.99, f"a live queue should hold the batch's own states, got {live:.4f}"
     assert frozen < live, f"frozen keys must stay distinct from the queries: {frozen:.4f} vs {live:.4f}"
+
+
+def test_decorrelation_is_minimised_by_the_collapse_it_claims_to_prevent() -> None:
+    """Documents the hazard that broke programme_free (2026-08-02).
+
+    `feature_decorrelation` standardises before penalising off-diagonal
+    correlation, so an all-rows-identical batch standardises to zero and the
+    penalty vanishes. Total collapse is its global MINIMUM. This is not a bug to
+    fix in isolation -- it is the VICReg contract -- but it means the term must
+    never ship without a variance floor beside it.
+    """
+    from morpheus.v2.losses import feature_decorrelation, variance_floor
+    torch.manual_seed(0)
+    healthy = torch.randn(16, 512)
+    collapsed = torch.randn(1, 512).repeat(16, 1)
+    assert float(feature_decorrelation(collapsed)) < 1e-9 < float(feature_decorrelation(healthy))
+    # The variance floor is the counter-force: maximal exactly where
+    # decorrelation is minimal.
+    target = 512 ** -0.5
+    assert (float(variance_floor(collapsed, target_std=target))
+            > float(variance_floor(healthy, target_std=target)))
+
+
+def test_both_d1_arms_pair_decorrelation_with_a_variance_floor() -> None:
+    """The D1 contrast must measure programme supervision and nothing else.
+
+    Either arm carrying decorrelation without variance collapses; either arm
+    carrying different regularisation from the other makes the comparison
+    measure more than the objective under test.
+    """
+    free = V2LossSchedule(objective_profile="programme_free", warmup_epochs=0).weights(1)
+    only = V2LossSchedule(objective_profile="programme_only", warmup_epochs=0).weights(1)
+    for name, weights in (("programme_free", free), ("programme_only", only)):
+        assert weights["decorrelation"] > 0, name
+        assert weights["variance"] > 0, f"{name} has decorrelation without a variance floor"
+    assert free["decorrelation"] == only["decorrelation"]
+    assert free["variance"] == only["variance"]

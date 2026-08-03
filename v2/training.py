@@ -438,10 +438,22 @@ class V2Trainer:
             # norm instead of opposing collapse. Scale the floor to the isotropic
             # value, which is exactly the "no direction carries less variance than
             # chance" statement the term is meant to make.
-            variance = (variance_floor(output["z_identity"],
-                                       target_std=output["z_identity"].shape[-1] ** -0.5)
-                        + variance_floor(output["z_biology"],
-                                         target_std=output["z_biology"].shape[-1] ** -0.5))
+            #
+            # Apply the floor ONLY to heads this profile actually trains. Applying
+            # it to z_identity under programme_only would put gradient into the
+            # identity head, which that profile must leave untouched -- the
+            # profile-contract test catches exactly this.
+            trains_identity = bool(weights.get("identity", 0.0) or weights.get("fusion_identity", 0.0))
+            trains_biology = any(weights.get(key, 0.0) for key in
+                                 ("programme", "neighbourhood", "supcon", "decorrelation",
+                                  "biology_contrastive"))
+            variance = output["z_biology"].new_zeros(())
+            if trains_identity:
+                variance = variance + variance_floor(
+                    output["z_identity"], target_std=output["z_identity"].shape[-1] ** -0.5)
+            if trains_biology:
+                variance = variance + variance_floor(
+                    output["z_biology"], target_std=output["z_biology"].shape[-1] ** -0.5)
             variance_term = weights["variance"] * variance
             loss = loss + variance_term
             metrics["variance_floor"] = float(variance.detach())
