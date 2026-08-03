@@ -1170,6 +1170,39 @@ completion. An agent owns this queue and launches each stage as the previous fin
 | 3 | **Seed extension** — seeds 45, 46 on D1-B, both arms | D2 proved training is **not seed-reproducible** on this stack, so three seeds is thin for anything quoted | ~4 GPU-h |
 | 4 | **Decorrelation ablation** — 0 / 0.01 / 0.04 on `programme_free`, one seed each | Turns today's defect from *a fix we made* into *a reported result about a widely used regulariser* — worth more to the paper than the fix | ~3 GPU-h |
 
+### ⚠ DECISION SUPERSEDED — 2026-08-03, before D1-B launched
+
+**Removing `decorrelation` is not sufficient, and the decision below was made on evidence from the
+wrong scale.** Every causal measurement supporting it — mine and the agent's — came from the G2.6
+16-patient memorisation batch, not from real streaming batches with a live queue.
+
+Controlled test at *training* scale, two `programme_free` models identical but for decorrelation,
+both from the same initialisation (verified: eff-rank 67.55 at step 0):
+
+| step | `decorrelation 0.04` | `decorrelation 0.0` |
+|---|---:|---:|
+| 0 | 67.55 | 67.55 |
+| 50 | 4.08 | 2.62 |
+| 100 | **1.95** | **2.16** |
+
+**Both collapse to effective rank ~2 within 100 steps.** Launching D1-B on the premise below would
+have burned ten runs discovering this.
+
+The likely second driver is **`biology_full_consistency` at weight 1.0** — hardcoded in the profile,
+not exposed as a CLI flag, so it stayed at 1.0 in both arms above. The G2.6 isolation put it on par
+with decorrelation (1.847 at weight 1.0 versus 0.0034 with it off; passes at 0.1 and 0.01), and its
+minimum is likewise trivially satisfied by a shared direction, so it rewards the collapse component.
+Three further arms are running to settle it: `decorr 0 / consistency 0.1`, `decorr 0 / consistency 0`,
+`decorr 0.04 / consistency 0.1`.
+
+**Standing lesson, and it is the same one twice in two days:** the variance-floor "fix" looked correct
+in an 800-step window and collapsed at 5,000; this decision looked correct on a memorisation batch and
+fails at training scale. *A fix must be demonstrated at the scale and duration it will actually run at,
+against a control that differs in one variable.*
+
+The reasoning below remains valid as far as it goes — decorrelation **is** defective and its removal
+is still warranted — it is simply not the whole cause. D1-B is held until the arms return.
+
 ### Decision, 2026-08-03: remove `decorrelation` from both D1 arms
 
 Measured on live checkpoints, 282 held-out patients: `programme_free` centred effective rank **1.76**
