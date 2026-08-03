@@ -124,6 +124,18 @@ def feature_decorrelation(state: torch.Tensor, min_batch: int = 8, eps: float = 
     rank-``(B-1)`` estimator, so it is skipped below ``min_batch`` where the
     estimate is unreliable on small, ragged patient batches
     (F-R2; see v2/research/B2_implementation_and_audit.md).
+
+    .. warning::
+       **This term alone does not prevent collapse -- total collapse is its
+       global minimum.**  Measured on a 16x512 batch: a healthy representation
+       scores 38.97, an identical-across-patients one scores 1.2e-17.  When every
+       row is the same vector, ``state - mean`` is zero, so standardising yields
+       ``0 / sqrt(0 + eps) = 0``, the correlation matrix is all zeros and the
+       penalty vanishes.  This is the VICReg failure mode: a covariance term
+       requires a **variance** term beside it or the optimiser will simply
+       collapse the representation to switch it off.  It must always be paired
+       with :func:`variance_floor` on the same state.  ``programme_free`` shipped
+       without that pairing and collapsed to cosine 0.9999 (2026-08-02).
     """
     if len(state) < min_batch:
         return state.new_zeros(())

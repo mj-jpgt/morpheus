@@ -70,7 +70,13 @@ class V2LossSchedule:
         if self.objective_profile == "programme_only":
             # decorrelation trains biology geometry, so it must stay active in
             # the profile that trains the biology head in isolation.
-            return {key: (value if key in {"programme", "neighbourhood", "supcon", "decorrelation"} else 0.0)
+            # `variance` is kept beside `decorrelation` in BOTH D1 arms. The
+            # covariance penalty has total collapse as its global minimum, so it
+            # needs the variance floor to be an anti-collapse force at all; and
+            # the two arms must carry identical regularisation or the D1 contrast
+            # measures more than programme supervision. See feature_decorrelation.
+            return {key: (value if key in {"programme", "neighbourhood", "supcon",
+                                           "decorrelation", "variance"} else 0.0)
                     for key, value in weights.items()}
         if self.objective_profile == "programme_free":
             # This is the D1 contrastive replacement arm.  It is deliberately
@@ -78,6 +84,11 @@ class V2LossSchedule:
             # receives no curated-programme supervision whatsoever.
             free = {key: 0.0 for key in weights}
             free["decorrelation"] = weights["decorrelation"]
+            # Required, not optional: with decorrelation alone this arm collapses
+            # to a single direction (within-modality off-diagonal cosine 0.9999,
+            # cross-modal positives and negatives indistinguishable) because
+            # collapse zeroes the covariance penalty. Symmetric with programme_only.
+            free["variance"] = weights["variance"]
             free["biology_contrastive"] = 1.0
             # `full_biology` is exported by D1, so it needs a declared
             # gradient path as well.  This is intentionally a WSI-targeted
@@ -421,7 +432,16 @@ class V2Trainer:
             metrics["separation"] = float(separation.detach())
         variance_term = output["z_identity"].new_zeros(())
         if weights["variance"]:
-            variance = variance_floor(output["z_identity"]) + variance_floor(output["z_biology"])
+            # target_std=1.0 is unreachable for an L2-normalised d-dimensional
+            # state: isotropic unit norm gives per-feature std 1/sqrt(d) (0.044 at
+            # d=512), so the default floor saturates and its gradient fights the
+            # norm instead of opposing collapse. Scale the floor to the isotropic
+            # value, which is exactly the "no direction carries less variance than
+            # chance" statement the term is meant to make.
+            variance = (variance_floor(output["z_identity"],
+                                       target_std=output["z_identity"].shape[-1] ** -0.5)
+                        + variance_floor(output["z_biology"],
+                                         target_std=output["z_biology"].shape[-1] ** -0.5))
             variance_term = weights["variance"] * variance
             loss = loss + variance_term
             metrics["variance_floor"] = float(variance.detach())
