@@ -325,6 +325,19 @@ def test_targets_carry_a_random_control_block(tmp_path):
         assert raw["scores"].std(axis=0).min() > 1e-8, "CALIBRA would refuse a constant column"
 
 
+def test_cancer_label_falls_back_to_organ():
+    """REGRESSION GUARD: 14 of 44 selected slides carry no oncotree code.  Letting those
+    become the string "nan" invents a cancer type that pools unrelated tumours and then gets
+    used as a confound covariate downstream."""
+    from morpheus.v2.calibra.hest_build import _cancer_label
+
+    assert _cancer_label({"oncotree_code": "COAD", "organ": "Bowel"}) == "COAD"
+    for missing in ("nan", "", "None", "UNKNOWN", "TODO"):
+        label = _cancer_label({"oncotree_code": missing, "organ": "Lymph node"})
+        assert label == "ORGAN_LYMPH_NODE", (missing, label)
+    assert _cancer_label({"oncotree_code": "nan", "organ": ""}) == "UNSPECIFIED"
+
+
 def test_targets_drop_constant_columns(tmp_path):
     ids, _, _, _, _ = _artifact_inputs()
     scores = np.random.default_rng(0).normal(size=(len(ids), 3)).astype(np.float32)

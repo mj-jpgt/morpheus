@@ -229,6 +229,20 @@ def _forward(model, transform, torch, images, device: str) -> np.ndarray:
 
 # --- stage: assemble ------------------------------------------------------------------
 
+def _cancer_label(meta: dict) -> str:
+    """Oncotree code where HEST records one, otherwise the organ.
+
+    14 of the 44 selected slides have no ``oncotree_code``; letting those become the string
+    "nan" would create a fake cancer type that silently pools unrelated tumours together and
+    would then be used as a confound covariate downstream.
+    """
+    code = str(meta.get("oncotree_code", "")).strip()
+    if code and code.lower() not in {"nan", "none", "unknown", "todo", ""}:
+        return code
+    organ = str(meta.get("organ", "")).strip()
+    return f"ORGAN_{organ.upper().replace(' ', '_')}" if organ else "UNSPECIFIED"
+
+
 def stage_assemble(args) -> None:
     plan = json.load(open(args.plan))
     panel = np.asarray(plan["panel_genes"], dtype=str)
@@ -247,7 +261,7 @@ def stage_assemble(args) -> None:
         ids.append(blob["spot_ids"].astype(str))
         embeds.append(blob["embeddings"])
         counts.append(blob["panel_counts"])
-        cancers.append(np.full(n, str(meta["oncotree_code"]), dtype=object))
+        cancers.append(np.full(n, _cancer_label(meta), dtype=object))
         splits.append(np.full(n, str(meta["split"]), dtype=object))
         slides.append(np.full(n, str(meta["id"]), dtype=object))
     if not ids:
