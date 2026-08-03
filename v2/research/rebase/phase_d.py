@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import subprocess
+import time
 import sys
 from pathlib import Path
 
@@ -401,10 +402,38 @@ def run_d1(args: argparse.Namespace) -> None:
         run_dir = root / f"d1_{item['arm'].lower()}_seed{item['seed']}"
         if run_dir.exists():
             raise RuntimeError(f"refusing stale D1 output directory {run_dir}; use a new run root")
-        result = subprocess.run(item["argv"], cwd=repo)
+    # The six runs are independent processes writing to disjoint directories, so
+    # serialising them only wastes wall-clock: each uses ~6 GB of an 80 GB card
+    # and is data-loading bound. `--max-parallel 1` reproduces the previous
+    # behaviour exactly. Every run is still gate-logged and verified below, in a
+    # fixed order, so the audit trail does not depend on completion order.
+    running: list[tuple[dict, subprocess.Popen]] = []
+    returncodes: dict[int, int] = {}
+    pending = list(enumerate(commands))
+    while pending or running:
+        while pending and len(running) < max(1, int(args.max_parallel)):
+            index, item = pending.pop(0)
+            running.append(({"index": index, **item}, subprocess.Popen(item["argv"], cwd=repo)))
+        alive = []
+        for entry, process in running:
+            code = process.poll()
+            if code is None:
+                alive.append((entry, process))
+            else:
+                returncodes[entry["index"]] = code
+        running = alive
+        if running and not pending:
+            entry, process = running[0]
+            returncodes[entry["index"]] = process.wait()
+            running = running[1:]
+        elif running:
+            time.sleep(5)
+    for index, item in enumerate(commands):
+        run_dir = root / f"d1_{item['arm'].lower()}_seed{item['seed']}"
+        returncode = returncodes[index]
         _append_gate_log(gate_log, f"D1_{item['profile']}_seed{item['seed']}", "runner_exit",
-                         str(result.returncode), "0", "PASS" if result.returncode == 0 else "FAIL")
-        if result.returncode:
+                         str(returncode), "0", "PASS" if returncode == 0 else "FAIL")
+        if returncode:
             raise RuntimeError(f"D1 {item['profile']} seed {item['seed']} failed; do not compare incomplete arms")
         liveness = json.loads((run_dir / "liveness.json").read_text(encoding="utf-8"))
         overfit, gradients = liveness.get("overfit_one_batch", {}), liveness.get("gradient_norms_first", {})
@@ -521,6 +550,9 @@ def main() -> None:
     d1.add_argument("--calibra-targets", default="", help="frozen RNA target artifact; D1 cannot be measured without it")
     d1.add_argument("--calibra-jobs", type=int, default=1); d1.add_argument("--bootstrap-repeats", type=int, default=2000)
     d1.add_argument("--device", default="cuda"); d1.add_argument("--execute", action="store_true")
+    d1.add_argument("--max-parallel", type=int, default=1,
+                    help="how many of the six training runs to execute concurrently; they are independent "
+                         "processes writing to disjoint directories, and 1 reproduces serial execution")
     d2 = sub.add_parser("d2", help="write or execute a target-only paired H-vs-PBS D2 run")
     d2.add_argument("--data-config", default="morpheus/configs/v1.json")
     d2.add_argument("--split-file", required=True)

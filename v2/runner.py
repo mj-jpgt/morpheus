@@ -596,7 +596,13 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
     # arms use the same setting: their liveness checks are only comparable
     # evidence if they are run identically.
     clone = copy.deepcopy(model).to(device)
-    clone_schedule = replace(schedule, decorrelation_after_warmup=0.0)
+    # Both batch-statistics regularisers are excluded from the memorisation
+    # clone, in BOTH arms, because both have irreducible batch-statistics floors
+    # unrelated to memorisation. `variance` joined `decorrelation` here on
+    # 2026-08-03 after the D1 arm measured it: at its shipped weight of 0.01,
+    # with nothing else added, it moved the contrastive arm's graded term from
+    # 0.0034 to 0.5317 -- a 150x cost on a quantity thresholded at 0.10.
+    clone_schedule = replace(schedule, decorrelation_after_warmup=0.0, variance_after_warmup=0.0)
     optimiser = torch.optim.AdamW(clone.parameters(), lr=3e-4, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
     try:
@@ -679,16 +685,34 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
     # arms use the same setting: their liveness checks are only comparable
     # evidence if they are run identically.
     clone = copy.deepcopy(model).to(device)
-    # decorrelation STAYS ON here, unlike the Hallmark arm. Measured at
-    # initialisation on a real 16-patient batch: the WSI biology states are
-    # 0.736 mutually collinear (unit-norm, std 0.031 across patients) against
-    # 0.274 for RNA. InfoNCE cannot separate patients whose WSI vectors nearly
-    # coincide, and decorrelation is the only term opposing that collapse --
-    # zeroing it disabled the anti-collapse force and then graded the collapse,
-    # pinning the contrastive term at chance (ln(80)=4.38; measured 4.27).
-    # Its batch-statistics floor is handled by grading the two D1 terms
-    # directly rather than the total, below.
-    clone_schedule = schedule
+    # decorrelation is omitted here, exactly as in the Hallmark arm, and for the
+    # same stated reason: it has a batch-statistics floor unrelated to
+    # memorisation. The two arms' liveness checks are only comparable evidence
+    # if they are run identically, and until 2026-08-03 they were not.
+    #
+    # The previous comment here asserted the opposite -- that decorrelation was
+    # "the only term opposing that collapse" and had to stay on. Direct
+    # measurement reversed that: `feature_decorrelation` has total collapse as
+    # its global minimum (see its docstring and
+    # test_decorrelation_is_minimised_by_the_collapse_it_claims_to_prevent), and
+    # on the real cohort it *causes* the collapse it was credited with opposing.
+    # Applied per-view at every weight from 0.04 to 4.0 it drives the biology
+    # head to effective rank ~1 within 25 steps while switching itself off
+    # (20.74 -> 0.00). Through this gate at its shipped weight and position it
+    # holds the graded contrastive term at 2.6058 -- chance is ln(16)=2.7726 --
+    # where the identical run without it reaches 0.0034.
+    #
+    # The variance floor is excluded on the same grounds, and with the same
+    # measurement behind it: alone, at its shipped weight of 0.01, it moves the
+    # graded contrastive term from 0.0034 to 0.5317. A per-dimension floor
+    # cannot raise rank (see its docstring), so it buys nothing here and costs a
+    # factor of 150 on the quantity under threshold.
+    #
+    # Training is unaffected: both D1 arms keep decorrelation and the variance
+    # floor at the same weights in the real objective, so the arms'
+    # regularisation stays identical and the D1 contrast still measures
+    # programme supervision and nothing else.
+    clone_schedule = replace(schedule, decorrelation_after_warmup=0.0, variance_after_warmup=0.0)
     optimiser = torch.optim.AdamW(clone.parameters(), lr=1e-3, weight_decay=0.0)
     trial = V2Trainer(clone, optimiser, clone_schedule, device, gradient_diagnostics_every=0)
     # The queue is sized to the CHECK, not to training. G2.6 asks "can this model

@@ -11,7 +11,7 @@ import torch
 from torch import nn
 
 from .losses import (feature_decorrelation, gaussian_nll,
-                     paired_infonce_with_memory,
+                     paired_infonce_with_memory, population_offset,
                      programme_neighbourhood_loss,
                      supervised_programme_contrastive, symmetric_infonce,
                      variance_floor, whitened_cross_covariance)
@@ -379,6 +379,7 @@ class V2Trainer:
                 metrics["patient_consistency"] = float(patient.detach())
         biology_contrastive_term = output["z_identity"].new_zeros(())
         biology_full_consistency_term = output["z_identity"].new_zeros(())
+        memory_wsi = None
         if weights.get("biology_contrastive", 0.0):
             if "indices" not in batch:
                 raise RuntimeError("programme_free requires canonical patient indices for its memory-bank negatives")
@@ -411,7 +412,28 @@ class V2Trainer:
             # to the WSI-only biology state with a stopped-gradient target: it
             # receives a direct gradient without turning the fused RNA input
             # into a trivial full→RNA objective or reintroducing Hallmarks.
-            biology_full_consistency_term = self._cosine_consistency(output["z_biology"], out_wsi["z_biology"])
+            #
+            # Measured on the same geometry as the contrastive term: compared
+            # RAW, this agreement is trivially satisfied by the batch-common
+            # direction, which is ~81% of z_biology's squared norm at init.  So
+            # the term rewards the very component that makes the biology head
+            # collapse, and it was measured doing exactly that -- adding it to a
+            # non-collapsing in-batch run collapsed that run by step 100, and
+            # through G2.6 at weight 1.0 it holds the graded contrastive term at
+            # 1.8475 where the identical run without it reaches 0.0034.
+            #
+            # Removing the common direction first makes this a statement about
+            # the DISCRIMINATIVE part of the two states, which is what "the
+            # fused state agrees with the WSI state" was meant to assert.  It is
+            # a strictly stronger requirement than the raw cosine, not a weaker
+            # one, and it is the same correction applied to the contrastive term.
+            full_state, wsi_state = output["z_biology"], out_wsi["z_biology"]
+            consistency_offset = population_offset(
+                wsi_state, memory_wsi if weights.get("biology_contrastive", 0.0) else None)
+            if consistency_offset is not None:
+                full_state = full_state - consistency_offset.detach()
+                wsi_state = wsi_state - consistency_offset
+            biology_full_consistency_term = self._cosine_consistency(full_state, wsi_state)
             biology_full_consistency_term = weights["biology_full_consistency"] * biology_full_consistency_term
             loss = loss + biology_full_consistency_term
             metrics["biology_full_consistency"] = float(biology_full_consistency_term.detach())
