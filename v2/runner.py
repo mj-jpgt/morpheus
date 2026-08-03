@@ -636,6 +636,13 @@ def _overfit_programme_only_actual(model: TumorStateV2, schedule: V2LossSchedule
             missing = [name for name, value in gradients.items() if value <= 0.0]
             if missing:
                 raise RuntimeError(f"programme_only G2.6 has detached trainable groups: {missing}")
+        # Clip exactly as `V2Trainer.train_epoch` does. The gate is a claim about
+        # the optimisation the real run performs, so running it with a different
+        # update rule makes it evidence about something else -- and measurably
+        # so: unclipped, the D1 contrastive arm on seed 43 read 0.1766 at step
+        # 800, 0.0477 at 1600 and 11.7665 at 2400, i.e. it converged and then
+        # blew up, so the verdict depended on where the loop happened to stop.
+        torch.nn.utils.clip_grad_norm_(clone.parameters(), 1.0)
         optimiser.step()
         # Record the descent in situ. A single terminal number cannot tell a
         # dead implementation ("flat from step 0") apart from an unconverged
@@ -774,6 +781,7 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
             missing = [name for name, value in gradients.items() if value <= 0.0]
             if missing:
                 raise RuntimeError(f"programme_free G2.6 has detached trainable groups: {missing}")
+            torch.nn.utils.clip_grad_norm_(clone.parameters(), 1.0)
             optimiser.step()
         return loss.detach(), metrics
 
@@ -789,6 +797,13 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
             missing = [name for name, value in gradients.items() if value <= 0.0]
             if missing:
                 raise RuntimeError(f"programme_free G2.6 has detached trainable groups: {missing}")
+        # Clip exactly as `V2Trainer.train_epoch` does. The gate is a claim about
+        # the optimisation the real run performs, so running it with a different
+        # update rule makes it evidence about something else -- and measurably
+        # so: unclipped, the D1 contrastive arm on seed 43 read 0.1766 at step
+        # 800, 0.0477 at 1600 and 11.7665 at 2400, i.e. it converged and then
+        # blew up, so the verdict depended on where the loop happened to stop.
+        torch.nn.utils.clip_grad_norm_(clone.parameters(), 1.0)
         optimiser.step()
     final, final_metrics = one_step(update=False)
     initial_value, final_value = float(initial.cpu()), float(final.cpu())
