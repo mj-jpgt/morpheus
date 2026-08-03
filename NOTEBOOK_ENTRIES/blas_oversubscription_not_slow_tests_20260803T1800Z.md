@@ -37,9 +37,20 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
 thread capping alone, on the same machine at the same moment. Independently, the coordinator measured
 the same test at 10.33 s and the whole 275-test suite at 58 s on an uncontended machine.
 
-**The suite is fine and remains green — now 275 tests**, up from 168 with the new tests from this
-session and from the other agents. No `slow` marker, no reduced seed count, and no change to the
-standing instruction is warranted; the earlier entry proposing them is withdrawn.
+**And the whole suite, capped, on this box while D1 trains:**
+
+```
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
+  pytest morpheus/v2/tests morpheus/tests -q
+232 passed, 1 warning in 49.09s
+```
+
+**49 seconds**, against two uncapped attempts that each ran over two hours without reaching test 32.
+(232 rather than the coordinator's 275 because this checkout predates some of the other agents' newer
+tests; the conclusion is identical.) The `-p no:randomly` flag was not needed.
+
+**The suite is fine and always was green.** No `slow` marker, no reduced seed count, and no change to
+the standing instruction is warranted; the earlier entry proposing them is withdrawn.
 
 **The same pathology is on the training side.** Each D1 runner holds **123 threads** with no caps in
 its environment, and `torch.get_num_threads()` defaults to 30 = `nproc`. Three concurrent runners
