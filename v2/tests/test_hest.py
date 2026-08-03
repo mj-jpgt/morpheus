@@ -15,7 +15,7 @@ import numpy as np
 from morpheus.v2.calibra.hest import (FOV_MICRONS, OUTPUT_PX, VISIUM_SPOT_DIAMETER_UM,
                                       HestAdapterError, cohort_classifier_auc, crop_pixels,
                                       effective_fov_microns, normalise_expression,
-                                      per_slide_mean_baseline, pooled_r,
+                                      per_slide_mean_baseline, pooled_r, spot_key,
                                       select_target_genes, slide_grouped_split, spot_windows,
                                       usable_spots, within_slide_r, window_area_ratio,
                                       write_spatial_artifact, write_spatial_targets)
@@ -105,6 +105,32 @@ def test_spot_windows_rejects_malformed_coordinates():
         except HestAdapterError:
             continue
         raise AssertionError(f"shape {bad.shape} should have raised")
+
+
+def test_spot_key_makes_the_repos_tss_deriver_recover_the_slide():
+    """REGRESSION GUARD: run_calibra's confound design calls pooled_tissue_source_site, which
+    is id.split("-")[1] -- written for TCGA barcodes.  Given a naive spot id it returns the
+    barcode's "-1" suffix for EVERY spot, so the TSS term collapses to a constant, silently
+    drops out of the design, and is still reported as adjusted-for.  The key layout puts the
+    slide in that field, which is the right spatial analogue of a source site."""
+    from morpheus.v2.calibra.residualise import pooled_tissue_source_site
+
+    slides = np.repeat(["MEND37", "TENX73", "ZEN36"], 12)
+    keys = np.asarray([spot_key(s, f"AACC{i}-1") for i, s in enumerate(slides)])
+    tss, frequent = pooled_tissue_source_site(keys, min_site_count=10)
+    assert tss.tolist() == slides.tolist(), tss[:5].tolist()
+    assert frequent == {"MEND37", "TENX73", "ZEN36"}, frequent
+
+    # The naive key is what this guard exists to prevent.
+    naive = np.asarray([f"{s}__AACC{i}-1" for i, s in enumerate(slides)])
+    naive_tss, _ = pooled_tissue_source_site(naive, min_site_count=10)
+    assert set(naive_tss.tolist()) == {"1"}, "fixture does not exhibit the defect; test is vacuous"
+
+    try:
+        spot_key("MEND-37", "AACC-1")
+    except HestAdapterError:
+        return
+    raise AssertionError("a slide id containing '-' shifts the TSS field and must raise")
 
 
 def test_adapter_constants_match_the_tcga_extractor():

@@ -71,6 +71,25 @@ class HestAdapterError(ValueError):
 
 # --- geometry: spot -> protocol-matched window ----------------------------------------
 
+def spot_key(slide_id: str, barcode: str) -> str:
+    """The canonical row key: ``HEST-<slide>-<barcode>``.
+
+    The dash layout is load-bearing, not cosmetic.  ``run_calibra`` derives its
+    tissue-source-site confound with ``pooled_tissue_source_site``, which is literally
+    ``identifier.split("-")[1]`` -- built for TCGA barcodes.  Fed an arbitrary spot id it
+    would return the barcode's ``-1`` suffix, i.e. the same constant for every spot, and the
+    TSS term would silently drop out of the confound design while still being reported as
+    adjusted-for.  Putting the slide in field 1 makes that same code recover the SLIDE, which
+    is the correct spatial analogue of a source site: it is the dominant batch factor here,
+    as the per-slide-mean baseline shows.  ``test_hest.py`` pins this against the real
+    ``pooled_tissue_source_site``.
+    """
+    slide, code = str(slide_id), str(barcode)
+    if "-" in slide:
+        raise HestAdapterError(f"slide id {slide!r} contains '-', which would shift the TSS field")
+    return f"HEST-{slide}-{code}"
+
+
 def effective_fov_microns(fov_microns: float = FOV_MICRONS,
                           crop_pct: float = HOPTIMUS_CROP_PCT) -> float:
     """The field the encoder actually sees, after its own centre crop: 128 -> 112 um."""

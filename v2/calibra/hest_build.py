@@ -24,7 +24,7 @@ import numpy as np
 from .hest import (EMBED_DIM, FOV_MICRONS, OUTPUT_PX, HestAdapterError, _atomic_savez,
                    cohort_classifier_auc, crop_pixels, normalise_expression,
                    per_slide_mean_baseline, pooled_r, select_target_genes, slide_grouped_split,
-                   spot_windows, usable_spots, within_slide_r, window_area_ratio,
+                   spot_key, spot_windows, usable_spots, within_slide_r, window_area_ratio,
                    write_spatial_artifact, write_spatial_targets)
 
 
@@ -278,8 +278,12 @@ def stage_assemble(args) -> None:
             print(f"[assemble] UNREADABLE {slide_meta['id']}: {exc!r}", flush=True)
             continue
         meta = json.loads(str(blob["meta"]))
-        n = len(blob["spot_ids"])
-        ids.append(blob["spot_ids"].astype(str))
+        staged = blob["spot_ids"].astype(str)
+        n = len(staged)
+        # Staging keys are "<slide>__<barcode>"; the artifact key puts the slide where the
+        # repo's TSS deriver looks for it.  See hest.spot_key.
+        ids.append(np.asarray([spot_key(meta["id"], key.split("__", 1)[-1]) for key in staged],
+                              dtype=str))
         embeds.append(blob["embeddings"])
         counts.append(blob["panel_counts"])
         cancers.append(np.full(n, _cancer_label(meta), dtype=object))
