@@ -14,7 +14,7 @@ differ whenever the training regime contains a dynamic the gate's regime removes
 usually designed to remove exactly such dynamics, because that is what makes them fast and
 deterministic.
 
-We report three independent instances from a single objective over two days. Each was believed to be
+We report four independent instances from a single objective over two days. Each was believed to be
 a completed fix at the time; each was falsified by extending the gate's regime toward the run's.
 
 ## Instance 1 — the window was shorter than the failure
@@ -76,8 +76,42 @@ The gate froze the queue to remove a *known* pathology, and in doing so removed 
 
 *Provenance: `d1b_premise_fails_all_five_arms_collapse`; queue-capacity sweep in progress.*
 
+## Instance 4 — the gate was read from a re-implementation of itself
+
+The sharpest instance, and the cheapest to avoid.
+
+To decide whether the objective was ready to launch, we ran the gate function
+(`_overfit_programme_free_contrastive`) from a standalone harness that reconstructed its inputs:
+cohort, split, schedule, model. Three seeds passed with margin, so the run was launched. The gate then
+failed *inside the runner*.
+
+For the identical seed and the identical 2,400-step budget, the same gate function returned:
+
+| | `programme_free` seed 43 |
+|---|---|
+| standalone harness | **0.0047** |
+| inside the runner | **0.50883** |
+
+Two orders of magnitude, against a threshold of 0.10 — a pass and a decisive fail. Nothing about
+either measurement is incorrect. The runner reaches the gate having constructed the model from the
+full experiment configuration and having consumed a different quantity of RNG, so
+`copy.deepcopy(model)` starts the memorisation loop from a different initialisation and different
+dropout draws. The harness reproduced the gate's *code* and not the gate's *caller*.
+
+This cost two launches: one aborted at the first run, and one that lost an arm mid-experiment after
+three arms had already trained to completion.
+
+**Design rule: a liveness gate must be read from the process that will perform the training, never
+from a harness that reconstructs the setup.** A harness is useful for developing a gate and is
+evidence about the harness. If a gate is expensive enough that one is tempted to rehearse it
+elsewhere, the correct response is to make the real gate cheaper — not to move it.
+
+*Provenance: `d1_relaunch`, `queue_size_implicates_the_key_set`.*
+
 ## What this implies for gate design
 
+0. **Read the gate from the process that will train.** Instance 4 is the cheapest of the four
+   to avoid and cost the most: two launches.
 1. **State what the gate certifies, in the gate.** "This model can memorise 16 patients against a
    frozen key set" is a different sentence from "this objective will learn", and only the first is
    supported. Our gate's own failure text said "expected a practically memorised actual-model
@@ -98,7 +132,7 @@ The gate froze the queue to remove a *known* pathology, and in doing so removed 
   tested. If the sweep clears the queue, the objective itself becomes the candidate and this section's
   third instance still stands as stated — the gate did not predict training health — but its
   mechanism paragraph must be rewritten.
-- All three instances come from one objective on one architecture. We do not claim a general rate at
+- All four instances come from one objective on one architecture. We do not claim a general rate at
   which liveness gates mislead; we claim the failure mode is real, recurred three times in two days
   once we looked for it, and is cheap to test for.
 - The effective-rank measurements are participation ratios of centred singular values on held-out
