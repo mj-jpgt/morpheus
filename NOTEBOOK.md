@@ -1065,7 +1065,41 @@ Standing instructions for whoever — human or agent — picks this up next.
 *Added 2026-08-03. Standing plan: D2 finishes → audit → next training. Do not start the next
 training before the audit clears; a contaminated D2 poisons everything that cites it.*
 
-## Stage 1 — D2 audit (CPU, ~1 h, blocking)
+## Stage 1 — D2 audit — **COMPLETE 2026-08-03. VERDICT: PBS decisively underperforms Hallmark.**
+
+> All six checks resolved. Full numbers in `v2/research/rebase/nature/D2_RESULT.md`; entries in
+> `NOTEBOOK_ENTRIES/D2_*`. Headline, on the **40 targets neither arm trained on**:
+> Δ(PBS−Hallmark) = **−0.1325 / −0.1089 / −0.1226** across seeds 42/43/44, with **both** the patient
+> and cancer bootstrap CIs excluding zero in **3/3**.
+>
+> | check | result |
+> |---|---|
+> | A1 six runs, gates passed | ✅ 6/6 `TRAIN_SUCCESS`; CALIBRA G4 `gates_pass: true`, `channel_gate_failures: []` all seeds. **Caveat: no run-level `SUCCESS.json`** — phase_d's unthrottled bootstraps were killed and recomputed by hand. Upstream verified intact. |
+> | A2 stratified readout | ✅ gap **survives at full size**; stratified−unrestricted ≤0.0034 in every seed |
+> | A3 negative control | ✅ arm gap on 90 random controls is −0.010 to −0.028, **4–13× smaller**; cancer CI covers zero 3/3, patient CI 2/3 |
+> | A4 seed agreement | ✅ same sign, overlapping, 3/3 |
+> | A5 effective rank | reported, **not interpreted** — and it *contradicts* a capacity story: seed 43 PBS has **higher** rank (34.12 vs 28.77) and still loses; seed 44 equal (9.11 vs 9.14) and still loses. Rank is seed-unstable (9→34) where the arm gap is not. |
+> | A6 re-export reproduces | ✅ **to five significant figures** (0.58612 vs 0.5861 recorded) |
+>
+> **The contamination worry ran backwards.** Scored on Hallmark's own supervision the gap is
+> *smaller* (−0.109/−0.079/−0.115) than on the untrained 40 — the old exam **understated** PBS's
+> deficit rather than manufacturing it.
+>
+> **Two findings that constrain everything downstream:**
+> 1. **Training is not seed-reproducible on this stack.** Re-exporting the surviving checkpoint
+>    reproduces the recorded number to 5 s.f., but *retraining* seed 42 with identical config gives
+>    0.6214 vs 0.5861 and rank 23.39 vs 8.68. **Quote paired differences, never levels.** Applies to
+>    D1 and everything after.
+> 2. **No prior D2 result had ever had a negative control applied.** `--target-groups random_control`
+>    selected the empty set, because `_targets` applied the `RANDOM_CONTROL__` prefix-drop *before*
+>    intersecting with the requested groups. Fixed; provably identical for non-control groups.
+>
+> **Outcome versus the predeclared gate: the third case, as anticipated below — PBS decisively
+> worse, CIs excluding zero in the wrong direction. Escalated, not rewritten.**
+
+### The original checklist, retained
+
+
 
 The audit is not a formality. The previous D2 headline (PBS −0.10 vs Hallmark, 3/3 seeds) was **not
 interpretable**, because 50 of the 90 scored targets were `hallmark_in_training` — one arm's own
