@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+import copy
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -214,6 +215,25 @@ class V2Trainer:
     # that same batch and the InfoNCE negatives track the queries they are meant
     # to oppose. Set only by the D1 liveness gate; never during a real run.
     freeze_biology_memory: bool = False
+    # Momentum for the biology key encoder. 0.0 keeps the historical behaviour
+    # exactly: the query encoder writes its own negative keys every step.
+    #
+    # At cohort scale that configuration collapses the biology head to centred
+    # effective rank ~2 within 150 steps and never recovers, under every setting
+    # of every regularisation weight tried. An EMA key encoder rescues it, at
+    # FIXED queue capacity so the negative count is unchanged. Measured held-out
+    # centred effective rank at step 500 (initialisation 67.55):
+    #     m=0  2.43 | m=0.9  2.34 | m=0.99  5.50 | m=0.999  7.61
+    # Monotone in m, and durable past the 583 steps that D1's 40 epochs amount to.
+    #
+    # 0.999 is chosen because it measured best in that sweep. NO MECHANISM IS
+    # CLAIMED. Two were proposed and both falsified by measurement: MoCo-style
+    # key staleness (the queue turns over completely every 19 steps, so no key is
+    # ever old) and a dimensionless time-constant-over-turnover criterion
+    # (predeclared, then refuted 4/5 with the discriminating prediction
+    # inverted). See paper/QUEUE_ANCHORING.md.
+    biology_key_momentum: float = 0.0
+    _biology_key_encoder: TumorStateV2 | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if self.programme_memory is None:
@@ -546,11 +566,42 @@ class V2Trainer:
             "variance": variance_term,
             **(programme_component_totals or {"programme": programme_total}),
         }
+        # With a momentum key encoder the enqueue moves to `update_biology_keys`,
+        # called AFTER the optimiser step so the keys reflect the post-update EMA
+        # rather than this forward pass.
         if (weights.get("biology_contrastive", 0.0) and torch.is_grad_enabled() and "indices" in batch
-                and not self.freeze_biology_memory):
+                and not self.freeze_biology_memory and self.biology_key_momentum <= 0.0):
             assert self.biology_memory is not None
             self.biology_memory.update(out_wsi["z_biology"], out_rna["z_biology"], batch["indices"])
         return loss, metrics, output
+
+    @torch.no_grad()
+    def update_biology_keys(self, batch: dict[str, torch.Tensor], epoch: int) -> None:
+        """EMA-update the key encoder, then enqueue keys encoded with it.
+
+        Deliberately kept out of the optimiser: the key encoder holds no
+        gradients and is never stepped, only interpolated toward the query
+        encoder. Buffers are copied rather than interpolated.
+        """
+        if self.biology_key_momentum <= 0.0 or self.freeze_biology_memory:
+            return
+        if not self.schedule.weights(epoch).get("biology_contrastive", 0.0) or "indices" not in batch:
+            return
+        assert self.biology_memory is not None
+        if self._biology_key_encoder is None:
+            self._biology_key_encoder = copy.deepcopy(self.model).to(self.device)
+            for parameter in self._biology_key_encoder.parameters():
+                parameter.requires_grad_(False)
+        key_encoder = self._biology_key_encoder
+        momentum = float(self.biology_key_momentum)
+        for key_parameter, query_parameter in zip(key_encoder.parameters(), self.model.parameters()):
+            key_parameter.mul_(momentum).add_(query_parameter.detach(), alpha=1.0 - momentum)
+        for key_buffer, query_buffer in zip(key_encoder.buffers(), self.model.buffers()):
+            key_buffer.copy_(query_buffer)
+        key_encoder.eval()
+        out_wsi = key_encoder(batch, view="wsi")
+        out_rna = key_encoder(batch, view="rna")
+        self.biology_memory.update(out_wsi["z_biology"].float(), out_rna["z_biology"].float(), batch["indices"])
 
     def _gradient_conflict_metrics(self) -> dict[str, float]:
         """Log objective-gradient cosines; do not silently alter optimisation.
@@ -641,6 +692,8 @@ class V2Trainer:
             last_gradients = group_norms
             nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             self.optimizer.step()
+            with torch.autocast(device_type="cuda", dtype=self.amp_dtype, enabled=self.device.startswith("cuda")):
+                self.update_biology_keys(batch, epoch)
             if self.programme_memory is not None and "indices" in batch:
                 self.programme_memory.update(output["z_biology"], batch["indices"])
             rows.append(metrics)
@@ -677,6 +730,11 @@ class V2Trainer:
             "numpy_rng": np.random.get_state(),
             "programme_memory": None if self.programme_memory is None else self.programme_memory.state_dict(),
             "biology_memory": None if self.biology_memory is None else self.biology_memory.state_dict(),
+            # A key encoder that silently reinitialised on resume would restart
+            # the run with keys from an untrained encoder and collapse mid-run,
+            # which looks exactly like the bug this mechanism exists to prevent.
+            "biology_key_momentum": float(self.biology_key_momentum),
+            "biology_key_encoder": None if self._biology_key_encoder is None else self._biology_key_encoder.state_dict(),
         }
         torch.save(state, Path(path))
 
@@ -697,4 +755,17 @@ class V2Trainer:
             self.programme_memory.load_state_dict(state["programme_memory"], self.device)
         if self.biology_memory is not None and state.get("biology_memory") is not None:
             self.biology_memory.load_state_dict(state["biology_memory"], self.device)
+        if state.get("biology_key_momentum") is not None:
+            self.biology_key_momentum = float(state["biology_key_momentum"])
+        if state.get("biology_key_encoder") is not None:
+            if self._biology_key_encoder is None:
+                self._biology_key_encoder = copy.deepcopy(self.model).to(self.device)
+                for parameter in self._biology_key_encoder.parameters():
+                    parameter.requires_grad_(False)
+            self._biology_key_encoder.load_state_dict(state["biology_key_encoder"])
+        elif self.biology_key_momentum > 0.0:
+            raise RuntimeError(
+                "resuming a run with biology_key_momentum > 0 from a checkpoint that has no key "
+                "encoder: it would restart from the query encoder's current weights and collapse "
+                "mid-run. Refusing rather than silently reinitialising.")
         return state

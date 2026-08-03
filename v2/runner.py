@@ -1055,6 +1055,7 @@ def run(args: argparse.Namespace) -> Path:
         ),
         device,
         gradient_diagnostics_every=args.gradient_diagnostics_every,
+        biology_key_momentum=args.biology_key_momentum,
     )
     biology_memory_keys = 0
     if args.objective_profile == "programme_free":
@@ -1276,6 +1277,14 @@ def main() -> None:
     parser.add_argument("--d2-pbs-components", type=int, default=0, choices=(0, 64, 128, 256))
     parser.add_argument("--separation-weight", type=float, default=0.01)
     parser.add_argument("--variance-weight", type=float, default=0.01)
+    parser.add_argument("--biology-key-momentum", type=float, default=0.0,
+                        help="EMA momentum for the biology key encoder that writes the contrastive "
+                             "queue. 0.0 is the historical behaviour, in which the query encoder "
+                             "writes its own negatives and the biology head collapses to centred "
+                             "effective rank ~2 at cohort scale. 0.999 measured best in a sweep "
+                             "(m=0 2.43, 0.9 2.34, 0.99 5.50, 0.999 7.61 at step 500). No mechanism "
+                             "is claimed; see paper/QUEUE_ANCHORING.md. Only programme_free uses the "
+                             "queue, so this is inert for other profiles.")
     parser.add_argument("--pretrain-epochs", type=int, default=0,
                         help="development-train-only slide self-supervision epochs before V2 fine-tuning")
     parser.add_argument("--pretrain-checkpoint", default="",

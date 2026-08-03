@@ -85,6 +85,7 @@ def d2_pair_manifest(args: argparse.Namespace) -> dict:
         "programme_weight": args.programme_weight, "programme_neighbourhood_weight": args.programme_neighbourhood_weight,
         "programme_supcon_weight": args.programme_supcon_weight, "separation_weight": args.separation_weight,
         "variance_weight": args.variance_weight, "programme_head_dim": args.programme_head_dim,
+        "biology_key_momentum": args.biology_key_momentum,
         "pretrain_epochs": 0, "pretrain_checkpoint": "",
         "pretrain_learning_rate": args.pretrain_learning_rate, "pretrain_mask_fraction": args.pretrain_mask_fraction,
         "pretrain_view_keep_fraction": args.pretrain_view_keep_fraction, "pretrain_target_dim": args.pretrain_target_dim,
@@ -122,6 +123,7 @@ def _runner_command(args: argparse.Namespace, manifest: Path, arm: str, seed: in
                "--programme-neighbourhood-weight", str(args.programme_neighbourhood_weight), "--programme-supcon-weight", str(args.programme_supcon_weight),
                "--separation-weight", str(args.separation_weight), "--variance-weight", str(args.variance_weight),
                "--programme-head-dim", str(args.programme_head_dim),
+               "--biology-key-momentum", str(args.biology_key_momentum),
                "--gradient-diagnostics-every", str(args.gradient_diagnostics_every),
                "--pretrain-learning-rate", str(args.pretrain_learning_rate), "--pretrain-mask-fraction", str(args.pretrain_mask_fraction),
                "--pretrain-view-keep-fraction", str(args.pretrain_view_keep_fraction), "--pretrain-target-dim", str(args.pretrain_target_dim),
@@ -613,6 +615,8 @@ def main() -> None:
                     help="Hallmark target width; padding it wider leaves NaN columns that silently disable "
                          "the neighbourhood and supcon terms, which are the collapse mechanism under test")
     d1.add_argument("--separation-weight", type=float, default=.01); d1.add_argument("--variance-weight", type=float, default=.01)
+    d1.add_argument("--biology-key-momentum", type=float, default=0.0,
+                    help="EMA momentum for the biology key encoder; passed identically to BOTH arms")
     d1.add_argument("--gradient-diagnostics-every", type=int, default=25)
     d1.add_argument("--pretrain-learning-rate", type=float, default=2e-4); d1.add_argument("--pretrain-mask-fraction", type=float, default=.30)
     d1.add_argument("--pretrain-view-keep-fraction", type=float, default=.70); d1.add_argument("--pretrain-target-dim", type=int, default=128)

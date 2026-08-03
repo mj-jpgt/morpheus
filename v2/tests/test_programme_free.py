@@ -385,3 +385,64 @@ def test_g26_grades_the_uncentred_contrastive_number() -> None:
     assert metrics["biology_contrastive"] == pytest.approx(float(expected), abs=1e-5)
     assert metrics["biology_contrastive_centred"] == pytest.approx(float(centred), abs=1e-5)
     assert metrics["biology_contrastive"] != pytest.approx(metrics["biology_contrastive_centred"], abs=1e-6)
+
+
+def test_momentum_key_encoder_is_excluded_from_the_optimiser_and_survives_restore() -> None:
+    """A key encoder that reinitialises on resume collapses the run mid-flight.
+
+    That failure looks exactly like the collapse this mechanism exists to
+    prevent, so the restore path is asserted rather than assumed. Also pins that
+    momentum=0 is byte-identical to the historical path, and that exactly one
+    write per step reaches the queue under either setting.
+    """
+    import copy as _copy
+    import tempfile
+    from pathlib import Path
+
+    def _make(momentum: float) -> V2Trainer:
+        torch.manual_seed(0)
+        config = V2ModelConfig(patch_dim=8, rna_dim=4, hidden_dim=32, heads=4, layers=1,
+                               local_slots=4, slide_slots=2, patient_slots=2, dropout=0.0)
+        model = TumorStateV2(config, programme_dim=8)
+        trainer = V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                            V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu",
+                            biology_key_momentum=momentum)
+        trainer.prime_biology_memory([_big_batch(n=2, k=8, seed=s) for s in range(6)], minimum_unique_keys=9)
+        return trainer
+
+    trainer = _make(0.999)
+    trainer.update_biology_keys(_big_batch(n=3, k=8, seed=99), epoch=1)
+    encoder = trainer._biology_key_encoder
+    assert encoder is not None
+    optimised = {id(p) for group in trainer.optimizer.param_groups for p in group["params"]}
+    assert not (optimised & {id(p) for p in encoder.parameters()}), "key encoder is in the optimiser"
+    assert all(not p.requires_grad for p in encoder.parameters())
+
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "checkpoint.pt"
+        trainer.save_checkpoint(path, epoch=3, sampler_state={}, manifest={})
+        saved = _copy.deepcopy(encoder.state_dict())
+        resumed = _make(0.999)
+        with torch.no_grad():  # perturb, so a failed restore cannot coincidentally match
+            for parameter in resumed.model.parameters():
+                parameter.add_(torch.randn_like(parameter))
+        resumed.load_checkpoint(path)
+        assert resumed._biology_key_encoder is not None, "key encoder lost on restore"
+        restored = resumed._biology_key_encoder.state_dict()
+        assert all(torch.equal(restored[key], saved[key]) for key in saved), "key encoder did not round-trip"
+        assert resumed.biology_key_momentum == pytest.approx(0.999)
+
+    # momentum=0 keeps the historical path: step() itself enqueues, no key encoder
+    legacy = _make(0.0)
+    before = legacy.biology_memory.size
+    legacy.step(_big_batch(n=3, k=8, seed=77), epoch=1)
+    assert legacy.biology_memory.size == before + 3
+    assert legacy._biology_key_encoder is None
+
+    # momentum>0 moves the write to update_biology_keys, and does not double-write
+    momentum_trainer = _make(0.999)
+    before = momentum_trainer.biology_memory.size
+    momentum_trainer.step(_big_batch(n=3, k=8, seed=76), epoch=1)
+    assert momentum_trainer.biology_memory.size == before, "step() double-enqueued"
+    momentum_trainer.update_biology_keys(_big_batch(n=3, k=8, seed=76), epoch=1)
+    assert momentum_trainer.biology_memory.size == before + 3
