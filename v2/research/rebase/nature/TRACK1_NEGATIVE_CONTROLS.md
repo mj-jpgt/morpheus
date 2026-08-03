@@ -304,13 +304,16 @@ P1 claims to enforce, so the battery has to demonstrate it. A missing control is
 `value = NaN`, `note = "inadmissible_<code>"` and status FAIL rather than omitted; silence is never a
 pass.
 
-Current ledger: **81 rows — 62 gates, 19 observations, 7 failed gates** (the six raw site
-certificates, and gene-label-shuffle seed 3's containment).
+Current ledger: **101 rows — 62 gates, 39 observations, 7 failed gates** (the six raw site
+certificates, and gene-label-shuffle seed 3's containment). The 39 observations include the entire
+must-beat baseline table, so the PCA loss above is recorded in the same append-only file as the gates
+without ever having been able to quarantine the run.
 
 ## Tests
 
 `v2/tests/test_track1_controls.py` (inherited, audited), `v2/tests/test_gene_label_shuffle_control.py`
-(9 new), `v2/tests/test_track1_battery_ledger.py` (7 new). The inherited agent's reported "single-column
+(9 new), `v2/tests/test_track1_battery_ledger.py` (7 new). **Full suite: 243 passed** — 184 under
+`v2/tests` (was 168) plus 59 under `tests/`, no failures, no skips. The inherited agent's reported "single-column
 bug" was located and its fix **is present**: `run_calibra.score_target_block_per_column` reshapes
 sklearn's single-output prediction (`.reshape(len(test_idx), -1)`), covered by
 `test_block_scoring_matches_the_single_column_reference`.
