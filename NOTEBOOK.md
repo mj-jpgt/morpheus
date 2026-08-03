@@ -1158,6 +1158,40 @@ so a failure is a real defect every time.
 Launch shape once green: 2 arms × seeds 42/43/44, concurrently on the 80 GB card (each run uses
 ~6 GB and is data-loading bound), outputs under `~/e0_run/` which is persistent storage.
 
+## Stage 3b — the GPU queue. **Standing rule: the card must not idle.**
+
+*Added 2026-08-03. The box bills whether or not we use it, so work is queued ahead, not decided on
+completion. An agent owns this queue and launches each stage as the previous finishes.*
+
+| # | job | why | cost |
+|---|---|---|---|
+| 1 | **D1-A** (`decorrelation 0.04`) — running | Becomes the **control** documenting the collapse defect at epoch 40; A5 quantifies it | in flight |
+| 2 | **D1-B** (`--decorrelation-weight 0`, both arms, seeds 42/43/44) | The real experiment. See the decision below. | ~6 GPU-h, concurrent |
+| 3 | **Seed extension** — seeds 45, 46 on D1-B, both arms | D2 proved training is **not seed-reproducible** on this stack, so three seeds is thin for anything quoted | ~4 GPU-h |
+| 4 | **Decorrelation ablation** — 0 / 0.01 / 0.04 on `programme_free`, one seed each | Turns today's defect from *a fix we made* into *a reported result about a widely used regulariser* — worth more to the paper than the fix | ~3 GPU-h |
+
+### Decision, 2026-08-03: remove `decorrelation` from both D1 arms
+
+Measured on live checkpoints, 282 held-out patients: `programme_free` centred effective rank **1.76**
+(hard rank 9, RNA–RNA cosine 0.977) against `programme_only` **7.38 / 7.35** — two seeds agreeing to
+two decimals. Onset coincides with warmup ending at epoch 4, when `decorrelation` switches on.
+
+Grounds for calling it a defect rather than D1's answer:
+- The term's global minimum **is** collapse (38.97 healthy vs 1.19e-17 all-identical), it collapses at
+  every weight 0.001–4.0 within 25 steps while switching itself off, and a per-dimension variance
+  floor provably cannot stop it because `z_i = m + a_i·u` satisfies one.
+- `feature_decorrelation` is applied only to `out_wsi["z_biology"]` and `variance_floor` only to the
+  fused `output["z_biology"]` — so the **RNA biology view carries no anti-collapse term at all**, and
+  it is the most collapsed of the three.
+- The damage is **arm-asymmetric**: `programme_only` is anchored by programme supervision,
+  `programme_free` is not. The defect would therefore manufacture "programme supervision helps" as an
+  artifact — precisely the false positive D1 exists to rule out.
+
+Removal is symmetric, so the contrast still isolates programme supervision, and no gate, threshold or
+success criterion changes. `test_both_d1_arms_pair_decorrelation_with_a_variance_floor` is **rewritten,
+not deleted**: it now asserts regularisation *symmetry* across arms plus the conditional hazard
+(`decorrelation > 0 ⇒ variance > 0`), which is what the measurements actually support.
+
 ## Stage 4 — after D1
 
 `d2_compare` with `--label-a programme_only --label-b programme_free --experiment D1`, the same
