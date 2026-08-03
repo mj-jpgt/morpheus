@@ -235,8 +235,15 @@ def test_a_live_queue_turns_the_replayed_batch_into_its_own_negatives() -> None:
     """
     live = _replay_queue_alignment(freeze=False)
     frozen = _replay_queue_alignment(freeze=True)
-    assert live > 0.99, f"a live queue should hold the batch's own states, got {live:.4f}"
+    # The absolute number is not the claim and is trajectory-dependent: the key
+    # is written during step N and probed after the optimiser has moved again,
+    # so it drifts by however far one step travels.  It was 0.9924 against the
+    # uncentred objective and is 0.9855 against the centred one (2026-08-03) for
+    # exactly that reason.  The SEPARATION between live and frozen is the
+    # mechanism, so assert that too rather than lean on a tight absolute bound.
+    assert live > 0.95, f"a live queue should hold the batch's own states, got {live:.4f}"
     assert frozen < live, f"frozen keys must stay distinct from the queries: {frozen:.4f} vs {live:.4f}"
+    assert live - frozen > 0.10, f"freezing must visibly separate keys from queries: {live:.4f} vs {frozen:.4f}"
 
 
 def test_decorrelation_is_minimised_by_the_collapse_it_claims_to_prevent() -> None:
@@ -274,3 +281,87 @@ def test_both_d1_arms_pair_decorrelation_with_a_variance_floor() -> None:
         assert weights["variance"] > 0, f"{name} has decorrelation without a variance floor"
     assert free["decorrelation"] == only["decorrelation"]
     assert free["variance"] == only["variance"]
+
+
+def test_paired_infonce_removes_the_batch_common_direction_by_default() -> None:
+    """Centring is load-bearing: without it the D1 objective starts ABOVE chance.
+
+    `z_biology` is L2-normalised but never centred.  Measured on the real cohort
+    at initialisation, 81% of its squared norm is one direction shared by every
+    patient, the positives hold no advantage over the negatives (minimum margin
+    -0.219) and the loss starts at 3.0762 against chance ln(16)=2.7726.  From
+    above chance, erasing every distinction is a DESCENT direction, and the
+    biology head reaches effective rank 1.00 within 50 steps.
+
+    This reproduces the pathology in miniature: a batch whose patient-specific
+    signal is buried under a large shared direction is at chance uncentred and
+    solvable centred.
+    """
+    torch.manual_seed(11)
+    dim, n = 16, 12
+    common = torch.nn.functional.normalize(torch.randn(1, dim), dim=-1)
+    signal = torch.nn.functional.normalize(torch.randn(n, dim), dim=-1)
+    # 97% shared direction, 3% patient identity -- the geometry measured on the
+    # real 16-patient batch, where the shared component is ~0.81 of the norm.
+    wsi = 0.97 * common + 0.03 * signal
+    rna = 0.97 * common + 0.03 * signal
+    ids = torch.arange(n)
+    queue_wsi = 0.97 * common + 0.03 * torch.nn.functional.normalize(torch.randn(40, dim), dim=-1)
+    queue_rna = 0.97 * common + 0.03 * torch.nn.functional.normalize(torch.randn(40, dim), dim=-1)
+    queue_ids = torch.arange(100, 140)
+    raw, _ = paired_infonce_with_memory(wsi, rna, ids, queue_wsi, queue_rna, queue_ids, centre=False)
+    centred, _ = paired_infonce_with_memory(wsi, rna, ids, queue_wsi, queue_rna, queue_ids)
+    # Uncentred the shared direction swamps the identity signal; centred, the
+    # identical WSI/RNA pairing is trivially recoverable.
+    assert float(centred) < float(raw)
+    assert float(centred) < 0.10 < float(raw)
+
+
+def test_centring_never_zeroes_a_real_ragged_batch() -> None:
+    """Real D1 batches hold B=1-3 patients; centring those by their own mean
+    would map B=1 to the zero vector and B=2 to an antipodal pair.  Below
+    `min_negatives` the estimate must come from the queue instead."""
+    from morpheus.v2.losses import population_offset
+    torch.manual_seed(12)
+    for batch_size in (1, 2, 3):
+        current = torch.randn(batch_size, 8)
+        memory = torch.randn(64, 8)
+        offset = population_offset(current, memory, min_batch=8)
+        assert offset is not None and offset.shape == (1, 8)
+        assert not torch.allclose(current - offset, torch.zeros_like(current))
+        # With no queue to borrow from, refuse to centre rather than annihilate.
+        assert population_offset(current, None, min_batch=8) is None
+    assert population_offset(torch.randn(16, 8), None, min_batch=8) is not None
+
+
+def test_g26_grades_the_uncentred_contrastive_number() -> None:
+    """Centring changes the value of the quantity G2.6 thresholds at <= 0.10.
+
+    The graded metric therefore keeps its historical definition -- uncentred,
+    queue included -- so that a fix to the optimisation cannot be mistaken for
+    a relaxed criterion.  The centred value is reported separately.
+    """
+    torch.manual_seed(13)
+    # Dropout off so the metric can be reproduced exactly by a second forward.
+    config = V2ModelConfig(patch_dim=8, rna_dim=4, hidden_dim=32, heads=4, layers=1,
+                           local_slots=4, slide_slots=2, patient_slots=2, dropout=0.0)
+    model = TumorStateV2(config, programme_dim=8)
+    trainer = V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                        V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu")
+    batches = [_big_batch(n=2, k=8, seed=seed) for seed in range(6)]
+    trainer.prime_biology_memory(batches, minimum_unique_keys=9)
+    batch = _big_batch(n=2, k=8, seed=99)
+    _, metrics, _ = trainer.step(batch, epoch=1)
+    assert "biology_contrastive" in metrics and "biology_contrastive_centred" in metrics
+    memory_wsi, memory_rna, memory_indices = trainer.biology_memory.view()
+    with torch.no_grad():
+        out_wsi, out_rna = model(batch, view="wsi"), model(batch, view="rna")
+        expected, _ = paired_infonce_with_memory(
+            out_wsi["z_biology"], out_rna["z_biology"], batch["indices"],
+            memory_wsi, memory_rna, memory_indices, centre=False)
+        centred, _ = paired_infonce_with_memory(
+            out_wsi["z_biology"], out_rna["z_biology"], batch["indices"],
+            memory_wsi, memory_rna, memory_indices)
+    assert metrics["biology_contrastive"] == pytest.approx(float(expected), abs=1e-5)
+    assert metrics["biology_contrastive_centred"] == pytest.approx(float(centred), abs=1e-5)
+    assert metrics["biology_contrastive"] != pytest.approx(metrics["biology_contrastive_centred"], abs=1e-6)

@@ -389,7 +389,21 @@ class V2Trainer:
             )
             biology_contrastive_term = weights["biology_contrastive"] * contrastive
             loss = loss + biology_contrastive_term
-            metrics["biology_contrastive"] = float(contrastive.detach())
+            # OPTIMISE the centred objective, but keep GRADING the raw one.
+            # Centring is what makes the loss trainable at all (see
+            # `paired_infonce_with_memory`), and it changes the value of the
+            # number G2.6 thresholds at <= 0.10.  Rather than let a fix move the
+            # graded quantity, `biology_contrastive` keeps its historical
+            # definition -- uncentred, queue included -- so the criterion is
+            # measured on exactly what it was always measured on, and the
+            # centred value is reported alongside it for diagnosis.
+            metrics["biology_contrastive_centred"] = float(contrastive.detach())
+            with torch.no_grad():
+                raw_contrastive, _ = paired_infonce_with_memory(
+                    out_wsi["z_biology"].detach(), out_rna["z_biology"].detach(), batch["indices"],
+                    memory_wsi, memory_rna, memory_indices, centre=False,
+                )
+            metrics["biology_contrastive"] = float(raw_contrastive.detach())
             metrics["biology_contrastive_effective_negatives_min"] = float(negatives.min().detach())
             metrics["biology_contrastive_effective_negatives_mean"] = float(negatives.float().mean().detach())
         if weights.get("biology_full_consistency", 0.0):

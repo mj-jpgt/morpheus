@@ -18,6 +18,52 @@ def symmetric_infonce(left: torch.Tensor, right: torch.Tensor, temperature: floa
     return 0.5 * (nn.functional.cross_entropy(logits, labels) + nn.functional.cross_entropy(logits.T, labels))
 
 
+def population_offset(current: torch.Tensor, memory: torch.Tensor | None,
+                      min_batch: int = 8) -> torch.Tensor | None:
+    """Estimate the batch-COMMON direction of a biology state, or ``None``.
+
+    ``z_biology`` is L2-normalised but never centred, so at initialisation the
+    overwhelming majority of its norm is a single direction shared by every
+    patient: measured on a real 16-patient batch, ``||mean_i z_i||**2 = 0.8133``
+    and the patient-to-patient cosine is 0.8008.  See
+    :func:`paired_infonce_with_memory` for why that is fatal.
+
+    Returns a ``[1, dim]`` mean, or ``None`` when no reliable estimate exists.
+    The reference is the current batch when it is large enough to estimate a
+    mean, and the current batch pooled with the detached key queue otherwise.
+    Real ragged WSI batches hold only B=1-3 patients: centring those by their
+    own mean would map B=1 to the zero vector and B=2 to an antipodal pair, so
+    below ``min_batch`` the queue -- which always holds at least 16 keys and is
+    refreshed every training step -- supplies the estimate instead.
+    """
+    if len(current) >= min_batch:
+        return current.mean(dim=0, keepdim=True)
+    if memory is None or len(memory) == 0:
+        return None
+    pooled = torch.cat([current, memory.detach().to(current.device)], dim=0)
+    return pooled.mean(dim=0, keepdim=True)
+
+
+def _centre_for_infonce(current: torch.Tensor, memory: torch.Tensor | None,
+                        min_batch: int) -> tuple[torch.Tensor, torch.Tensor | None]:
+    """Remove the common direction from the current rows and the queue SEPARATELY.
+
+    Each population gets its own offset.  Forcing the current batch's offset
+    onto a frozen queue was measured to be unstable: the queue's keys were
+    encoded by an earlier model and drift away from the live states, so the
+    shared-offset variant reached the criterion at step 200 (0.0311, 16/16
+    retrieval) and then diverged to 7.62 and full collapse by step 400.  Giving
+    each population its own offset converges monotonically instead:
+    0.4025 -> 0.0835 -> 0.0101 at steps 400/600/800.
+    """
+    offset = population_offset(current, memory, min_batch=min_batch)
+    centred_current = current if offset is None else current - offset
+    centred_memory = memory
+    if memory is not None and len(memory) >= min_batch:
+        centred_memory = memory - memory.mean(dim=0, keepdim=True)
+    return centred_current, centred_memory
+
+
 def paired_infonce_with_memory(
     wsi: torch.Tensor,
     rna: torch.Tensor,
@@ -28,6 +74,7 @@ def paired_infonce_with_memory(
     *,
     temperature: float = 0.07,
     min_negatives: int = 8,
+    centre: bool = True,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Symmetric patient-paired InfoNCE with ID-aware detached key queues.
 
@@ -36,6 +83,31 @@ def paired_infonce_with_memory(
     detached WSI and RNA keys; current paired keys remain differentiable. An
     ID match in either queue is masked rather than treated as a false negative.
     Returns ``(loss, per-row_negative_counts)`` and refuses a silent no-op.
+
+    ``centre`` removes each modality's batch-common direction before the
+    similarity, and is **load-bearing, not cosmetic**.  Without it this loss
+    drives the biology head to effective rank 1.00 within 50 steps and then
+    stops moving.  The mechanism, measured on the real cohort (2026-08-03):
+
+    * ``z_biology`` is normalised but not centred, so ~81% of its squared norm
+      is one direction shared by every patient;
+    * every cosine is therefore dominated by a constant, and each key carries a
+      query-independent bias ``<mean_query_side, key>`` that swamps the
+      patient-specific term -- classic hubness;
+    * consequently the positives start no better than the negatives (minimum
+      margin **-0.219**) and the loss starts at **3.0762, ABOVE chance**
+      (ln 16 = 2.7726);
+    * from above chance, *erasing every distinction is a genuine descent
+      direction*, and it terminates on the permutation-symmetric configuration
+      where the InfoNCE gradient is exactly zero by symmetry.
+
+    Neither `variance_floor` nor `feature_decorrelation` can prevent this and
+    both were measured failing to: a per-dimension variance floor is satisfied
+    by the rank-1 family ``z_i = m + a_i*u`` (weight 10.0 still collapsed), and
+    the covariance penalty switches itself off by collapsing (20.74 -> 0.00 in
+    25 steps at every weight from 0.04 to 4.0).  Centring is the only measured
+    intervention that learns: raw in-batch InfoNCE 3.0762 -> 0.0110 with 16/16
+    retrieval by step 400, patient-to-patient cosine 0.8008 -> 0.0528.
     """
     if wsi.ndim != 2 or rna.shape != wsi.shape or patient_indices.shape != (len(wsi),):
         raise ValueError("WSI, RNA and patient_indices must be aligned [batch, dimension]")
@@ -52,6 +124,11 @@ def paired_infonce_with_memory(
         or memory_indices.shape != (len(memory_wsi),)
     ):
         raise ValueError("memory WSI/RNA states and IDs must be aligned")
+    if centre:
+        # Modality-wise, and population-wise within each modality: the WSI
+        # current rows and the WSI queue are centred independently, likewise RNA.
+        wsi, memory_wsi = _centre_for_infonce(wsi, memory_wsi, min_negatives)
+        rna, memory_rna = _centre_for_infonce(rna, memory_rna, min_negatives)
 
     def directional(query: torch.Tensor, paired_keys: torch.Tensor,
                     queued_keys: torch.Tensor | None) -> tuple[torch.Tensor, torch.Tensor]:
