@@ -289,6 +289,16 @@ def test_artifact_round_trips_through_the_real_validator(tmp_path):
         assert manifest["n_slides"] == 4
 
 
+def test_atomic_write_leaves_no_temporary_files(tmp_path):
+    """np.savez appends .npz when the name lacks it, so the NamedTemporaryFile placeholder is
+    not the file that gets renamed and was being left behind as 0-byte litter."""
+    ids, cancers, split, slides, emb = _artifact_inputs()
+    write_spatial_artifact(tmp_path / "a.npz", spot_ids=ids, cancers=cancers, split=split,
+                           slide_ids=slides, embeddings=emb)
+    left = sorted(p.name for p in tmp_path.iterdir())
+    assert left == ["a.npz"], left
+
+
 def test_artifact_refuses_a_slide_that_straddles_partitions(tmp_path):
     """REGRESSION GUARD: spot-level splitting puts neighbouring -- often overlapping -- tissue
     on both sides of the split and silently contaminates every reported number."""

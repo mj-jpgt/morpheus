@@ -1,4 +1,4 @@
-## 2026-08-03 06:20 UTC — The zero-parameter per-slide mean beats H-Optimus ridge on the metric the field reports (pooled r 0.571 vs 0.357), and TCGA/HEST separate at AUC 1.000
+## 2026-08-03 06:20 UTC — The zero-parameter per-slide mean beats H-Optimus ridge on the metric the field reports (pooled r 0.571 vs 0.357), and TCGA/HEST separate at AUC 0.99999
 
 **Logged:** 2026-08-03 06:20 UTC. **How obtained:** `hest_build tile/assemble/baselines/cohort-control` on the A100 box (150.136.45.194), workspace `~/ws_spatial`, outputs in `/lambda/nfs/geeg/biorag3_persistent_20260711/spatial/out/`.
 
@@ -30,7 +30,7 @@ any within-slide signal at all (0.151), which is real but roughly a third of wha
 pooled number advertises.
 
 **Cohort classifier control.** Logistic regression on row-L2-normalised H-Optimus embeddings,
-20,000 patches per cohort, 5-fold cross-validated: **TCGA vs HEST AUC = 1.0000**. A
+20,000 patches per cohort, 5-fold cross-validated: **TCGA vs HEST AUC = 0.99999**. A
 within-TCGA split of the same size and classifier gives **0.5012**, i.e. chance. The two
 cohorts are perfectly linearly separable in embedding space.
 
@@ -74,7 +74,7 @@ zero, as it must, and the image model retains 0.15. So the image genuinely carri
 information. It is just far less than the usual headline number implies.
 
 Separately, a simple classifier can tell our TCGA images from these spatial images perfectly
-— 100% — while being unable to distinguish two random halves of TCGA at all. The two datasets
+— 99.999% — while being unable to distinguish two random halves of TCGA at all. The two datasets
 are trivially distinguishable to the model, which matters for anything that mixes them.
 
 ### Meaning for the claim
@@ -94,7 +94,7 @@ measurement on this project that is not confounded by bulk averaging. It is a fl
 ceiling: no tuning, one alpha, 50 genes, and the image window covers 5.28× the tissue the
 transcriptome came from, which dilutes the association rather than inventing it.
 
-**3. AUC 1.000 between TCGA and HEST is a hard constraint on cross-cohort work.** Residual
+**3. AUC 0.99999 between TCGA and HEST is a hard constraint on cross-cohort work.** Residual
 batch signal is fully available to any model that sees both cohorts, so no result that pools
 or transfers between them can be attributed to biology without explicit correction, and the
 number must be declared wherever such a transfer appears. The within-TCGA null at 0.5012

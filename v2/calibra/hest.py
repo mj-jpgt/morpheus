@@ -303,8 +303,14 @@ def _atomic_savez(target: Path, **arrays) -> Path:
     handle = tempfile.NamedTemporaryFile(dir=str(target.parent), suffix=".npz.tmp", delete=False)
     handle.close()
     np.savez_compressed(handle.name, **arrays)
+    # savez appends ".npz" when the name does not already end in it, so the placeholder
+    # NamedTemporaryFile created is NOT the file that was written and must be removed too.
     written = handle.name if handle.name.endswith(".npz") else handle.name + ".npz"
-    os.replace(written, target)
+    try:
+        os.replace(written, target)
+    finally:
+        if written != handle.name and os.path.exists(handle.name):
+            os.unlink(handle.name)
     return target
 
 
