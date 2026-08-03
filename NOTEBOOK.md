@@ -1166,6 +1166,61 @@ spatial data that has not been acquired.
 
 ---
 
+# Entry index — 2026-08-03
+
+*32 entries written by four concurrent agents. Full text in `NOTEBOOK_ENTRIES/`; indexed here rather
+than inlined so this file stays navigable. Chronological within each thread.*
+
+### D1 — repairing the objective (three stacked defects, all fixed)
+| time | entry | headline |
+|---|---|---|
+| 02:10 | `g26_variance_floor_fix` | variance floor eliminates the collapse — **later corrected** |
+| 03:40 | `g26_stepbudget_sweep` | **CORRECTION**: it only *delays* collapse; lr 3e-3 stable where 1e-3 is not |
+| 05:00 | `g26_rank_collapse_diagnosis` | the third defect is rank-1 collapse under the **contrastive objective itself**, not any regulariser |
+| 07:30 | `g26_centring_fix` | centring fixes it; a second term then blocks the graded metric |
+| 09:30 | `g26_term_isolation` | every term the G2.6 clone adds beyond contrastive costs an order of magnitude |
+| 11:00 | `g26_passes` | **G2.6 passes, 3/3 seeds, unchanged criterion and step budget** |
+| 14:00 | `d1_launched` | both arms clear the gate; six runs, three concurrent |
+| 15:30 | `d1_relaunch` | **correction**: first launch stopped by its own in-runner gate; budget → 2400 |
+| 16:30 | `d1_training` | in-runner G2.6 passes at 2400, including the seed that failed at 800 |
+| 17:00 | `d1_readout_preregistration` | the default target set puts `programme_only`'s own supervision on the exam |
+| 18:05 | `d1_recovery_procedure` | read before restarting anything — `run_d1` refuses a non-empty output dir |
+| 18:30 | `d1_pipeline_emits_the_contaminated_number` | the pipeline's own output file is the contaminated one, and it looks authoritative |
+
+### D2 — Hallmark vs PBS
+| time | entry | headline |
+|---|---|---|
+| 01:45 | `D2_seed42_recovery` | Hallmark re-exports exactly; **the PBS arm was a mid-training snapshot (epoch 13)** |
+| 01:50 | `D2_v3_environment_and_relaunch` | environment reconstituted; 5 of 6 arms must be retrained |
+| 01:52 | `D2_negative_control_unrunnable` | **the negative control could not be selected at all** (`_targets` bug) |
+| 02:35 | `D2_v3_throughput_contention` | throughput is co-tenant-bound, not GPU-bound |
+| 05:30 | `D2_v3_hallmark_arms_complete` | 3/3 Hallmark arms done |
+| 10:50 | `D2_v3_analysis_cost_and_suspend_error` | bootstrap is 96 CPU-hours; **agent stalled it 2 h by misreading `ps`** |
+| 11:45 | `D2_blas_threading_pathology` | multithreaded BLAS is **23× slower** on this box |
+| 12:10 | `D2_stratified_result` | **the PBS deficit survives on 40 untrained targets; contamination ran the other way** |
+
+### P1 — instrument evidence
+| time | entry | headline |
+|---|---|---|
+| 01:20 | `winkler_prior_art` | Winkler 2020 reports **no magnitude** — Track 2's framing survives |
+| 01:50 | `t15_gene_label_shuffle` | the subspace survives a label shuffle; largely a build check |
+| 01:52 | `t13_confound_certificate` | **must-FAIL control DID NOT FAIL** on the raw representation |
+| 01:55 | `t17b_known_covariate` | image-only ER **0.878** vs pre-registered [0.78, 0.92] |
+| 02:20 | `t2_induced_correlation_sweep` | induced correlation is **structural**: flat in n over 13×, in rank over 15×, 20× a matched structureless design |
+| 02:30 | `t12_t14_t16_t17_calibra_ledger` | controls behave, but **76–82% of the per-target channel is reproduced by random gene sets** |
+| 03:00 | `t13_adjusted_certificate_and_p6` | **adjustment fully discharges site** (0.363 → 0.012 at chance 0.0118); P6 fails as predeclared |
+| 03:55 | `dilution_foreign_tumour` | two of four predictions **falsified — I was too pessimistic**; 40% contamination costs 20% of channel |
+| 04:40 | `t11_t12_must_beat_baselines` | **ordinary PCA beats the interventional dictionary** in 3 of 4 cells and never loses |
+
+### P4 — second modality, and cross-cutting
+| time | entry | headline |
+|---|---|---|
+| 04:30 | `spatial_modality_acquisition` | HEST-1k acquired; **CC BY-NC-SA not CC BY**; 44 of 1,276 survive a clean filter |
+| 06:20 | `spatial_baselines` | **the zero-parameter per-slide mean beats H-Optimus ridge** (pooled r 0.571 vs 0.357); TCGA/HEST separate at AUC 0.99999 |
+| 18:00 | `blas_oversubscription_not_slow_tests` | a 6-second test took >25 min; the misdiagnosis, logged as a dead end |
+
+---
+
 # Running log
 
 > **Logging convention (added 2026-08-02).** Concurrent agents must NOT edit this file directly —
