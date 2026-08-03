@@ -92,12 +92,20 @@ on a frozen queue (a frozen queue is a perfect anchor). It also explains why no 
 helped: the degenerate direction is invisible to the loss by construction, so no reweighting of terms
 that are computed *within* that loss can see it either.
 
-**It is not yet confirmed.** Its distinguishing prediction is about *how much* decoupling is needed. If
-anchoring strength drives the effect, larger `m` should help monotonically. Measured, m = 0.999 gives
-6.89 against m = 0.99's 6.65 — barely separated, suggesting **decoupling at all matters far more than
-how much**. That further distinguishes the account from staleness, where the amount of lag would be
-the entire story. An `m = 0.9` arm is running as the sharper test: if it also works, decoupling-at-all
-is confirmed.
+**It is not confirmed, and one sharpening of it has been tested and refuted.** We proposed, and
+predeclared, that the required momentum should track queue turnover — that the EMA time constant
+`τ = 1/(1−m)` must exceed `T = capacity/batch`, making the criterion dimensionless in `τ/T`. Five
+predictions were committed before the runs. **Four were wrong, and the discriminating one inverted:**
+at `m = 0.95`, the arm with the *lowest* `τ/T` (0.52, capacity 8192) was the healthiest of its group
+at 3.67, where the criterion required it to be the worst; effective rank rose as `τ/T` fell.
+
+What the data supports is narrower: rank is **monotone in `m` and nearly flat in capacity**. At fixed
+`m = 0.95`, tripling the queue from 2,048 to 8,192 moves effective rank 3.53 → 3.67. At fixed capacity
+4,096, raising `m` from 0.95 to 0.999 moves it 2.91 → 7.82. A threshold sits between `τ = 20` (fails)
+and `τ = 100` (works) and appears at the same place for every capacity tested — an *absolute* time
+constant, not a ratio. We record that as an observation and explicitly do **not** advance it as a
+mechanism: it would be the fourth proposed explanation for this collapse, resting on the same data
+that refuted the third.
 
 ## Why this may matter beyond one codebase
 
@@ -115,9 +123,13 @@ that is no reassurance at all.
 - **The durability of the fix is not yet established.** Recovery is measured to step 100; runs to 1,500
   steps are in progress. This project has twice had a fix look correct inside a short window and fail
   outside it, so this section may not be cited for the fix until those return.
-- The anchoring account is **not** confirmed against a control. The decisive experiment — decoupling
-  the key encoder while holding it at a *fixed* lag, versus a genuinely stale queue at matched lag —
-  has not been run.
+- The anchoring account is **not** confirmed against a control, and as stated it makes no prediction
+  about how much decoupling is required — which is simultaneously why it survived the turnover
+  experiment and why it is currently unfalsifiable. It should not be cited as established.
+- The turnover/`τ-over-T` sharpening was predeclared, tested and **refuted**; it is withdrawn.
+- The next testable shape, not yet run: vary the learning rate, which changes how far the encoder
+  moves per step without changing either `τ` or `T`. An absolute-`τ` threshold should move with it;
+  a per-step-drift account predicts it should not.
 - The capacity effect (§3) remains confounded: capacity changes both anchoring quality and negative
   count, and we have not separated them.
 - The staleness metric reported measures key-to-*query* lag, not key-to-*key* spread. With a 19-step
