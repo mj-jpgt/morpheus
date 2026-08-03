@@ -249,12 +249,19 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
                          n_draws: int = 25, n_components: int = 32, seed: int = 42,
                          recovery_fraction: float = 0.8,
                          molecular_directions: np.ndarray | None = None,
+                         n_splits: int = 5, alpha: float = 1.0,
                          n_jobs: int = 1) -> SpikeRecoveryResult:
     """Push known-strength spikes through the full pipeline and measure recovery.
 
     ``design`` is the confound design matrix; residualisation is applied to the
     spiked data exactly as it is to the real data — that identity is the whole
     point, so do not "optimise" it away.
+
+    ``n_splits`` and ``alpha`` are the residualiser's own knobs, forwarded
+    unchanged to :func:`cross_fitted_residuals`. They exist so that Track 2 can
+    show the confound-induced level-0 baseline is a property of *shared
+    residualisation* rather than of this particular fold count or shrinkage;
+    the defaults reproduce every number produced before they were exposed.
 
     The detection floor is the smallest non-zero level whose recovered statistic
     exceeds the null (level 0) 90th percentile in at least ``recovery_fraction``
@@ -266,8 +273,9 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     levels = np.asarray(levels, dtype=np.float64)
     rng = np.random.default_rng(seed)
 
-    x_residual = cross_fitted_residuals(x, design, seed=seed)
-    y_residual = cross_fitted_residuals(y, design, seed=seed)
+    resid = dict(n_splits=n_splits, alpha=alpha, seed=seed)
+    x_residual = cross_fitted_residuals(x, design, **resid)
+    y_residual = cross_fitted_residuals(y, design, **resid)
 
     # Draw every (direction, seed) up front so the result is identical regardless of
     # how the draws are scheduled across workers.
@@ -287,7 +295,7 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
                                          rng=np.random.default_rng(draw_seed),
                                          molecular_direction=direction,
                                          return_directions=True)
-            spiked_residual = cross_fitted_residuals(spiked, design, seed=seed)
+            spiked_residual = cross_fitted_residuals(spiked, design, **resid)
             # TARGETED readout: score the planted axis, not a maximum over the whole
             # subspace. See the module docstring -- a max readout is swamped by
             # ambient structure and returns NaN floors on real data.
@@ -380,6 +388,8 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
                                n_components=n_components, recovery_fraction=recovery_fraction,
                                delta=delta,
                                meta={"null_reference_p90": null_reference, "n_draws": n_draws,
+                                     "residualiser_n_splits": int(n_splits),
+                                     "residualiser_alpha": float(alpha),
                                      "n_patients": int(len(x)),
                                      "baseline_recovered_median": baseline,
                                      "baseline_recovered_median_signed": baseline_signed,

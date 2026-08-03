@@ -39,7 +39,21 @@ in the design span, so it varies draw to draw.
 
 This is why the floor must be read with a **paired** test, and it is a caution for every confound-adjusted
 cross-modal analysis in this literature: **adjustment does not merely remove signal, it manufactures a
-small amount of apparent cross-modal correlation.** Nobody reports this.
+small amount of apparent cross-modal correlation.**
+
+> **PRIOR ART — this phenomenon is NOT new. Corrected 2026-08-02.**
+> An earlier version of this section claimed "nobody reports this". That was wrong, and the claim is
+> withdrawn. The effect is an exact algebraic identity, not an empirical discovery: for signals with
+> `r_uv = 0` it is the multivariate partial-correlation formula
+> `corr(Mu, Mv) = −R_u·R_v·ρ / sqrt((1−R_u²)(1−R_v²))` — Yule (1907) / Frisch–Waugh–Lovell — reproduced
+> against our simulation to 7.4e-16 at this n and design rank. It has been independently rediscovered and
+> published *as a warning* in fMRI (Murphy 2009), GWAS (Aschard 2015; Dahl 2019), genomics (Nygaard 2016;
+> Li 2023), and stated as folklore for `removeBatchEffect` (Smyth 2020). Most directly, **Winkler et al.
+> 2020, NeuroImage 220:117065** applies CCA to imaging × non-imaging residuals and warns that
+> "residualisation introduces dependencies" inflating error rates — cross-modal, warned, and with a fix.
+> See `NOVELTY_SEARCH.md`. What may remain ours is the *magnitude* under correct residualisation of
+> exactly-orthogonal signals (0.067–0.140 here vs 0.003 for independent signals, so structural rather
+> than a degrees-of-freedom artifact). Nothing broader may be claimed.
 
 ## 2. Two floors — do not conflate them
 

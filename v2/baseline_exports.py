@@ -64,6 +64,54 @@ def export_raw_hoptimus_baseline(output: str | Path, *, patient_ids: Sequence[st
                   source_provenance=source_provenance)
 
 
+def export_zero_parameter_baseline(output: str | Path, *, patient_ids: Sequence[str], cancers: Sequence[str],
+                                   split: Sequence[str], targets: np.ndarray,
+                                   source_provenance: dict[str, object] | None = None) -> Path:
+    """Export the cancer-type mean: the zero-fitted-parameter naive baseline.
+
+    Every patient of cancer c receives the *training-fold* mean target vector for
+    cancer c and nothing else. There is no fitted parameter beyond a group mean,
+    and no patient-specific information whatsoever, so this is the floor any
+    representation must clear before "it predicts molecular state" means anything.
+
+    It is also the sharpest available test of the confound adjustment itself.
+    Cancer type is in CALIBRA's design matrix, so after residualisation this
+    baseline must collapse to nothing. If it does not, the adjustment is not
+    removing the cancer effect it claims to remove, and every adjusted number in
+    the run is reading lineage. A baseline that is *supposed* to score zero is
+    worth more than one that is supposed to score high.
+
+    Cancers absent from the training fold receive the global training mean rather
+    than their own test-fold mean, which would be leakage dressed as a baseline.
+    """
+    ids, cancer, parts, y, _ = _validate_inputs(patient_ids, cancers, split, targets)
+    train = parts == "train"
+    if train.sum() < 2:
+        raise BaselineExportError("the zero-parameter baseline needs at least two training patients")
+    global_mean = y[train].mean(axis=0)
+    state = np.repeat(global_mean[None, :], len(ids), axis=0).astype(np.float32)
+    seen: list[str] = []
+    for group in np.unique(cancer):
+        rows = (cancer == group) & train
+        if rows.sum() < 2:
+            continue
+        state[cancer == group] = y[rows].mean(axis=0)
+        seen.append(str(group))
+    # A representation that is constant everywhere is not measurable; that is a
+    # property of the split, not a bug, and must surface as a refusal.
+    if float(np.std(state, axis=0).max()) < 1e-8:
+        raise BaselineExportError("cancer-type means are constant across the cohort; nothing to measure")
+    return _write(output, patient_ids=ids, cancers=cancer, split=parts,
+                  states={"wsi_identity": state},
+                  method="zero_parameter_cancer_mean",
+                  config={"rule": "training_fold_mean_target_vector_of_the_patient_cancer_type",
+                          "n_cancers_with_training_mean": len(seen),
+                          "fallback": "global_training_mean_for_cancers_absent_from_train",
+                          "n_targets": int(y.shape[1]),
+                          "fit_population": "train_fold_group_means_only_zero_fitted_parameters"},
+                  source_provenance=source_provenance)
+
+
 def _reduce_pair(wsi: np.ndarray, rna: np.ndarray, train: np.ndarray, components: int) -> tuple[np.ndarray, np.ndarray, int]:
     maximum = min(components, int(train.sum()) - 1, wsi.shape[1], rna.shape[1])
     if maximum < 2:

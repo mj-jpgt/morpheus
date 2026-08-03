@@ -1062,6 +1062,84 @@ Standing instructions for whoever — human or agent — picks this up next.
 
 # Running log
 
+> **Logging convention (added 2026-08-02).** Concurrent agents must NOT edit this file directly —
+> simultaneous writes silently lose entries. Each agent writes its entry to
+> `NOTEBOOK_ENTRIES/<topic>_<UTC timestamp>.md` using the section format below, and the main session
+> merges them into this log. Every entry carries `**Logged:**`, `**How obtained:**`, `### Technical`,
+> `### In plain terms`, `### Meaning for the claim`.
+
+---
+## 2026-08-02 01:20 UTC — G2.6 in-batch collapse diagnosed: the non-contrastive terms drive the representation to a single point
+
+**Logged:** 2026-08-02 01:20 UTC. **How obtained:** `scratchpad/collapse_diag.py` on the A100, real
+cohort (3,118 train patients, H-Optimus patch store), one fixed 16-patient batch, hidden 512 /
+4 layers / 8 heads, programme head 256, seed 42, 800 steps, frozen memory queue (capacity 64).
+Three arms differing only in loss weights.
+
+### What was asked
+`programme_free`'s InfoNCE term sits at exactly ln(16) = 2.7726 — in-batch chance — so D1 cannot
+launch. Two competing explanations: (H1) the model destroys separable information; (H2) the 16
+patients are not separable at all, in which case the G2.6 criterion (`biology_contrastive <= 0.10`)
+is unreachable by construction and the *gate* is wrong.
+
+### Technical
+
+**H2 is refuted.** Raw inputs are clearly separable:
+
+| | off-diagonal cosine between the 16 patients |
+|---|---:|
+| raw H-Optimus patient mean | 0.3265 |
+| raw RNA | 0.0587 |
+
+**H1 is confirmed, and the culprit is the non-contrastive terms.**
+
+| arm | in-batch InfoNCE (chance 2.7726) | retrieval acc@1 (chance 0.062) | cross-modal pos cos | cross-modal neg cos | WSI within-modality off-diag cos |
+|---|---|---|---|---:|---:|
+| **A** full `programme_free` schedule | 3.4681 → **2.7734** | 0.062 → **0.000** | 0.0538 → 0.9959 | 0.0816 → 0.9960 | 0.7089 → **0.9999** |
+| **B** contrastive ONLY | 3.4681 → **2.0789** | 0.062 → **0.188** | 0.0538 → 0.9988 | 0.0816 → **0.4922** | 0.7089 → **0.4946** |
+| **C** contrastive only, lr 3e-3 | 3.4681 → 2.7724 | 0.062 → 0.125 | 0.0538 → 0.9998 | 0.0816 → 0.9997 | 0.7089 → 0.9998 |
+
+Arm A is **total representational collapse**: every patient's `z_biology` converges to the same
+vector (within-modality off-diagonal cosine 0.9999), and positive and negative cross-modal pairs
+become indistinguishable (0.9959 vs 0.9960). Retrieval falls to 0.000, i.e. *below* chance.
+
+Arm B, with `{programme, neighbourhood, supcon, separation, variance, decorrelation}` zeroed,
+does **not** collapse: positives separate from negatives (0.9988 vs 0.4922), the loss descends
+**below chance** to 2.0789, and retrieval reaches 3× chance.
+
+Arm C shows the collapse is also reachable by raising the learning rate alone, so it is an
+optimisation instability that several settings can trigger — not one bad term with one bad weight.
+
+Note the irony: the **decorrelation** term was added specifically to prevent collapse (`training.py`
+docstring, F-R2). With it active the representation collapses to cosine 0.9999; with it off, it does
+not. It is not doing the job it was introduced for, and may be contributing.
+
+`z_biology` matrix rank stays at 16/16 in every arm — rank is preserved while the representation
+collapses in direction. Another instance of the P2 theme: **rank does not track information.**
+
+### In plain terms
+The model was being asked to tell 16 patients apart. The information needed is plainly there —
+the raw images and the raw RNA distinguish those patients easily. But under the full training
+recipe the model learns to output *the same answer for everybody*, at which point every patient
+looks identical and telling them apart is impossible. Switching off the auxiliary objectives and
+leaving only the "match the image to its RNA" objective stops that happening, and the model starts
+learning. Cranking the learning rate brings the collapse back, so it is a stability problem, not a
+single wrong knob.
+
+### Meaning for the claim
+- The G2.6 gate is **correct to fail** — it is catching a real defect, not an impossible criterion.
+  No goalpost may be moved.
+- The fix is an **engineering** fix (loss weighting / optimisation stability), not a change to what
+  D1 measures. It stays within the boundary the user set.
+- Contrastive-only reaches 2.0789, still far from the `<= 0.10` criterion, so this identifies the
+  direction but is **not yet a passing configuration**. D1 remains blocked.
+- Confirms the earlier queue finding was necessary but not sufficient: two independent defects were
+  stacked, the memory queue self-cancellation and this collapse.
+
+### Files / commits
+`v2/training.py` (`freeze_biology_memory`), `v2/runner.py` (`freeze_memory` arm),
+`v2/tests/test_programme_free.py` (+3 tests), `scratchpad/collapse_diag.py`.
+
 ---
 ## 2026-08-01 20:35 UTC — D2 seed 42: both arms trained 40/40 epochs; held-out representation geometry measured
 **Status:** RESULT

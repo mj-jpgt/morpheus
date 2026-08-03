@@ -11,6 +11,7 @@ be fit on the active development split only.
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 from hashlib import sha256
 import json
 import os
@@ -123,7 +124,9 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
                       fit_population: str = "train", gene_annotations: str = "",
                       allow_missing_rna: bool = False, rna_log_transform: str = "none",
                       max_missing_rna_fraction: float = 0.01,
-                      restrict_to_split: bool = False) -> dict[str, object]:
+                      restrict_to_split: bool = False,
+                      shuffle_gene_labels: bool = False,
+                      shuffle_seed: int = 0) -> dict[str, object]:
     """Create patient-ID keyed PBS codes without fitting on held-out patients."""
     if n_components not in {64, 128, 256}:
         raise ValueError("PBS component sensitivity is predeclared at 64, 128, or 256")
@@ -216,6 +219,24 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
     # abundance would erase the intervention interpretation.
     reference_response = np.asarray(reference.x[:, keep], dtype=np.float32)[:, finite_gene] / development_scale[None, :]
     dictionary = ReferenceDictionary.fit(reference_response, genes, reference.row_ids, n_components=n_components)
+    # T1.5 must-FAIL control 3: permute WHICH GENE each loading belongs to while
+    # leaving the directions, their spectrum and their mutual geometry untouched.
+    # Permuting the rows of (gene_mean, gene_basis) and leaving ``genes`` in its
+    # original order is exactly that: the encoder still consumes the same
+    # expression matrix in the same column order, but every loading now names the
+    # wrong gene. Two claims are separated by doing this and nothing else --
+    # "there is a legible subspace" must survive it, and "gene g drives axis k"
+    # must not.
+    gene_label_shuffle: dict[str, object] = {"enabled": False}
+    if shuffle_gene_labels:
+        order = np.random.default_rng(shuffle_seed).permutation(len(genes))
+        fixed_points = int((order == np.arange(len(order))).sum())
+        dictionary = replace(dictionary, gene_mean=dictionary.gene_mean[order],
+                             gene_basis=dictionary.gene_basis[order])
+        gene_label_shuffle = {"enabled": True, "seed": int(shuffle_seed), "n_genes": int(len(order)),
+                              "fixed_points": fixed_points,
+                              "permutation_digest": _digest_array(order.astype(np.int64)),
+                              "note": "gene labels permuted; directions, spectrum and geometry unchanged"}
     scores = dictionary.encode_expression(transformed_expression, genes).astype(np.float32)
     if not np.isfinite(scores).all() or np.all(np.std(scores, axis=0) < 1e-8):
         raise ValueError("PBS codes are degenerate; inspect RNA scale/gene alignment rather than training")
@@ -254,6 +275,7 @@ def build_pbs_targets(*, data_config: str, split_file: str, rna_table: str,
         "atom_coordinates_sha256": _digest_array(dictionary.atom_coordinates.astype(np.float32)),
         "atom_id_digest": _digest_strings(dictionary.atom_ids),
         "axis_annotations": annotation_manifest,
+        "gene_label_shuffle": gene_label_shuffle,
         "cohort_restriction": {key: value for key, value in restriction.items() if key != "dropped_patients"},
         "cohort_restriction_dropped_patients": list(restriction.get("dropped_patients", [])),
     }
@@ -293,6 +315,10 @@ def main() -> None:
     parser.add_argument("--restrict-to-split", action="store_true",
                         help="treat the split file as the authoritative cohort, exactly as the runner does")
     parser.add_argument("--gene-annotations", default="", help="optional gene-level proliferation/essentiality annotation table; missing data is reported unavailable")
+    parser.add_argument("--shuffle-gene-labels", action="store_true",
+                        help="T1.5 must-FAIL control: permute the dictionary gene labels, keeping the directions")
+    parser.add_argument("--shuffle-seed", type=int, default=0,
+                        help="draw index for --shuffle-gene-labels; vary it to build a shuffle null")
     print(json.dumps(build_pbs_targets(**vars(parser.parse_args())), indent=2, sort_keys=True))
 
 

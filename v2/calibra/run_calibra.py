@@ -28,7 +28,8 @@ import pandas as pd
 
 from .calibration import permutation_null, spike_recovery_curve
 from .residualise import confound_design, cross_fitted_residuals, pooled_tissue_source_site
-from .spectral import cca_spectrum, effective_rank, heldout_top_cca
+from .spectral import (cca_spectrum, effective_rank, heldout_single_direction_correlation,
+                       heldout_top_cca)
 
 
 def _canonical_tcga_patient(value: object) -> str:
@@ -138,6 +139,102 @@ def _channel_value(summary: dict, metric: str) -> float:
     return float(summary.get(aliases.get(metric, metric), float("nan")))
 
 
+def score_target_block_per_column(x_residual: np.ndarray, y_residual: np.ndarray, *,
+                                  n_splits: int = 5, alpha: float = 1.0, seed: int = 42) -> np.ndarray:
+    """Held-out single-direction correlation for every column of a target block.
+
+    Ridge at a fixed alpha is separable across outputs, so one multi-output fit
+    per fold is numerically identical to looping
+    ``heldout_single_direction_correlation`` over the columns (asserted in
+    ``v2/tests/test_track1_controls.py``) and is two orders of magnitude faster.
+    """
+    from sklearn.linear_model import Ridge
+    from sklearn.model_selection import KFold
+
+    x_residual = np.asarray(x_residual, dtype=np.float64)
+    y_residual = np.asarray(y_residual, dtype=np.float64)
+    if y_residual.ndim == 1:
+        y_residual = y_residual[:, None]
+    prediction = np.empty_like(y_residual)
+    splitter = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    for train_idx, test_idx in splitter.split(x_residual):
+        model = Ridge(alpha=alpha, fit_intercept=True).fit(x_residual[train_idx], y_residual[train_idx])
+        # sklearn drops the trailing axis for a single-output fit; a one-column
+        # target block is exactly what a per-target control run passes in.
+        prediction[test_idx] = np.asarray(model.predict(x_residual[test_idx])).reshape(len(test_idx), -1)
+    values = np.full(y_residual.shape[1], np.nan)
+    for j in range(y_residual.shape[1]):
+        if np.std(prediction[:, j]) > 1e-12 and np.std(y_residual[:, j]) > 1e-12:
+            values[j] = float(np.corrcoef(prediction[:, j], y_residual[:, j])[0, 1])
+    return values
+
+
+def random_direction_column_correlation(x_residual: np.ndarray, y_residual: np.ndarray, *,
+                                        n_draws: int = 40, seed: int = 42) -> np.ndarray:
+    """Per-column ``observed_matched_direction``: RANDOM image direction, this target.
+
+    This is the statistic the CALIBRA ``detection_floor`` is actually measured
+    in. The floor comes from ``corr(X_res u, Y_spiked_res v)`` with ``u`` drawn
+    at random from image space, so the only per-target quantity on the floor's
+    scale is the same correlation with ``v`` pinned to a single target column.
+
+    It is reported next to ``score_target_block_per_column`` precisely because
+    the two disagree, and the disagreement is the point: a random direction
+    through a 256-column representation sees essentially nothing, while a
+    *fitted* (cross-validated) direction through the same representation sees a
+    great deal. Grading a fitted-direction readout against a random-direction
+    floor is not a like-for-like comparison, and any per-target claim that does
+    so is reading a floor that was never measured for it.
+    """
+    x_residual = np.asarray(x_residual, dtype=np.float64)
+    y_residual = np.asarray(y_residual, dtype=np.float64)
+    rng = np.random.default_rng(seed)
+    scores = np.empty((n_draws, y_residual.shape[1]))
+    y_std = (y_residual - y_residual.mean(axis=0)) / np.maximum(y_residual.std(axis=0), 1e-12)
+    for draw in range(n_draws):
+        u = rng.normal(size=x_residual.shape[1])
+        u /= np.linalg.norm(u)
+        projected = x_residual @ u
+        projected = (projected - projected.mean()) / max(projected.std(), 1e-12)
+        scores[draw] = (projected[:, None] * y_std).mean(axis=0)
+    return np.median(scores, axis=0)
+
+
+def grade_random_controls(control_values: np.ndarray, control_names: np.ndarray, *,
+                          detection_floor: float, exceedance_ceiling: float = 0.05) -> dict:
+    """T1.4 verdict: matched random gene sets must NOT clear the run's own floor.
+
+    Stated in advance so "it failed" is falsifiable: the control behaves as
+    required when (a) the median control column lies below the unpaired
+    ``detection_floor`` this same run measured, and (b) at most
+    ``exceedance_ceiling`` of control columns exceed it. The exact count and the
+    identity of every exceedance are reported either way — an exceedance rate
+    above the ceiling is a finding about the instrument, not a rounding error to
+    be smoothed over.
+    """
+    values = np.asarray(control_values, dtype=np.float64)
+    names = np.asarray(control_names).astype(str)
+    finite = np.isfinite(values)
+    if not finite.any() or not np.isfinite(detection_floor):
+        return {"status": "unavailable_no_finite_controls_or_floor", "n_controls": int(len(values)),
+                "detection_floor": float(detection_floor), "passed": False,
+                "median": float("nan"), "exceedance_fraction": float("nan"),
+                "n_exceedances": 0, "exceedances": []}
+    median = float(np.median(values[finite]))
+    exceeds = finite & (values > float(detection_floor))
+    fraction = float(exceeds.sum()) / float(finite.sum())
+    return {"status": "scored", "n_controls": int(finite.sum()),
+            "detection_floor": float(detection_floor),
+            "median": median, "max": float(values[finite].max()),
+            "p95": float(np.percentile(values[finite], 95)),
+            "n_exceedances": int(exceeds.sum()), "exceedance_fraction": fraction,
+            "exceedance_ceiling": float(exceedance_ceiling),
+            "exceedances": sorted(zip(names[exceeds].tolist(),
+                                      [float(v) for v in values[exceeds]]), key=lambda p: -p[1]),
+            "median_below_floor": bool(median < float(detection_floor)),
+            "passed": bool(median < float(detection_floor) and fraction <= float(exceedance_ceiling))}
+
+
 def validate_evaluated_targets(y: np.ndarray, names: np.ndarray) -> None:
     """G1 target-matrix guard for the exact cohort reaching CALIBRA."""
     value, labels = np.asarray(y, dtype=np.float64), np.asarray(names).astype(str)
@@ -175,6 +272,12 @@ def main() -> None:
                         help="fail the stage unless an rna_* state clears its same-run pairing null")
     parser.add_argument("--require-channel-gates", action="store_true",
                         help="fail the stage if an evaluated state fails CALIBRA's targeted-readout gate")
+    parser.add_argument("--score-random-controls", action="store_true",
+                        help="ALSO score the excluded RANDOM_CONTROL__ block as its own target group "
+                             "(T1.4 must-FAIL control) instead of discarding it")
+    parser.add_argument("--random-control-exceedance-ceiling", type=float, default=0.05,
+                        help="fraction of RANDOM_CONTROL__ columns allowed above the run's own unpaired "
+                             "detection floor before the negative control is escalated")
     args = parser.parse_args()
 
     output = Path(args.output)
@@ -201,7 +304,13 @@ def main() -> None:
         keep_targets = target_groups == args.target_group
     # Exclude the random-control columns from the molecular block itself; they are
     # a null for a different question and would dilute the channel estimate.
-    keep_targets &= ~np.char.startswith(target_names, "RANDOM_CONTROL__")
+    is_control = np.char.startswith(target_names, "RANDOM_CONTROL__")
+    # ...but "excluded from the channel" must not mean "thrown away". T1.4 grades
+    # them as their own target group against the very floor this run measures, so
+    # keep the block aside rather than deleting it.
+    control_scores = scores[:, keep_targets & is_control]
+    control_names = target_names[keep_targets & is_control]
+    keep_targets &= ~is_control
     scores = scores[:, keep_targets]
     target_names = target_names[keep_targets]
     if scores.shape[1] == 0 or not np.isfinite(scores).all() or len(set(target_names)) != len(target_names):
@@ -212,6 +321,7 @@ def main() -> None:
     summaries: dict[str, dict] = {}
     channel_gate_failures: list[str] = []
     rna_positive_controls: list[tuple[str, str, str, bool]] = []
+    random_control_verdicts: dict[str, dict] = {}
 
     for artifact_path in args.artifacts:
         path = Path(artifact_path)
@@ -341,6 +451,66 @@ def main() -> None:
                     ])
             summaries[f"{method}::{state}"] = summary
 
+            if args.score_random_controls and control_scores.shape[1]:
+                # Same residualisation, same partition, same seed as the channel
+                # measurement above; only the target block changes.
+                x_res = cross_fitted_residuals(x, design, seed=args.seed)
+                control_res = cross_fitted_residuals(control_scores[aligned[mask]], design, seed=args.seed)
+                y_res = cross_fitted_residuals(y, design, seed=args.seed)
+                control_values = score_target_block_per_column(x_res, control_res, seed=args.seed)
+                real_values = score_target_block_per_column(x_res, y_res, seed=args.seed)
+                # The floor's own units. Reported for every column of both blocks
+                # so the two scales can be read side by side rather than merged.
+                control_matched = random_direction_column_correlation(
+                    x_res, control_res, n_draws=args.n_draws, seed=args.seed)
+                real_matched = random_direction_column_correlation(
+                    x_res, y_res, n_draws=args.n_draws, seed=args.seed)
+                # PRIMARY, spec-literal verdict: the statistic the floor is
+                # measured in, graded against the floor.
+                verdict = grade_random_controls(control_matched, control_names,
+                                                detection_floor=summary["detection_floor"],
+                                                exceedance_ceiling=args.random_control_exceedance_ceiling)
+                verdict["statistic"] = "observed_matched_direction_per_column_random_u"
+                verdict["real_target_matched_median"] = float(np.nanmedian(real_matched))
+                # SECONDARY, powered verdict: the statistic any real per-target
+                # analysis would actually use. Recorded separately, never merged
+                # into the primary one, because the scales are different.
+                verdict["fitted_direction"] = grade_random_controls(
+                    control_values, control_names, detection_floor=summary["detection_floor"],
+                    exceedance_ceiling=args.random_control_exceedance_ceiling)
+                verdict["fitted_direction"]["statistic"] = "heldout_single_direction_correlation_fitted_u"
+                # The real block scored through the IDENTICAL statistic is the
+                # only thing that makes "the controls are below the floor"
+                # informative rather than a statement about a weak readout.
+                verdict["fitted_direction"]["real_target_median"] = float(np.nanmedian(real_values))
+                verdict["fitted_direction"]["real_target_exceedance_fraction"] = float(
+                    np.nanmean(real_values > summary["detection_floor"])) if np.isfinite(summary["detection_floor"]) else float("nan")
+                random_control_verdicts[f"{method}::{state}"] = verdict
+                for task_name, names, fitted, matched in (
+                        ("calibra_random_control", control_names, control_values, control_matched),
+                        ("calibra_real_target", target_names, real_values, real_matched)):
+                    for name, fit_value, match_value in zip(names, fitted, matched):
+                        rows.append(_row(method=method, representation_state=state, task=task_name,
+                                         target=str(name), metric="observed_matched_direction",
+                                         value=float(match_value),
+                                         note=f"floor={summary['detection_floor']};random_u;floor_units"))
+                        rows.append(_row(method=method, representation_state=state, task=task_name,
+                                         target=str(name), metric="heldout_matched_direction",
+                                         value=float(fit_value),
+                                         note=f"floor={summary['detection_floor']};fitted_u;NOT_floor_units"))
+                for metric in ("median", "p95", "max", "n_exceedances", "exceedance_fraction",
+                               "real_target_matched_median"):
+                    rows.append(_row(method=method, representation_state=state, task="calibra_random_control",
+                                     target="__block__", metric=f"random_control_{metric}",
+                                     value=float(verdict.get(metric, float("nan"))),
+                                     note=f"{verdict['status']};{verdict['statistic']}"))
+                for metric in ("median", "p95", "max", "n_exceedances", "exceedance_fraction",
+                               "real_target_median", "real_target_exceedance_fraction"):
+                    rows.append(_row(method=method, representation_state=state, task="calibra_random_control",
+                                     target="__block_fitted__", metric=f"random_control_{metric}",
+                                     value=float(verdict["fitted_direction"].get(metric, float("nan"))),
+                                     note=f"{verdict['fitted_direction']['status']};fitted_u;NOT_floor_units"))
+
             if state.startswith("rna_"):
                 rna_positive_controls.append((method, state, "after", bool(
                     np.isfinite(summary["heldout_top_cca"])
@@ -395,6 +565,11 @@ def main() -> None:
         "n_targets": int(scores.shape[1]), "target_group": args.target_group or "all_non_control",
         "recovery_fraction": 0.8, "n_jobs": args.n_jobs,
         "purity_complete_case_paired": bool(purity_by_patient),
+        "score_random_controls": bool(args.score_random_controls),
+        "n_random_control_columns": int(control_scores.shape[1]) if args.score_random_controls else 0,
+        "random_control_exceedance_ceiling": float(args.random_control_exceedance_ceiling),
+        "random_control_statistic": ("heldout_single_direction_correlation: out-of-fold ridge predictor, "
+                                     "one direction per target column, signed; same units as detection_floor"),
         "readout": "targeted_single_direction",
         "readout_note": ("recovery scored on the planted (u,v) axis, not a top-CCA maximum; "
                          "floor units are single-direction correlation and are NOT comparable "
@@ -412,6 +587,7 @@ def main() -> None:
                    "rna_positive_controls": [{"method": method, "state": state, "condition": condition, "passed": passed}
                                              for method, state, condition, passed in rna_positive_controls],
                    "rna_positive_control_passed": positive_passed,
+                   "random_control_verdicts": random_control_verdicts,
                    "gates_pass": not channel_gate_failures and (not args.require_rna_positive_control or positive_passed)}
     (output / "calibra_gates.json").write_text(json.dumps(gate_status, indent=2), encoding="utf-8")
     if args.require_channel_gates and channel_gate_failures:

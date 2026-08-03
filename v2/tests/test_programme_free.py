@@ -10,7 +10,7 @@ from morpheus.v2.runner import (_overfit_programme_only_actual,
                                 _overfit_programme_free_contrastive,
                                 _require_programme_free_overfit,
                                 _trained_states_for_profile)
-from morpheus.v2.training import V2LossSchedule, V2Trainer
+from morpheus.v2.training import PairedBiologyMemoryBank, V2LossSchedule, V2Trainer
 
 
 def _config(hidden: int = 32) -> V2ModelConfig:
@@ -162,3 +162,78 @@ def test_a_row_with_a_genuinely_missing_axis_is_still_excluded():
     real_axis = mask.any(dim=0)
     gate = mask[:, real_axis].all(dim=1)
     assert gate.tolist() == [True, True, False, True]
+
+
+def _replay_queue_alignment(*, freeze: bool, steps: int = 12) -> float:
+    """Replay ONE fixed batch; report how close the queue keys sit to that batch.
+
+    The defect this measures: with a live queue, replaying one batch overwrites
+    every slot with re-encoded copies of that batch's own states, so the InfoNCE
+    "negatives" become the queries. Returns max cosine similarity between any
+    queue key and any current batch state.
+    """
+    torch.manual_seed(11)
+    model = TumorStateV2(_config(hidden=32), programme_dim=8)
+    optimiser = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    trainer = V2Trainer(model, optimiser,
+                        V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu")
+    trainer.biology_memory = PairedBiologyMemoryBank(capacity=16)
+    trainer.prime_biology_memory([_big_batch(n=2, k=8, seed=seed) for seed in range(8)],
+                                 minimum_unique_keys=9)
+    trainer.freeze_biology_memory = freeze
+    fixed = _big_batch(n=4, k=8, seed=99)
+    for _ in range(steps):
+        optimiser.zero_grad(set_to_none=True)
+        loss, _, _ = trainer.step(fixed, epoch=1)
+        loss.backward()
+        optimiser.step()
+    with torch.no_grad():
+        current = torch.nn.functional.normalize(
+            trainer.model(fixed, view="wsi")["z_biology"].float(), dim=-1)
+        keys, _, _ = trainer.biology_memory.view()
+        return float((keys @ current.T).max())
+
+
+def test_biology_memory_refreshes_during_normal_training() -> None:
+    """The freeze flag must not change the training path: default is live."""
+    torch.manual_seed(12)
+    model = TumorStateV2(_config(hidden=32), programme_dim=8)
+    trainer = V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                        V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu")
+    assert trainer.freeze_biology_memory is False
+    trainer.prime_biology_memory([_big_batch(n=2, k=8, seed=seed) for seed in range(6)],
+                                 minimum_unique_keys=9)
+    before = trainer.biology_memory.size
+    trainer.step(_big_batch(n=4, k=8, seed=77), epoch=1)
+    assert trainer.biology_memory.size == before + 4
+
+
+def test_frozen_queue_does_not_absorb_the_replayed_batch() -> None:
+    torch.manual_seed(13)
+    model = TumorStateV2(_config(hidden=32), programme_dim=8)
+    trainer = V2Trainer(model, torch.optim.AdamW(model.parameters(), lr=1e-3),
+                        V2LossSchedule(objective_profile="programme_free", warmup_epochs=0), "cpu")
+    trainer.prime_biology_memory([_big_batch(n=2, k=8, seed=seed) for seed in range(6)],
+                                 minimum_unique_keys=9)
+    trainer.freeze_biology_memory = True
+    keys_before = trainer.biology_memory.indices[:trainer.biology_memory.size].clone()
+    states_before = trainer.biology_memory.wsi_states[:trainer.biology_memory.size].clone()
+    for _ in range(5):
+        trainer.step(_big_batch(n=4, k=8, seed=77), epoch=1)
+    size = trainer.biology_memory.size
+    assert torch.equal(trainer.biology_memory.indices[:size], keys_before)
+    assert torch.equal(trainer.biology_memory.wsi_states[:size], states_before)
+
+
+def test_a_live_queue_turns_the_replayed_batch_into_its_own_negatives() -> None:
+    """The mechanism, stated as a measurement rather than as an outcome.
+
+    Whether this is *sufficient* to pin the contrastive term at chance depends on
+    scale and on how collinear the WSI states are; it is not reproduced by a toy
+    model with random features, so this test deliberately asserts the mechanism
+    and NOT a loss improvement. The loss claim belongs to a real G2.6 run.
+    """
+    live = _replay_queue_alignment(freeze=False)
+    frozen = _replay_queue_alignment(freeze=True)
+    assert live > 0.99, f"a live queue should hold the batch's own states, got {live:.4f}"
+    assert frozen < live, f"frozen keys must stay distinct from the queries: {frozen:.4f} vs {live:.4f}"

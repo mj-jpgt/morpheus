@@ -198,6 +198,11 @@ class V2Trainer:
     biology_memory: PairedBiologyMemoryBank | None = None
     gradient_diagnostics_every: int = 25
     decorrelation_bank_capacity: int = 512
+    # Training always refreshes the queue. The G2.6 memorisation check must not:
+    # it replays ONE fixed batch, so a live queue fills with re-encoded copies of
+    # that same batch and the InfoNCE negatives track the queries they are meant
+    # to oppose. Set only by the D1 liveness gate; never during a real run.
+    freeze_biology_memory: bool = False
 
     def __post_init__(self) -> None:
         if self.programme_memory is None:
@@ -473,7 +478,8 @@ class V2Trainer:
             "variance": variance_term,
             **(programme_component_totals or {"programme": programme_total}),
         }
-        if weights.get("biology_contrastive", 0.0) and torch.is_grad_enabled() and "indices" in batch:
+        if (weights.get("biology_contrastive", 0.0) and torch.is_grad_enabled() and "indices" in batch
+                and not self.freeze_biology_memory):
             assert self.biology_memory is not None
             self.biology_memory.update(out_wsi["z_biology"], out_rna["z_biology"], batch["indices"])
         return loss, metrics, output

@@ -659,7 +659,8 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
                                         loader: UncappedHoptimusBatches, device: str,
                                         steps: int = 800, minimum_memory_keys: int = 16,
                                         overfit_patients: int = 16,
-                                        overfit_memory_capacity: int = 64) -> dict[str, object]:
+                                        overfit_memory_capacity: int = 64,
+                                        freeze_memory: bool = True) -> dict[str, object]:
     """G2.6 for D1 on a clone of the *actual* model and trainer path.
 
     This deliberately does not train post-hoc linear probes on frozen states.
@@ -712,6 +713,17 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
         priming_batches.append(raw)
         observed_ids.update(int(value) for value in raw["indices"].tolist())
     trial.prime_biology_memory(priming_batches, minimum_unique_keys=minimum_memory_keys)
+    # FREEZE the queue for the memorisation loop. Training refreshes it every
+    # step, which is correct there because every step sees new patients. Here one
+    # fixed batch is replayed, so a live queue overwrites all `capacity` slots
+    # with re-encoded copies of those same patients within `capacity/batch` steps:
+    # the negatives then move with the queries and the contrastive term cannot
+    # descend. Measured pinned at chance (4.27 vs ln(80)=4.38) across four
+    # unrelated interventions. Frozen, the keys stay real held-out train patients
+    # from the priming batches, and the queue's gradient path is still exercised.
+    # `freeze_memory=False` exists only so the two arms can be measured against
+    # each other on real data; the gate itself always runs frozen.
+    trial.freeze_biology_memory = freeze_memory
     try:
         fixed_batch = next(iterator)
     except StopIteration:
@@ -759,6 +771,7 @@ def _overfit_programme_free_contrastive(model: TumorStateV2, schedule: V2LossSch
     return {
         "batch_patients": int(len(fixed_batch["indices"])),
         "memory_unique_keys": int(trial.biology_memory.unique_count if trial.biology_memory else 0),
+        "memory_frozen": bool(trial.freeze_biology_memory),
         "initial_loss": initial_value, "final_loss": final_value,
         "initial_biology_contrastive": float(initial_metrics.get("biology_contrastive", float("nan"))),
         "final_biology_contrastive": float(final_metrics.get("biology_contrastive", float("nan"))),
