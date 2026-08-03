@@ -437,8 +437,14 @@ Three design sizes appear in this paper and must not be conflated:
 | 109-column ("anchor") | 109 | cancer + `tss_pool10` | n = 500–6,427 | §4.6, §4.7 (Track 2 sweep) |
 
 *Provenance: `PHASE1_RESULT.md` (99); `TRACK1_NEGATIVE_CONTROLS.md` header and `DILUTION_LOWER_BOUND.md`
-§1 (108); `TRACK2_INDUCED_CORRELATION.md` §4 (109). The 99- and 109-column designs differ by cohort
-and by the number of sites surviving pooling at the respective n; the pooling rule is identical.*
+§1 (108); `TRACK2_INDUCED_CORRELATION.md` §4 (109). The three designs differ by cohort and by the
+number of sites surviving pooling at the respective n and partition; the pooling rule
+(`min_site_count = 10`) is identical throughout. Two further bookkeeping differences are recorded
+rather than hidden: the earlier n = 2,530 configuration holds out 21 test cancers against **14**
+development cancers, while the maximal split holds out 21 against **11**, so the two cohorts are not
+nested; and the site-dummy counts (75 / 84 / 76) differ because they are computed on different
+partitions. No result in this paper compares a number from one design directly against a number from
+another.*
 
 ### 3.3 Channel statistic and its null — `v2/calibra/run_calibra.py`
 
