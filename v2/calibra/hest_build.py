@@ -194,31 +194,42 @@ def _embed_windows(slide, corners, crop_px, render_patch, model, transform, torc
                    device: str, batch_size: int, readers: int = 12) -> np.ndarray:
     """Embed one slide's windows, overlapping slide I/O with GPU work.
 
-    Reading a 744x744 level-0 region off NFS costs ~155 ms cold, so a serial loop is
-    I/O-bound at ~6 spots/s -- six hours for this cohort.  ``openslide_read_region`` is
-    thread-safe and releases the GIL, so the reads are issued from a small thread pool while
-    the GPU works on the previous batch.  Patch order is preserved, so the embedding rows
-    still line up with ``corners``.
+    Two things had to move off the main thread, both measured on the box:
+
+    * Reading a 744x744 level-0 region off NFS costs ~155 ms cold, so a serial loop is
+      I/O-bound at ~6 spots/s -- six hours for this cohort.
+    * The timm transform (resize, centre crop, ``to_tensor``, ``normalize``) is pure CPU and
+      cost more wall time than the GPU forward did: py-spy caught the main thread inside
+      ``to_tensor``/``normalize`` in 5 of 6 samples while all twelve reader threads sat idle.
+
+    So the workers now render *and* transform, and the main thread only stacks and runs the
+    model.  ``openslide_read_region`` is thread-safe and both PIL and torch release the GIL
+    for the heavy parts.  This changes no numerics: the same transform is applied to the same
+    patches in the same order, and patch order is preserved so embedding rows still line up
+    with ``corners``.
     """
     from concurrent.futures import ThreadPoolExecutor
+
+    def prepare(corner):
+        image = render_patch(slide, int(corner[0]), int(corner[1]), crop_px)
+        return transform(image)
 
     out = []
     with ThreadPoolExecutor(max_workers=readers) as pool:
         pending = None
         for start in range(0, len(corners), batch_size):
-            chunk = corners[start:start + batch_size]
-            future = pool.map(lambda c: render_patch(slide, int(c[0]), int(c[1]), crop_px), chunk)
+            future = pool.map(prepare, corners[start:start + batch_size])
             if pending is not None:
-                out.append(_forward(model, transform, torch, list(pending), device))
+                out.append(_forward(model, torch, list(pending), device))
             pending = future
         if pending is not None:
-            out.append(_forward(model, transform, torch, list(pending), device))
+            out.append(_forward(model, torch, list(pending), device))
     return np.concatenate(out, axis=0).astype(np.float32) if out else np.zeros((0, EMBED_DIM), np.float32)
 
 
-def _forward(model, transform, torch, images, device: str) -> np.ndarray:
+def _forward(model, torch, tensors, device: str) -> np.ndarray:
     """One H-Optimus-0 batch, in exactly the precision the TCGA store used."""
-    batch = torch.stack([transform(im) for im in images]).to(device)
+    batch = torch.stack(tensors).to(device)
     with torch.inference_mode(), torch.autocast("cuda", dtype=torch.float16,
                                                 enabled=device.startswith("cuda")):
         values = model(batch)

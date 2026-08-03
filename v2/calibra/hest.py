@@ -55,6 +55,15 @@ VISIUM_SPOT_PITCH_UM = 100.0
 EMBED_DIM = 1536
 RANDOM_CONTROL_PREFIX = "RANDOM_CONTROL__"
 
+# H-Optimus-0's own timm ``pretrained_cfg``: 224 px input at crop_pct 0.875, crop_mode
+# "center".  ``create_transform`` therefore resizes our 256 px patch (a no-op) and then
+# CENTRE-CROPS it to 224.  The encoder consequently sees 128 * 224/256 = 112 um, not the
+# 128 um we cut.  This applies identically to all 271,710 TCGA patches -- the same transform
+# is resolved from the same cfg -- so comparability is unaffected, but the physical field
+# under analysis is 112 um and saying "128 um" without this footnote overstates it by 14%.
+HOPTIMUS_CROP_PCT = 0.875
+HOPTIMUS_INPUT_PX = 224
+
 
 class HestAdapterError(ValueError):
     pass
@@ -62,12 +71,22 @@ class HestAdapterError(ValueError):
 
 # --- geometry: spot -> protocol-matched window ----------------------------------------
 
+def effective_fov_microns(fov_microns: float = FOV_MICRONS,
+                          crop_pct: float = HOPTIMUS_CROP_PCT) -> float:
+    """The field the encoder actually sees, after its own centre crop: 128 -> 112 um."""
+    if not 0 < crop_pct <= 1:
+        raise HestAdapterError("crop_pct must lie in (0, 1]")
+    return float(fov_microns * crop_pct)
+
+
 def window_area_ratio(fov_microns: float = FOV_MICRONS,
                       spot_diameter_um: float = VISIUM_SPOT_DIAMETER_UM) -> float:
     """How many times more tissue the image window sees than the assay did.
 
     The square 128 um window against the circular 55 um spot: 16384 / 2375.8 = 6.90.
-    Reported in the artifact manifest so no downstream reader can forget it.
+    After H-Optimus-0's own centre crop the encoder sees 112 um, i.e. 5.28x -- use
+    ``effective_fov_microns()`` for the number that describes what the model was shown.
+    Both are reported in the artifact manifest so no downstream reader can forget them.
     """
     if fov_microns <= 0 or spot_diameter_um <= 0:
         raise HestAdapterError("field of view and spot diameter must be positive")
@@ -322,6 +341,9 @@ def write_spatial_artifact(output: str | Path, *, spot_ids: Sequence[str], cance
     cfg.setdefault("output_px", OUTPUT_PX)
     cfg.setdefault("spot_diameter_um", VISIUM_SPOT_DIAMETER_UM)
     cfg.setdefault("window_area_ratio", round(window_area_ratio(), 4))
+    cfg.setdefault("effective_fov_microns", round(effective_fov_microns(), 4))
+    cfg.setdefault("effective_window_area_ratio",
+                   round(window_area_ratio(effective_fov_microns()), 4))
     cfg.setdefault("unit_of_analysis", "visium_spot")
     manifest = {
         "artifact_version": ARTIFACT_VERSION, "method": "hest_spatial", "trained_states": trained.tolist(),

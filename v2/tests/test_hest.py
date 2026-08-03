@@ -14,7 +14,8 @@ import numpy as np
 
 from morpheus.v2.calibra.hest import (FOV_MICRONS, OUTPUT_PX, VISIUM_SPOT_DIAMETER_UM,
                                       HestAdapterError, cohort_classifier_auc, crop_pixels,
-                                      normalise_expression, per_slide_mean_baseline, pooled_r,
+                                      effective_fov_microns, normalise_expression,
+                                      per_slide_mean_baseline, pooled_r,
                                       select_target_genes, slide_grouped_split, spot_windows,
                                       usable_spots, within_slide_r, window_area_ratio,
                                       write_spatial_artifact, write_spatial_targets)
@@ -52,6 +53,21 @@ def test_window_area_ratio_is_the_documented_cost():
     assert abs(ratio - 6.90) < 0.01, f"documented cost drifted: {ratio}"
     # Matching the spot instead of the protocol would be 1.0 by definition.
     assert abs(window_area_ratio(VISIUM_SPOT_DIAMETER_UM, VISIUM_SPOT_DIAMETER_UM) - 4 / np.pi) < 1e-9
+
+
+def test_effective_field_accounts_for_the_encoder_centre_crop():
+    """H-Optimus-0's own pretrained_cfg is 224 px at crop_pct 0.875, so create_transform
+    centre-crops our 256 px patch to 224 and the encoder sees 112 um, not 128.  Identical for
+    the TCGA store, so comparability holds -- but the analysed field is 112 um."""
+    assert abs(effective_fov_microns() - 112.0) < 1e-9
+    assert abs(window_area_ratio(effective_fov_microns()) - 5.28) < 0.01
+    assert effective_fov_microns(crop_pct=1.0) == FOV_MICRONS
+    for bad in (0.0, -0.5, 1.5):
+        try:
+            effective_fov_microns(crop_pct=bad)
+        except HestAdapterError:
+            continue
+        raise AssertionError(f"crop_pct={bad} should have raised")
 
 
 def test_crop_pixels_is_magnification_invariant_in_microns():
