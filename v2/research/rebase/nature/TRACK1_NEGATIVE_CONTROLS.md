@@ -227,12 +227,64 @@ out **whole cancers**, so every test patient receives the global training mean a
 constant on the evaluated partition. That is a property of the split, not a bug; the comparison is only
 meaningful on `--partition all` and is recorded as such.
 
-Scoring of the baseline blocks through the identical instrument (`--partition test`, 500 permutations,
-16 draws — these are `GateLedger.observe` comparisons, not validity gates, so the 2,000-permutation
-requirement that binds the must-FAIL controls does not bind here) was **still running when this
-document was written**; partial result at the time of writing, d2_h `wsi_biology`: PBS block adjusted
-top-CCA **0.5504** with induced baseline 0.0642, against the frozen-RNA block's 0.6052 with induced
-baseline 0.1062. The full table lands in `p1_evidence/track1/calibra_{pbs,randdict,pca,pbsshuf1}/`.
+All four blocks were scored through the identical instrument (`--partition test --levels
+0.0,0.05,0.10,0.20,0.40 --n-draws 16 --n-components 16 --n-permutations 500 --seed 42`; these are
+`GateLedger.observe` comparisons, not validity gates, so the 2,000-permutation requirement binding the
+must-FAIL controls does not bind here), and **every difference carries a 400-draw paired bootstrap CI**
+— PBS and the baseline scored on the *same* resample, so the CI is on the difference.
+
+**Held-out top-CCA, PBS minus baseline:**
+
+| artifact | state | baseline | PBS | baseline | difference | CI95 | verdict |
+|---|---|---|---:|---:|---:|---|---|
+| d2_h | **wsi_biology** | random dictionary | 0.5032 | 0.4551 | +0.0481 | [−0.0177, +0.0693] | TIE |
+| d2_h | **wsi_biology** | **PCA basis** | 0.5032 | **0.5520** | **−0.0488** | **[−0.0734, −0.0183]** | **BASELINE WINS** |
+| d2_h | **wsi_biology** | shuffled labels (s1) | 0.5032 | 0.5146 | −0.0114 | [−0.0601, +0.0445] | TIE |
+| d2_h | **wsi_biology** | shuffled labels (s2) | 0.5032 | 0.5187 | −0.0155 | [−0.0561, +0.0318] | TIE |
+| d2_h | full_biology | random dictionary | 0.8417 | 0.8102 | +0.0315 | [+0.0241, +0.0653] | PBS wins |
+| d2_h | full_biology | **PCA basis** | 0.8417 | **0.8776** | **−0.0359** | **[−0.0483, −0.0236]** | **BASELINE WINS** |
+| d2_h | full_biology | shuffled labels (s1) | 0.8417 | 0.8140 | +0.0277 | [+0.0197, +0.0660] | PBS wins |
+| d2_h | full_biology | shuffled labels (s2) | 0.8417 | 0.8085 | +0.0332 | [+0.0116, +0.0632] | PBS wins |
+| d2_i | **wsi_biology** | random dictionary | 0.4605 | 0.4108 | +0.0497 | [+0.0251, +0.1372] | PBS wins |
+| d2_i | **wsi_biology** | **PCA basis** | 0.4605 | 0.4905 | −0.0300 | [−0.0429, +0.0053] | TIE |
+| d2_i | **wsi_biology** | shuffled labels (s1) | 0.4605 | 0.4245 | +0.0360 | [+0.0111, +0.0926] | PBS wins |
+| d2_i | **wsi_biology** | shuffled labels (s2) | 0.4605 | 0.4317 | +0.0288 | [−0.0030, +0.0887] | TIE |
+| d2_i | full_biology | random dictionary | 0.8634 | 0.8487 | +0.0147 | [−0.0004, +0.0283] | TIE |
+| d2_i | full_biology | **PCA basis** | 0.8634 | **0.8714** | **−0.0080** | **[−0.0233, −0.0001]** | **BASELINE WINS (marginal)** |
+| d2_i | full_biology | shuffled labels (s1) | 0.8634 | 0.8408 | +0.0227 | [−0.0029, +0.0288] | TIE |
+| d2_i | full_biology | shuffled labels (s2) | 0.8634 | 0.8374 | +0.0260 | [+0.0057, +0.0383] | PBS wins |
+
+Reading down the three opponents:
+
+* **vs. size- and spectrum-matched random dictionary** — PBS wins 2/4, ties 2/4, **never loses**.
+* **vs. gene-label-shuffled PBS** — PBS wins 3/8, ties 5/8, **never loses**.
+* **vs. ordinary PCA of the same expression matrix** — **PBS loses 3/4 with a CI excluding zero and ties
+  the fourth. It never wins.**
+
+**This is the deflationary result T1.1 was designed to force.** The PCA basis is fit on development rows
+only, through the same transform PBS uses, and is capacity-matched at 128 columns, so neither leak nor
+capacity explains it. The claim "interventional coordinates are legible in a way generic decompositions
+are not" is contradicted by the strongest available comparison, with a CI. What survives is the much
+weaker "interventional coordinates beat *random* projections of the same expression matrix" — which PCA
+also satisfies.
+
+**A readout dependence that qualifies §T1.5.** At `n_components = 32` with a 500-draw bootstrap the
+gene-label-shuffled block was indistinguishable from PBS on all three shuffle draws. At
+`n_components = 16` here, PBS beats it on 3 of 8 draws with a CI excluding zero. The defensible
+statement is therefore *the shuffle costs the dictionary little and sometimes nothing, never more than a
+few hundredths of a CCA* — still enough to void gene-level attribution, but not the flat tie the
+n=32 readout alone suggested. Both readouts are reported; neither is selected after the fact.
+
+Block-level context (adjusted top-CCA, and the same value minus the ~0.147 permutation null median):
+
+| block | d2_h wsi_biology | above null | d2_i wsi_biology | above null | induced baseline (d2_h) |
+|---|---:|---:|---:|---:|---:|
+| curated pathway, 82 cols | 0.6052 | 0.4569 | 0.4703 | 0.3231 | 0.1062 |
+| PBS, 128 | 0.5504 | 0.4050 | 0.5217 | 0.3730 | 0.0705 |
+| random dictionary, 128 | 0.5226 | 0.3761 | 0.4415 | 0.2919 | 0.0806 |
+
+The induced baseline differs by block, which is itself a Track 2 confirmation: blocks whose coordinates
+the confound design explains less produce less induced correlation.
 
 ## T1.8 — the ledger
 
