@@ -21,10 +21,11 @@ from pathlib import Path
 
 import numpy as np
 
-from .hest import (EMBED_DIM, FOV_MICRONS, OUTPUT_PX, HestAdapterError, _atomic_savez, crop_pixels,
-                   normalise_expression, per_slide_mean_baseline, pooled_r, select_target_genes,
-                   slide_grouped_split, spot_windows, usable_spots, within_slide_r,
-                   window_area_ratio, write_spatial_artifact, write_spatial_targets)
+from .hest import (EMBED_DIM, FOV_MICRONS, OUTPUT_PX, HestAdapterError, _atomic_savez,
+                   cohort_classifier_auc, crop_pixels, normalise_expression,
+                   per_slide_mean_baseline, pooled_r, select_target_genes, slide_grouped_split,
+                   spot_windows, usable_spots, within_slide_r, window_area_ratio,
+                   write_spatial_artifact, write_spatial_targets)
 
 
 def _render_patch():
@@ -378,8 +379,12 @@ def stage_cohort_control(args) -> None:
 
     with h5py.File(args.tcga_store, "r") as handle:
         store = handle["embeddings"]
+        # h5py fancy indexing needs sorted indices, but the store is ordered by
+        # patient/slide, so the two halves of a sorted draw are DIFFERENT PATIENTS and the
+        # "null" would measure patient identity rather than chance.  Shuffle after reading.
         pick = np.sort(rng.choice(store.shape[0], size=2 * n, replace=False))
         tcga = store[pick, :].astype(np.float32)
+    tcga = tcga[rng.permutation(len(tcga))]
     tcga = tcga / np.maximum(np.linalg.norm(tcga, axis=1, keepdims=True), 1e-8)
 
     cross = cohort_classifier_auc(tcga[:n], hest, seed=args.seed)
