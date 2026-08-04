@@ -33,7 +33,8 @@ from morpheus.v2.calibra.spectral import (heldout_single_direction_correlation, 
 LEVELS = (0.0, 0.01, 0.02, 0.03, 0.05, 0.075, 0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60)
 
 
-def make_cohort(n: int, p: int, q: int, n_sites: int, rng: np.random.Generator):
+def make_cohort(n: int, p: int, q: int, n_sites: int, rng: np.random.Generator,
+                confound: float = 1.5):
     """X, Y, design, strata with a confound that acts on BOTH modalities.
 
     The confound matters: the whole reason the floor is not zero is that
@@ -49,8 +50,8 @@ def make_cohort(n: int, p: int, q: int, n_sites: int, rng: np.random.Generator):
     site_y = rng.normal(size=(n_sites, q))
     cancer_x = rng.normal(size=(5, p))
     cancer_y = rng.normal(size=(5, q))
-    x = rng.normal(size=(n, p)) + 1.5 * site_x[site] + 1.5 * cancer_x[cancer]
-    y = rng.normal(size=(n, q)) + 1.5 * site_y[site] + 1.5 * cancer_y[cancer]
+    x = rng.normal(size=(n, p)) + confound * site_x[site] + confound * cancer_x[cancer]
+    y = rng.normal(size=(n, q)) + confound * site_y[site] + confound * cancer_y[cancer]
     return x, y, design, cancer
 
 
@@ -66,9 +67,10 @@ def plant(x, y, rho: float, seed: int, negative: bool):
 
 
 def case(name: str, *, n: int, p: int, q: int, rho: float, negative: bool, seed: int,
-         n_draws: int, n_components: int, n_jobs: int, n_sites: int = 20) -> dict:
+         n_draws: int, n_components: int, n_jobs: int, n_sites: int = 20,
+         confound: float = 1.5) -> dict:
     rng = np.random.default_rng(seed)
-    x, y, design, strata = make_cohort(n, p, q, n_sites, rng)
+    x, y, design, strata = make_cohort(n, p, q, n_sites, rng, confound=confound)
     y_real, u0, v0 = plant(x, y, rho, seed, negative)
 
     curve = spike_recovery_curve(x, y_real, design, levels=LEVELS, n_draws=n_draws,
@@ -101,7 +103,7 @@ def case(name: str, *, n: int, p: int, q: int, rho: float, negative: bool, seed:
 
     matched = summary["observed_matched_direction"]
     return {
-        "case": name, "n": n, "p": p, "q": q, "seed": seed,
+        "case": name, "n": n, "p": p, "q": q, "seed": seed, "confound": confound,
         "planted_rho": rho, "negative": negative,
         "detection_floor": floor,
         "transmission_floor": summary["transmission_floor"],
@@ -179,6 +181,33 @@ def main() -> None:
             "detection_floor", "truth_planted_direction_abs",
             "shipped_observed_above_floor", "corrected_flag_truth_direction",
             "corrected_flag_heldout")}), flush=True)
+
+    # --- B1: the PAIRED sign test. Same seed, same cohort, same planted magnitude,
+    # sign of the association reflected. Anything that differs between the two rows
+    # is a sign defect and nothing else.
+    for seed in range(args.seed, args.seed + 4):
+        for negative in (False, True):
+            results.append(case(f"I_signpair_seed{seed}_{'neg' if negative else 'pos'}",
+                                n=args.n, p=1, q=1, rho=0.60, negative=negative, seed=seed,
+                                n_draws=args.n_draws, n_components=1, n_jobs=args.n_jobs))
+            print(f"[I seed={seed} {'neg' if negative else 'pos'}] " + json.dumps({
+                k: results[-1][k] for k in (
+                    "detection_floor", "truth_planted_direction_abs", "truth_over_floor",
+                    "shipped_observed_matched_direction", "shipped_observed_above_floor",
+                    "corrected_flag_truth_direction")}), flush=True)
+
+    # --- B2: a MILD confound lowers the induced baseline and hence the floor, which is
+    # what makes a truth/floor ratio of 10x reachable at all. Same code path throughout.
+    for rho in (0.0, 0.2, 0.4, 0.6, 0.8):
+        results.append(case(f"J_mild_confound_rho{rho:g}", n=args.n, p=16, q=16, rho=rho,
+                            negative=False, seed=args.seed, n_draws=args.n_draws,
+                            n_components=args.n_components, n_jobs=args.n_jobs, confound=0.25))
+        print(f"[J rho={rho:g}] " + json.dumps({k: results[-1][k] for k in (
+            "detection_floor", "confound_induced_baseline", "truth_planted_direction_abs",
+            "truth_over_floor", "shipped_observed_matched_direction",
+            "shipped_observed_above_floor", "corrected_flag_truth_direction",
+            "heldout_top_cca", "corrected_flag_heldout",
+            "G1_heldout_top_cca_pairing_destroyed", "G1_clears")}), flush=True)
 
     Path(args.out).write_text(json.dumps(results, indent=2))
     print(f"[written] {args.out} ({len(results)} cases)", flush=True)
