@@ -301,9 +301,81 @@ discharged.
 
 ---
 
-### 8. Breadth, the forest null, and what did not run
+### 8. Breadth: ten more artifacts, including all six D1-B
 
-*(filled by the amendment commit that follows)*
+Predeclared as "no thresholds attached, reported for breadth": the remaining `d2_v3` artifacts (seeds
+43, 44) and the six D1-B artifacts `~/e0_run/d1_v2/artifacts/d1_{p,f}_seed4{2,3,4}.npz`, state
+`wsi_biology`, partition `test`, arms `raw` and `adjusted`, **k ∈ {5, 15} only** (plain and
+prior-corrected), 200 permutations, both nulls. Because the sweep is truncated these are **lower
+bounds** on max-over-k: at the anchor the maximum often sat at k = 1 or k = 3.
+
+**Adjusted arms, k-NN max over the truncated grid, as a multiple of chance.** Every global *p* below
+is 0.0050, the floor.
+
+| artifact | site × chance | site within-cancer *p* | cancer × chance |
+|---|---:|---:|---:|
+| d2_h_seed43 | 4.42 | 0.0746 | 4.56 |
+| d2_h_seed44 | 4.32 | 0.0348 | 4.13 |
+| d2_i_seed43 | 3.23 | 0.1493 | 3.27 |
+| d2_i_seed44 | **5.20** | 0.0050 | 4.28 |
+| d1_p_seed42 | 2.69 | 0.5970 | 3.47 |
+| d1_p_seed43 | 3.52 | 0.0597 | 3.55 |
+| d1_p_seed44 | 4.23 | 0.0846 | 4.11 |
+| **d1_f_seed42** | **6.21** | 0.0050 | **5.82** |
+| **d1_f_seed43** | **6.67** | 0.0100 | 4.98 |
+| **d1_f_seed44** | **7.38** | 0.0050 | **6.69** |
+
+Raw arms for the same blocks read 6.33–13.18× (site) and 6.72–9.71× (cancer), so the probe has power
+everywhere.
+
+Three things in this table matter.
+
+1. **Four of these twenty adjusted readings exceed 5× chance**, up to **7.38×** — on a truncated k grid
+   and therefore understated. These blocks carry no predeclared threshold (the bands were scoped to the
+   anchor), so they do not change the band verdict; they do show the anchor is not the worst case.
+2. **D1-B `programme_free` (`d1_f`) is the worst of the twelve artifacts on both confounders**, and it
+   is the artifact whose *raw* certificate looks best: its raw joint LDA for site is 0.1071–0.1449
+   against `d1_p`'s 0.1778–0.3764 and `d2_i_seed43`'s 0.4735. **A low raw joint LDA does not predict a
+   low post-adjustment nonlinear reading — on this cohort it anti-predicts it.** That is a direct
+   argument against using the certificate's joint row as a proxy for "how confounded is this
+   representation".
+3. **The within-cancer *p* column shows the §4 decomposition holding across artifacts**: on five of the
+   ten blocks the adjusted site reading is *not* significant against the within-cancer null
+   (*p* = 0.06–0.60) while every one is at the floor against the global null. Where site survives
+   beyond cancer it does so weakly; what survives strongly is cancer.
+
+**The declared 32-class arm.** `--partition all`, cancer target, 32 classes, chance 0.03125,
+`runs/d2_final/artifacts/`, 100 permutations, global null (*p* floor 0.0099), k ∈ {1, 5, 15, 50}:
+
+| artifact | arm | joint LDA | kNN max | × chance | global p95 | global *p* |
+|---|---|---:|---:|---:|---:|---:|
+| d2_h | raw | 0.6129 | 0.4145 | 13.26 | 0.0404 | 0.0099 |
+| d2_h | adjusted | 0.0412 | 0.1865 | **5.97** | 0.0381 | 0.0099 |
+| d2_h | adjusted, standardised | 0.0396 | 0.1997 | **6.39** | 0.0371 | 0.0099 |
+| d2_i | raw | 0.4426 | 0.3556 | 11.38 | 0.0405 | 0.0099 |
+| d2_i | adjusted | 0.0278 | 0.1543 | **4.94** | 0.0392 | 0.0099 |
+| d2_i | adjusted, standardised | 0.0281 | 0.1592 | **5.09** | 0.0370 | 0.0099 |
+
+**Caveat stated with the number:** `--partition all` includes the 3,118 training patients, so this arm
+is in-distribution and is not a held-out measurement. It is reported because the 32-class figure was
+declared in advance and because the project's framing quotes 32 classes; it is **not** used for any
+verdict. The held-out 21-class arm in §3 is.
+
+### 8b. What did not run, and why
+
+* **The random forest's permutation null** is the one declared item whose cost defeated it: 126.7 s
+  (raw) / 245.9 s (adjusted) per out-of-fold fit at n = 2,766 with 85 classes, against 0.1 s for the
+  k-NN and 11.5–15.5 s for the SVM. Its declared 100 permutations were cut to the predeclared floor of
+  50 and its block set was reduced to `d2_h_seed42` `wsi_biology`, both targets, `raw` and
+  `adjusted_standardised` — see §5 and the amendment note below. The forest's **observed** values are
+  reported in §5 without a null wherever the null did not finish, and are labelled as such.
+* **The other two states** (`full_biology`, `rna_biology`) were run only through `certify_axes`'
+  published numbers, not through the probe: the probe grid was spent on `wsi_biology` (the image-only
+  channel, which is what §4.2 headlines) across twelve artifacts rather than on three states of two.
+  Nothing about the estimator argument is state-specific, but the measurement for those two states on
+  TCGA is **not made here** and should not be assumed from `wsi_biology`.
+* **`min_site_count`** was left at the project default of 10 throughout; no sensitivity sweep on the
+  pooling threshold was run.
 
 ---
 
