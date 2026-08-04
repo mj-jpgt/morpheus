@@ -29,6 +29,36 @@ parser.add_argument("--skip-readouts", action="store_true")
 args = parser.parse_args()
 
 ROOT = Path(args.run_root).resolve()
+
+
+def _require_resolves(path: Path, what: str, expect_children: tuple = ()) -> Path:
+    """Fail LOUDLY when a path does not resolve, instead of reporting an absence.
+
+    The failure this exists for: `d1_audit` took its run root on faith. Pointed at
+    a directory that did not exist, or at the wrong run, every `TRAIN_SUCCESS.json`
+    probe returned False and A1 reported "the run is incomplete" -- which reads as
+    a measurement ("I looked, the runs are not done") when the truth is a lookup
+    error ("I looked in the wrong place"). It hid a completed D1 paired bootstrap
+    for a day while the draft carried [PENDING] cells for the paper's most
+    load-bearing negative result.
+
+    Same shape as a mistyped metrics key returning `[]`, and an idle-check that
+    fired in the gap between two stages: a read that says "nothing here" when it
+    should say "I failed to look". Distinguishing *measured nothing* from *failed
+    to measure* is cheap once you know to.
+    """
+    if not path.exists():
+        raise SystemExit(f"PATH ERROR, not an empty result -- nothing was measured. "
+                         f"{what} does not exist: {path}")
+    if expect_children and not path.is_dir():
+        raise SystemExit(f"PATH ERROR: {what} is not a directory: {path}")
+    for child in expect_children:
+        if not any(path.glob(child)):
+            found = sorted(item.name for item in path.iterdir())[:12]
+            raise SystemExit(f"PATH ERROR: {what} exists but contains no {child!r}: {path}. "
+                             f"Refusing to report an absence that is really a wrong-directory "
+                             f"error. Contents: {found}")
+    return path
 SKIP = args.skip_readouts
 TARGETS = Path(args.targets).resolve()
 REPO = Path(args.repo).resolve()
@@ -44,6 +74,16 @@ def check(name: str, passed: bool, detail: object) -> None:
     if not passed:
         FAIL.append(name)
 
+
+_require_resolves(ROOT, "run root", expect_children=("d1_*_seed*",))
+if not TARGETS.is_file():
+    raise SystemExit(f"PATH ERROR, not an empty result: targets file does not exist: {TARGETS}")
+# REPO is only the cwd for the d2_compare subprocess; the package is normally
+# reached via PYTHONPATH, and `.resolve()` follows a `<ws>/morpheus` symlink so
+# the parent may legitimately contain no directory of that name. Require it to
+# exist and no more -- an assertion that fires on a correct layout is worse than
+# none, because it trains the reader to ignore it.
+_require_resolves(REPO, "repo / subprocess working directory")
 
 # ---------------------------------------------------------------- A1 completeness
 runs = {f"d1_{a}_seed{s}": ROOT / f"d1_{a}_seed{s}" for s in SEEDS for a in ("p", "f")}
@@ -67,7 +107,7 @@ if FAIL:
                      "Do not compare incomplete arms.")
 
 # ---------------------------------------------------------------- A2/A3 readouts
-arts = ROOT / "artifacts"
+arts = _require_resolves(ROOT / "artifacts", "artifacts directory", expect_children=("*.npz",))
 P = [str(arts / f"d1_p_seed{s}.npz") for s in SEEDS]
 F = [str(arts / f"d1_f_seed{s}.npz") for s in SEEDS]
 readouts = {
