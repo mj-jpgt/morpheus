@@ -149,12 +149,13 @@ def test_indexed_cca_is_near_zero_on_unpaired_noise():
 
 
 def test_indexed_cca_recovers_a_planted_signal():
+    """Paired against the noise case above: the same estimator, an unambiguous plant."""
     rng = np.random.default_rng(3)
-    shared = rng.normal(size=(400, 1))
+    shared = 2.0 * rng.normal(size=(400, 1))
     x = np.hstack([shared, rng.normal(size=(400, 9))])
     y = np.hstack([shared, rng.normal(size=(400, 5))])
     value = heldout_top_cca_indexed(x, y, np.arange(200), np.arange(200, 400), n_components=5)
-    assert value > 0.8
+    assert value > 0.85
 
 
 def test_too_small_a_split_is_unavailable_not_wrong():
