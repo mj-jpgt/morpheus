@@ -365,10 +365,12 @@ def main() -> None:
                 "FAILS TO REPLICATE": "p>=0.01 or R<0.30"},
         "predeclared_in": "NOTEBOOK_ENTRIES/PREDECLARED_alchemist_external_replication_20260804T1830Z.md",
     }
-    (output / "alchemist_channel.json").write_text(json.dumps(report, indent=2, default=str))
     mapped = arms["alchemist_mapped_to_tcga_lung_codes"]
     report["verdict"]["R_under_mapped_labels"] = (
         float(mapped["excess_over_null_median"] / denominator) if denominator > 0 else float("nan"))
+    # Written last, so everything computed above is actually in the artifact. The first run
+    # dumped the JSON before this line and the label-sensitivity ratio existed only in stdout.
+    (output / "alchemist_channel.json").write_text(json.dumps(report, indent=2, default=str))
     print(f"\n[VERDICT] R={ratio:.3f}  p={p:.4f}  ->  {verdict}", flush=True)
     print(f"[label sensitivity] R under the declared LUAD/LUSC/OTHER mapping = "
           f"{report['verdict']['R_under_mapped_labels']:.3f} "
