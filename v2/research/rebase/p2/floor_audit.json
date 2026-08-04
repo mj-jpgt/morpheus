@@ -1,0 +1,1829 @@
+{
+ "_": "The floor audit behind paper/P2_RANK_DRAFT.md 4.1a. Every rank comparison the paper makes or relies on, each judged against the floor measured on ITS OWN block. Owned and checked by v2/research/rebase/p2/p2_floor_audit.py; the draft's table is rendered from this file and asserted against it by v2/tests/test_p2_floor_audit.py. Nothing here is computed: every value is read back out of the source named in its `src` block.",
+ "floors": {
+  "R1_residualised_export": {
+   "value": 3.295,
+   "statistic": "R1",
+   "block": "residualised",
+   "n": 5,
+   "what": "five identical `programme_only` retrains at seed 42, GPU non-determinism the only source of variation; §4.1",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "extracted/F1_RETRAINING_REPEAT.json",
+     "path": "printed_spread.rank_residualised.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "extracted/F1_RETRAINING_REPEAT.json",
+     "path": "printed_spread.rank_residualised.min"
+    }
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm, and same-seed repeats exclude seed variation entirely — and BIMODAL, not a spread"
+  },
+  "R1_raw_export": {
+   "value": 3.111,
+   "statistic": "R1",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five retrains, read on the raw exported block; §4.1",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "extracted/F1_RETRAINING_REPEAT.json",
+     "path": "printed_spread.rank_raw.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "extracted/F1_RETRAINING_REPEAT.json",
+     "path": "printed_spread.rank_raw.min"
+    }
+   },
+   "caveat": "as above"
+  },
+  "within_arm_seed_band": {
+   "low": 2.1,
+   "high": 3.75,
+   "statistic": "R1",
+   "block": "residualised",
+   "what": "§4.2's within-arm fold across three seeds, over the four arms: 3.15× / 3.75× / 2.64× / 2.10×. It governs any comparison that varies the SEED",
+   "caveat": "four arms, three seeds each, eight within-arm degrees of freedom"
+  }
+ },
+ "statistics_with_no_measured_floor": [
+  "R2",
+  "R3",
+  "PR",
+  "PR_rownorm",
+  "RankMe as published",
+  "participation ratio",
+  "stable rank",
+  "α-ReQ |α−1|",
+  "LiDAR",
+  "hard numerical matrix rank"
+ ],
+ "blocks_with_no_measured_floor": [
+  "fixed held-out probe (256 patients)",
+  "training batch, in-run",
+  "16-patient gate batch",
+  "282 held-out patients (live checkpoint)",
+  "`rna_biology` view",
+  "`full_biology` view"
+ ],
+ "known_source_disagreements": [
+  {
+   "where": "paper/P2_RANK_DRAFT.md §5.2 and paper/QUEUE_ANCHORING.md",
+   "claim": "the momentum effect is “2.6–3.3× at every step past 150”",
+   "source_says": "the section's own table gives 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600) — a range of 2.208–3.596× — and 4.343× at step 100",
+   "action": "REPORTED, NOT SUBSTITUTED. §5 is another agent's section. Neither the prose range nor a replacement is used anywhere in this audit; the step-400 row quotes the table."
+  }
+ ],
+ "comparisons": [
+  {
+   "id": "§4.1-d2-seed-44-—-a",
+   "section": "§4.1",
+   "comparison": "D2 seed 44 — arm H against arm I",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 9.142598,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.H44.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 9.105243,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.I44.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — the section states it: the difference is not resolvable.",
+   "clears": false,
+   "ratio": 1.0041,
+   "value_digits": 3
+  },
+  {
+   "id": "§4.1-d2-seed-43-—-a",
+   "section": "§4.1",
+   "comparison": "D2 seed 43 — arm H against arm I",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 28.771472,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.H43.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 34.116761,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.I43.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — the section states it: the difference is not resolvable.",
+   "clears": false,
+   "ratio": 1.1858,
+   "value_digits": 3
+  },
+  {
+   "id": "§4.1-d2-seed-42-—-a",
+   "section": "§4.1",
+   "comparison": "D2 seed 42 — arm H against arm I",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 23.386803,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.H42.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 14.86753,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.I42.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — the section states it: the difference is not resolvable.",
+   "clears": false,
+   "ratio": 1.573,
+   "value_digits": 3
+  },
+  {
+   "id": "§4.1-d1-b-seed-44-—",
+   "section": "§4.1, §4.7.2",
+   "comparison": "D1-B seed 44 — `programme_only` against `programme_free`",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 11.114808,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_p_seed44.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 6.393658,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_f_seed44.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — the section states it: the difference is not resolvable.",
+   "clears": false,
+   "ratio": 1.7384,
+   "value_digits": 3
+  },
+  {
+   "id": "§4.1-d1-b-seed-42-—",
+   "section": "§4.1, §4.7.2",
+   "comparison": "D1-B seed 42 — `programme_only` against `programme_free`",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 29.381309,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_p_seed42.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 13.418405,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_f_seed42.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — the section states it: the difference is not resolvable.",
+   "clears": false,
+   "ratio": 2.1896,
+   "value_digits": 3
+  },
+  {
+   "id": "§4.1-d1-b-seed-43-—",
+   "section": "§4.1, §4.7.2",
+   "comparison": "D1-B seed 43 — `programme_only` against `programme_free`",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 24.672962,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_p_seed43.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 7.600259,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_f_seed43.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — and it is the closest of the seven, clearing **by 1.5%** in the wrong direction (3.246× against 3.295×).",
+   "clears": false,
+   "ratio": 3.2463,
+   "value_digits": 3
+  },
+  {
+   "id": "4.1-phase1b-raw",
+   "section": "§4.1, §4.9",
+   "comparison": "Phase 1b, single seed — `full` against `programme_only`",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "raw",
+   "floor": "R1_raw_export",
+   "a": {
+    "value": 38.483395,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE_P1B.json",
+     "path": "v21_release_20260720_retry3_resume_safe.diagnostic_full_seed42.wsi_biology.raw.R1"
+    }
+   },
+   "b": {
+    "value": 32.059398,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE_P1B.json",
+     "path": "v21_release_20260720_retry3_resume_safe.diagnostic_programme_only_seed42.wsi_biology.raw.R1"
+    }
+   },
+   "rests_on": "nothing. Its arms were never verified matched (§3.4), its channel moved 0.002, and §4.9 already reads it as *neither quantity resolvable at one seed*.",
+   "clears": false,
+   "ratio": 1.2004,
+   "value_digits": 3
+  },
+  {
+   "id": "4.1-d1b-s42-raw",
+   "section": "§4.1 (provenance note), §4.7",
+   "comparison": "D1-B seed 42 — the same pair on the **raw** block",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "raw",
+   "floor": "R1_raw_export",
+   "a": {
+    "value": 25.30739,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_p_seed42.raw.R1"
+    }
+   },
+   "b": {
+    "value": 12.531684,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_f_seed42.raw.R1"
+    }
+   },
+   "rests_on": "nothing.",
+   "clears": false,
+   "ratio": 2.0195,
+   "value_digits": 3
+  },
+  {
+   "id": "4.1-d1b-s43-raw",
+   "section": "§4.1 (provenance note), §4.7",
+   "comparison": "D1-B seed 43 — the same pair on the **raw** block",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "raw",
+   "floor": "R1_raw_export",
+   "a": {
+    "value": 21.480049,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_p_seed43.raw.R1"
+    }
+   },
+   "b": {
+    "value": 6.94989,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_f_seed43.raw.R1"
+    }
+   },
+   "rests_on": "nothing — **and this row is why block-matching is load-bearing**: the same pair reads 3.246× residualised, and 3.246× judged against the *raw* floor of 3.111× would read as OUTSIDE when on its own block it is inside.",
+   "clears": false,
+   "ratio": 3.0907,
+   "value_digits": 3
+  },
+  {
+   "id": "4.1-d1b-s44-raw",
+   "section": "§4.1 (provenance note), §4.7",
+   "comparison": "D1-B seed 44 — the same pair on the **raw** block",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "raw",
+   "floor": "R1_raw_export",
+   "a": {
+    "value": 10.089156,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_p_seed44.raw.R1"
+    }
+   },
+   "b": {
+    "value": 6.007604,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance5_D1B.d1_f_seed44.raw.R1"
+    }
+   },
+   "rests_on": "nothing.",
+   "clears": false,
+   "ratio": 1.6794,
+   "value_digits": 3
+  },
+  {
+   "id": "4.1-superseded-n1",
+   "section": "§4.1, §3.5",
+   "comparison": "the superseded n = 1 envelope — D2 H42 re-export against retrain",
+   "kind": "nuisance",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "it IS an estimate of the floor, at n = 1, not a comparison judged against one",
+   "clears": false,
+   "a": {
+    "value": 23.386803,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.H42.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 8.680901,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance6_D2.H42_recovered_reexport.residualised.R1"
+    }
+   },
+   "rests_on": "nothing — superseded by the n = 5 measurement. It is listed because §4.1's own argument is that a single pair can return a floor that licenses everything, and 2.694× is the pair that did.",
+   "ratio": 2.6941,
+   "value_digits": 3
+  },
+  {
+   "id": "4.2-fold-h44",
+   "section": "§4.2",
+   "comparison": "within-arm seed fold, D2 H (Hallmark) — three seeds, nothing else varied",
+   "kind": "nuisance",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "a measurement OF the nuisance, not a selection judged against it",
+   "a": {
+    "value": 28.771472,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.H43.R1"
+    }
+   },
+   "b": {
+    "value": 9.142598,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.H44.R1"
+    }
+   },
+   "rests_on": "§4.2's cleanest single object: one arm, no arm contrast, 3.15× in rank against 0.0012 in channel; the channel over the same three seeds moves 1.8–5.6%.",
+   "clears": false,
+   "ratio": 3.147,
+   "value_digits": 3
+  },
+  {
+   "id": "4.2-fold-i44",
+   "section": "§4.2",
+   "comparison": "within-arm seed fold, D2 I (perturbation basis) — three seeds, nothing else varied",
+   "kind": "nuisance",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "a measurement OF the nuisance, not a selection judged against it",
+   "a": {
+    "value": 34.116761,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.I43.R1"
+    }
+   },
+   "b": {
+    "value": 9.105243,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.I44.R1"
+    }
+   },
+   "rests_on": "the seed alone moves rank **further than five same-seed retrains do** (3.75× against 3.295×); the channel over the same three seeds moves 1.8–5.6%.",
+   "clears": true,
+   "ratio": 3.7469,
+   "value_digits": 3
+  },
+  {
+   "id": "4.2-fold-p44",
+   "section": "§4.2",
+   "comparison": "within-arm seed fold, D1 P (`programme_only`) — three seeds, nothing else varied",
+   "kind": "nuisance",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "a measurement OF the nuisance, not a selection judged against it",
+   "a": {
+    "value": 29.381309,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.P42.R1"
+    }
+   },
+   "b": {
+    "value": 11.114808,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.P44.R1"
+    }
+   },
+   "rests_on": "the stable arm; the channel over the same three seeds moves 1.8–5.6%.",
+   "clears": false,
+   "ratio": 2.6434,
+   "value_digits": 3
+  },
+  {
+   "id": "4.2-fold-f44",
+   "section": "§4.2",
+   "comparison": "within-arm seed fold, D1 F (`programme_free`) — three seeds, nothing else varied",
+   "kind": "nuisance",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "a measurement OF the nuisance, not a selection judged against it",
+   "a": {
+    "value": 13.418405,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.F42.R1"
+    }
+   },
+   "b": {
+    "value": 6.393658,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.F44.R1"
+    }
+   },
+   "rests_on": "the unstable arm; the channel over the same three seeds moves 1.8–5.6%.",
+   "clears": false,
+   "ratio": 2.0987,
+   "value_digits": 3
+  },
+  {
+   "id": "4.3-free-spread",
+   "section": "§4.3",
+   "comparison": "`programme_free` step-200 spread across five seeds",
+   "kind": "nuisance",
+   "statistic": "R3",
+   "block": "training batch, in-run",
+   "floor": null,
+   "floor_note": "R3 on in-run training batches; the states were never saved, so these are [NOT RECOMPUTABLE] under R1 and no floor exists on this block",
+   "a": {
+    "value": 45.64579,
+    "src": {
+     "kind": "json",
+     "file": "extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
+     "path": "runs.d1_f_seed43.value"
+    }
+   },
+   "b": {
+    "value": 7.544903,
+    "src": {
+     "kind": "json",
+     "file": "extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
+     "path": "runs.d1_f_seed42.value"
+    }
+   },
+   "rests_on": "five seeds, one step, no interval; the claim is that the spread is large.",
+   "clears": false,
+   "ratio": 6.0499,
+   "value_digits": 3
+  },
+  {
+   "id": "4.3-only-spread",
+   "section": "§4.3",
+   "comparison": "`programme_only` step-200 spread across five seeds",
+   "kind": "nuisance",
+   "statistic": "R3",
+   "block": "training batch, in-run",
+   "floor": null,
+   "floor_note": "as above",
+   "a": {
+    "value": 112.07783,
+    "src": {
+     "kind": "json",
+     "file": "extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
+     "path": "runs.d1_p_seed46.value"
+    }
+   },
+   "b": {
+    "value": 94.951666,
+    "src": {
+     "kind": "json",
+     "file": "extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
+     "path": "runs.d1_p_seed45.value"
+    }
+   },
+   "rests_on": "five seeds, one step, no interval; the claim is that the spread is small.",
+   "clears": false,
+   "ratio": 1.1804,
+   "value_digits": 3
+  },
+  {
+   "id": "4.3-spread-of-spreads",
+   "section": "§4.3",
+   "comparison": "**the two spreads against each other** — 6.05× against 1.18×",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "training batch, in-run",
+   "floor": null,
+   "floor_note": "the compared quantity is a SPREAD, not a level. §4.1's floor is a floor on levels, and **no floor has ever been measured for a spread on this project** — so §4.3's headline is the one claim in the paper the criterion cannot even be applied to",
+   "a": {
+    "value": 6.049884,
+    "src": {
+     "kind": "spread",
+     "file": "extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
+     "paths": [
+      "runs.d1_f_seed42.value",
+      "runs.d1_f_seed43.value",
+      "runs.d1_f_seed44.value",
+      "runs.d1_f_seed45.value",
+      "runs.d1_f_seed46.value"
+     ]
+    }
+   },
+   "b": {
+    "value": 1.180367,
+    "src": {
+     "kind": "spread",
+     "file": "extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
+     "paths": [
+      "runs.d1_p_seed42.value",
+      "runs.d1_p_seed43.value",
+      "runs.d1_p_seed44.value",
+      "runs.d1_p_seed45.value",
+      "runs.d1_p_seed46.value"
+     ]
+    }
+   },
+   "rests_on": "five seeds per arm and no interval on either spread. The claim survives because the two arms' step-200 *levels* are an order of magnitude apart and the supervised arm's five seeds agree to 18%, not because the ratio of the two spreads clears anything.",
+   "clears": false,
+   "ratio": 5.1254,
+   "value_digits": 3
+  },
+  {
+   "id": "4.4-3-fixedseed-probe",
+   "section": "§4.4(3), §5.4",
+   "comparison": "controlled 200-step probe, **seed held fixed** — min(m = 0.999) against max(m = 0)",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "clears": true,
+   "floor_note": "statistic AND block both mismatched — R3 on a fixed held-out probe against an R1 residualised-export floor; no floor has been measured on the probe",
+   "a": {
+    "value": 6.92,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/probevar_m0.999_2.log",
+     "step": 200,
+     "column": "eff-rank"
+    }
+   },
+   "b": {
+    "value": 1.98,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/probevar_m0_3.log",
+     "step": 200,
+     "column": "eff-rank"
+    }
+   },
+   "rests_on": "it clears by **6%** — no more comfortable than the 1.5% §4.1 declines to lean on — and it holds the **seed** fixed, which §4.2 measures as the dominant term. The seed-varied version of this same check is row 4.9a/5.4 below and it does not clear.",
+   "ratio": 3.4949,
+   "value_digits": 3
+  },
+  {
+   "id": "4.5a-thirty",
+   "section": "§4.5(a)",
+   "comparison": "**30 arm comparisons** — 5 statistics (R1, R2, R3, PR, PR_rownorm) × 6 pairs",
+   "kind": "direction",
+   "statistic": "R1/R2/R3/PR",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "only R1 has a measured floor. R2, R3, PR and PR_rownorm have none, so 24 of these 30 comparisons cannot be judged against the criterion at all",
+   "pair_max": {
+    "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+    "paths": [
+     [
+      "artifacts.H42.R1",
+      "artifacts.I42.R1"
+     ],
+     [
+      "artifacts.H43.R1",
+      "artifacts.I43.R1"
+     ],
+     [
+      "artifacts.H44.R1",
+      "artifacts.I44.R1"
+     ],
+     [
+      "artifacts.P42.R1",
+      "artifacts.F42.R1"
+     ],
+     [
+      "artifacts.P43.R1",
+      "artifacts.F43.R1"
+     ],
+     [
+      "artifacts.P44.R1",
+      "artifacts.F44.R1"
+     ],
+     [
+      "artifacts.H42.R2",
+      "artifacts.I42.R2"
+     ],
+     [
+      "artifacts.H43.R2",
+      "artifacts.I43.R2"
+     ],
+     [
+      "artifacts.H44.R2",
+      "artifacts.I44.R2"
+     ],
+     [
+      "artifacts.P42.R2",
+      "artifacts.F42.R2"
+     ],
+     [
+      "artifacts.P43.R2",
+      "artifacts.F43.R2"
+     ],
+     [
+      "artifacts.P44.R2",
+      "artifacts.F44.R2"
+     ],
+     [
+      "artifacts.H42.R3",
+      "artifacts.I42.R3"
+     ],
+     [
+      "artifacts.H43.R3",
+      "artifacts.I43.R3"
+     ],
+     [
+      "artifacts.H44.R3",
+      "artifacts.I44.R3"
+     ],
+     [
+      "artifacts.P42.R3",
+      "artifacts.F42.R3"
+     ],
+     [
+      "artifacts.P43.R3",
+      "artifacts.F43.R3"
+     ],
+     [
+      "artifacts.P44.R3",
+      "artifacts.F44.R3"
+     ],
+     [
+      "artifacts.H42.PR",
+      "artifacts.I42.PR"
+     ],
+     [
+      "artifacts.H43.PR",
+      "artifacts.I43.PR"
+     ],
+     [
+      "artifacts.H44.PR",
+      "artifacts.I44.PR"
+     ],
+     [
+      "artifacts.P42.PR",
+      "artifacts.F42.PR"
+     ],
+     [
+      "artifacts.P43.PR",
+      "artifacts.F43.PR"
+     ],
+     [
+      "artifacts.P44.PR",
+      "artifacts.F44.PR"
+     ],
+     [
+      "artifacts.H42.PR_rownorm",
+      "artifacts.I42.PR_rownorm"
+     ],
+     [
+      "artifacts.H43.PR_rownorm",
+      "artifacts.I43.PR_rownorm"
+     ],
+     [
+      "artifacts.H44.PR_rownorm",
+      "artifacts.I44.PR_rownorm"
+     ],
+     [
+      "artifacts.P42.PR_rownorm",
+      "artifacts.F42.PR_rownorm"
+     ],
+     [
+      "artifacts.P43.PR_rownorm",
+      "artifacts.F43.PR_rownorm"
+     ],
+     [
+      "artifacts.P44.PR_rownorm",
+      "artifacts.F44.PR_rownorm"
+     ]
+    ]
+   },
+   "ratio": 3.2463,
+   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Every one of the 30 folds is inside the one floor that exists, which supports rather than undermines the claim: a verdict read off an unresolvable difference is exactly what §4.5 says a rank verdict is.",
+   "clears": false,
+   "values_label": "1.004× – 3.246× over 30",
+   "value_digits": 3
+  },
+  {
+   "id": "4.5b-block-flip",
+   "section": "§4.5(b)",
+   "comparison": "the four **R3** rows of §4.5(b)'s table — D2 seeds 43 and 44, raw and residualised",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "raw and residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "R3 has no floor of its own; the R1 rows of this table are rows 1–3 above",
+   "pair_max": {
+    "file": "ws_rank/RANK_RECOMPUTE.json",
+    "paths": [
+     [
+      "instances.instance6_D2.H43.raw.R3",
+      "instances.instance6_D2.I43.raw.R3"
+     ],
+     [
+      "instances.instance6_D2.H43.residualised.R3",
+      "instances.instance6_D2.I43.residualised.R3"
+     ],
+     [
+      "instances.instance6_D2.H44.raw.R3",
+      "instances.instance6_D2.I44.raw.R3"
+     ],
+     [
+      "instances.instance6_D2.H44.residualised.R3",
+      "instances.instance6_D2.I44.residualised.R3"
+     ]
+    ]
+   },
+   "ratio": 1.0793,
+   "rests_on": "the **sign flipping with the block**, on differences of 1–8%. The claim is that the block choice is worth more than the difference it adjudicates — which is a statement that the difference is unresolvable, made in the other direction.",
+   "clears": false,
+   "values_label": "1.012× – 1.079× over 4",
+   "value_digits": 3
+  },
+  {
+   "id": "4.5c-views",
+   "section": "§4.5(c)",
+   "comparison": "**18 comparisons** — 6 pairs × 3 co-trained views (`wsi`, `rna`, `full`)",
+   "kind": "direction",
+   "statistic": "R1",
+   "block": "residualised, per view",
+   "floor": null,
+   "floor_note": "the floor is measured on `wsi_biology` only. `rna_biology` and `full_biology` have **no measured floor**, and the largest fold among them — D1 s44 `full_biology`, 5.250× — is larger than the wsi floor, so the 11/18 and 2/9 counts include orderings nobody can say are resolvable and orderings nobody has measured a floor for",
+   "pair_max": {
+    "file": "ws_p2/out/P2_ROBUSTNESS.json",
+    "paths": [
+     [
+      "H42.wsi_biology.eff_rank",
+      "I42.wsi_biology.eff_rank"
+     ],
+     [
+      "H42.rna_biology.eff_rank",
+      "I42.rna_biology.eff_rank"
+     ],
+     [
+      "H42.full_biology.eff_rank",
+      "I42.full_biology.eff_rank"
+     ],
+     [
+      "H43.wsi_biology.eff_rank",
+      "I43.wsi_biology.eff_rank"
+     ],
+     [
+      "H43.rna_biology.eff_rank",
+      "I43.rna_biology.eff_rank"
+     ],
+     [
+      "H43.full_biology.eff_rank",
+      "I43.full_biology.eff_rank"
+     ],
+     [
+      "H44.wsi_biology.eff_rank",
+      "I44.wsi_biology.eff_rank"
+     ],
+     [
+      "H44.rna_biology.eff_rank",
+      "I44.rna_biology.eff_rank"
+     ],
+     [
+      "H44.full_biology.eff_rank",
+      "I44.full_biology.eff_rank"
+     ],
+     [
+      "P42.wsi_biology.eff_rank",
+      "F42.wsi_biology.eff_rank"
+     ],
+     [
+      "P42.rna_biology.eff_rank",
+      "F42.rna_biology.eff_rank"
+     ],
+     [
+      "P42.full_biology.eff_rank",
+      "F42.full_biology.eff_rank"
+     ],
+     [
+      "P43.wsi_biology.eff_rank",
+      "F43.wsi_biology.eff_rank"
+     ],
+     [
+      "P43.rna_biology.eff_rank",
+      "F43.rna_biology.eff_rank"
+     ],
+     [
+      "P43.full_biology.eff_rank",
+      "F43.full_biology.eff_rank"
+     ],
+     [
+      "P44.wsi_biology.eff_rank",
+      "F44.wsi_biology.eff_rank"
+     ],
+     [
+      "P44.rna_biology.eff_rank",
+      "F44.rna_biology.eff_rank"
+     ],
+     [
+      "P44.full_biology.eff_rank",
+      "F44.full_biology.eff_rank"
+     ]
+    ]
+   },
+   "ratio": 5.2498,
+   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. The 2/9 count is already not quoted as a rate (`rna_biology` is partly circular).",
+   "clears": false,
+   "values_label": "1.004× – 5.250× over 18",
+   "value_digits": 3
+  },
+  {
+   "id": "4.6-six-pairs",
+   "section": "§4.6, §4.6a, T1",
+   "comparison": "**the six pairs every one of T1's twelve metric rows is scored on**",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "pair_max": {
+    "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+    "paths": [
+     [
+      "artifacts.H42.R1",
+      "artifacts.I42.R1"
+     ],
+     [
+      "artifacts.H43.R1",
+      "artifacts.I43.R1"
+     ],
+     [
+      "artifacts.H44.R1",
+      "artifacts.I44.R1"
+     ],
+     [
+      "artifacts.P42.R1",
+      "artifacts.F42.R1"
+     ],
+     [
+      "artifacts.P43.R1",
+      "artifacts.F43.R1"
+     ],
+     [
+      "artifacts.P44.R1",
+      "artifacts.F44.R1"
+     ]
+    ]
+   },
+   "ratio": 3.2463,
+   "rests_on": "nothing. §4.6 gives three reasons not to read its counts — n = 6, D2 s44's 1.4 sampling SDs, and §4.6a's coordinate choice. **This is a fourth, and the paper does not currently state it**: not one of the six pairs is resolvable under the one metric that has a measured floor.",
+   "clears": false,
+   "values_label": "1.004× – 3.246× over 6",
+   "value_digits": 3
+  },
+  {
+   "id": "4.6-rankme-d2",
+   "section": "§4.6, T1",
+   "comparison": "RankMe as published, the three D2 pairs — the row §4.6 quotes against ours",
+   "kind": "selection",
+   "statistic": "RankMe (raw, uncentred, ε = 1e-7)",
+   "block": "raw",
+   "floor": null,
+   "floor_note": "**no retraining floor has been measured for any statistic other than canonical R1.** RankMe, participation ratio, stable rank, α-ReQ and LiDAR — eight of T1's twelve rows — cannot be judged against the criterion at all",
+   "pair_max": {
+    "file": "ws_p2/out/P2_METRICS_D2.json",
+    "paths": [
+     [
+      "H42.metrics.rankme_raw",
+      "I42.metrics.rankme_raw"
+     ],
+     [
+      "H43.metrics.rankme_raw",
+      "I43.metrics.rankme_raw"
+     ],
+     [
+      "H44.metrics.rankme_raw",
+      "I44.metrics.rankme_raw"
+     ]
+    ]
+   },
+   "ratio": 3.3817,
+   "rests_on": "nothing that this paper can check. §4.2 does measure RankMe's arm/seed split (29.1% arm, F = 1.09, n.s.) — which is the honest substitute for a floor it does not have.",
+   "clears": false,
+   "values_label": "1.248× – 3.382× over 3",
+   "value_digits": 3
+  },
+  {
+   "id": "4.7.1-threshold",
+   "section": "§4.7.1",
+   "comparison": "**the predeclared violation threshold** (2.0× fold) against the floor",
+   "kind": "direction",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "this row compares a THRESHOLD to the floor, not two representations",
+   "a": {
+    "value": 3.295,
+    "src": {
+     "kind": "json",
+     "file": "extracted/F1_RETRAINING_REPEAT.json",
+     "path": "printed_spread.rank_residualised.spread"
+    }
+   },
+   "b": {
+    "value": 2.0,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.7.1",
+     "literal": "2.0"
+    }
+   },
+   "rests_on": "the fact itself: the fold a pair had to exceed to count as a necessity violation was **1.65× smaller than the floor** and below §4.2's 2.10–3.75× seed band, so the 66-pair scan could only ever return violations that are unresolvable. Both violations it returned (rows below) are.",
+   "clears": false,
+   "ratio": 1.6475,
+   "value_digits": 3
+  },
+  {
+   "id": "4.7.4-h44-i43",
+   "section": "§4.7.4",
+   "comparison": "the surviving necessity violation — H44 against I43",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "within_arm_seed_band",
+   "floor_note": "it clears the 3.295× retraining floor by 13%, but the comparison varies the **seed**, so the governing nuisance range is §4.2's within-arm band",
+   "a": {
+    "value": 34.116761,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.I43.R1"
+    }
+   },
+   "b": {
+    "value": 9.142598,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.H44.R1"
+    }
+   },
+   "rests_on": "+0.1101 more channel on the lower-rank artifact, a gap comparable to the headline D2 arm effect. It is presented as supporting, not load-bearing, and is partially pre-empted by Aldeneh et al. (ICASSP 2025). It clears the band by **0.5%**.",
+   "clears": false,
+   "ratio": 3.7316,
+   "value_digits": 3
+  },
+  {
+   "id": "4.7.4-p44-i43",
+   "section": "§4.7.4, F6(d)",
+   "comparison": "the second violation of the 66-pair scan — P44 against I43",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "a": {
+    "value": 34.116761,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.I43.R1"
+    }
+   },
+   "b": {
+    "value": 11.114808,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.P44.R1"
+    }
+   },
+   "rests_on": "+0.1206 more channel. **The draft names this pair only in `P2_FIGURES.md` F6(d) and attaches no floor verdict to it**; it is inside the 3.295× floor and inside §4.2's band, and it is cross-experiment as well as cross-seed.",
+   "clears": false,
+   "ratio": 3.0695,
+   "value_digits": 3
+  },
+  {
+   "id": "4.8-dilution-raw",
+   "section": "§4.8",
+   "comparison": "dilution d = 0 → 0.80, raw block",
+   "kind": "regime",
+   "statistic": "R1",
+   "block": "raw",
+   "floor": "R1_raw_export",
+   "floor_note": "**EXEMPT.** The representation is `concat(mean, std)` over frozen H-Optimus-0 tokens with no stochastically trained parameters — the only fitted step is a deterministic per-level PCA — so there is no retraining and §3.5 does not apply",
+   "a": {
+    "value": 196.187123,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance4_dilution.wsi_dilution_000.raw.R1"
+    }
+   },
+   "b": {
+    "value": 161.22617,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance4_dilution.wsi_dilution_080.raw.R1"
+    }
+   },
+   "value_digits": 3,
+   "rests_on": "monotonicity over seven nested levels and the *ratio* of the two fractional changes (−3.10% rank against −66.7% channel), both read from the same representation through the same instrument. Single seed, single donor draw, no interval on any level-to-level difference.",
+   "clears": false,
+   "ratio": 1.2168
+  },
+  {
+   "id": "4.8-dilution-residualised",
+   "section": "§4.8",
+   "comparison": "dilution d = 0 → 0.80, residualised block",
+   "kind": "regime",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
+   "floor_note": "**EXEMPT.** The representation is `concat(mean, std)` over frozen H-Optimus-0 tokens with no stochastically trained parameters — the only fitted step is a deterministic per-level PCA — so there is no retraining and §3.5 does not apply",
+   "a": {
+    "value": 210.178953,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance4_dilution.wsi_dilution_000.residualised.R1"
+    }
+   },
+   "b": {
+    "value": 203.666878,
+    "src": {
+     "kind": "json",
+     "file": "ws_rank/RANK_RECOMPUTE.json",
+     "path": "instances.instance4_dilution.wsi_dilution_080.residualised.R1"
+    }
+   },
+   "value_digits": 3,
+   "rests_on": "monotonicity over seven nested levels and the *ratio* of the two fractional changes (−3.10% rank against −66.7% channel), both read from the same representation through the same instrument. Single seed, single donor draw, no interval on any level-to-level difference.",
+   "clears": false,
+   "ratio": 1.032
+  },
+  {
+   "id": "4.9-decorr-history",
+   "section": "§4.9, §6.4",
+   "comparison": "the historical decorrelation instance — “+107% rank at flat benchmark”",
+   "kind": "excluded",
+   "statistic": "unknown — predates the consolidation",
+   "block": "unknown",
+   "floor": null,
+   "floor_note": "no artifact, no statistic, and the cited source file does not exist (`[NOT RECOMPUTABLE]`)",
+   "a": {
+    "value": 103.3,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.9",
+     "literal": "103.3"
+    }
+   },
+   "b": {
+    "value": 49.9,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.9",
+     "literal": "49.9"
+    }
+   },
+   "value_digits": 1,
+   "rests_on": "nothing. It is excluded from every count on **provenance**, not on the floor — and it happens also to be inside the floor, which is a second reason and not the operative one.",
+   "clears": false,
+   "ratio": 2.0701
+  },
+  {
+   "id": "4.9-sixteen",
+   "section": "§4.9",
+   "comparison": "the “16/16” instance — pinned at the batch size in every arm",
+   "kind": "excluded",
+   "statistic": "hard numerical matrix rank",
+   "block": "16-patient train batch",
+   "floor": null,
+   "floor_note": "not an effective rank at all; withdrawn as a rank instance",
+   "a": {
+    "value": 16.0,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.9",
+     "literal": "16/16",
+     "value": 16.0
+    }
+   },
+   "b": {
+    "value": 16.0,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.9",
+     "literal": "16/16",
+     "value": 16.0
+    }
+   },
+   "value_digits": 0,
+   "rests_on": "the co-measured collapse evidence — patient cosine 0.9999, retrieval 0.000 *below* its 0.062 chance level — and the fact that the R3 rank of the same objective falls 12.88 → 1.00. The rank column carries nothing.",
+   "clears": false,
+   "ratio": 1.0
+  },
+  {
+   "id": "4.9-d1a-probe",
+   "section": "§4.9, §5.1, §5.4",
+   "comparison": "D1-A epoch 39 — `programme_only` 9.81 against `programme_free` 1.71",
+   "kind": "collapse",
+   "statistic": "R3",
+   "block": "282 held-out patients, live checkpoint",
+   "floor": null,
+   "floor_note": "`[NOT RECOMPUTED]` under R1 — it needs a GPU forward pass — and no floor has been measured on this block",
+   "a": {
+    "value": 9.81,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.9",
+     "literal": "9.81"
+    }
+   },
+   "b": {
+    "value": 1.71,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.9",
+     "literal": "1.71"
+    }
+   },
+   "rests_on": "a collapse verdict with co-measured evidence: RNA-view mutual cosine 0.986, hard rank 11, and no exported readout at all. Its own source entry forbids concluding anything about supervision from it.",
+   "clears": false,
+   "ratio": 5.7368,
+   "value_digits": 3
+  },
+  {
+   "id": "4.10-infonce-step50",
+   "section": "§4.10",
+   "comparison": "clean in-batch InfoNCE, step 0 → 50",
+   "kind": "collapse",
+   "statistic": "R3",
+   "block": "diagnostic script, train batch",
+   "floor": null,
+   "floor_note": "R3 on a train batch; no floor on this block, and the reading is AT the collapse floor",
+   "a": {
+    "value": 12.88,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.10",
+     "literal": "12.88"
+    }
+   },
+   "b": {
+    "value": 1.0,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.10",
+     "literal": "1.00"
+    }
+   },
+   "rests_on": "positive and worst-negative cosine both 0.9993 and a minimum margin of −0.0001, co-measured. §4.10 is where the paper says rank works.",
+   "clears": false,
+   "ratio": 12.88,
+   "value_digits": 3
+  },
+  {
+   "id": "4.10-boundary",
+   "section": "§4.10",
+   "comparison": "the boundary — D2 s44's rank against its own nominal dimensionality (256)",
+   "kind": "direction",
+   "statistic": "R1",
+   "block": "residualised",
+   "floor": null,
+   "floor_note": "not a between-configuration comparison; a level against the ambient dimension",
+   "a": {
+    "value": 256.0,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "4.10",
+     "literal": "256",
+     "value": 256.0
+    }
+   },
+   "b": {
+    "value": 9.142598,
+    "src": {
+     "kind": "json",
+     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+     "path": "artifacts.H44.R1"
+    }
+   },
+   "rests_on": "held-out channels of 0.5983 and 0.4757 against a **measured** permutation null of 0.140 — a co-measured quantity, not a ratio. A representation at 3.6% of nominal rank was carrying a large, permutation-significant channel.",
+   "clears": false,
+   "ratio": 28.0008,
+   "value_digits": 3
+  },
+  {
+   "id": "5.1-instance2",
+   "section": "§5.1, instance 2",
+   "comparison": "**the residual**: gate rank 5.81 (16 memorised patients, frozen 64-key queue) against ~1.8 at cohort scale (3,118 streaming patients, live 4,096-key queue)",
+   "kind": "regime",
+   "statistic": "R3",
+   "block": "TWO different blocks — see the note",
+   "floor": null,
+   "floor_note": "**EXEMPT, and it is not a ratio at all.** 5.81 is read on a 16-patient *train* batch against a frozen queue; ~1.8 is read on 282 *held-out* patients at cohort scale. §3.1's own rule forbids comparing rank across blocks, so the 3.23× that provoked this row is not a quantity the paper may form",
+   "a": {
+    "value": 5.81,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.1",
+     "literal": "5.81"
+    }
+   },
+   "b": {
+    "value": 1.8,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.1",
+     "literal": "1.8",
+     "value": 1.8
+    }
+   },
+   "rests_on": "two things, neither of them a rank difference. (i) The gate's own **binary** pass criterion — contrastive 0.012–0.057 against a ≤ 0.10 bar with retrieval 16/16 on three seeds. (ii) The cohort-scale arm being independently **collapsed**: RNA-view mutual cosine 0.977 / 0.986, hard rank 9 / 11, against the supervised sibling at 7.38 / 7.35. The claim — *a gate that certifies memorisation of 16 does not certify learning at 3,118* — is a statement about what the gate's regime removes, not a selection between two configurations.",
+   "clears": false,
+   "ratio": 3.2278,
+   "value_digits": 3
+  },
+  {
+   "id": "5.1-instance3-sweep",
+   "section": "§5.1, instance 3; S1",
+   "comparison": "the five-arm regulariser sweep — widest between-arm fold at a shared step (50)",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed 256-patient held-out probe",
+   "floor": null,
+   "floor_note": "R3 on the probe; no floor on this block",
+   "a": {
+    "value": 4.08,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.1",
+     "literal": "4.08"
+    }
+   },
+   "b": {
+    "value": 2.62,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.1",
+     "literal": "2.62"
+    }
+   },
+   "rests_on": "an absolute-level claim, not a between-arm one: **all five** arms fall from a verified common initialisation of 67.55 to 1.59–3.43, i.e. ≥ 19.7×, including both regularisers at zero. The between-arm folds carry nothing and are not quoted.",
+   "clears": false,
+   "ratio": 1.5573,
+   "value_digits": 3
+  },
+  {
+   "id": "5.4-row1-step600",
+   "section": "§5.4 row 1, §5.2",
+   "comparison": "m = 0.999 against m = 0, **one seed**, step 600",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched; §5.4 states all three mismatches (arm, duration, block) and that each points toward a LARGER floor here",
+   "a": {
+    "value": 7.42,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "7.42"
+    }
+   },
+   "b": {
+    "value": 2.81,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "2.81"
+    }
+   },
+   "rests_on": "nothing — §5.4 says so.",
+   "clears": false,
+   "ratio": 2.6406,
+   "value_digits": 3
+  },
+  {
+   "id": "5.4-row2-seedvaried",
+   "section": "§5.4 row 2",
+   "comparison": "m = 0.999 against m = 0, **worst case over three seeds**, 500 steps",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "block mismatched — the fixed held-out probe has no floor of its own",
+   "a": {
+    "value": 10.45,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mseed_m0.999_s43.log",
+     "step": 500,
+     "column": "CANONICAL"
+    }
+   },
+   "b": {
+    "value": 3.18,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mseed_m0_s42.log",
+     "step": 500,
+     "column": "CANONICAL"
+    }
+   },
+   "rests_on": "a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**.",
+   "clears": false,
+   "ratio": 3.2862,
+   "value_digits": 3
+  },
+  {
+   "id": "5.4-row3-r3",
+   "section": "§5.4 row 3",
+   "comparison": "the same replication under the tripwire statistic",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 6.85,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mseed_m0.999_s43.log",
+     "step": 500,
+     "column": "R3-rank"
+    }
+   },
+   "b": {
+    "value": 2.81,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mseed_m0_s42.log",
+     "step": 500,
+     "column": "R3-rank"
+    }
+   },
+   "rests_on": "as row above.",
+   "clears": false,
+   "ratio": 2.4377,
+   "value_digits": 3
+  },
+  {
+   "id": "5.4-m0999-over-m099",
+   "section": "§5.4 limit 2, Appendix C",
+   "comparison": "**the value the project actually runs** — m = 0.999 over m = 0.99, step 600",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 7.42,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "7.42"
+    }
+   },
+   "b": {
+    "value": 5.88,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "5.88"
+    }
+   },
+   "rests_on": "nothing. The binary outcome supports **momentum against none**, not this value over its neighbour; `m = 0.999` is retained because it measured best in a sweep whose resolution the paper does not trust.",
+   "clears": false,
+   "ratio": 1.2619,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-per-step-max",
+   "section": "§5.2 prose",
+   "comparison": "m = 0.999 against m = 0 at step 400 — the widest fold past step 150",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "clears": true,
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 7.84,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "7.84"
+    }
+   },
+   "b": {
+    "value": 2.18,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "2.18"
+    }
+   },
+   "rests_on": "nothing quotable. **§5.2's prose says the effect is “2.6–3.3× at every step past 150”, which disagrees with its own table**: the per-step folds are 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600), and 4.343× at step 100. Flagged, not substituted (§5 is another agent's). This single-seed fold does exceed the floor at one step, but it varies no seed, and the seed-varied worst case above does not.",
+   "ratio": 3.5963,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-staleness-agreement",
+   "section": "§5.2 measurement 2",
+   "comparison": "m = 0.999 (6.89) against m = 0.99 (6.65) at step 100",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 6.89,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "6.89"
+    }
+   },
+   "b": {
+    "value": 6.65,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "6.65"
+    }
+   },
+   "rests_on": "**not the ordering.** What falsifies MoCo's staleness account here is that key-to-encoder agreement varies 2.06× (0.908 against 0.441) while rank is *indistinguishable* — an equality claim, which a 1.04× difference supports. The sentence “the best-agreeing arm does not have the best rank” reads an ordering off that 1.04× and should be restated as the equality it is.",
+   "clears": false,
+   "ratio": 1.0361,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-staleness-none",
+   "section": "§5.2 measurement 2",
+   "comparison": "m = 0.999 (6.89) against no momentum (2.58) at step 100",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 6.89,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "6.89"
+    }
+   },
+   "b": {
+    "value": 2.58,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "2.58"
+    }
+   },
+   "rests_on": "the same binary outcome as §5.4; one seed.",
+   "clears": false,
+   "ratio": 2.6705,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-capacity-64",
+   "section": "§5.2 measurement 3",
+   "comparison": "capacity 64 (6.17) against capacity 4,096 (2.16), fixed key encoder",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 6.17,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "6.17"
+    }
+   },
+   "b": {
+    "value": 2.16,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2",
+     "literal": "2.16"
+    }
+   },
+   "rests_on": "one seed, and the section's own admission that capacity confounds anchoring quality with negative count. It is one of three measurements said to rule the staleness account out, and it is inside the floor.",
+   "clears": false,
+   "ratio": 2.8565,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-turnover-inversion",
+   "section": "§5.2 turnover falsification",
+   "comparison": "the discriminating τ/T prediction — P4 (3.67) against P2 (3.53)",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 3.67,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/QUEUE_ANCHORING.md",
+     "heading": null,
+     "literal": "3.67"
+    }
+   },
+   "b": {
+    "value": 3.53,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/QUEUE_ANCHORING.md",
+     "heading": null,
+     "literal": "3.53"
+    }
+   },
+   "rests_on": "**the predeclared reading, not the ordering.** The criterion required P4 to be the worst of its group and fixed “fails ≤ 3.5” in advance; P4 read 3.67 and so did not fail. That is a predicted effect being ABSENT. The draft's “the discriminating one inverted” reads an ordering off a 1.04× difference and overstates what the data support.",
+   "clears": false,
+   "ratio": 1.0397,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-turnover-flat",
+   "section": "§5.2 turnover falsification",
+   "comparison": "“nearly flat in capacity” — 2,048 (3.53) against 8,192 (3.67) at m = 0.95",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 3.67,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/QUEUE_ANCHORING.md",
+     "heading": null,
+     "literal": "3.67"
+    }
+   },
+   "b": {
+    "value": 3.53,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/QUEUE_ANCHORING.md",
+     "heading": null,
+     "literal": "3.53"
+    }
+   },
+   "rests_on": "an **equality** claim, and the same 1.04× that cannot carry the ordering above does carry this. The two rows are the same two numbers used two ways, and are listed together deliberately.",
+   "clears": false,
+   "ratio": 1.0397,
+   "value_digits": 3
+  },
+  {
+   "id": "5.2-turnover-momentum",
+   "section": "§5.2 turnover falsification",
+   "comparison": "m = 0.95 → 0.999 at fixed capacity 4,096 — 2.91 against 7.82",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 7.82,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/QUEUE_ANCHORING.md",
+     "heading": null,
+     "literal": "7.82"
+    }
+   },
+   "b": {
+    "value": 2.91,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/QUEUE_ANCHORING.md",
+     "heading": null,
+     "literal": "2.91"
+    }
+   },
+   "rests_on": "one seed per cell; the surviving statement is monotonicity in m across five values.",
+   "clears": false,
+   "ratio": 2.6873,
+   "value_digits": 3
+  },
+  {
+   "id": "4.9a-decorr-r3",
+   "section": "§4.9a",
+   "comparison": "decorrelation 0.0 → 0.04 at m = 0.999, step 400 (R3 — the column quoted)",
+   "kind": "selection",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "statistic and block both mismatched",
+   "a": {
+    "value": 8.01,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/ablate_decorr0.04.log",
+     "step": 400,
+     "column": "R3-rank"
+    }
+   },
+   "b": {
+    "value": 4.32,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/ablate_decorr0.0.log",
+     "step": 400,
+     "column": "R3-rank"
+    }
+   },
+   "rests_on": "**monotonicity across three levels and a co-measured contradicting quantity**: the RNA-view mutual cosine rises 0.4774 → 0.7657 → 0.8696 on the *same runs* as rank rises. One seed per level. The magnitude carries nothing; the direction and the cosine do. Figure F9.",
+   "clears": false,
+   "ratio": 1.8542,
+   "value_digits": 3
+  },
+  {
+   "id": "4.9a-decorr-r1",
+   "section": "§4.9a",
+   "comparison": "the same three runs under the canonical statistic",
+   "kind": "selection",
+   "statistic": "R1",
+   "block": "fixed held-out probe",
+   "floor": "R1_residualised_export",
+   "floor_note": "block mismatched — the probe has no floor of its own",
+   "a": {
+    "value": 12.2,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/ablate_decorr0.04.log",
+     "step": 400,
+     "column": "CANONICAL"
+    }
+   },
+   "b": {
+    "value": 6.29,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/ablate_decorr0.0.log",
+     "step": 400,
+     "column": "CANONICAL"
+    }
+   },
+   "rests_on": "as above. Recorded because the 1.85× the notebook entry quotes is the **R3** column; statistic-matched to the floor it is 1.940×, and both are inside.",
+   "clears": false,
+   "ratio": 1.9396,
+   "value_digits": 3
+  },
+  {
+   "id": "4.9a-likeforlike-pair",
+   "section": "§4.1a, §5.4, §6.2",
+   "comparison": "**the like-for-like pair §5.4 says does not exist** — `ablate_decorr0.04` against `mseed_m0.999_s42`, identical configuration and seed, step 400",
+   "kind": "nuisance",
+   "statistic": "R1",
+   "block": "fixed held-out probe",
+   "floor": null,
+   "floor_note": "**n = 2 is a pair, not a floor.** §4.1 states the trap in terms: any pair drawn from four concordant repeats spans at most 1.028×, and a measured floor of 1.03× would license every comparison in the paper. This pair may not be quoted as a floor for the momentum/probe regime",
+   "a": {
+    "value": 12.2,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/ablate_decorr0.04.log",
+     "step": 400,
+     "column": "CANONICAL"
+    }
+   },
+   "b": {
+    "value": 11.44,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mseed_m0.999_s42.log",
+     "step": 400,
+     "column": "CANONICAL"
+    }
+   },
+   "rests_on": "nothing may be read off it as a floor. It is recorded because §5.4 and §6.2 both say **no like-for-like measurement exists in this regime**, and one does: the two runs share momentum, decorrelation, capacity, learning rate, seed and step-0 state (67.55 / 101.38 / 0.0342 / 0.3650), and `d1_momentum_probe.py` has no schedule that depends on the step budget. Over the eight shared logged steps the widest canonical fold is 1.128× (step 150).",
+   "clears": false,
+   "ratio": 1.0664,
+   "value_digits": 3
+  }
+ ]
+}
