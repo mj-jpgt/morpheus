@@ -51,6 +51,8 @@ ITEMS = [
      "the dilution dose-response and its miscalibration factor"),
     ("F8", "fig_f8_collapse",
      "the collapse boundary, and the 16/16 withdrawal"),
+    ("F9", "fig_f9_decorrelation",
+     "rank rises while a co-measured collapse measure rises with it"),
     ("T1", "tab_t1_selection_rule",
      "rank as a selection rule - and it is underpowered"),
 ]

@@ -35,7 +35,7 @@ import pytest
 FIGURES = Path(__file__).resolve().parents[1] / "research" / "rebase" / "p2" / "figures"
 MODULES = ["fig_f1_envelope", "fig_f2_variance", "fig_f3_floor", "fig_f4_defeaters",
            "fig_f5_verdict", "fig_f6_necessity", "fig_f7_dilution", "fig_f8_collapse",
-           "tab_t1_selection_rule"]
+           "fig_f9_decorrelation", "tab_t1_selection_rule"]
 
 D2_ARMS = ["H", "I"]
 D1_ARMS = ["P", "F"]
@@ -335,6 +335,30 @@ def _synthetic_corpus(root: Path) -> dict:
             write(f"e0_run/d1_diag/probevar_m{m}_{rep}.log",
                   f"momentum={m}  decorrelation=0.04  capacity=4096  steps=200\n"
                   f"DONE momentum={m} decorr=0.04 final_eff_rank={v:.2f} rna_rna=0.89\n")
+
+    # F9's decorrelation ablation, in the two-rank-statistic log format
+    # `d1_momentum_probe.py` writes. The three arms MUST share their step-0 row,
+    # because fig_f9 refuses to draw a sweep that varies more than the weight -
+    # and the mseed log must share every header field except the step budget,
+    # because that is what makes it a same-seed repeat rather than another arm.
+    def probe_log(momentum, decorr, steps, series, rna):
+        head = (f"momentum={momentum}  decorrelation={decorr}  capacity=4096  lr=0.0002  "
+                f"seed=42  steps={steps}  probe=256\n"
+                "tau=1000.0 steps   T=capacity/214=19.1 steps   tau/T=52.25\n"
+                "  step   R3-rank  CANONICAL  feat-std  rna-rna  contrastive\n")
+        rows = ""
+        for i, step in enumerate(range(0, steps + 1, 50)):
+            r3 = 67.55 if step == 0 else series * (1.0 + 0.03 * (i % 3))
+            rows += (f"{step:>6}{r3:>10.2f}{r3 * 1.52:>11.2f}{0.03:>10.4f}"
+                     f"{(0.3650 if step == 0 else rna):>9.4f}"
+                     f"{'nan' if step == 0 else '4.5000':>13}\n")
+            rows += f"        STALENESS age:cos  0:0.1{i}0\n"
+        return head + rows + (f"\nDONE momentum={momentum} decorr={decorr} "
+                              f"final_eff_rank={series:.2f} rna_rna={rna:.4f}\n")
+
+    for decorr, r3, rna in (("0.0", 4.32, 0.4774), ("0.01", 6.22, 0.7657), ("0.04", 8.01, 0.8696)):
+        write(f"e0_run/d1_diag/ablate_decorr{decorr}.log", probe_log("0.999", decorr, 400, r3, rna))
+    write("e0_run/d1_diag/mseed_m0.999_s42.log", probe_log("0.999", "0.04", 500, 7.46, 0.8300))
 
     # ---- extracted ---------------------------------------------------------
     runs = {}

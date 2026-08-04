@@ -567,7 +567,106 @@ it"*.
 
 ---
 
+### F9 — Rank rises while a co-measured collapse measure rises with it
+
+**Draft section.** §4.9a. **NEW 2026-08-04.** The dissociation this figure carries is **stronger than
+anything in §4.9**, and until now it had no figure at all.
+
+**Claim.** Raising the covariance-decorrelation weight raises effective rank **monotonically across
+three levels** while the RNA-view patient-to-patient mutual cosine — a *direct* measurement of the
+condition rank exists to detect — rises **monotonically with it**, co-measured on the identical runs
+and printed on the same log lines. Rank reports more occupied directions; the cosine reports the
+patients' states converging on one vector.
+
+**Why it is stronger than §4.9's instances**, and both reasons are about the *shape* of the evidence
+rather than its size: it is **monotone across three levels** rather than a single contrast, and the
+contradicting quantity is **co-measured** rather than inferred from a downstream readout in another
+table. §4.9's instances can each be answered with "different instrument, different table"; this one
+cannot.
+
+**Panels.**
+
+- **(a) The dissociation, twin axes, statistic R3.** `feature_decorrelation` ∈ {0.0, 0.01, 0.04} on
+  the x axis, one point per level. Left axis: **R3** — 4.32 / 6.22 / 8.01. Right axis: **RNA-view
+  mutual cosine** — 0.4774 / 0.7657 / 0.8696. Both series rise. R3 is the column these logs' own
+  `final_eff_rank=` line reports, so it is the column a notebook entry quoting "eff-rank" is quoting.
+- **(b) The same, under canonical R1** — 6.29 / 9.32 / 12.20 against the identical cosine series.
+  **Two panels rather than one because binding constraint 1 forbids two rank statistics on one axis**;
+  the point of (b) is that the direction survives the choice of statistic, and that R1 is the
+  statistic §4.1's floor is measured in.
+- **(c), (d) The tracks over training**, steps 0–400, all three arms plus the same-seed repeat —
+  rank in (c), cosine in (d) — from **one verified common initialisation** (R3 67.55, canonical R1
+  101.38, cosine 0.3650 at step 0 in every arm), so the endpoint is not an artefact of where the
+  reading was taken.
+
+**Required annotations, drawn inside the artwork and not left to a caption.**
+
+1. **ONE SEED PER LEVEL.** Printed on the x-axis label of (a) and (b) and again in the bold band
+   beneath the panels.
+2. **The rank change is ×1.854 (R3) / ×1.940 (canonical R1) and both are INSIDE §4.1's ×3.295
+   floor** — drawn as a shaded band anchored at each panel's own decorrelation = 0 value
+   (4.32 → 14.23 in (a), 6.29 → 20.73 in (b)), so the reader sees the whole sweep sitting inside it.
+   **The monotonicity and the co-measured cosine carry this result, not the magnitude of the rank
+   change**, and the bold band says exactly that.
+3. The **same-seed repeat** of the 0.04 arm is drawn as open markers, labelled in the legend as
+   **n = 2 — a pair, NOT a floor**.
+
+**Data.** `v2/research/rebase/p2/figures/data/e0_run/d1_diag/ablate_decorr{0.0,0.01,0.04}.log` and
+`mseed_m0.999_s42.log`, vendored and hashed through `extract_from_box.py` like every other figure's
+data (`v2/research/rebase/p2/figures/data/MANIFEST.json`); produced on the box by `v2/research/rebase/d1_momentum_probe.py`, which
+imports **both** rank statistics from `v2/calibra` and computes neither inline. The floor is read from
+`v2/research/rebase/p2/figures/data/extracted/F1_RETRAINING_REPEAT.json` and the figure **asserts the printed spread against the
+log's own min and max** before drawing it. Script `v2/research/rebase/p2/figures/fig_f9_decorrelation.py`;
+tests in `v2/tests/test_p2_figures.py`; reported in
+`NOTEBOOK_ENTRIES/lr_test_and_decorrelation_reversal_20260804T1130Z.md` §2.
+
+**Status.** `PLOTTABLE`.
+
+**Caption must carry.** (i) **One seed per level, 400 steps, one objective, one cohort.** (ii) The
+rank change is **inside §4.1's floor**, and the floor drawn is on a **different arm, duration and
+block** — canonical R1 on the residualised exported `wsi_biology` block, `programme_only`, 40 epochs
+— while these runs are `programme_free` at 400 steps on a fixed held-out probe **for which no floor
+has been measured**, so the band is indicative (§4.1a rows 48–50). (iii) The correction the figure
+carries: ***"`feature_decorrelation` is defective" was conditional on a query-written queue.***
+Without a momentum key encoder the same term *aggravated* the collapse (1.59 against 2.17 at step
+250, §5.1 instance 3); with one it raises rank. **Every claim this project makes about that term
+needs *"in the absence of a momentum key encoder"* attached** — §2.4, §4.9, §4.9a and Appendix C now
+do. (iv) The `mseed_m0.999_s42` repeat is `n = 2` and **may not be quoted as a floor** for this
+regime; §4.1's own argument is that a pair drawn from concordant repeats can license everything.
+
+---
+
 ## Main tables
+
+### T8 — The floor audit: every rank comparison the paper makes or relies on
+
+**Draft section.** §4.1a. **NEW 2026-08-04.**
+
+Fifty rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
+**block**, the floor **its own block licenses**, whether it clears, and what the claim rests on if it
+does not. **23 of the 25 selections between candidate configurations are inside a floor**; 13 rows sit
+on a statistic or a block for which **no floor has ever been measured**; 5 are exempt with the reason
+stated. Exemptions are stated, never taken silently.
+
+**This table is generated, not typed.** `v2/research/rebase/p2/floor_audit.json` is the list;
+`v2/research/rebase/p2/p2_floor_audit.py --markdown` renders exactly the table the draft prints, and
+`v2/tests/test_p2_floor_audit.py` **re-reads every value out of the file it came from** — a vendored
+box log, a JSON readout, or a named section of the draft — and fails if a ratio disagrees with its
+source, if a verdict disagrees with its floor, or if the draft's copy of the table has drifted from
+the list. A ‡ marks a row whose statistic or block does not match the floor it is judged against.
+
+**Provenance.** `floor_audit.json` cites, per row, a file under
+`v2/research/rebase/p2/figures/data/` or a section of `paper/P2_RANK_DRAFT.md`,
+`paper/QUEUE_ANCHORING.md` or a notebook entry. Nothing in it is recomputed.
+
+**Status.** `PLOTTABLE` (text table).
+
+**Must carry.** Block-matching is load-bearing: D1-B seed 43 is **3.246×** residualised and
+**3.091×** raw, and its residualised figure against the *raw* floor of 3.111× reads as **outside**
+the floor when on its own block it is inside. The table also records one **open source
+disagreement**, reported and not substituted: §5.2's prose says the momentum effect is
+*"2.6–3.3× at every step past 150"*, where the section's own table gives 2.208×–3.596× over steps
+200–600 (and 4.343× at step 100).
 
 ### T1 — Rank as a selection rule against the published alternatives — **and it is underpowered**
 
@@ -788,7 +887,7 @@ resolvable either**, and the panel says so rather than leaving it for a referee.
 6.85 / 2.81 = 2.44×, also inside. Three caveats make this indicative rather than a like-for-like
 disqualification, and none of them rescues it: the floor was measured on `programme_only` at 40 epochs
 on an exported artifact, and these runs are `programme_free` at 500 steps on a held-out probe —
-different arm, duration and block, and no like-for-like floor for this regime has been measured.
+different arm, duration and block, and no like-for-like floor for this regime has been measured — though one same-seed **pair** in it now has been, and is concordant (1.066× at step 400; §4.1a row 50). **n = 2 is a pair, not a floor**, and the panel must not draw it as one.
 **What does not depend on rank at all is the reason the fix was adopted** (the unfixed configuration
 collapses and the fixed one does not, visible in retrieval, in the contrastive loss, and in whether
 `programme_free` reaches 40 epochs without the tripwire firing), and the panel must not be drawn as
@@ -894,7 +993,7 @@ input.
 |---|---|---|
 | **A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each | **Not run.** F1's envelope is one retraining pair; F2 reaches the same conclusion from 8 within-arm d.f. without it. **The paper's most valuable missing measurement.** | §4.4, §6.2 |
 | ~~A seed replication of S4's momentum sweep~~ | **REPORTED 2026-08-04, and it does not clear F1's floor.** Three seeds per momentum, 500 steps; every m = 0.999 seed exceeds every m = 0 seed, closing a single-seed defect that was **hardcoded in the harness**, not a design choice. But the worst-case separation is **3.29× against 3.295×**. S4 now carries that, and the draft rests the fix on a binary training outcome (§5.4) rather than on the ratio. | §5.2, §5.4, §6.2 |
-| **A like-for-like retraining floor for the momentum regime** | **Not measured.** F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
+| **A like-for-like retraining floor for the momentum regime** | **Not measured — but one same-seed PAIR in that regime now has been, and it is concordant** (`ablate_decorr0.04` against `mseed_m0.999_s42`: 1.066× at step 400, ≤ 1.128× over the shared steps; draft §4.1a row 50). **n = 2 is a pair, not a floor**, and §4.1's own argument is that a pair drawn from concordant repeats can license everything, so it is recorded and not used. F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets. | §3.2, §6.2, §6.3 |
 | Error bars on any dilution rank or channel value | Single seed, single donor draw; the source states there is no error bar on level-to-level differences. | §4.8, §6.2 |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run; "unchanged" means the point estimates differ by 0.002 and nothing more. | §4.9, §6.2 |
