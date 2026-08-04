@@ -28,8 +28,21 @@ design columns, 84 sites, `n_test = 2,766`), top-CCA at 16 components:
 | all 90 non-control, Δ | −0.1359 | −0.1077 | −0.1192 | −0.1359 / −0.1077 / −0.1192 ✓ |
 | `random_control`, Δ | −0.0099 | −0.0280 | −0.0268 | −0.0099 / −0.0280 / −0.0268 ✓ |
 
-Every figure reproduces to four decimals. The instrument and the workspace are sound, so what
-follows is about the claim, not about the plumbing.
+Every point estimate reproduces to four decimals. The full 2,000-repeat bootstrap on the untrained
+40 (`ANCHOR_geneset40.json`):
+
+| seed | Δ | patient CI₉₅ | p | cancer CI₉₅ | p | published patient / cancer CI |
+|---|---:|:---:|---:|:---:|---:|---|
+| 42 | −0.1325 | [−0.1605, −0.0993] | 0.0000 | [−0.1792, −0.0632] | 0.0010 | identical to 4 dp |
+| 43 | −0.1089 | [−0.1459, −0.0733] | 0.0000 | [−0.1604, −0.0108] | 0.0125 | [−0.1460,−0.0749] / [−0.1623,−0.0118] |
+| 44 | −0.1226 | [−0.1483, −0.0867] | 0.0000 | [−0.1643, −0.0427] | 0.0010 | [−0.1502,−0.0866] / [−0.1653,−0.0411] |
+
+Seed 42 reproduces exactly; seeds 43 and 44 agree to ~0.002 on the interval bounds and are identical
+on the point estimate. That residue is expected and benign: `d2_compare` seeds each pair's bootstrap
+at `args.seed + pair_index`, and the published readout was run as separate per-pair jobs
+("13 jobs, ~13 minutes", `D2_RESULT.md` §5), so pairs 2 and 3 drew a different resample sequence
+there than in this single three-pair invocation. Both CIs exclude zero in 3/3 either way. The
+instrument and the workspace are sound, so what follows is about the claim, not the plumbing.
 
 ---
 
@@ -52,12 +65,27 @@ own supervision. Same `d2_compare`, unmodified; only `--targets` changes.
 | 44 | gene sets, untrained 40 | 0.5983 | 0.4757 | **−0.1226** |
 | 44 | **PBS codes (128)** | 0.5335 | 0.5309 | **−0.0026** |
 
-**Reading, against the predeclared rule.** The predeclared third branch is taken: **neither arm
-separates on PBS codes.** Δ is −0.0098 / +0.0088 / −0.0026 — the sign is not even consistent across
-seeds, and every value sits inside the −0.0099…−0.0280 band the published `random_control` negative
-control already occupies. Per the predeclaration this is **uninformative about which supervision is
-better in that space**, and it is reported as such. Arm I does **not** win on its own codes, so the
-clean "each arm is better in its own space" refutation is *not* what happened.
+**Full 2,000-repeat paired bootstrap on the PBS-code exam** (`T1_pbs_codes.json`), same design,
+same partition, same seed:
+
+| seed | Δ (PBS−H) | patient CI₉₅ | p_improve | cancer CI₉₅ | p_improve |
+|---|---:|:---:|---:|:---:|---:|
+| 42 | −0.0098 | [−0.0422, **+0.0232**] | 0.3080 | [−0.0498, **+0.0317**] | 0.2990 |
+| 43 | +0.0088 | [**−0.0177**, +0.0426] | 0.7380 | [**−0.0237**, +0.0503] | 0.7080 |
+| 44 | −0.0026 | [−0.0342, **+0.0230**] | 0.3810 | [−0.0454, **+0.0373**] | 0.4115 |
+
+**Reading, against the predeclared rule.** The predeclared third branch is taken, and it is met in
+its strict form: **all six intervals cover zero** — patient and cancer, in 3/3 seeds — with
+`p_improve` between 0.30 and 0.74. Δ is −0.0098 / +0.0088 / −0.0026, the sign is not consistent
+across seeds, and every value sits inside the −0.0099…−0.0280 band the published `random_control`
+negative control already occupies. Per the predeclaration this is **uninformative about which
+supervision is better in that space**, and it is reported as such and not read either way. Arm I
+does **not** win on its own codes, so the clean "each arm is better in its own space" refutation is
+*not* what happened.
+
+For contrast, on the gene-set exam the same instrument put every one of the six intervals *away*
+from zero at p ≤ 0.0125. Same arms, same patients, same design, same statistic, same number of
+repeats — only the coordinate system of the target block differs.
 
 **But the contrast between the two exams is the finding, and it is large and stable:**
 

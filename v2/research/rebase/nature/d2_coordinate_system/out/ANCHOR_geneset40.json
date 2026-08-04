@@ -1,0 +1,139 @@
+{
+  "experiment": "D2_ANCHOR_geneset40",
+  "arm_a": "hallmark",
+  "arm_b": "pbs",
+  "target_groups": [
+    "heldout_pathway",
+    "immune_tme",
+    "tumour_state"
+  ],
+  "n_targets": 40,
+  "deflation": {
+    "enabled": false,
+    "label": "",
+    "npz": "",
+    "axes_file": "",
+    "n_axes": 0,
+    "axes": [],
+    "applied_to": "confound design, so removed from the targets and BOTH arms identically"
+  },
+  "pairs": [
+    {
+      "hallmark": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s42/artifacts/d2_h_seed42.npz",
+      "pbs": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s42/artifacts/d2_i_seed42.npz",
+      "n_test": 2766,
+      "point_hallmark": 0.6125515560670497,
+      "point_pbs": 0.4800258605072433,
+      "pbs_minus_hallmark": {
+        "patient": {
+          "n_valid": 2000,
+          "mean_delta": -0.12980505244526327,
+          "ci95_low": -0.16048369358145861,
+          "ci95_high": -0.09929907824877274,
+          "p_improve": 0.0,
+          "mode": "patient",
+          "repeats": 2000,
+          "point_delta": -0.13252569555980642
+        },
+        "cancer": {
+          "n_valid": 2000,
+          "mean_delta": -0.1180245587790526,
+          "ci95_low": -0.17922069303453358,
+          "ci95_high": -0.06317131171307895,
+          "p_improve": 0.001,
+          "mode": "cancer",
+          "repeats": 2000,
+          "point_delta": -0.13252569555980642
+        }
+      },
+      "confounds": {
+        "columns": [
+          "cancer",
+          "tss"
+        ],
+        "min_site_count": 10,
+        "n_distinct_sites_kept": 84,
+        "n_deflated_axes": 0,
+        "n_design_columns": 108
+      }
+    },
+    {
+      "hallmark": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s43/artifacts/d2_h_seed43.npz",
+      "pbs": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s43/artifacts/d2_i_seed43.npz",
+      "n_test": 2766,
+      "point_hallmark": 0.5970180659703436,
+      "point_pbs": 0.48815008139035565,
+      "pbs_minus_hallmark": {
+        "patient": {
+          "n_valid": 2000,
+          "mean_delta": -0.10873680941524964,
+          "ci95_low": -0.14592440901442102,
+          "ci95_high": -0.07330749916527197,
+          "p_improve": 0.0,
+          "mode": "patient",
+          "repeats": 2000,
+          "point_delta": -0.10886798457998792
+        },
+        "cancer": {
+          "n_valid": 2000,
+          "mean_delta": -0.09140598606240423,
+          "ci95_low": -0.16037661973136666,
+          "ci95_high": -0.010816025900974092,
+          "p_improve": 0.0125,
+          "mode": "cancer",
+          "repeats": 2000,
+          "point_delta": -0.10886798457998792
+        }
+      },
+      "confounds": {
+        "columns": [
+          "cancer",
+          "tss"
+        ],
+        "min_site_count": 10,
+        "n_distinct_sites_kept": 84,
+        "n_deflated_axes": 0,
+        "n_design_columns": 108
+      }
+    },
+    {
+      "hallmark": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s44/artifacts/d2_h_seed44.npz",
+      "pbs": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s44/artifacts/d2_i_seed44.npz",
+      "n_test": 2766,
+      "point_hallmark": 0.5982672623910414,
+      "point_pbs": 0.4756549231036225,
+      "pbs_minus_hallmark": {
+        "patient": {
+          "n_valid": 2000,
+          "mean_delta": -0.11754804822245692,
+          "ci95_low": -0.1482934268428645,
+          "ci95_high": -0.08669673051225993,
+          "p_improve": 0.0,
+          "mode": "patient",
+          "repeats": 2000,
+          "point_delta": -0.12261233928741894
+        },
+        "cancer": {
+          "n_valid": 2000,
+          "mean_delta": -0.10187184956868596,
+          "ci95_low": -0.16425116278203197,
+          "ci95_high": -0.04273115722644221,
+          "p_improve": 0.001,
+          "mode": "cancer",
+          "repeats": 2000,
+          "point_delta": -0.12261233928741894
+        }
+      },
+      "confounds": {
+        "columns": [
+          "cancer",
+          "tss"
+        ],
+        "min_site_count": 10,
+        "n_distinct_sites_kept": 84,
+        "n_deflated_axes": 0,
+        "n_design_columns": 108
+      }
+    }
+  ]
+}
