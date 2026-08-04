@@ -380,8 +380,9 @@ The predeclaration listed eight ways a **favourable** result would be untrustwor
 1. **Step 3 fails → Reading 4, not Reading 1.** Honoured. The headline sentence of §0 says the channel
    survives *and* says this is Reading 4.
 2. **The adjuster is a relabelled incumbent.** `adjuster_agreement` is reported for every arm. The
-   kernel arms sit at per-axis r-median 0.9992–0.9995 and **are** relabelled incumbents; the flag says
-   so in the JSON. The location–scale arm is not (relative Frobenius difference 0.9919).
+   kernel arms sit at per-axis r-median 0.9993–0.9995 and the saturated arm at 0.9992, and all of them
+   **are** relabelled incumbents; the flag says so in the JSON. The location–scale arm is not (relative
+   Frobenius difference 0.9919 on `d2_h`, 0.9961 on `d2_i`).
 3. **The null moved.** It did not, materially: 0.1453–0.1491 across arms. Grading is on excess anyway.
 4. **The ceiling is large.** It is not: 6.0–11.2% of the channel's excess, §5, and it is in the
    headline table rather than an appendix.
