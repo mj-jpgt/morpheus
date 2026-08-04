@@ -453,6 +453,8 @@ def stage_gene_sets(args) -> None:
                          "ratio_to_real": float(np.nanmedian(fitted) / np.nanmedian(real_fitted))})
             print(f"[gset] {name}: fitted_median={arms[-1]['fitted_median']:.4f} "
                   f"ratio={arms[-1]['ratio_to_real']:.4f}", flush=True)
+        if args.cross_slide:
+            out["cross_slide_arm"] = _cross_slide_gene_sets(data, blob, args)
         ratios = np.asarray([a["ratio_to_real"] for a in arms])
         out["random_gene_set_arm"] = {
             "sets": arms, "n_sets": len(arms),
@@ -463,6 +465,55 @@ def stage_gene_sets(args) -> None:
     _write(args.output, "claim3_gene_sets.json", out)
 
 
+def _cross_slide_gene_sets(data, blob, args) -> dict:
+    """Claim 3 asked at the only resolution that generalises: fit on train SLIDES, test on test SLIDES.
+
+    The out-of-fold statistic ``score_target_block_per_column`` uses is a random KFold over
+    spots, so its folds share slides and, at high sampling density, share tissue -- a 128 um
+    window on a 100 um pitch overlaps its neighbours.  That statistic is the literal port of
+    the TCGA control and is reported as such, but a ratio measured there says nothing about
+    whether a random gene set reproduces the part of the channel that survives a slide
+    boundary.  This arm fits the same ridge on the 22 training slides and scores
+    ``within_slide_r`` on the 13 test slides, where no fold can share tissue with any other.
+    """
+    from sklearn.linear_model import Ridge
+
+    slides, split = data["slides"], data["split"]
+    train, test = split == "train", split == args.partition
+    x = np.asarray(data["x"], dtype=np.float64)
+    block_ids = blob["spot_ids"].astype(str)
+    position = {p: i for i, p in enumerate(block_ids.tolist())}
+    missing = [p for p in data["ids"][train | test].tolist() if p not in position]
+    if missing:
+        raise HestAdapterError(f"cross-slide block is missing {len(missing)} spots, e.g. {missing[:3]}")
+    take = np.asarray([position[p] for p in data["ids"].tolist()])
+
+    def _score(block: np.ndarray) -> dict:
+        model = Ridge(alpha=args.ridge_alpha).fit(x[train], block[train])
+        prediction = model.predict(x)
+        return {"pooled_r": float(np.nanmean(pooled_r(block, prediction, test))),
+                "within_slide_r": float(np.nanmean(within_slide_r(block, prediction, slides, test)))}
+
+    real = _score(np.asarray(data["y"], dtype=np.float64))
+    arms = []
+    for name in [str(k) for k in blob["set_names"]]:
+        block = np.asarray(blob[name], dtype=np.float64)[take]
+        value = _score(block)
+        value["set"] = name
+        value["within_ratio_to_real"] = float(value["within_slide_r"] / real["within_slide_r"])
+        value["pooled_ratio_to_real"] = float(value["pooled_r"] / real["pooled_r"])
+        arms.append(value)
+        print(f"[gset/cross] {name}: within={value['within_slide_r']:.4f} "
+              f"ratio={value['within_ratio_to_real']:.4f}", flush=True)
+    within_ratios = np.asarray([a["within_ratio_to_real"] for a in arms])
+    return {"real": real, "sets": arms, "ridge_alpha": args.ridge_alpha,
+            "n_train_spots": int(train.sum()), "n_test_spots": int(test.sum()),
+            "within_ratio_median": float(np.median(within_ratios)),
+            "within_ratio_min": float(within_ratios.min()),
+            "within_ratio_max": float(within_ratios.max()),
+            "what_this_is": "ridge fit on the 22 train slides, scored within the 13 test slides"}
+
+
 def stage_random_sets(args) -> None:
     """Build the matched random-gene-set target blocks from the raw HEST h5ad store."""
     plan = json.load(open(args.plan))
@@ -470,7 +521,8 @@ def stage_random_sets(args) -> None:
     root = Path(args.root)
     slides = plan["slides"]
     train_ids = [s["id"] for s in slides if s["split"] == "train"]
-    eval_ids = [s["id"] for s in slides if s["split"] == args.partition]
+    eval_ids = ([s["id"] for s in slides] if args.partition == "all"
+                else [s["id"] for s in slides if s["split"] == args.partition])
 
     common = None
     for meta in slides:
@@ -648,6 +700,10 @@ def main() -> None:
     g.add_argument("--per-slide", type=int, default=213)
     g.add_argument("--n-draws", type=int, default=40)
     g.add_argument("--random-sets", default="", help="npz written by the random-sets stage")
+    g.add_argument("--cross-slide", action="store_true",
+                   help="also fit on train SLIDES and score within test slides; requires a "
+                        "random-sets npz built with --partition all")
+    g.add_argument("--ridge-alpha", type=float, default=1000.0)
     g.set_defaults(func=stage_gene_sets)
 
     r = sub.add_parser("random-sets")
