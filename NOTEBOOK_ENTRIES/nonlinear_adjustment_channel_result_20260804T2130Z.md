@@ -414,6 +414,14 @@ Per the rules for this run, `NOTEBOOK.md`, the paper drafts and `claim_guards.py
    *raw* block. Against the adjustment's own measured rate — **1.19–1.75×** design chance, not 1.00× —
    the same readings are **2.4–3.3× (site)** and **3.1–3.7× (cancer)**. The *significance* is
    unchanged; only the magnitude moves. The raw-arm multiples are unaffected.
+
+   **Scope.** The inflation is a property of the *null*, not of the estimator, so it applies to every
+   probe in that entry whose null permutes labels of an already-adjusted block — the RBF-SVM rows
+   (site 3.85–3.63×, cancer 6.10×) and the random-forest rows (site 2.85×, cancer 5.66×) as well as
+   the k-NN. **The size of the inflation was measured here for the k-NN only**, so those rows should be
+   read as pending the same correction rather than as corrected by it. The raw arms of all three
+   families are unaffected, because an unadjusted block carries no adjustment artefact — measured:
+   the row-shuffled *unadjusted* block reads 1.34× / 1.28× at p = 0.10 / 0.065.
 3. **Same entry §2, "Measured chance matches design chance, so the probe is not capacity-bound"** —
    correct as written (the global label-permutation null does sit at the design rate) but incomplete:
    that null measures the chance rate of the *estimator*, not of the *estimator applied to an adjusted
