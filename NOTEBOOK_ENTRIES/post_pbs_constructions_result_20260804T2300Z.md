@@ -224,9 +224,11 @@ them".
 
 The three attempts to build a *better basis* did not beat PCA. Blending the interventional and
 variance bases got most of the way there and clearly beat the original dictionary, but did not
-overtake plain PCA in any of the four comparisons. Filtering the perturbations down to the ones that
-reproduce across two cell lines did not help. Putting both datasets on a common per-gene scale did
-not help either.
+overtake plain PCA in any of the four comparisons — and by the time it had got that far it had become
+95% the same thing as PCA anyway, measured in the space the test looks at. Filtering the perturbations
+down to the ones that reproduce across two cell lines did not help at all, which at least tells us the
+problem is not that the perturbation data is noisy. Putting both datasets on a common per-gene scale
+helped a little — a real gain over the original dictionary — but nowhere near enough to overtake PCA.
 
 ---
 
@@ -262,7 +264,10 @@ not help either.
 
 Modules: `v2/perturbation_basis_common.py`, `v2/build_causal_basis_targets.py`,
 `v2/causal_attribution.py`, `v2/tests/test_post_pbs_constructions.py`, plus
-`development_expression_moments` in `v2/baseline_target_common.py`.
+`development_expression_moments` in `v2/baseline_target_common.py` and two allowlist entries in
+`v2/tests/test_effective_rank_canonical.py`. All six were re-verified against the committed HEAD
+blobs after the runs — `_require_workspace_matches` → `{"checked": 6, "differ": 0, "missing": 0}` —
+so the numbers above were produced by the code that is in the repository, not by a drifted copy.
 Results, persisted to NFS at
 `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/p3_post_pbs/` —
 `results/construction_table.csv`, `results/bootstrap_{joint_cca,consensus,domain_adapted,pbs_rebuild}.{json,csv}`,
