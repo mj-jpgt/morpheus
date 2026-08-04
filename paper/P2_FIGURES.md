@@ -264,14 +264,15 @@ is invariant to all three.
 **Panels.** Three small multiples, one per degree of freedom, each a 6-column grid of ✓/✗ cells with
 the information verdict drawn beneath as a **flat reference row that is correct in every column**.
 
-- **(a) Statistic.** Rows R1 / R2 / R3, columns D2 s42/s43/s44, D1 s42/s43/s44.
-  **`[REDRAW REQUIRED — do not use draft §4.5(a) as printed]`.** Measured under the canonical
-  variants: R1 `OK MISS OK OK OK OK`; **R2 `OK OK MISS OK OK OK`**; **R3 `OK MISS OK OK OK OK`**.
-  The three disagree on **2 of 6 pairs (D2 s43, D2 s44)**, not 3 of 6, and D1 s42 does not
-  disagree. The draft's printed R2 and R3 rows are the eigenvalue participation ratio and its
-  row-normalised form; if the panel shows those rows they must be **labelled `PR` and `PR_rownorm`,
-  not R2 and R3**. Reason and full table:
-  `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` §3.
+- **(a) Statistic.** Five rows, columns D2 s42/s43/s44, D1 s42/s43/s44. Canonical
+  R1 `OK MISS OK OK OK OK`; canonical **R2 `OK OK MISS OK OK OK`**; canonical
+  **R3 `OK MISS OK OK OK OK`** — the three disagree on **2 of 6 pairs (D2 s43, D2 s44)**. Then, drawn
+  in a visually separated block below them and **labelled `PR` and `PR_rownorm`, never R2 and R3**:
+  `PR` `OK OK MISS MISS OK OK` and `PR_rownorm` `OK OK MISS OK OK OK` — the eigenvalue participation
+  ratio `(Σσ²)²/Σσ⁴` and its row-normalised form, which are what an earlier version of this analysis
+  computed under the R2/R3 labels. `PR` is identical cell for cell to T1's "participation ratio" row,
+  and the panel must say so, because the two are not independent evidence. Draft §4.5(a) was
+  corrected to this at commit `a11549a`; earlier printings of that table must not be used.
 - **(b) Block.** Raw against confound-residualised, for the two D2 seeds where it flips under R3:
   seed 43 R3 raw H 11.720 / I 11.111 (H) → resid H 14.746 / I 15.915 (**I**); seed 44 R3 raw
   H 5.385 / I 5.449 (I) → resid H 6.564 / I 6.302 (**H**). Show R1 and R2 in the same panel as the
@@ -290,10 +291,18 @@ the information verdict drawn beneath as a **flat reference row that is correct 
 `v2/research/rebase/p2/p2_robustness.py`; original `~/e0_run/P2_ROBUSTNESS.json`, tabulated in
 `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §4.2.
 
-**Status.** (b), (c) `PLOTTABLE`. (a) `PLOTTABLE` **from `P2_RANK_VARIANTS.json` only**; the draft's
-own §4.5(a) table must be corrected before the panel is drawn, and §4.5's provenance note — which
-attributes the two entries' differing R3 rows to raw-versus-residualised block — is also wrong: both
-are residualised, and the difference is the statistic.
+**Status.** `PLOTTABLE`. (a) must be drawn **from `P2_RANK_VARIANTS.json`**, which is the source
+draft §4.5(a) now cites; §4.5's provenance note previously attributed the two source entries'
+differing R3 rows to raw-versus-residualised block, which was wrong — both are residualised and the
+difference is the statistic — and that too was corrected at `a11549a`.
+
+**A panel this figure should carry and currently cannot.** The draft's own framing is that the
+correction to (a) *is* the paper's result: a fourth statistic living under a disambiguated name,
+inside the analysis code of the section that argues the name is unreliable. A small inset showing
+`(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` on one synthetic spectrum family would make the size of the
+substitution concrete rather than asserted. That is **`NEEDS EXTRACTION`** — cheap, CPU-only,
+deterministic new computation, which must be written into `v2/research/rebase/p2/` with a test rather
+than a scratchpad file, and run with the thread caps.
 
 **Caption must carry.** These panels do not show that rank is wrong; they show that **a rank verdict
 is not a well-defined object until the statistic, the block and the view are stated**. The
@@ -348,11 +357,12 @@ UTC). Predeclaration — `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_2026080
 restriction — `NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md`. Matching —
 `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` (`"objective_only_difference": true`).
 
-**Status.** `PLOTTABLE`. **The bootstrap that draft §4.7.2 marks `[D1 PAIRED BOOTSTRAP PENDING]` in
-six cells has landed** — the file exists, on the correct 40-target readout, with `n_valid` 2,000 of
-2,000 repeats. §4.7.2, §4.7.3's third deflation and §6.2's row are out of date and must be
-reconciled by the draft's owner before this figure is drawn; the values above are read directly from
-the two JSON files and are not transcribed from the draft.
+**Status.** `PLOTTABLE`. The bootstrap draft §4.7.2 previously marked `[D1 PAIRED BOOTSTRAP PENDING]`
+in six cells **existed all along** — it was hidden by the audit chain's stale absolute path — and was
+folded into the draft at commit `a11549a`. The values above are read directly from the two JSON files.
+**Both estimators must be drawn, and the conservative one weighted**: the patient bootstrap is
+decisive 3/3, the cancer-cluster bootstrap 2/3. A panel showing only the patient interval would be
+the selective quotation §4.6 exists to refuse.
 
 **Caption must carry.** `D1_PAIRED_BOOTSTRAP.json` (unsuffixed) **must not be used** — it scores all
 90 non-control targets, of which 50 are `programme_only`'s own supervision. The arms differ in
@@ -647,8 +657,14 @@ from step 200 to 600.
 `[MOMENTUM SEED REPLICATION PENDING]`.** This sweep is **one seed per momentum value**, and §4.2
 measures the seed term as dominant for exactly this statistic on this stack. §5.3 states the
 consequence without softening it: the hyperparameter choice §5 reports rests on a rank difference
-that has not been tested against the nuisance term this paper's own headline measures. §6.2 lists the
-replication as not run. **A version of this figure that does not say so contradicts F2.**
+that has not been tested against the nuisance term this paper's own headline measures.
+**A version of this figure that does not say so contradicts F2.** The single seed was a **defect,
+not a design choice** — the momentum harness had its seed hardcoded, so the sweep could not have
+varied seeds had we asked it to — and the panel must say which of the two it was. A seed-replicated
+sweep (`m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported beside the participation ratio) is
+**armed and not yet reported** (§5.3, §6.2); when it lands, the marker is replaced by a per-arm seed
+band drawn the way F2(b) draws one, and **the figure must be redrawn either way**, including if the
+replication shows the effect is inside the seed band.
 
 **Caption must carry.** MoCo's staleness account is ruled out three ways and the alternative is
 stated as unconfirmed: the queue turns over completely every 19 steps; key-to-encoder cosine at step
@@ -721,7 +737,7 @@ input.
 | would-be figure | why it cannot be drawn | where the draft says so |
 |---|---|---|
 | **A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each | **Not run.** F1's envelope is one retraining pair; F2 reaches the same conclusion from 8 within-arm d.f. without it. **The paper's most valuable missing measurement.** | §4.4, §6.2 |
-| **A seed replication of S4's momentum sweep** | Not run. One seed per momentum value, against a statistic §4.2 measures as seed-dominated. | §5.3, §6.2 |
+| **A seed replication of S4's momentum sweep** | **Armed, not yet reported.** One seed per momentum value, against a statistic §4.2 measures as seed-dominated — and the single seed was a defect (hardcoded in the harness), not a design choice. | §5.3, §6.2 |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets. | §3.2, §6.2, §6.3 |
 | Error bars on any dilution rank or channel value | Single seed, single donor draw; the source states there is no error bar on level-to-level differences. | §4.8, §6.2 |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run; "unchanged" means the point estimates differ by 0.002 and nothing more. | §4.9, §6.2 |
@@ -739,14 +755,16 @@ input.
 
 ## Pending dependencies, collected
 
-| item | figure | state as of 2026-08-04 02:55 UTC |
+| item | figure | state as of 2026-08-04 03:10 UTC |
 |---|---|---|
-| D1 paired bootstrap, 40 targets | **F6(b)** | **LANDED.** `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json`, 00:08 UTC; negative control 02:40 UTC. Draft §4.7.2 still prints `[D1 PAIRED BOOTSTRAP PENDING]` in six cells and §6.2 still lists it as blocked — **the draft's owner must reconcile before F6 is drawn.** |
-| Momentum seed replication | **S4** | `[MOMENTUM SEED REPLICATION PENDING]` — not run. Every S4 panel carries the marker. |
-| Controlled retraining repeat design | F1, F4 | Not run. Named in §6.2 as the most valuable missing measurement. Do **not** draw F1's band as if it were an estimated distribution; it is one pair. |
-| Per-step arrays for the collapse tracks | F8(b) | `NEEDS EXTRACTION` from `~/e0_run/d1_diag/`, else before/after markers. |
-| Corrected §4.5(a) in the draft | **F5(a)** | Data available (`~/ws_p2/out/P2_RANK_VARIANTS.json`); the draft table is wrong and must be corrected first. |
-| Phase 1b equivalence test | T7 | Not run; the row stays qualified. |
+| D1 paired bootstrap, 40 targets | **F6(b), F6(c)** | **RESOLVED.** `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` (00:08 UTC) and `D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json` (02:40 UTC); folded into draft §4.7.2 at commit `a11549a`. Draw **both** estimators; weight the cancer-cluster one. |
+| §4.5(a)'s statistic labels | **F5(a)** | **RESOLVED.** Corrected in the draft at `a11549a`; plot from `~/ws_p2/out/P2_RANK_VARIANTS.json`. |
+| **Momentum seed replication** | **S4** | **`[MOMENTUM SEED REPLICATION PENDING]`** — armed (`m ∈ {0, 0.999} × 3 seeds`), not yet reported. Every S4 panel carries the marker until it lands, and S4 is redrawn whichever way it comes out. |
+| **Controlled retraining repeat design** | **F1, F4** | **Not run**, and named in §6.2 as the paper's most valuable missing measurement. Do **not** draw F1's 2.69× band as if it were an estimated distribution; it is one pair on one configuration. |
+| Per-step arrays for the collapse tracks | F8(b) | `NEEDS EXTRACTION` from `~/e0_run/d1_diag/`, else before/after paired markers. Do not interpolate. |
+| Synthetic `(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` inset | F5 | `NEEDS EXTRACTION` — new CPU-only computation, to be written into `v2/research/rebase/p2/` with a test. |
+| Phase 1b equivalence test | T7 | Not run; the row stays qualified, and "unchanged" means the point estimates differ by 0.002. |
+| Labelled linear probe on every artifact | — | Not run. No figure depends on it; §6.2 and §6.3 state the absence. |
 
 ---
 
@@ -765,13 +783,18 @@ Checked 2026-08-04. Every path in this file exists unless the row says it does n
   outputs are P1's; the artifact this paper reads is
   `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` and the build scripts are
   `v2/research/dilution/`.
-- Draft **§4.9** cites the surviving D1-A checkpoints as `~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt`.
-  The directories are named `d1_p_seed42` and so on; the four `last.pt` files exist under those names.
-  Not fixed here — the draft is another agent's.
-- Draft **Appendix B** cites the vendored rank-recomputation scripts as
+Two stale pointers **in `paper/P2_RANK_DRAFT.md`**, not fixed here because the draft is another
+agent's, and flagged in
+`NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` §5:
+
+- Draft **line 1699** (§4.9) cites the surviving D1-A checkpoints as
+  `~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt`. Those paths do not resolve: the directories are
+  `d1_p_seed42`, `d1_p_seed43`, `d1_p_seed44`, `d1_f_seed42`. The draft's substantive statement is
+  right — `d1_f_seed43` and `d1_f_seed44` exist as directories and hold no checkpoint.
+- Draft **line 2234** (Appendix B) cites the vendored rank-recomputation scripts as
   `v2/research/rebase/recompute_rank.py` and `recompute_p1b.py`. **Neither exists**; the files are
   `v2/research/rebase/rank_recompute_all_instances.py` and
-  `v2/research/rebase/rank_recompute_phase1b.py`. Not fixed here — the draft is another agent's.
+  `v2/research/rebase/rank_recompute_phase1b.py`.
 
 ---
 
