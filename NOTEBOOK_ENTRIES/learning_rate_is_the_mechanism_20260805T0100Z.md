@@ -1,4 +1,4 @@
-## 2026-08-05 01:00 UTC — The two missing cells report: it is the learning rate. Momentum is neither necessary nor sufficient, and this is the first of four accounts to survive a predeclared test
+## 2026-08-05 01:00 UTC — The two missing cells report: it is the learning rate. Momentum is neither necessary nor sufficient, and this is the fourth account for this collapse and the first to survive a predeclared test
 
 **Logged:** 2026-08-05 01:00 UTC. **How obtained:** `~/e0_run/d1_diag/lr_L{5,6}.log`, read against
 `~/e0_run/d1_diag/lr_L{1,2,3,4}.log`. 400 steps, `programme_free`, fixed held-out probe, capacity
@@ -63,13 +63,18 @@ test**.
 
 | # | account | how it died |
 |---|---|---|
-| 1 | regulariser weighting | five-arm sweep: all five arms collapse from 67.55 to 1.59–3.43, both regularisers at zero included |
-| 2 | MoCo key **staleness** | three measurements: 19-step turnover; agreement does not predict rank; the freshest queue is the healthiest |
-| 3 | the `τ/T` turnover criterion | predeclared, five predictions, four wrong and the discriminating one produced **no effect** (`turnover_criterion_FALSIFIED_20260804T0330Z.md`) |
-| 4 | **momentum above a threshold in τ** | **this entry** — L5 fails at m = 0.999, L6 works at m = 0 |
-| 5 | **the learning rate** | **survives**, on a predeclared pair of opposite-signed predictions |
+| 1 | MoCo key **staleness** | three measurements: 19-step turnover; agreement does not predict rank; the freshest queue is the healthiest |
+| 2 | the `τ/T` turnover criterion | predeclared, five predictions, four wrong and the discriminating one produced **no effect** (`turnover_criterion_FALSIFIED_20260804T0330Z.md`) |
+| 3 | **momentum above a threshold in τ** | **this entry** — L5 fails at m = 0.999, L6 works at m = 0 |
+| **4** | **the learning rate** | **survives**, on a predeclared pair of opposite-signed predictions |
 
-Three of the four dead accounts were killed by experiments built to test them, two of those
+**The numbering is fixed and means one thing throughout the paper: the learning rate is the fourth
+account, and the three before it are staleness, `τ/T`, and momentum.** A further candidate —
+**regulariser weighting** — was ruled out earlier still by the five-arm sweep (all five arms collapse
+from 67.55 to 1.59–3.43, both regularisers at zero included). It is a candidate *cause* of the
+collapse rather than an account of why the momentum fix works, so it is not counted among the three.
+
+All three dead accounts were killed by experiments built to test them, two of those
 predeclared. That is a stronger methods story than one unfalsified survivor, and the draft reports the
 sequence rather than only the survivor.
 

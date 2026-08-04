@@ -6,12 +6,23 @@ rank does not track information content") and carried a STALE banner. Nothing be
 from it unverified: every path in this file was checked to exist on 2026-08-04, and the ones that
 did not are named in "Paths corrected in this rewrite" at the end.
 
-**The claim every figure here serves** (`P2_RANK_DRAFT.md` §1.3):
+**The claim every figure here serves** (`P2_RANK_DRAFT.md` §1.3). **Updated 2026-08-05: the claim
+narrowed, and the box below is the current one. The general form — *"effective rank is unusable as a
+selection signal"* — is WITHDRAWN** (draft §4.1b); any figure or caption still serving it is stale.
 
-> Effective rank is unusable as a selection signal because its between-arm differences are smaller
-> than its own within-arm reproducibility floor — inside the regime its proponents explicitly
-> reserve for it. Its dynamic range is dominated by the one factor that carries no information: the
-> training seed.
+> Effective rank's usability as a selection signal is conditional on the co-trained **view** it is
+> read from and on the **statistic** it is read with, and neither condition is ever stated when the
+> number is quoted. On the `wsi_biology` view under canonical R1 its between-arm differences are
+> smaller than its own within-arm reproducibility floor — inside the regime its proponents explicitly
+> reserve for it — and its dynamic range there is dominated by the one factor that carries no
+> information, the training seed. On `rna_biology` and `full_biology`, same statistic, same five runs,
+> the floor is fifty times smaller and every between-arm difference clears it.
+
+**And the fact the figure set must not bury** (draft §4.1b): on the raw exported block **RankMe as
+published has a retraining floor of 1.811× against our centred statistic's 3.111×** on the same five
+retrains, and RankMe is the only selection in the paper's own 60-row audit that clears a floor its own
+statistic and block license. **T9** carries both halves; **F1** must be captioned as measuring one
+view with one statistic, not as measuring the metric.
 
 One row per display item. For each: what it shows, the **exact data file** it draws from, the
 **single claim** it carries, and the **draft section** it belongs to.
@@ -1020,7 +1031,7 @@ better behaved on *spread* but rests on a thinner basis on *divergence rate*.
 `NOTEBOOK_ENTRIES/d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`.
 **Status.** `PLOTTABLE`.
 
-### S6 — E1: the experiment this paper should have been built on
+### S6 — E1: the experiment this paper was NOT built on, and should not now be
 
 A one-page description of `v2/calibra/e1_rank_information.py` and `v2/calibra/aggregate_e1.py`: a
 preregistered, gate-enforced, three-seed, equivalence-margin design (margin 0.10) whose aggregated
@@ -1114,8 +1125,9 @@ in this repository. It is `PLOTTABLE` from the draft's table and must not be dra
 provenance were equal to F9's. Closing it is a file copy; draft §6.4 states the gap.
 
 **Caption must carry.** **(1)** This is the **fourth** account proposed for this collapse and the
-**first to survive a predeclared test**; regulariser weighting, MoCo staleness and the `τ/T` turnover
-criterion were each falsified, the last two by experiments built to test them. **(2)** At the training
+**first to survive a predeclared test**; MoCo staleness, the `τ/T` turnover criterion and **momentum
+itself** were each falsified, the last two by experiments built to test them, and regulariser weighting
+had been ruled out before any of them as a candidate *cause*. **(2)** At the training
 rate actually used, `2e-4`, momentum **does** rescue the objective, and the seed-varied replication of
 that (S4) is unambiguous — **lowering the learning rate would have solved the original problem more
 simply and we did not try it**. **(3)** One seed per cell, on a block with **no measured floor**: all
@@ -1181,18 +1193,23 @@ Checked 2026-08-04. Every path in this file exists unless the row says it does n
   outputs are P1's; the artifact this paper reads is
   `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` and the build scripts are
   `v2/research/dilution/`.
-Two stale pointers **in `paper/P2_RANK_DRAFT.md`**, not fixed here because the draft is another
-agent's, and flagged in
-`NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` §5:
+Two stale pointers **in `paper/P2_RANK_DRAFT.md`** were flagged here on 2026-08-04, in
+`NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` §5. **Both are now closed, and this
+block records that rather than repeating them, because line numbers into a draft under revision go
+stale immediately and one of the two entries had itself become self-contradictory** — it named the
+same two paths as wrong and as correct.
 
-- Draft **line 1699** (§4.9) cites the surviving D1-A checkpoints as
-  `~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt`. Those paths do not resolve: the directories are
-  `d1_p_seed42`, `d1_p_seed43`, `d1_p_seed44`, `d1_f_seed42`. The draft's substantive statement is
-  right — `d1_f_seed43` and `d1_f_seed44` exist as directories and hold no checkpoint.
-- Draft **line 2234** (Appendix B) cites the vendored rank-recomputation scripts as
-  `v2/research/rebase/rank_recompute_all_instances.py` and `v2/research/rebase/rank_recompute_phase1b.py`. **Neither exists**; the files are
+- §4.9's D1-A checkpoints were cited as `~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt`, which do not
+  resolve. **CLOSED**: the draft now writes `~/e0_run/d1_v1/d1_p_seed{42,43,44}/last.pt` and
+  `~/e0_run/d1_v1/d1_f_seed42/last.pt`. The substantive statement was right all along —
+  `d1_f_seed43` and `d1_f_seed44` exist as directories and hold no checkpoint.
+- Appendix B's rank-recomputation script paths. **CLOSED**: the draft cites
   `v2/research/rebase/rank_recompute_all_instances.py` and
-  `v2/research/rebase/rank_recompute_phase1b.py`.
+  `v2/research/rebase/rank_recompute_phase1b.py`, and both exist at those paths.
+
+**Rule adopted 2026-08-05:** a pointer into another file in this plan cites a **section**, never a
+line number. `v2/tests/test_paper_paths_resolve.py` checks the paths; nothing checks a line number,
+and every line number in this file had drifted within a day of being written.
 
 ---
 

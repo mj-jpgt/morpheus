@@ -118,10 +118,11 @@ m = 0.99. A predeclared learning-rate test has since shown that the threshold mo
 rate and is not a property of m at all: see draft §5.2a.
 
 **`m = 0.999` is used because it measured best in this sweep. No mechanism is claimed here.** That is a
-weaker justification than a hyperparameter usually receives and it is stated deliberately: **three**
-mechanisms were proposed for this effect and all three were falsified by measurement (below), and the
-fourth — the momentum threshold this table shows — was falsified in turn by the learning-rate test in
-P2 §5.2a. A reader can
+weaker justification than a hyperparameter usually receives and it is stated deliberately: **two**
+mechanisms were proposed for this effect and both were falsified by measurement (below) — MoCo's key
+staleness and the `τ/T` turnover criterion — and the **third**, the momentum threshold this table
+shows, was falsified in turn by the learning-rate test in P2 §5.2a. **The learning rate is the fourth
+account and the first to survive a predeclared test.** A reader can
 see exactly how much to trust the choice, which is more than a value defended by an unverified story
 would offer.
 

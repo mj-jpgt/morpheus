@@ -2936,11 +2936,16 @@ reassurance at all.
 
 ### 5.2a The mechanism, on the fourth attempt: it is the learning rate — and this is the first account to survive a predeclared test
 
-**Three accounts of this collapse were proposed and falsified before this one.** Regulariser weighting
-(refuted by the five-arm sweep: all five arms collapse, including both regularisers at zero, §5.1
-instance 3); MoCo's key **staleness** (refuted three ways above); and the `τ/T` **turnover criterion**
-(predeclared, tested and not met). A fourth — **momentum itself**, `m` above a threshold near
-`τ = 100` — was what the sweep above left standing, and it is the one this subsection tests. **The
+**Three accounts of this collapse were proposed and falsified before this one, and the third of them
+is the one §5.2 above is written around.** They are: MoCo's key **staleness** (refuted three ways
+above); the `τ/T` **turnover criterion** (predeclared, tested, and the discriminating prediction
+simply not met); and **momentum itself** as the controlling variable, `m` above a threshold near
+`τ = 100`, which is what the sweep above left standing and is what this subsection tests. *(A fourth
+candidate, **regulariser weighting**, was ruled out earlier still by the five-arm sweep — all five
+arms collapse, including both regularisers at zero, §5.1 instance 3. It is a candidate **cause** of
+the collapse rather than an account of why the momentum fix works, and it is not counted among the
+three so that the numbering in this paper means one thing throughout: **the learning rate is the
+fourth account, and the three before it are staleness, `τ/T`, and momentum.*)* **The
 sequence is part of the contribution and is reported as such**: a mechanism section that shows one
 surviving story is much weaker evidence than one that shows three deaths and the design that killed
 them.
@@ -3221,8 +3226,9 @@ downstream behaviour, and the rank curve is reported as the diagnostic that foun
 
 **Two further honest limits carried from the source drafts, one of which §5.2a has now moved.**
 Instance 3's *cause* was established only as
-far as "the key set, not the objective's weighting", and three successive mechanisms — regulariser
-weighting, MoCo staleness, the `τ/T` turnover criterion — were predicted, tested and falsified.
+far as "the key set, not the objective's weighting", and three successive mechanisms — MoCo staleness,
+the `τ/T` turnover criterion, and the momentum threshold this section is written around — were
+predicted, tested and falsified.
 **§5.2a closes that limit in a direction the section did not expect**: a predeclared learning-rate test
 establishes that the collapse is primarily a learning-rate phenomenon and that the momentum threshold
 this section was written around is an artefact of the single rate it was measured at. What is *not*
@@ -3274,7 +3280,7 @@ should be withdrawn to a replication.
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run. §4.9 states that "unchanged" means the point estimates differ by 0.002 and nothing more. |
 | Rank and channel under **one** statistic across **all** instances | **Done for D2, dilution, Phase 1b and D1-B** — one implementation, every surviving artifact recomputed, published values reproduced exactly. **Impossible** for the decorrelation instance (artifacts never existed; the cited source file is absent) and the "16/16" instance (a train-time batch of 16, never exported, and a hard `matrix_rank`). D1-A's 9.81 / 1.71 are `[NOT RECOMPUTED]` — a GPU forward pass from surviving checkpoints, and the GPU was in use. |
 | Any instance on a **second architecture, cohort or modality pair** | All of it is one architecture family (transformer aggregator over frozen H-Optimus-0 patch tokens with a biology head), one cohort (TCGA), one modality pair (morphology → bulk expression). `claim_guards.no_external_cohort` is undischarged for every morphology result on this project. |
-| **E1**, the preregistered rank-versus-information experiment in this repository | Built (`v2/calibra/e1_rank_information.py`, `aggregate_e1.py`, equivalence margin 0.10, three-seed requirement) and **never run**. It is the experiment this paper should have been built on. |
+| **E1**, the preregistered rank-versus-information experiment in this repository | Built (`v2/calibra/e1_rank_information.py`, `aggregate_e1.py`, equivalence margin 0.10, three-seed requirement) and **never run** — **and it should not be run for the surviving claim.** *An earlier version of this row called it "the experiment this paper should have been built on"; the 2026-08-04 aptness audit withdrew that (`NOTEBOOK_ENTRIES/PREDECLARED_E1_aptness_and_verdict_20260804T0609Z.md`, `P2_FIGURES.md` S6) and the phrase is corrected here.* E1 asks whether decorrelation-created rank carries molecular information — the claim that was falsified and removed — and contains no within-arm term at all, so it measures the surviving claim nowhere. It is also unrunnable: no artifact pair carries the preregistered decorrelation 0 → >0 intervention. |
 | Rank at **capacity scale**, where Deng et al. report a power law | Not measured. §2.3 argues their sweep is over capacity-like variables and ours is not; **we do not claim rank fails at capacity scale.** |
 | A case where the collapse diagnostic **fails** | We have not found one (§4.10). |
 | ~~The competing-metric and variance-decomposition scripts, vendored~~ | **CLOSED, and enforcing the rule found an error.** All five now live at `v2/research/rebase/p2/` with an end-to-end test (`v2/tests/test_p2_analysis_scripts.py`), vendored at commit `7b37dce`. Re-run from a byte-verified checkout (402/402 files by git blob SHA-1), **§4.2, §4.4(1), §4.5(b), §4.5(c), §4.6 and §4.7 reproduce to every published digit**. §4.5(a)'s second and third rows did **not**: they were a mislabelled statistic, are relabelled PR / PR_rownorm, and the count falls from 3 of 6 to 2 of 6 (§4.5a). The rule was worth enforcing precisely because it caught something. |
@@ -3438,9 +3444,10 @@ momentum, and at `4e-5` it reaches 12.30–35.24, including **12.30 with no mome
 Momentum does rescue the objective at the rate we actually train at, and the seed-varied replication of
 that is unambiguous; it is simply **neither necessary nor sufficient**, and lowering the learning rate
 would have solved the original problem more simply. We did not try it. **This is the fourth account
-proposed for this collapse and the first to survive a predeclared test** — regulariser weighting, MoCo's
-key-staleness account and a `τ/T` turnover criterion were each falsified by measurement, the last two by
-experiments built to test them. We report the sequence and not just the survivor, because four accounts
+proposed for this collapse and the first to survive a predeclared test** — MoCo's key-staleness account,
+a `τ/T` turnover criterion and **momentum itself** were each falsified by measurement, the last two by
+experiments built to test them, and a further candidate *cause*, regulariser weighting, had been ruled
+out before any of them. We report the sequence and not just the survivor, because four accounts
 and one predeclared discriminator is a more honest description of what we know than one account that was
 never given the chance to die.
 
