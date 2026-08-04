@@ -2778,14 +2778,14 @@ at all.** Three same-seed repeats of each arm at `lr = 1e-3` put the largest acr
 **0.223** against a largest within-arm spread of **0.250** over three identical retrains: **the cosine's
 difference between the arms is inside its own retraining spread**, which is this paper's own criterion
 returning its usual answer on a statistic that had never been asked to face it. The m = 0.999 arm alone
-spans **0.5207–0.9292** over four same-seed runs of one configuration, so the 0.5207 the fold above is
-read from is the bottom of that arm's own range rather than a property of the arm. The rank was already
+spans **0.5207–0.9292** over four same-seed runs of one configuration, so the 0.5207 that fold is read
+from is the bottom of that arm's own range rather than a property of the arm. The rank was already
 flat; the cosine, given a floor, is flat too. *(The mean-offset ratio that the centring account rested
 on was measured at the same time and behaves the same way: it varies by a factor of five between
 identical retrains and separates no arms. It explains why the uncentred cosine is unstable; it is not
 evidence that the arms differ in it.)* **The surviving use is therefore not under strain from this
-observation.** It is under a different obligation instead, which is the next paragraph. *Nine runs, one
-seed, one stack, at `lr = 1e-3` and not the project's `2e-4`;
+observation.** What it is under instead is a different obligation, which the second paragraph below
+states. *Nine runs, one seed, one stack, at `lr = 1e-3` and not the project's `2e-4`;
 `NOTEBOOK_ENTRIES/the_dissociation_does_not_survive_its_own_floor_20260804T1800Z.md`.*
 
 **And even for the surviving use, rank is not the best instrument.** Patient-to-patient mutual cosine
@@ -3246,9 +3246,10 @@ arm's own four same-seed runs span **0.5207–0.9292**, and the 0.5207 in the fo
 that range rather than a property of the arm. **At n = 3 the two instruments agree, and what they agree
 on is that the three high-rate arms are indistinguishable** — which is the opposite of a dissociation
 and is reported in `NOTEBOOK_ENTRIES/the_dissociation_does_not_survive_its_own_floor_20260804T1800Z.md`
-and in §4.10. None of that rescues the momentum knob or was ever claimed to: what this subsection says
-about momentum at the high rate is unchanged, and it is why §5.2a does not say "momentum does nothing",
-only that momentum does nothing **that rank can see**. *The 1.9–2.2× cosine folds are left in the table
+and in §4.10. **What the subsection concludes about momentum is unchanged**, because the conclusion was
+never the dissociation: it is why §5.2a does not say "momentum does nothing", only that momentum does
+nothing **that rank can see** — and the correction is that at this rate it now does nothing the cosine
+can see either. *The 1.9–2.2× cosine folds are left in the table
 because they are what these runs read, not because they carry anything: the momentum fold at `lr = 1e-3`
 is inside the floor just quoted, and the one at `4e-5` is at a rate where the cosine has no floor
 either.*
@@ -3452,7 +3453,8 @@ queue fix (§5.2) worked."*
    no floor had been measured at all; **neither clause is true any longer**, and the change is a
    measurement rather than a concession. Five same-seed repeats of each of m = 0.999 and m = 0.99 at a
    600-step budget give an R3 floor of **1.195×** — the smallest of the sixteen probe floors, and the
-   only comparison in this paper with no collapsed arm on either side — so **1.262× clears it, by
+   one comparison among them with **no collapsed arm on either side**, because both arms train — so
+   **1.262× clears it, by
    1.06×**, computed by the checker with nothing about the direction predeclared and no threshold
    moved. Three things have to be said in the same breath as that pass, and all three are on the audit
    row (§4.1a row 46).
@@ -3491,10 +3493,12 @@ queue fix (§5.2) worked."*
 all three of its possible answers.** The seven between-arm differences of §4.1 are **inside** a floor
 measured on their own statistic and block and carry nothing. Eleven rows on the probe block, including
 the momentum fix, **clear** a floor measured on their own statistic, block, reading step and arms. And
-the third answer has now emptied: for three revisions this sentence ended *"three remain unjudgeable,
-each naming the specific run that would settle it"* — **those three runs were named, run, and returned
-three passes** (row 1 of the table above by 1.51×, limit 2 by 1.06×, and §5.2's capacity-64 measurement
-by 1.68×), so **no selection in this paper is unjudgeable any longer**. Naming the run is what made the
+the third answer has emptied of selections, though not of rows: until this revision this sentence ended
+*"three remain unjudgeable, each naming the specific run that would settle it"* — **those three runs
+were named, run, and returned three passes** (row 1 of the table at the head of this subsection by
+1.51×, limit 2 by 1.06×, and §5.2's capacity-64 measurement by 1.68×), so **no selection between
+candidate configurations in this paper is unjudgeable any longer**, while sixteen non-selection rows
+still are and each still says why. Naming the run is what made the
 unjudgeable column temporary rather than a permanent parking space, which is the part of the practice
 worth copying. We regard that as the rule
 working rather than the rule failing, and the alternative — applying the floor to RankMe's use and
