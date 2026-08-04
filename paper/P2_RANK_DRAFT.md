@@ -254,6 +254,12 @@ In descending order of how well evidenced they are.
 8. **Three mutually incompatible statistics named `effective_rank` across ten call sites in one
    repository** (§3.1) — two of them live abort thresholds that kill training runs — reported **and**
    harmonised, with every recomputable historical instance recomputed under one definition.
+9. **A fourth one, found in our own analysis code, in the section arguing the name is unreliable**
+   (§4.5a). It changed a published count from 3 of 6 to 2 of 6 and withdrew a qualification from §4.7.
+   It was invisible to review, to the test suite and to the authors, and surfaced **only** when the
+   traceability rule was enforced by vendoring the producing code into the repository. The
+   recommendation that follows is the one this paper is willing to make generally: **against this class
+   of error the defence is mechanical provenance, not diligence.**
 
 Plus a domain in which the within-method matched-arm evaluation of rank as a selection rule has not
 been done: across **453 de-duplicated works** citing RankMe, Roy & Vetterli, LiDAR or α-ReQ, none
@@ -788,12 +794,34 @@ level that was *measured*, not assumed.
 level attached.
 
 **A null that is not zero.** The permutation null for a 16-component canonical correlation on ~2,700
-patients sits at 0.140–0.147, because a multivariate maximum over 16 fitted directions is upward-biased
+patients sits between **0.140 and 0.147 depending on the cohort and the permutation procedure** (see
+the footnote below — the two ends are different procedures and must not be substituted), because a
+multivariate maximum over 16 fitted directions is upward-biased
 at finite *n*. A raw channel ratio therefore flatters the surviving signal and the null-corrected column
 is the one quoted throughout. This is also why "both arms at chance" is not a testable statement for
 these readouts, and why §4.7's negative control is stated as "controls must score below real targets" —
 necessary and not sufficient
 (`NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md:59-63`).
+
+> **Footnote — this project quotes at least three permutation nulls and they are not substitutable.**
+> **0.140** is D2's, from a **200-draw row-shuffle of the residualised target matrix**
+> (`NOTEBOOK_ENTRIES/D2_stratified_result_20260803T1210Z.md`); it is the comparator for every D1 and D2
+> number in this paper, including §4.7.3's random controls. **0.145–0.147** is the dilution sweep's,
+> from a **300-draw within-cancer permutation** at a different *n* (`DILUTION_LOWER_BOUND.md` §2); it is
+> the comparator for §4.8 and nothing else. **0.151–0.158** appears elsewhere on the project at other
+> cohort sizes and component counts. They differ in *n*, in component count and — for 0.140 — in the
+> **permutation procedure itself**, and P1's audit records explicitly that the median is cohort- and
+> capacity-specific and **must not be carried across**
+> (`NOTEBOOK_ENTRIES/p1_submission_draft_20260803T1230Z.md` §5).
+>
+> An earlier version of §4.7.3 compared D2's random controls against **0.147**. That was wrong; it is
+> corrected to **0.140**, and the conclusion is unchanged (0.44/0.147 = 3.0× against 0.44/0.140 = 3.2×).
+> **We record the error and not only the fix, because it is the same failure mode as §3.1 and §4.5(a) —
+> numbers that look interchangeable, are not, and carry no label saying which is which.** A related
+> label conflict survives in our own notes:
+> `NOTEBOOK_ENTRIES/d1_a3_verdict_and_effect_vs_floor_20260804T0300Z.md` calls 0.140 a "within-cancer"
+> null where `p1_submission_draft` identifies it as a row-shuffle. **The value is agreed; the procedure
+> label is not.** We follow the latter and flag the former rather than quietly picking one.
 
 **In-sample bias, checked.** The headline channel is fitted at a 16-component budget and is therefore
 upward-biased. Re-run with `heldout_top_cca` (directions fit on half the patients, scored on the other),
@@ -1144,17 +1172,38 @@ values of a different function. Note that the `PR` row is **identical, cell for 
 "participation ratio" row** — that identity is the arithmetic signature of the substitution and is why
 the two must not be counted as independent evidence.*
 
-**The correction, stated at the same prominence as the finding it qualifies.** Earlier versions of this
-table labelled rows 2 and 3 **R2** and **R3** — the statistics of `d1_audit.py` and
-`d1_geometry_probe.py`. **They were not.** The script that produced them carried its own inline
-definitions and computed `(Σσ²)²/Σσ⁴`, the order-2 Hill number of the **eigenvalue** distribution,
-where `d1_audit.py`'s R2 — and therefore `RANK_VARIANTS["R2"]` — is `(Σσ)²/Σσ²`, the order-2 Hill
-number of the **singular-value** distribution. They are different statistics. The rows are therefore
-relabelled **PR** and **PR_rownorm**, which is exactly what they are; the numbers themselves are
-unchanged and reproduce cell for cell. The mislabelling was found only when the script was vendored
-into the repository and rewritten to call the single canonical implementation — which is the same
-failure mode, in our own analysis code, that §3.1 documents in the production code, and it survived
-until the "every number traces to a file in the repository" rule was actually enforced.
+#### The correction to this table is itself the paper's result, and we present it that way
+
+Earlier versions of this table labelled rows 2 and 3 **R2** and **R3** — the statistics of
+`d1_audit.py` and `d1_geometry_probe.py`. **They were not.** The script that produced them carried its
+own inline definitions and computed `(Σσ²)²/Σσ⁴`, the order-2 Hill number of the **eigenvalue**
+distribution, where `d1_audit.py`'s R2 — and therefore `RANK_VARIANTS["R2"]` — is `(Σσ)²/Σσ²`, the
+order-2 Hill number of the **singular-value** distribution. They are different statistics. The rows are
+relabelled **PR** and **PR_rownorm**, which is exactly what they are; the numbers themselves are correct
+values of that function and reproduce cell for cell.
+
+**This is a fourth statistic living under a name §3.1 spends its length disambiguating — and it was
+inside our own analysis code, in the section of this paper that argues the name is unreliable.** We
+report it as evidence rather than as an erratum, because almost nothing else we could measure would
+support the claim as directly.
+
+**How it survived, which is the part that generalises.** The substitution was invisible to review — the
+label said R2 and the number was plausible for R2. It was invisible to the test suite, because no test
+compared the analysis script's rank to the repository's. It was invisible to the authors through two
+drafts and a full recomputation pass. **It was found only when the traceability rule was enforced —
+when the script that produced the numbers was vendored into the repository and rewritten to call the
+single canonical implementation instead of its own.** Nothing about care, review or expertise caught
+it; a mechanical provenance requirement did. **That is the recommendation this paper can actually
+make: against this class of error the defence is mechanical provenance, not diligence.**
+
+**Two details that make it usable rather than confessional.** First, the arithmetic fingerprint: the
+`PR` row is **identical, cell for cell, to §4.6's "participation ratio" row**. That identity is what a
+reader can look for to detect the same substitution in their own tables — two differently-named rows
+that agree exactly are one statistic reported twice, not two statistics agreeing. Second, the direction
+of the damage: the correction moved one count **against** us (3 of 6 → 2 of 6) and withdrew one
+qualification **for** us (D1's "only 2/3 under R2" becomes 3/3, removing a hedge from a result that
+already went against this paper). **An error scatters; a bias does not.** We note that not as a defence
+but because it is the check a referee should run on any self-reported correction.
 
 **What moves as a result, and it moves against us.** Re-measured with the canonical `RANK_VARIANTS`:
 
@@ -1244,6 +1293,13 @@ neither arm was supervised on** (`heldout_pathway` + `immune_tme` + `tumour_stat
 | D1 s42 | P42 | F42 | 0.6117 | 0.5412 | +0.0705 | P |
 | D1 s43 | P43 | F43 | 0.6198 | 0.5336 | +0.0863 | P |
 | D1 s44 | P44 | F44 | 0.6087 | 0.5126 | +0.0961 | P |
+
+**Sign convention, stated because it differs from §4.7.2's by design.** Δ here is `A − B` with the
+better arm written first, so every value is positive and the "winner" column carries the meaning.
+§4.7.2 uses the **predeclared** direction `channel(programme_free) − channel(programme_only)`, under
+which the same three D1 gaps read **−0.0705 / −0.0863 / −0.0961** and their bootstrap intervals are
+negative. **Same numbers, opposite sign, two tables** — flagged here rather than left for a reader to
+trip over.
 
 | metric | D2 s42 | D2 s43 | D2 s44 | D1 s42 | D1 s43 | D1 s44 | D2 | D1 | ALL | exact 2-sided binomial *p* |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|---:|
@@ -1377,12 +1433,16 @@ the ones that failed.
   own `random_control` (0.443–0.474). This is the "both arms train" branch. The queue fix (§5.2) worked.
 - **"The negative control passes, so the readout is clean."** *Only in the narrow sense, and the verdict
   must be recorded with its qualification.* Audit check A3 passes **on arm difference**: the
-  `random_control` arm gap is −0.022 / −0.007 / −0.032 with all three CIs spanning zero, so **the
-  instrument does not manufacture an arm difference where none should exist**. But the **absolute**
-  level on random controls is **0.44–0.48**, against real targets' 0.51–0.62 and a within-cancer
-  permutation null of **0.147** — so random gene sets carry roughly **three times the floor**, and 0.44
-  is emphatically **not** the null. That agrees with an independent finding on this project (T1.4) that
-  covariate-matched random gene sets reproduce **76–82%** of the per-target channel. **The correct
+  `random_control` arm gap is **−0.0224 / −0.0072 / −0.0322** with all three CIs spanning zero, so
+  **the instrument does not manufacture an arm difference where none should exist**. But the
+  **absolute** level on random controls is **0.4425–0.4810**, against real targets' 0.51–0.62 and the
+  D2 row-shuffle permutation null of **0.140** — so random gene sets sit at **≈3.2× the floor**
+  (3.1–3.4× across the six control readings), and 0.44 is emphatically **not** the null. Two
+  independent estimates agree on the size of that: these controls are **77–85%** of their own arm's
+  real-target level, and T1.4 found covariate-matched random gene sets reproducing **76–82%** of the
+  per-target channel. **The comparator is 0.140 and not the dilution sweep's 0.147** — an earlier
+  version of this bullet used 0.147, which is a different permutation procedure at a different *n*; see
+  §3.2's footnote. **The correct
   verdict is therefore "the instrument does not manufacture an arm difference; the absolute level is
   high and separately explained", not an unqualified pass** — and any future quotation of A3 must carry
   that sentence. It does not weaken the D1 result, which is a *paired arm difference* and is exactly the
@@ -1433,7 +1493,8 @@ paper's surviving claim, and D1 is an example of it rather than a counterexample
 objection to this paper is that it holds rank to a strict standard — *your difference must exceed your
 own noise floor* — and holds its own effect to a loose one. So: **the smallest D1 arm difference we
 report (0.0705) is roughly half the real-versus-random-control margin of 0.139** (real targets
-0.51–0.62 against random controls 0.44–0.48, §4.7.3). That is §4.1's envelope argument arriving from
+0.51–0.62 against random controls 0.4425–0.4810, §4.7.3; the margin is 0.6117 − 0.4728 = **0.1389** on
+seed 42, the seed that supplies the 0.0705). That is §4.1's envelope argument arriving from
 the channel side rather than the rank side, and it points at us. The effect we measure is *small
 relative to its own instrument's floor*, and a reader is entitled to hold that against our channel
 readings exactly as we hold the 2.69× envelope against rank.
@@ -1995,7 +2056,9 @@ Conceded, and the citation that makes the objection sharpest is ours to supply: 
 (Interspeech 2023; *Computer Speech and Language*) report that *"altering the downstream architecture
 structure leads to significant fluctuations in the performance ranking of the evaluated models"*. Our
 reference standard is a 16-component held-out canonical correlation against confound-residualised
-molecular targets, with a measured permutation null of 0.140–0.147. Four things partially answer the
+molecular targets, with a measured permutation null of 0.140 (D2 row-shuffle) or 0.145–0.147 (dilution
+within-cancer) depending on the readout — §3.2's footnote, which also records that we got this wrong
+once. Four things partially answer the
 objection and none of them dismisses it: the ordering is **98.0% arm** with F = 128.2 (§4.2); it is
 **identical across all three co-trained views for all six pairs** (§4.5c); it **survives held-out
 re-estimation with equal or larger deltas** (§3.2); and the `random_control` arm difference spans zero
@@ -2011,9 +2074,10 @@ stable, which it is under every perturbation we applied.**
 
 *Second — and stated because §4.1 holds rank to this standard, so the paper must hold itself to it.*
 **The margins we work with are not comfortably above the instrument's own floor.** The `random_control`
-level is 0.44–0.48 against real targets' 0.51–0.62 and a within-cancer permutation null of 0.147, so
-random gene sets carry roughly three times the floor — consistent with T1.4's independent finding that
-covariate-matched random gene sets reproduce 76–82% of the per-target channel. The real-versus-random
+level is 0.4425–0.4810 against real targets' 0.51–0.62 and the D2 row-shuffle permutation null of
+**0.140** (**not** the dilution sweep's 0.147 — §3.2's footnote), so random gene sets sit at ≈3.2× the
+floor — consistent with T1.4's independent finding that covariate-matched random gene sets reproduce
+76–82% of the per-target channel. The real-versus-random
 margin is therefore about **0.139**, and the smallest arm difference we quote (0.0705) is **about half
 of it** (§4.7.4). The negative control does what a negative control must — it does not manufacture an
 arm *difference* — but its **absolute level is high and separately explained**, and no absolute channel
@@ -2096,6 +2160,17 @@ strongest of them picks the information-poorer arm 3/3 on our in-scope contrast 
 unspecified constant — and every selection-rule count in this paper is reported with the statement that
 six pairs cannot support such a count. Our own headline miscalibration constant moved from 3.74× to 21.5×
 when we matched the preprocessing, in our favour, and the flattering number is not used.
+
+**And the paper's clearest single piece of evidence is one we did not design and would rather not have
+had.** While enforcing our own rule that every number trace to a file in the repository, we found a
+*fourth* statistic living under the name `effective_rank` — in the analysis script behind the very
+section that argues the name is unreliable. It moved a published count from 3 of 6 pairs to 2 of 6 and
+removed a qualification from the result that had already gone against us. It was invisible to review,
+invisible to the tests, and invisible to us across two drafts and a full recomputation; it surfaced
+only when the code that produced the numbers was vendored and forced to call the one canonical
+implementation. **We could not have argued the thesis better than that, and we did not argue it — we
+tripped over it.** The practical form is the recommendation we would most like carried: the defence
+against a scalar whose name is stable while its definition is not is *mechanical provenance*, not care.
 
 Finally, we report that three mutually incompatible statistics were implemented under the name
 `effective_rank`, across ten call sites, in the repository that produced these results — two of them
@@ -2186,9 +2261,10 @@ Reproduced verbatim so that any future quotation can carry it.
   "2/3 under R2" rested on a mislabelled statistic and is **withdrawn** (§4.5a).
 - **The `random_control` verdict (§4.7.3, §6.3).** *"The instrument does not manufacture an arm
   difference; the absolute level is high and separately explained."* Never quote audit check A3 as an
-  unqualified pass. Arm gap −0.022 / −0.007 / −0.032, CIs spanning zero — but absolute level 0.44–0.48
-  against real targets' 0.51–0.62 and a permutation null of 0.147, i.e. ~3× the floor, consistent with
-  T1.4's 76–82%. **No absolute channel level in this paper may be read against an assumed null of zero.**
+  unqualified pass. Arm gap −0.0224 / −0.0072 / −0.0322, CIs spanning zero — but absolute level
+  0.4425–0.4810 against real targets' 0.51–0.62 and the **D2 row-shuffle** null of **0.140**, i.e.
+  ≈3.2× the floor, consistent with T1.4's 76–82%. **The comparator is 0.140, never 0.147** (§3.2's
+  footnote). **No absolute channel level in this paper may be read against an assumed null of zero.**
 - **Our own margin (§4.7.4, §6.3).** The smallest arm difference quoted (0.0705) is about **half** the
   real-versus-random-control margin (0.139). Any quotation of a D1 or D2 arm difference should carry
   this, for the same reason §4.1's envelope travels with every rank level.

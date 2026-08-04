@@ -272,3 +272,50 @@ the finding it qualifies.
 concurrent agent when this addendum was written. Only `paper/P2_RANK_DRAFT.md`,
 `paper/QUEUE_ANCHORING.md` and this entry were staged; nothing under `v2/` was touched or committed by
 this work.
+
+---
+
+### 10. Addendum 4 — the null comparator was wrong, and the mislabelled statistic is promoted into the argument
+
+**1. §4.7.3 compared D2's random controls against the wrong permutation null, and it is the exact error
+this paper is about.** The comparator used was **0.147**, the dilution sweep's **within-cancer**
+permutation at a different *n*. The correct comparator for D2/D1 is **0.140**, a **200-draw row-shuffle
+of the residualised target matrix** (`NOTEBOOK_ENTRIES/D2_stratified_result_20260803T1210Z.md`).
+Corrected in §4.7.3, §6.3 and Appendix C. **The conclusion is unchanged**: 0.4425–0.4810 against 0.140
+is **≈3.2×** the floor (3.1–3.4× across the six control readings), where 0.147 gave 3.0×.
+
+A **footnote added to §3.2** now records that this project quotes **at least three** permutation nulls —
+**0.140** (D2 row-shuffle), **0.145–0.147** (dilution within-cancer), **0.151–0.158** elsewhere — that
+they differ in *n*, component count and, for 0.140, **in the permutation procedure itself**, and that
+P1's own audit says they **must not be carried across**
+(`p1_submission_draft_20260803T1230Z.md` §5). The footnote records the error rather than only the fix,
+because it is §3.1's failure mode in a second quantity.
+
+**And it flags a label conflict inside our own notes**, unresolved: `d1_a3_verdict_and_effect_vs_floor`
+calls 0.140 a *"within-cancer"* null where `p1_submission_draft` identifies it as a **row-shuffle**.
+**The value is agreed; the procedure label is not.** The draft follows the latter and flags the former
+rather than quietly picking one.
+
+**2. The mislabelled statistic is promoted from erratum to evidence.** §4.5(a) now carries a named
+subsection arguing that a *fourth* statistic under the name `effective_rank`, inside the analysis code
+for the section that argues the name is unreliable, is the paper's thesis demonstrating itself. The
+framing does the work the coordinator asked for: **the substitution was invisible to review, invisible
+to the test suite, and invisible to the authors across two drafts and a full recomputation pass, and
+was found only when the traceability rule was enforced by vendoring the producing code.** The
+recommendation is therefore mechanical rather than moral: *against this class of error the defence is
+mechanical provenance, not diligence.* Two supporting details are included so it reads as usable rather
+than confessional — the **`PR` row is cell-for-cell identical to §4.6's participation-ratio row**, which
+is the arithmetic fingerprint a reader can look for elsewhere (two differently-named rows agreeing
+exactly are one statistic reported twice); and the correction moved one count **against** us and
+withdrew one qualification **for** us, **the scatter signature of an error rather than a bias**.
+Promoted to §1.4 as contribution 9 and to a new paragraph in §7.
+
+**3. Sign convention verified end to end.** §4.6's table uses `Δ = A − B` (better arm first, all
+positive) and §4.7.2 uses the predeclared `Δ = F − P` (negative). Both are correct for their table and
+the two are now **explicitly reconciled in §4.6's caption**, which states that the same three D1 gaps
+read −0.0705 / −0.0863 / −0.0961 in §4.7.2. Every other mention checked: §1 abstract, §4.7.1's
+predeclared threshold, §4.7.2's narrative (−0.0863), §4.7.4, §6.3 and Appendix C use the magnitude
+unsigned or the negative convention consistently. No figure caption in `P2_FIGURES.md` quotes a D1
+delta.
+
+Suite after these edits: **326 passed**, thread-capped. Markdown only; nothing under `v2/` touched.
