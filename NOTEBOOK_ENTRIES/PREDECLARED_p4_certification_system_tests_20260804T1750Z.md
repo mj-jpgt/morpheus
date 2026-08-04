@@ -229,3 +229,38 @@ What this task contributes instead, and it is the part their predeclaration does
 It does not test P3. P3's hypothesis was refuted by its own predeclared test and the surviving
 claim is narrow; the P3 work in this task is a written re-plan against what is now true, in
 `paper/P3_P4_PLAN.md`, not a new experiment. No number in that plan will be new.
+
+---
+
+## AMENDMENT, 2026-08-04 18:35 UTC — condition 2's pass flag is sign-dependent in the single-axis case
+
+Recorded **before the full run**, on evidence from a smoke run at reduced settings
+(`--n-draws 4 --n-permutations 20`), and committed before any full-setting number was produced.
+
+The predeclaration said condition 2 is PASS iff `SpikeRecoveryResult.summary()["observed_above_floor"]`
+is `True`. That flag is `observed_matched_direction > detection_floor`, and
+`observed_matched_direction` is a **signed** correlation along the randomly drawn direction pair
+`(u, v)` the spike was planted on. With a single-column `x` and a single-column `y` — which is
+exactly the per-axis certification unit — `u` and `v` are scalars, so the statistic is
+`sign(u·v) · |corr(axis, target)|` and its **sign is a coin flip with no content**. On the smoke run
+it returned **−0.4765** against a `detection_floor` of 0.05, i.e. the flag said FAIL for an
+association whose magnitude is nearly ten times the floor.
+
+**Amended criterion, fixed now.** Condition 2 is PASS iff
+
+> `abs(spectral.heldout_single_direction_correlation(axis, target)) > SpikeRecoveryResult.detection_floor`
+
+which is the pairing `heldout_single_direction_correlation`'s own docstring prescribes: *"the CALIBRA
+`detection_floor` is expressed in single-direction correlation units … grading a per-target control
+against that floor therefore requires a per-target statistic on the same scale."* A NaN floor remains
+a FAIL. The shipped `observed_above_floor` flag and the signed `observed_matched_direction` are still
+reported next to the amended verdict so the discrepancy is visible rather than papered over.
+
+The same substitution applies to `refused_floor` in Test C, for the same reason.
+
+**This is a defect in the shipped flag, not only in my use of it**, and it is recorded as one: for a
+multi-column `x` the same median-over-random-directions is centred near zero, so
+`observed_above_floor` is close to always-`False` there too. No library code is changed by this task
+— the flag is left exactly as it is and the amended criterion is applied at reporting time, which is
+where the module docstring says magnitudes belong ("Magnitudes are taken at reporting time, never
+before the pairing").

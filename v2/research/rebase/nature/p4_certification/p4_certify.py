@@ -279,12 +279,20 @@ def cmd_endtoend(args) -> None:
                                  n_draws=args.n_draws, seed=args.seed, n_jobs=args.n_jobs)
     summary = curve.summary()
     floor = summary["detection_floor"]
+    # AMENDED CRITERION, see the amendment appended to the predeclaration: the shipped
+    # observed_above_floor flag compares a SIGNED correlation along a random direction
+    # pair against the floor, and for a one-column x that sign is a coin flip. The
+    # magnitude of the single-direction statistic is what the floor is expressed in.
+    magnitude = float(abs(grid[axis, target]))
+    clears = bool(np.isfinite(floor) and magnitude > floor)
     conditions["2_clears_detection_floor"] = {
-        "verdict": "PASS" if summary["observed_above_floor"] else "FAIL",
+        "verdict": "PASS" if clears else "FAIL",
+        "criterion": "amended: abs(heldout_single_direction_correlation) > detection_floor",
+        "abs_single_direction_correlation": magnitude,
         "detection_floor": floor,
         "transmission_floor": summary.get("transmission_floor"),
         "observed_matched_direction": summary.get("observed_matched_direction"),
-        "observed_above_floor": bool(summary["observed_above_floor"]),
+        "shipped_flag_observed_above_floor": bool(summary["observed_above_floor"]),
         "floor_is_nan": bool(not np.isfinite(floor)),
         "levels": summary["levels"], "recovered_median": summary["recovered_median"],
         "delta_median": summary["delta_median"],
@@ -448,7 +456,10 @@ def cmd_competitor(args) -> None:
                 "null_median": float(np.nanmedian(np.abs(null))),
                 "detection_floor": float(curve["detection_floor"]),
                 "observed_matched_direction": float(curve.get("observed_matched_direction", np.nan)),
-                "observed_above_floor": bool(curve["observed_above_floor"]),
+                "shipped_flag_observed_above_floor": bool(curve["observed_above_floor"]),
+                # AMENDED: magnitude against the floor, per the appended amendment.
+                "clears_detection_floor": bool(np.isfinite(curve["detection_floor"])
+                                               and abs(float(grid[axis, t])) > curve["detection_floor"]),
                 "axis_breaches_certificate": bool(axis in breaching),
                 "axis_balanced_accuracy": float(accuracy[axis]),
                 "axis_null_p95": float(null_p95[axis])}
@@ -458,7 +469,7 @@ def cmd_competitor(args) -> None:
 
     for row in rows:
         row["refused_site"] = bool(row["axis_breaches_certificate"] or not joint_ok)
-        row["refused_floor"] = bool(not row["observed_above_floor"])
+        row["refused_floor"] = bool(not row["clears_detection_floor"])
         row["refused_null"] = bool(not (row["abs_correlation"] > row["null_p95"]))
         row["answered_by_policy_C"] = bool(not (row["refused_site"] or row["refused_floor"]
                                                 or row["refused_null"]))
