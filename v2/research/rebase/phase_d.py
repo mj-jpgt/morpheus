@@ -410,6 +410,56 @@ def _d1_runner_command(args: argparse.Namespace, arm: str, seed: int) -> list[st
     return command
 
 
+def _require_workspace_matches(repo: Path, manifest: str) -> dict:
+    """Refuse to launch from a workspace whose files differ from the canonical tree.
+
+    The failure this exists for: every GPU workspace on this box was built once
+    from a tarball and then maintained file-by-file, so each drifted from the
+    repository by 12-15 source files without anyone noticing. It surfaced as an
+    experiment failing on a bug that had already been fixed, and the audit that
+    found it showed all seven workspaces affected.
+
+    The manifest MUST come from outside the workspace. A manifest stored inside it
+    would go stale together with the code and silently self-approve -- the same
+    error as syncing `git diff <my-last-commit>..HEAD`, which measures the set
+    changed since your last commit rather than the set differing from your tree.
+
+    Generate it from the canonical checkout::
+
+        git ls-files | while read f; do
+            printf '%s  %s
+' "$(git show HEAD:"$f" | tr -d '
+' | md5sum | cut -d' ' -f1)" "$f"
+        done > head_manifest.txt
+
+    Line endings are normalised on both sides: a Windows checkout ships CRLF,
+    which is cosmetic and would otherwise report every file as differing.
+    """
+    expected: dict[str, str] = {}
+    for line in Path(manifest).read_text(encoding="utf-8").splitlines():
+        digest, _, name = line.partition("  ")
+        if name:
+            expected[name] = digest
+    differ, missing = [], []
+    for name, digest in expected.items():
+        if not name.startswith(("v2/", "tests/", "src/", "configs/")) or not name.endswith((".py", ".json", ".yaml")):
+            continue
+        target = repo / name
+        if not target.is_file():
+            missing.append(name)
+            continue
+        if hashlib.md5(target.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != digest:
+            differ.append(name)
+    if differ or missing:
+        raise RuntimeError(
+            f"workspace {repo} does not match {manifest}: {len(differ)} file(s) differ, "
+            f"{len(missing)} missing. Refusing to launch -- a stale workspace produces results that "
+            f"look like data. differ={sorted(differ)[:8]} missing={sorted(missing)[:8]}. "
+            "Fix by shipping every tracked file, not a diff: "
+            "`git ls-files > /tmp/t.txt && tar -cf - -T /tmp/t.txt | ssh box 'cd <ws> && tar -xf -'`")
+    return {"manifest": str(Path(manifest).resolve()), "checked": len(expected), "differ": 0, "missing": 0}
+
+
 def run_d1(args: argparse.Namespace) -> None:
     """Train both supervision arms from one command, then measure them identically."""
     root = Path(args.run_root).resolve(); root.mkdir(parents=True, exist_ok=True)
@@ -433,6 +483,11 @@ def run_d1(args: argparse.Namespace) -> None:
         return
     repo = Path(__file__).resolve().parents[3]
     _require_clean_worktree(repo)
+    # A clean tree only proves the workspace agrees with ITSELF. This proves it
+    # agrees with the canonical checkout, which is the failure that actually bit us.
+    if args.workspace_manifest:
+        manifest["workspace_verified"] = _require_workspace_matches(repo, args.workspace_manifest)
+        _write_json(manifest_path, manifest)
     if (root / "SUCCESS.json").exists():
         raise RuntimeError(f"refusing an already-complete D1 run root {root}")
     if not args.calibra_targets or not Path(args.calibra_targets).is_file():
@@ -623,6 +678,10 @@ def main() -> None:
     d1.add_argument("--separation-weight", type=float, default=.01); d1.add_argument("--variance-weight", type=float, default=.01)
     d1.add_argument("--biology-key-momentum", type=float, default=0.0,
                     help="EMA momentum for the biology key encoder; passed identically to BOTH arms")
+    d1.add_argument("--workspace-manifest", default="",
+                    help="path to a hash manifest generated from the CANONICAL checkout. The launcher "
+                         "refuses to start if any source file differs. Must live outside the workspace: "
+                         "a manifest stored inside it goes stale with the code and self-approves.")
     d1.add_argument("--rank-tripwire-step", type=int, default=200)
     d1.add_argument("--rank-tripwire-minimum", type=float, default=4.0,
                     help="in-run centred effective-rank bar; D1 gates on this instead of on the "
