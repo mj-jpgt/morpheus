@@ -1763,7 +1763,12 @@ all 66 ordered pairs of the 12 artifacts against the predeclared criterion, two 
 is **H44 against I43**: 3.73× lower effective rank (9.143 against 34.117) carrying **+0.110** more
 molecular channel — a gap comparable to the headline D2 arm effect, same architecture, cohort, schedule
 and modality pair, differing in arm and seed. It is a genuine low-rank/high-information instance and it
-is the only configuration RankMe's hedge cannot absorb. **But it is a cross-arm, cross-seed comparison,
+is the only configuration RankMe's hedge cannot absorb. **And §4.1's rule applies to it too, which we
+state first rather than leaving it to the scope objection.** Its 3.73× clears the 3.295× retraining
+floor by 13%, but the comparison varies the **seed**, and the nuisance range that governs a seed-varied
+comparison is §4.2's within-arm **2.10–3.75×** — which 3.73× sits inside. So this instance is not a
+resolvable rank difference either, by the standard this paper applies to everyone else's, and that is a
+second reason it is supporting rather than load-bearing. **But it is a cross-arm, cross-seed comparison,
 and RankMe reserves itself to "different runs of a given method"; a referee will argue H44 and I43 are
 not that.** It is presented here as a *supporting* observation with its scope stated, never as the
 load-bearing one — and, per §2.2, it is in any case **partially pre-empted**: Aldeneh et al. (ICASSP

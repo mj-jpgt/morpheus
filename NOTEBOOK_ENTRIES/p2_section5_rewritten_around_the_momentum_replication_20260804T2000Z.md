@@ -95,7 +95,30 @@ overlap.
   `paper/QUEUE_ANCHORING.md`'s superseding header; `paper/P2_FIGURES.md` S4 status and caption, the
   "figures the paper does not have" table and the pending-dependencies table.
 
-### 5. One source disagreement, reported rather than quoted
+### 5. Swept the rest of the draft for the same defect, and found one more
+
+Every other rank ratio the draft leans on was checked against the floor measured on its own block:
+
+- **§4.1's seven, and §4.7's three** — inside, and both sections already say so at length.
+- **§4.8's dose–response** — the representation has **no fitted parameters**, so §3.5 and the
+  retraining floor do not apply; the exemption is already stated in the section.
+- **§4.9's Phase 1b (1.200×)** — already recorded in Appendix C as inside this stack's retraining noise.
+- **§4.9's decorrelation "+107%" (≈2.07×)** — inside the floor, but already `[NOT RECOMPUTABLE]` and
+  excluded from every count and summary statement, so it carries nothing. The exclusion rests on
+  provenance rather than on the floor; that is sufficient but it is not the same argument.
+- **§4.10 and §5.1's collapse readings** (12.88 → 1.00, 67.55 → ~2, 1.71 against 9.81) — 5.7× and up,
+  outside the floor, and each with independent co-measured evidence of collapse.
+- **§5.1's instance 2** (gate 5.81 against cohort-scale ~1.8, ≈3.2×) — inside the floor, but the two
+  numbers are different regimes (16 patients on a frozen queue against 3,118 streaming) rather than a
+  between-configuration selection, and the argument there is carried by retrieval and cohort-scale
+  collapse. Flagged here; not rewritten.
+- **§4.7.4's surviving necessity violation, H44 against I43 (3.73×) — this one needed fixing and has
+  been.** It clears the 3.295× retraining floor by 13%, but it is a **seed-varied** comparison, and the
+  nuisance range for that is §4.2's within-arm **2.10–3.75×**, which 3.73× sits inside. §4.7.4 now says
+  so before the scope objection rather than resting only on "cross-arm, cross-seed". It was already
+  reported as supporting rather than load-bearing; it now has a second reason to be.
+
+### 6. One source disagreement, reported rather than quoted
 
 **The assignment's framing that `programme_free` "had never trained to 40 epochs in this project's
 history" does not match the source, and the draft does not say it.**
