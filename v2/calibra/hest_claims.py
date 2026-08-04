@@ -379,7 +379,7 @@ def stage_certificate(args) -> None:
         print(f"[knn ] {arm:8s} balanced_accuracy={observed:.4f} chance={1.0/n_classes:.4f} "
               f"null_p95={record.get('null_p95', float('nan')):.4f} "
               f"({time.time()-start:.0f} s)", flush=True)
-    for residualise in (False, True):
+    for residualise in (() if args.knn_only else (False, True)):
         arm = "adjusted" if residualise else "raw"
         start = time.time()
         result = certify_axes(x, ids, cancers, n_permutations=args.n_permutations,
@@ -396,7 +396,8 @@ def stage_certificate(args) -> None:
               f"joint={result['joint_lda_balanced_accuracy']:.4f} chance={result['chance_rate']:.4f} "
               f"breach={result['n_breaching_axes']}/{result['n_axes']} "
               f"({result['wall_seconds']:.0f} s)", flush=True)
-    _write(args.output, "claim1_claim4_certificate.json", out)
+    _write(args.output, "claim1c_knn_probe.json" if args.knn_only
+           else "claim1_claim4_certificate.json", out)
 
 
 def stage_channel(args) -> None:
@@ -709,6 +710,9 @@ def main() -> None:
     c.add_argument("--knn-k", type=int, default=15)
     c.add_argument("--knn-permutations", type=int, default=200,
                    help="within-cancer label permutations for the kNN probe's own null")
+    c.add_argument("--knn-only", action="store_true",
+                   help="run only the non-mean-based probe and its null, leaving an already "
+                        "measured certify_axes result in place")
     c.set_defaults(func=stage_certificate)
 
     h = common(sub.add_parser("channel"))
