@@ -299,7 +299,7 @@ def probe_state(features: np.ndarray, class_index: np.ndarray, n_classes: int, *
                 strata: np.ndarray | None = None, k_grid=(1, 3, 5, 10, 15, 25, 50),
                 forest_trees: int = 300, run_svm: bool = False, n_splits: int = 5, seed: int = 42,
                 knn_permutations: int = 200, model_permutations: int = 100,
-                n_jobs: int = 1, include_linear: bool = True) -> dict:
+                n_jobs: int = 1, include_linear: bool = True, nulls: str = "both") -> dict:
     """Run every probe on one feature block, with a global and a within-stratum null.
 
     ``include_linear`` re-runs the certificate's own two classifiers on the identical
@@ -321,8 +321,11 @@ def probe_state(features: np.ndarray, class_index: np.ndarray, n_classes: int, *
             "per_axis_max": float(np.max(per_axis)),
             "per_axis_median": float(np.median(per_axis)),
         }
+    # ``nulls="global"`` exists only as a cost lever for the estimators whose per-fit cost
+    # makes two nulls unaffordable; it never selects WHICH null is quoted, because the
+    # global null is the applicable bar and is always computed.
     permutation_sets = {"global": global_permutations}
-    if strata is not None:
+    if strata is not None and nulls == "both":
         permutation_sets["within_stratum"] = (
             lambda ci, *, n_permutations, seed: within_stratum_permutations(
                 ci, strata, n_permutations=n_permutations, seed=seed))
@@ -378,6 +381,8 @@ def main() -> None:
     parser.add_argument("--model-permutations", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-jobs", type=int, default=1)
+    parser.add_argument("--nulls", default="both", choices=("both", "global"),
+                        help="'global' skips the within-stratum null; a cost lever only")
     args = parser.parse_args()
 
     k_grid = tuple(int(v) for v in str(args.k_grid).split(",") if v.strip())
@@ -388,6 +393,7 @@ def main() -> None:
                                "knn_permutations": args.knn_permutations,
                                "model_permutations": args.model_permutations,
                                "n_splits": args.n_splits, "seed": args.seed,
+                               "nulls": args.nulls,
                                "min_site_count": args.min_site_count}}
     for artifact_path in args.artifacts:
         path = Path(artifact_path)
@@ -430,7 +436,7 @@ def main() -> None:
                                          run_svm=bool(args.run_svm), n_splits=args.n_splits,
                                          seed=args.seed, knn_permutations=args.knn_permutations,
                                          model_permutations=args.model_permutations,
-                                         n_jobs=args.n_jobs)
+                                         n_jobs=args.n_jobs, nulls=args.nulls)
                     record.update({"status": "scored", "artifact": path.stem, "state": state,
                                    "target": target, "arm": arm, "partition": args.partition,
                                    "duplicate_patient_ids": duplicates,
