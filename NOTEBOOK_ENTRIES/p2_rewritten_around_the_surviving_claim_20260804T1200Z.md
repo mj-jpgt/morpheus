@@ -160,3 +160,115 @@ work's two pushes and bears directly on §4.2 of the draft. Two things folded in
    "every number traces to a file in the repository" rule is unsatisfied for §4.2, §4.4, §4.5 and §4.6.
 
 Nothing in the audit changes a number in the draft.
+
+---
+
+### 8. Addendum 2 — the D1 bootstrap exists, A3's verdict is qualified, and our own margin is now in the argument
+
+Four coordinator updates folded into `paper/P2_RANK_DRAFT.md` after the rewrite.
+
+**1. `[D1 PAIRED BOOTSTRAP PENDING]` is closed — and the answer is less favourable than the point
+estimates were.** The stratified bootstrap existed all along; the audit chain's stale absolute path hid
+it. §4.7.2 now carries both estimators, in the predeclared direction
+`Δ = channel(programme_free) − channel(programme_only)`:
+
+| seed | Δ | patient CI₉₅ | cancer-cluster CI₉₅ |
+|---|---:|---|---|
+| 42 | −0.0705 | [−0.0938, −0.0444] | [−0.0957, −0.0180] |
+| 43 | −0.0863 | [−0.1186, −0.0522] | **[−0.1386, +0.0006]** |
+| 44 | −0.0961 | [−0.1314, −0.0618] | [−0.1535, −0.0016] |
+
+**Decisive 3/3 on the patient bootstrap, 2/3 on the cancer-cluster bootstrap.** The cluster estimator
+resamples whole cancer types and is the conservative one, so it is the one weighted — and the draft says
+so in the abstract, the short abstract, the status block, §4.7.2, §4.7.3, §6.2, the conclusion and
+Appendix C. The reason for that redundancy is stated in §4.7.2: **§4.6 refuses to let a 5/6 sign count
+carry weight, so quoting the favourable one of two estimators on the paper's most load-bearing negative
+would be incoherent.** Note the sign convention changed: the table previously used `P − F` (positive);
+it now uses the predeclaration's `F − P` so the CIs and the Δ they bound agree.
+
+**2. Audit check A3 is recorded with its qualification, not as a pass.** It passes **on arm difference**
+(`random_control` gaps −0.022 / −0.007 / −0.032, all CIs spanning zero). But the **absolute** level is
+0.44–0.48 against real targets' 0.51–0.62 and a within-cancer permutation null of **0.147** — random
+gene sets carry roughly **three times the floor**, agreeing with T1.4's independent 76–82%. The verdict
+now reads *"the instrument does not manufacture an arm difference; the absolute level is high and
+separately explained"* in §4.7.3, §6.3 and Appendix C. It does not weaken D1, which is a paired arm
+difference — the exact quantity the control clears — but it forbids reading any absolute channel level
+against an assumed null of zero.
+
+**3. Our own margin is now in the argument rather than waiting to be used against us.** The smallest arm
+difference we quote (0.0705) is **about half** the real-versus-random-control margin (0.139). That is
+§4.1's envelope argument arriving from the channel side and pointing at us. New paragraph in §4.7.4,
+promoted into the short abstract and made §6.3's second exposure. It sets out the three respects in
+which our paired, interval-backed differences sit differently from rank's uninterval-backed levels
+(paired-vs-level, intervals-vs-none, and the variance decomposition depending on no margin at all) and
+**states that none of the three makes our own margin large.** This pre-empts the sharpest available
+objection — that we hold rank to a strict standard and ourselves to a loose one.
+
+**4. §5.2's single seed was a defect, not a design choice.** The momentum harness had its **seed
+hardcoded**; the sweep could not have varied seeds had it been asked to. §5.3 and the
+`QUEUE_ANCHORING.md` header now say so, and both record that a seed-replicated sweep is **armed**
+(`m ∈ {0, 0.999} × 3 seeds`, canonical statistic alongside the participation ratio). §5.3 states the
+disjunction in advance: **if the distributions separate across seeds the tension with §4.1 disappears;
+if they overlap, the momentum choice is a rank comparison this paper's own rule disqualifies and §5.2
+must be rewritten to rest on downstream behaviour rather than on rank.** Committed before the result so
+the reading cannot be chosen afterwards.
+
+**Still open after this addendum:** the stale path in the D1 audit chain is unfixed (it hid a result for
+a day); the seed-replicated momentum sweep has not reported; `~/e0_run/p2_*.py` are still unvendored.
+
+Suite re-run after these edits: **317 passed**. Markdown only.
+
+---
+
+### 9. Addendum 3 — the vendoring caught a mislabelled statistic in our own analysis code
+
+Commit `7b37dce` (concurrent, another agent) vendored the five P2 analysis scripts to
+`v2/research/rebase/p2/` with an end-to-end test, closing the §6.2 row this rewrite had opened. Two
+consequences for the draft, one of them a correction that moves a published number.
+
+**What reproduced.** Re-run from a checkout verified byte-equal to HEAD (402/402 files by git blob
+SHA-1): **§4.2, §4.4(1), §4.5(b), §4.5(c), §4.6 and §4.7 reproduce to every published digit.**
+
+**What did not.** `p2_rank_variants.py` — the script behind **§4.5(a)** — began
+`sys.path.insert(0, "/home/ubuntu/ws")`, the workspace the drift audit found most stale, and carried
+its own inline `R1`/`R2`/`R3`. **Its "R2" and "R3" were not R2 and R3.** They were `(Σσ²)²/Σσ⁴`, the
+order-2 Hill number of the **eigenvalue** distribution, where `d1_audit.py`'s R2 — and therefore
+`RANK_VARIANTS["R2"]` — is `(Σσ)²/Σσ²`, the order-2 Hill number of the **singular-value**
+distribution. Different statistics.
+
+Folded into the draft as follows:
+
+- §4.5(a)'s rows 2 and 3 are **relabelled `PR` and `PR_rownorm`**, which is what they are; the numbers
+  are unchanged and reproduce cell for cell.
+- **The headline count falls from 3 of 6 pairs to 2 of 6** (D2 s43, D2 s44). Propagated to the
+  abstract, §1.4 contribution 5 and §4.4's forward reference.
+- **§4.7.3's "D1 is only 2/3 under R2" qualification is WITHDRAWN.** Canonical R2 scores D1 **3/3**.
+  This *removes* a qualification from the necessity result, i.e. **it costs us** — D1 now confirms
+  RankMe under every canonical statistic we compute, and the only surviving qualification on D1 is the
+  interval one (3/3 patient, 2/3 cluster). Propagated to the status block and Appendix C.
+- §4.5(b)'s R2/R3 **levels** are unaffected; they were computed with the canonical function all along.
+
+**The slot is closed.** `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` landed while
+this was being written and carries the corrected per-cell rows, so §4.5(a) now tabulates all five
+statistics — canonical R1/R2/R3 plus PR/PR_rownorm under their true names — rather than carrying a
+pending marker. Canonical R2 reads `OK OK MISS OK OK OK` (5/6) and canonical R3 reads
+`OK MISS OK OK OK OK` (5/6, identical to R1). Nothing was reconstructed by hand.
+
+**A second, smaller error the same entry caught.** §4.5's provenance note had explained the two source
+entries' differing R3 rows as raw-versus-residualised block. **That was wrong** — both are
+residualised; the difference was the statistic. Corrected in §4.5(a). The R3 *levels* in §4.5(b) were
+always canonical and reproduce exactly.
+
+**And a duplication now flagged:** the `PR` row is identical cell for cell to §4.6's "participation
+ratio" row. That identity is the arithmetic signature of the substitution, and §4.5(a) now says the two
+must not be counted as independent evidence.
+
+**The point worth keeping.** This is §3.1's finding — three functions under one name — recurring in
+*our own analysis code*, and it survived until the "every number traces to a file in the repository"
+rule was actually enforced rather than merely stated. §4.5(a) now says so at the same prominence as
+the finding it qualifies.
+
+**Working-tree note.** Commit `7b37dce`'s files carried further uncommitted modifications by a
+concurrent agent when this addendum was written. Only `paper/P2_RANK_DRAFT.md`,
+`paper/QUEUE_ANCHORING.md` and this entry were staged; nothing under `v2/` was touched or committed by
+this work.

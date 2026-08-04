@@ -19,6 +19,13 @@
 > values, flat over 400 steps, readings at the collapse floor, and a tight fixed-seed repeat with a
 > 3.5× separation and an empty band) and states equally plainly that **no seed replication of this
 > sweep exists**, which is the measurement that would close the gap.
+>
+> **The single-seed limitation was a defect, not a design choice: the momentum harness had its seed
+> hardcoded**, so the sweep could not have varied seeds had it been asked to. The "Limits" bullet below
+> reading *"The sweep is one seed per momentum value"* should be read as a property of the apparatus
+> rather than a judgement that one seed sufficed. A seed-replicated sweep is **armed** —
+> `m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported alongside the participation ratio — and P2
+> §5.3 states in advance what each outcome licenses.
 
 *Draft section, 2026-08-03. Companion to `LIVENESS_GATE_DESIGN.md`. Every number traces to a named
 entry in `NOTEBOOK_ENTRIES/` or a log under `~/e0_run/d1_diag/`. Claims not measured are marked as

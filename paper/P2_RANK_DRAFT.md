@@ -16,8 +16,12 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > Earlier versions were organised around *"effective rank does not track information content"* and
 > around a preregistered necessity test that was expected to break RankMe's *necessary-but-not-
 > sufficient* hedge. The test ran. It went the other way: `programme_only` (high rank) beats
-> `programme_free` (low rank) on the measured molecular channel **3/3 seeds** under the canonical
-> statistic (2/3 under the statistic an earlier draft nominated). Per the preregistered instruction in
+> `programme_free` (low rank) on the measured molecular channel in **all three seeds** — interval-backed
+> 3/3 on the patient bootstrap and **2/3 on the conservative cancer-cluster bootstrap** — under the
+> canonical statistic — and under every canonical statistic we compute; an earlier draft's "2/3
+> under R2" qualification rested on a mislabelled statistic and is withdrawn (§4.5a). Per the
+> preregistered
+> instruction in
 > `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md` (outcome **O2**), this is
 > reported **at abstract prominence as a negative for the paper's generality** and is §4.7, ahead of
 > every result that favours us.
@@ -25,10 +29,13 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > **2. The claim that survived is different, narrower, and better powered.** It is stated in §1.3 and
 > carried by §4.1–§4.5. It does not depend on any sign count.
 >
-> **3. Pending slots.** The D1 channel numbers in §4.7 are point estimates; the official paired
-> bootstrap has not produced `D1_PAIRED_BOOTSTRAP_STRATIFIED.json` because of a stale-path bug in the
-> D1 audit chain. Those cells carry `[D1 PAIRED BOOTSTRAP PENDING]`. Nothing in §4.1–§4.5 depends on
-> them.
+> **3. Pending slots — one closed, one open.** The D1 intervals are **no longer pending**: the
+> stratified paired bootstrap existed all along and was hidden by a stale absolute path in the audit
+> chain. §4.7.2 now reports **both** estimators, and the conservative one is less favourable to us —
+> decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap**, with seed 43's
+> interval touching zero at +0.0006. Still open: **no seed replication of §5.2's momentum sweep**,
+> whose absence is what makes §5 strain against §4.1 (§5.3). It is armed, and §5.3 states in advance
+> what each outcome licenses.
 >
 > **4. Every effective-rank number in this draft was recomputed under one canonical definition on
 > 2026-08-04** and every surviving instance reproduces exactly. Two instances are marked
@@ -47,8 +54,10 @@ self-supervised representations and for selecting hyperparameters without labels
 Balestriero, Najman & LeCun, ICML 2023, arXiv:2210.02885). **We claim no discovery of the negative,
 and we report our own failed prediction first.** We ran a preregistered test of RankMe's
 *necessary-but-not-sufficient* hedge — two arms of one method differing only in objective, three
-seeds — and the hedge held: the higher-rank arm carried the larger held-out molecular channel in
-3/3 seeds, in the same direction as its rank advantage. That is a negative for this paper's
+seeds, paired bootstraps — and the hedge held: the higher-rank arm carried the larger held-out
+molecular channel in all three seeds, in the same direction as its rank advantage, interval-backed
+3/3 under a patient bootstrap and **2/3 under the conservative cancer-cluster bootstrap** (both are
+quoted; the conservative one is the one to weight). That is a negative for this paper's
 generality and we state it here, at the prominence a confirmation would have received. It joins
 published prior art we cannot claim novelty over: Aldeneh, Thilak, Higuchi, Theobald & Likhomanenko
 (ICASSP 2025, DOI 10.1109/ICASSP49660.2025.10889651) already report that *"rank does not reliably
@@ -76,7 +85,8 @@ re-exporting a surviving checkpoint reproduces to five significant figures, and 
 short-horizon repeat at fixed seed spans 4.7%.
 
 Two further findings constrain any use of the number at all. The between-arm *verdict* flips with the
-choice of rank statistic (3 of 6 pairs), with whether the block is confound-residualised (2 of 3 D2
+choice of rank statistic (2 of 6 pairs, corrected from a published 3 of 6 — §4.5a), with whether the
+block is confound-residualised (2 of 3 D2
 seeds), and with which co-trained view of the same model is measured (2 of 6 pairs); the information
 verdict never flips under any of them. And on a seven-level dose–response with a **zero-parameter**
 representation, rank under-reports the information loss by a factor between **1.95× and 21.5×**
@@ -92,13 +102,18 @@ of 0.140, so "low rank means little information" is false outside total collapse
 published alternatives on the same artifacts and **none is better**: LiDAR picks the
 information-poorer arm 0/3 on the in-scope contrast at every δ over eight orders of magnitude.
 Selection-rule counts on six pairs are reported and are explicitly underpowered — a *flawless* 6/6
-would give p = 0.031 — which is why the argument rests on the variance decomposition instead.
+would give p = 0.031 — which is why the argument rests on the variance decomposition instead. And we
+apply the paper's own standard to the paper: our smallest arm difference (0.0705) is about **half**
+the real-versus-random-control margin of 0.139, so the effect we measure is itself small relative to
+its instrument's floor. That is §4.1's argument arriving from the channel side, it points at us, and
+we state it before it is put to us.
 
 ### Short abstract (~200 words)
 
 Effective rank (Roy & Vetterli 2007) is proposed as a label-free criterion for representation quality
 and hyperparameter selection (RankMe, ICML 2023). We first report a failed prediction: a preregistered
-within-method test of RankMe's necessity hedge confirmed it, 3/3 seeds. What survives is a claim about
+within-method test of RankMe's necessity hedge confirmed it in all three seeds — interval-backed 3/3
+under a patient bootstrap and 2/3 under the conservative cluster bootstrap. What survives is a claim about
 usefulness, not truth: **effective rank's between-arm differences are smaller than its own within-arm
 reproducibility floor, inside the same-method regime RankMe reserves for itself.** Six of seven
 between-arm rank differences ever measured on this project (1.004×–2.19×) lie inside the 2.69×
@@ -230,7 +245,7 @@ In descending order of how well evidenced they are.
    configuration a practitioner is looking at when they reach for rank.
 4. **A defeater check** (§4.4), which the exemplar literature will demand and which earlier drafts
    lacked: the instability is in training and not in estimation, established four independent ways.
-5. **The verdict is under-determined by choices nobody states** (§4.5): statistic (3/6 pairs), block
+5. **The verdict is under-determined by choices nobody states** (§4.5): statistic (2/6 pairs), block
    (2/3 D2 seeds), measured view (2/6 pairs). The information verdict flips under none of them.
 6. **A dose–response magnitude miscalibration, corrected against ourselves** (§4.8): −3.10% rank
    against −66.7% channel on matched preprocessing, i.e. 21.5×, replacing a previously published 3.74×
@@ -1091,8 +1106,9 @@ reads **23.387** — so the "you evaluated a centred variant, the published metr
 is answered numerically: on these artifacts the two are the same number to four significant figures.
 
 **What (4) does *not* answer.** The choice of *statistic* and of *block* does change the between-arm
-**verdict**, on a third of the pairs. That is §4.5, and it is a separate objection which we do not
-dismiss — we adopt it.
+**verdict**, on a third of the pairs. That is §4.5 — where the table has itself been corrected once,
+for exactly the reason this paper is about. It is a separate objection which we do not dismiss; we
+adopt it.
 
 **One thing this section cannot establish.** We have two configurations and one stack. We do not know
 whether this variance is a property of effective rank, of this hardware's non-determinism, of this
@@ -1105,18 +1121,63 @@ most valuable missing measurement after a labelled probe.
 Even setting reproducibility aside, "which arm has the higher effective rank" does not have one answer
 on our data, while "which arm carries more molecular information" always does.
 
-**(a) It flips with the statistic — 3 of 6 pairs.** All three statistics computed on the same 12
-artifacts, same residualisation, same ground truth; "OK" means the higher-rank arm is the one that
-carries the larger channel:
+**(a) It flips with the statistic — and this table has itself been corrected once, which is the
+section's own point made at our expense.** All statistics computed on the same 12 artifacts, same
+residualisation, same ground truth; "OK" means the higher-rank arm is the one that carries the larger
+channel:
 
-| statistic | D2 s42 | D2 s43 | D2 s44 | D1 s42 | D1 s43 | D1 s44 |
-|---|:--:|:--:|:--:|:--:|:--:|:--:|
-| **R1** canonical (Roy–Vetterli, order 1) | OK | **MISS** | **OK** | **OK** | OK | OK |
-| **R2** (`d1_audit.py`, order 2) | OK | **OK** | **MISS** | **MISS** | OK | OK |
-| **R3** (`d1_geometry_probe.py`, order 2, rows normalised) | OK | **OK** | **MISS** | **OK** | OK | OK |
+| statistic | D2 s42 | D2 s43 | D2 s44 | D1 s42 | D1 s43 | D1 s44 | D2 | D1 | ALL |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| **R1** canonical — Roy & Vetterli, order 1 on σ | OK | **MISS** | **OK** | OK | OK | OK | 2/3 | 3/3 | 5/6 |
+| **R2** canonical — `d1_audit.py`, order 2 on σ, `(Σσ)²/Σσ²` | OK | **OK** | **MISS** | OK | OK | OK | 2/3 | 3/3 | 5/6 |
+| **R3** canonical — R2 after L2-normalising rows | OK | **MISS** | **OK** | OK | OK | OK | 2/3 | 3/3 | 5/6 |
+| *PR* — order 2 on the **eigenvalue** distribution, `(Σσ²)²/Σσ⁴` *(published in error as "R2")* | OK | OK | MISS | **MISS** | OK | OK | 2/3 | 2/3 | 4/6 |
+| *PR_rownorm* — PR after L2-normalising rows *(published in error as "R3")* | OK | OK | MISS | OK | OK | OK | 2/3 | 3/3 | 5/6 |
 
-**On 3 of the 6 pairs the three functions return different verdicts** (D2 s43, D2 s44, D1 s42). All
-three are called `effective_rank` in this repository, and all three appear in the published literature.
+*Provenance: `v2/research/rebase/p2/p2_rank_variants.py`, vendored at commit `7b37dce` and re-run on a
+workspace verified byte-equal to HEAD before execution (402/402 files by git blob SHA-1);
+`NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` §0. Originally published from
+`NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §4.3. The first three rows
+are the canonical `RANK_VARIANTS`; the last two are the statistics the pre-vendoring script actually
+computed under the labels "R2" and "R3", retained under their true names because the numbers are correct
+values of a different function. Note that the `PR` row is **identical, cell for cell, to §4.6's
+"participation ratio" row** — that identity is the arithmetic signature of the substitution and is why
+the two must not be counted as independent evidence.*
+
+**The correction, stated at the same prominence as the finding it qualifies.** Earlier versions of this
+table labelled rows 2 and 3 **R2** and **R3** — the statistics of `d1_audit.py` and
+`d1_geometry_probe.py`. **They were not.** The script that produced them carried its own inline
+definitions and computed `(Σσ²)²/Σσ⁴`, the order-2 Hill number of the **eigenvalue** distribution,
+where `d1_audit.py`'s R2 — and therefore `RANK_VARIANTS["R2"]` — is `(Σσ)²/Σσ²`, the order-2 Hill
+number of the **singular-value** distribution. They are different statistics. The rows are therefore
+relabelled **PR** and **PR_rownorm**, which is exactly what they are; the numbers themselves are
+unchanged and reproduce cell for cell. The mislabelling was found only when the script was vendored
+into the repository and rewritten to call the single canonical implementation — which is the same
+failure mode, in our own analysis code, that §3.1 documents in the production code, and it survived
+until the "every number traces to a file in the repository" rule was actually enforced.
+
+**What moves as a result, and it moves against us.** Re-measured with the canonical `RANK_VARIANTS`:
+
+- **The headline count falls from 3 of 6 pairs to 2 of 6** (D2 s43 and D2 s44; **D1 s42 no longer
+  disagrees**). The claim that the statistic changes the verdict survives; its size does not.
+- **Canonical R2 scores D1 3/3**, where the mislabelled row reported 2/3. The consequence for §4.7.3 is
+  recorded there: the qualification *"D1 is only 2/3 under the statistic an earlier draft nominated"*
+  **does not survive**, and D1's confirmation of RankMe is correspondingly less qualified than the
+  previous draft allowed.
+- **Canonical R3 swaps its two D2 verdicts.**
+- **§4.5(b)'s R2 and R3 *levels* are unaffected** — they were computed with the canonical function all
+  along and reproduce exactly.
+
+**A second, smaller error in the same section, also corrected.** §4.5's provenance note previously
+explained the discrepancy between the two source entries' R3 rows as *"one is computed on the raw block
+and the other on the residualised block"*. **That was not the reason.** Both are on the residualised
+block; the difference was the statistic. The R3 *levels* quoted in (b) below (H43 14.746 / I43 15.915;
+H44 6.564 / I44 6.302) are the canonical R3 and reproduce exactly — it was only (a)'s *verdicts* that
+came from `PR_rownorm`.
+
+All of PR, PR_rownorm, R1, R2 and R3 have been called `effective_rank` somewhere in this repository or
+in the published literature, and the pairwise disagreements above are between functions that share
+that name.
 
 **(b) It flips with the block — 2 of 3 D2 seeds, for R3.** Raw versus confound-residualised, the choice
 no version of this project stated:
@@ -1254,31 +1315,51 @@ each of four outcomes was committed in
 `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`, written before `d1_audit.log` was
 opened and before any channel value was seen.
 
-#### 4.7.2 Result: necessity is not violated. It is confirmed, 3/3
+#### 4.7.2 Result: necessity is not violated. It is confirmed — 3/3 on the patient bootstrap, 2/3 on the conservative one
 
-| seed | rank, `programme_only` | rank, `programme_free` | ratio | channel, `programme_only` | channel, `programme_free` | Δ | patient CI₉₅ | cancer CI₉₅ | rank ordering correct? |
+Δ is the **predeclared** direction, `channel(programme_free) − channel(programme_only)`, so a negative Δ
+means the lower-rank arm loses.
+
+| seed | rank, `programme_only` | rank, `programme_free` | ratio | channel, `programme_only` | channel, `programme_free` | **Δ** | patient CI₉₅ | **cancer-cluster CI₉₅** | rank ordering correct? |
 |---|---:|---:|---:|---:|---:|---:|:---:|:---:|:---:|
-| 42 | **29.381** | **13.418** | 2.19× | 0.6117 | 0.5412 | **+0.0705** | `[D1 PAIRED BOOTSTRAP PENDING]` | `[D1 PAIRED BOOTSTRAP PENDING]` | **yes** |
-| 43 | **24.673** | **7.600** | 3.25× | 0.6198 | 0.5336 | **+0.0863** | `[D1 PAIRED BOOTSTRAP PENDING]` | `[D1 PAIRED BOOTSTRAP PENDING]` | **yes** |
-| 44 | **11.115** | **6.394** | 1.74× | 0.6087 | 0.5126 | **+0.0961** | `[D1 PAIRED BOOTSTRAP PENDING]` | `[D1 PAIRED BOOTSTRAP PENDING]` | **yes** |
+| 42 | **29.381** | **13.418** | 2.19× | 0.6117 | 0.5412 | **−0.0705** | [−0.0938, −0.0444] | [−0.0957, −0.0180] | **yes** |
+| 43 | **24.673** | **7.600** | 3.25× | 0.6198 | 0.5336 | **−0.0863** | [−0.1186, −0.0522] | **[−0.1386, +0.0006]** | **yes** |
+| 44 | **11.115** | **6.394** | 1.74× | 0.6087 | 0.5126 | **−0.0961** | [−0.1314, −0.0618] | [−0.1535, −0.0016] | **yes** |
 
 *Provenance: rank — `~/e0_run/d1_v2/artifacts/d1_{p,f}_seed{42,43,44}.npz`, **canonical R1 on the
 residualised held-out `wsi_biology` block**, recomputed 2026-08-04
 (`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5).
-Channel — `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §5.2, on the 40
-targets neither arm trained on, reproducing `d2_readout.py`'s residualisation, seed and component budget;
-**point estimates without a paired bootstrap.** The official
-`~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` does not exist: the D1 audit chain's readout step
-fails on a stale absolute path (`/lambda/nfs/.../d1_v2/artifacts/` against the real
-`/home/ubuntu/e0_run/...`), a one-line bug in the chain and not a fault in the data. `D1_PAIRED_BOOTSTRAP.json`
-must **not** be used when it lands — it scores all 90 non-control targets, of which 50 are
-`programme_only`'s own supervision.*
+Channel and intervals — `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json`, on the 40 targets neither
+arm trained on (`heldout_pathway` + `immune_tme` + `tumour_state`) per the preregistration in
+`NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md`; point estimates independently
+reproduced by `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §5.2.
+**The bootstrap existed all along and was hidden by the audit chain's stale absolute path**
+(`/lambda/nfs/.../d1_v2/artifacts/` against the real `/home/ubuntu/e0_run/...`) — a one-line bug in the
+chain, not a fault in the data, and the reason earlier versions of this table carried
+`[D1 PAIRED BOOTSTRAP PENDING]`. `D1_PAIRED_BOOTSTRAP.json` (unstratified) is **not** used here and must
+not be: it scores all 90 non-control targets, of which 50 are `programme_only`'s own supervision.*
 
 `programme_free` has both the lower rank **and** the lower channel, **3/3 seeds**, in the same direction
 as its rank advantage. This is outcome **O2** of the predeclaration: *"Rank vindicated on this pair.
 Goes in the paper as a limitation, with the same prominence a confirmation would have had. The broad
 claim must then be narrowed or defended on other evidence."* It is, and it has been: the broad claim is
 gone and §1.3 is what replaced it.
+
+**Both bootstraps are quoted, and the conservative one is the one to weight.** On the patient bootstrap
+the result is decisive in **3/3** seeds. On the **cancer-cluster** bootstrap — which resamples whole
+cancer types rather than patients, and is therefore the estimator that survives the objection that our
+2,766 test patients are not 2,766 independent observations — it is decisive in **2/3**, with seed 43's
+interval touching zero at **+0.0006**. A referee will weight the cluster bootstrap, and so do we.
+Reporting only the patient result would be exactly the kind of selective quotation this section exists
+to avoid: **§4.6 refuses to let a 5/6 sign count carry weight, and it would be incoherent to then quote
+the favourable one of two estimators on the paper's most load-bearing negative result.**
+
+This does not rescue the paper's old claim. A cluster interval that includes zero by 0.0006 in one seed
+of three is not evidence that `programme_free` matches `programme_only`; it is evidence that **one seed
+is not decisive at the cancer-cluster level**, against a point estimate of −0.0863 pointing the same way
+as the other two. The honest statement is: *the higher-rank arm wins in all three seeds; the win is
+interval-backed in three of three at the patient level and two of three at the cancer level.* Necessity
+is confirmed, slightly less strongly than the patient bootstrap alone would suggest.
 
 **It also trips a preregistered escalation elsewhere.** `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` records
 `"preregistered_prediction": "programme_free >= programme_only on the held-out molecular channel; if
@@ -1294,6 +1375,19 @@ the ones that failed.
   necessity."** *Rejected.* `programme_free` is **not** collapsed this time — canonical ranks 6.4–13.4
   against the ~1.7 of the defective earlier run — and its channel (0.513–0.541) sits clearly above its
   own `random_control` (0.443–0.474). This is the "both arms train" branch. The queue fix (§5.2) worked.
+- **"The negative control passes, so the readout is clean."** *Only in the narrow sense, and the verdict
+  must be recorded with its qualification.* Audit check A3 passes **on arm difference**: the
+  `random_control` arm gap is −0.022 / −0.007 / −0.032 with all three CIs spanning zero, so **the
+  instrument does not manufacture an arm difference where none should exist**. But the **absolute**
+  level on random controls is **0.44–0.48**, against real targets' 0.51–0.62 and a within-cancer
+  permutation null of **0.147** — so random gene sets carry roughly **three times the floor**, and 0.44
+  is emphatically **not** the null. That agrees with an independent finding on this project (T1.4) that
+  covariate-matched random gene sets reproduce **76–82%** of the per-target channel. **The correct
+  verdict is therefore "the instrument does not manufacture an arm difference; the absolute level is
+  high and separately explained", not an unqualified pass** — and any future quotation of A3 must carry
+  that sentence. It does not weaken the D1 result, which is a *paired arm difference* and is exactly the
+  quantity the control clears; it does mean no absolute channel level in this paper may be read against
+  an assumed null of zero, which §3.2 already requires and §6.3 now restates.
 - **"`programme_only` wins because the readout is scored on its own supervision."** *Rejected by
   construction and by measurement.* The readout was pre-restricted, per
   `NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md`, to the **40 targets neither arm was
@@ -1301,15 +1395,21 @@ the ones that failed.
   explicitly excluded from the headline. And re-estimating with `heldout_top_cca` — directions fit on
   half the patients, scored on the other half — **preserves every arm ordering on all three views with
   equal or larger deltas** (§3.2).
-- **"The gap is inside the noise."** *Not resolved, and marked as such.* The paired bootstrap has not
-  run (see the provenance note). The direction is consistent 3/3 and survives held-out estimation, but
-  **the D1 rows must carry CIs before publication** and are marked pending until they do.
-- **"It depends on the rank statistic."** *Partly true, and it is the only qualification that survives.*
-  D1 scores **3/3 under the canonical R1 and under R3, but 2/3 under R2** — the statistic an earlier
-  draft nominated for exactly this table (§4.5a). The honest summary of D1 is therefore *"the rank
-  ordering agrees with the information ordering on 2–3 of 3 seeds depending on which function you call
-  effective rank"*, not a clean 3/3. That qualification weakens the negative slightly; it does not remove
-  it.
+- **"The gap is inside the noise."** *Resolved, and it is the qualification that costs the most.* The
+  stratified paired bootstrap exists (§4.7.2). At the patient level the gap is decisive 3/3. At the
+  **cancer-cluster** level it is decisive **2/3**, seed 43's interval reaching **+0.0006**. So the
+  objection does not succeed — the point estimates agree 3/3 and two of three clear the conservative
+  estimator — but it is not dismissed either, and the paper states the 2/3 wherever it states the 3/3.
+- **"It depends on the rank statistic."** ***Withdrawn — this qualification does not survive, and its
+  withdrawal costs us.*** Earlier versions of this section reported that D1 scores 3/3 under R1 and R3
+  but only **2/3 under R2**, the statistic an earlier draft nominated for exactly this table, and
+  offered *"2–3 of 3 depending on which function you call effective rank"* as the honest summary. **The
+  row that produced the 2/3 was not R2.** It was the order-2 Hill number of the *eigenvalue*
+  distribution, mislabelled (§4.5a). Re-measured with the canonical `RANK_VARIANTS`, **D1 scores 3/3
+  under canonical R2 as well.** So the necessity result is *less* qualified than the previous draft
+  claimed, not more: the higher-rank arm wins in all three seeds under every canonical statistic we
+  compute. The only surviving qualification on D1 is the interval one — 3/3 on the patient bootstrap,
+  **2/3 on the cancer-cluster bootstrap** (§4.7.2).
 - **"The rank gap is ~9×, so this is a large-gap regime."** *Rejected; the 9× figure was ours and it was
   wrong.* The "12 versus 111" numbers are the **in-run tripwire** (R3, training batches, step 200), not
   the quantity the channel is computed on. Measured where the channel is measured — held-out patients,
@@ -1328,6 +1428,32 @@ even in the instance where rank gets the answer right, the size of the gap it is
 own nuisance band, and two of the three are inside the retraining envelope of §4.1. **A metric can be
 right on average and still be unusable for a single comparison**; that is the whole content of this
 paper's surviving claim, and D1 is an example of it rather than a counterexample to it.
+
+**And the same argument applies to us, which we state before it is put to us.** The sharpest available
+objection to this paper is that it holds rank to a strict standard — *your difference must exceed your
+own noise floor* — and holds its own effect to a loose one. So: **the smallest D1 arm difference we
+report (0.0705) is roughly half the real-versus-random-control margin of 0.139** (real targets
+0.51–0.62 against random controls 0.44–0.48, §4.7.3). That is §4.1's envelope argument arriving from
+the channel side rather than the rank side, and it points at us. The effect we measure is *small
+relative to its own instrument's floor*, and a reader is entitled to hold that against our channel
+readings exactly as we hold the 2.69× envelope against rank.
+
+Three things distinguish the two cases, and none of them makes our margin large:
+
+1. **The channel difference is a paired within-run difference and the rank difference is a level**
+   (§3.5). The floor that matters for a paired difference is the spread of that difference, which is
+   0.024 on a mean of −0.121 across the D2 seeds and same-signed 3/3; the floor that matters for a level
+   is 2.69×, which six of seven arm differences fail to clear (§4.1). That asymmetry is the practical
+   heart of the paper and it is not an accident of which quantity we like better.
+2. **The channel difference is interval-backed and the rank difference is not** — 3/3 at the patient
+   level and 2/3 at the cancer level here, 3/3 on both in D2. No rank difference in this paper carries
+   an interval at all, because no one computes one.
+3. **The variance decomposition does not depend on any margin.** §4.2's 34.5% / 98.0% split is a
+   statement about where each quantity's variance lives across 12 matched artifacts, and it would read
+   the same if every absolute level were halved.
+
+**What none of that buys is a claim that our effect is comfortably above its floor. It is not**, and
+§6.3 records this as the paper's second-largest exposure after the single-stack limitation.
 
 **One violation of necessity does exist in our data, and we deliberately do not lead with it.** Scanning
 all 66 ordered pairs of the 12 artifacts against the predeclared criterion, two violate. The usable one
@@ -1799,8 +1925,20 @@ seeds. **No seed replication of the momentum sweep exists.** So the honest statu
 is: monotone and durable at one seed, tight under stack non-determinism at one seed, and **untested
 against seed variation** — which is precisely the nuisance term §4.2 measures as dominant. `m = 0.999` is
 retained because it measured best and because the objective now trains, not because the rank difference
-that selected it clears this paper's own bar. **A seed replication of the momentum sweep is the single
-measurement that would close the gap between §4 and §5, and it has not been run** (§6.2).
+that selected it clears this paper's own bar.
+
+**And the single-seed limitation was a defect, not a design choice.** The momentum harness had its
+**seed hardcoded**, so the sweep could not have varied seeds even had we asked it to — the arms in the
+table above are one seed because the harness admitted only one, not because a one-seed sweep was judged
+sufficient. That is worth recording for the same reason §5.1's instance 4 is: a measurement apparatus
+that silently constrains what can be measured produces a result that looks like a decision and is not
+one. **A seed-replicated sweep is armed** — `m ∈ {0, 0.999} × 3 seeds`, with the canonical statistic
+reported alongside the participation ratio the tripwire uses, so the two are comparable for the first
+time in this material. **It will close the gap between §4 and §5 either way**: if the m = 0 and m = 0.999
+distributions separate across seeds, §5.2's fix clears §4.1's own bar and the tension disappears; if they
+overlap, the momentum choice is a rank comparison this paper's rule disqualifies, and §5.2 must be
+rewritten to rest on the objective's downstream behaviour rather than on its rank. **We state that
+disjunction now, before the result, so the reading cannot be chosen afterwards.**
 
 **Two further honest limits carried from the source drafts.** Instance 3's *cause* is established only as
 far as "the key set, not the objective's weighting"; the mechanism is open, MoCo's staleness account was
@@ -1838,9 +1976,9 @@ should be withdrawn to a replication.
 | would-be measurement | why it is absent |
 |---|---|
 | **A controlled repeat design for §4.1** — N retrainings of one configuration, rank and channel measured on each | **Not run.** §4.1's envelope rests on **one** retraining pair plus three-seed spreads. §4.2 exists because of this and reaches the same conclusion from 8 within-arm d.f. without the 2.69× number, but a proper repeat design is the single measurement that would make §4.1 unimpeachable. **This is now the most valuable missing measurement in the paper.** |
-| **A seed replication of §5.2's momentum sweep** | Not run. §5.3 states the consequence: the hyperparameter choice §5 reports rests on a rank difference that has not been tested against the nuisance term §4.2 measures as dominant. |
+| **A seed replication of §5.2's momentum sweep** | **Armed, not yet reported.** `m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported alongside the participation ratio. §5.3 states the consequence of its absence and why the single-seed sweep was a **defect** — the harness had its seed hardcoded — rather than a design choice. |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
-| **The D1 paired bootstrap** (§4.7) | Blocked by a one-line stale-path bug in the D1 audit chain; `D1_PAIRED_BOOTSTRAP_STRATIFIED.json` does not exist. The D1 rows carry `[D1 PAIRED BOOTSTRAP PENDING]` and must not be quoted as interval-backed. |
+| ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
 | An error bar on any dilution rank or channel value | Single seed, single donor draw; bootstrapping donor assignments is CPU-only and unrun. |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run. §4.9 states that "unchanged" means the point estimates differ by 0.002 and nothing more. |
 | Rank and channel under **one** statistic across **all** instances | **Done for D2, dilution, Phase 1b and D1-B** — one implementation, every surviving artifact recomputed, published values reproduced exactly. **Impossible** for the decorrelation instance (artifacts never existed; the cited source file is absent) and the "16/16" instance (a train-time batch of 16, never exported, and a hard `matrix_rank`). D1-A's 9.81 / 1.71 are `[NOT RECOMPUTED]` — a GPU forward pass from surviving checkpoints, and the GPU was in use. |
@@ -1848,7 +1986,7 @@ should be withdrawn to a replication.
 | **E1**, the preregistered rank-versus-information experiment in this repository | Built (`v2/calibra/e1_rank_information.py`, `aggregate_e1.py`, equivalence margin 0.10, three-seed requirement) and **never run**. It is the experiment this paper should have been built on. |
 | Rank at **capacity scale**, where Deng et al. report a power law | Not measured. §2.3 argues their sweep is over capacity-like variables and ours is not; **we do not claim rank fails at capacity scale.** |
 | A case where the collapse diagnostic **fails** | We have not found one (§4.10). |
-| **The competing-metric and variance-decomposition scripts, vendored into the repository** | `~/e0_run/p2_competing_metrics.py`, `p2_selection_rule.py`, `p2_necessity_and_variance.py`, `p2_robustness.py` produce §4.2, §4.4, §4.5 and §4.6 and are **not yet in the repository**, unlike the rank-recomputation scripts (vendored at commit `8609081`). Their outputs are reproduced independently against a verified-current workspace (§4.2), but the "every number traces to a file in the repository" rule is not yet satisfied for them. **Vendoring them is a pre-submission requirement.** |
+| ~~The competing-metric and variance-decomposition scripts, vendored~~ | **CLOSED, and enforcing the rule found an error.** All five now live at `v2/research/rebase/p2/` with an end-to-end test (`v2/tests/test_p2_analysis_scripts.py`), vendored at commit `7b37dce`. Re-run from a byte-verified checkout (402/402 files by git blob SHA-1), **§4.2, §4.4(1), §4.5(b), §4.5(c), §4.6 and §4.7 reproduce to every published digit**. §4.5(a)'s second and third rows did **not**: they were a mislabelled statistic, are relabelled PR / PR_rownorm, and the count falls from 3 of 6 to 2 of 6 (§4.5a). The rule was worth enforcing precisely because it caught something. |
 | Rank computed with RankMe's exact ε convention as a *published-comparable* number | Not attempted; §2.1's discrepancy means no number here is comparable to a published RankMe value. (A faithful RankMe *was* computed on our artifacts for §4.2 and §4.6 — that is an internal comparison, not a cross-paper one.) |
 
 ### 6.3 "Your ground truth is the weak link"
@@ -1860,11 +1998,28 @@ reference standard is a 16-component held-out canonical correlation against conf
 molecular targets, with a measured permutation null of 0.140–0.147. Four things partially answer the
 objection and none of them dismisses it: the ordering is **98.0% arm** with F = 128.2 (§4.2); it is
 **identical across all three co-trained views for all six pairs** (§4.5c); it **survives held-out
-re-estimation with equal or larger deltas** (§3.2); and each arm clears its own `random_control` (§4.7).
-What is not answered: it is one readout, and a different downstream task could order the arms
-differently. **If the ground truth moves, §4.6's counts move with it — but §4.1–§4.3 do not, because they
-are statements about rank's own variance and require the ground truth only to establish that the
-information ordering is stable, which it is under every perturbation we applied.**
+re-estimation with equal or larger deltas** (§3.2); and the `random_control` arm difference spans zero
+in all three seeds (§4.7.3).
+
+**Two things are not answered, and the second is this paper's second-largest exposure after the
+single-stack limitation.**
+
+*First*, it is one readout, and a different downstream task could order the arms differently. **If the
+ground truth moves, §4.6's counts move with it — but §4.1–§4.3 do not, because they are statements about
+rank's own variance and require the ground truth only to establish that the information ordering is
+stable, which it is under every perturbation we applied.**
+
+*Second — and stated because §4.1 holds rank to this standard, so the paper must hold itself to it.*
+**The margins we work with are not comfortably above the instrument's own floor.** The `random_control`
+level is 0.44–0.48 against real targets' 0.51–0.62 and a within-cancer permutation null of 0.147, so
+random gene sets carry roughly three times the floor — consistent with T1.4's independent finding that
+covariate-matched random gene sets reproduce 76–82% of the per-target channel. The real-versus-random
+margin is therefore about **0.139**, and the smallest arm difference we quote (0.0705) is **about half
+of it** (§4.7.4). The negative control does what a negative control must — it does not manufacture an
+arm *difference* — but its **absolute level is high and separately explained**, and no absolute channel
+number anywhere in this paper may be read against an assumed null of zero. §4.7.4 sets out the three
+respects in which our paired, interval-backed differences are nonetheless in a different position from
+rank's uninterval-backed levels, and states plainly that none of the three makes our own margin large.
 
 ### 6.4 A defect in our own evidence base, reported not repaired
 
@@ -1912,9 +2067,10 @@ is used to select between representations, and they are also why it is silently 
 
 **We begin with what went against us.** We ran a preregistered test designed to break RankMe's
 necessary-but-not-sufficient hedge, on two arms of one method with three seeds, and the hedge held: the
-higher-rank arm carried the larger held-out molecular channel 3/3. Rank was right about which arm to keep.
-That result is not a footnote to this paper; it removed the claim this paper used to make, and the claim
-that replaced it had to be one that survives rank being right on average.
+higher-rank arm carried the larger held-out molecular channel in all three, interval-backed 3/3 under a
+patient bootstrap and 2/3 under the conservative cancer-cluster one. Rank was right about which arm to
+keep. That result is not a footnote to this paper; it removed the claim this paper used to make, and the
+claim that replaced it had to be one that survives rank being right on average.
 
 It is. **The metric's between-arm differences are smaller than its own within-arm reproducibility floor,
 inside the regime its authors reserve for it.** Six of the seven between-arm rank differences this project
@@ -1978,6 +2134,8 @@ to run the thing twice.
 | 4.4 | subsampling SDs; probe repeats; tolerance and centring insensitivity | metrics entry §3; `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md`; recomputation entry §2, §4 | `~/e0_run/P2_METRICS_ALL_SUBSAMPLED.json`, `~/e0_run/d1_diag/probevar_*.log` |
 | 4.5 | statistic / block / view flips | metrics entry §4.2, §4.3; recomputation entry §4, §7 | `~/e0_run/P2_ROBUSTNESS.json` |
 | 4.7 | necessity test, predeclaration, escalation | `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`; metrics entry §5; `d1_readout_preregistration_20260803T1700Z.md` | `~/e0_run/d1_v2/`, `~/e0_run/d1_audit.log` |
+| 4.7.2 | both paired bootstraps on the 40 untrained targets | `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` | patient and cancer-cluster CI₉₅ per seed |
+| 4.7.3, 6.3 | `random_control` arm gaps, absolute levels, and the qualified A3 verdict | D1 audit check A3; `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json`; T1.4's 76–82% random-gene-set finding | — |
 | 4.8 | dilution table, both blocks, the 1.95–21.5× range | `DILUTION_LOWER_BOUND.md` §2, §6; `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`; recomputation entry §5 | `p1_evidence/dilution/`; `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` |
 | 4.9 | D2, Phase 1b, "16/16", decorrelation | `D2_RESULT.md` §2, §4; `PHASE1B_TARGETED_READOUT.md` §3, §5, §7; `NOTEBOOK.md` 2026-08-02 01:20 UTC; `ENGINE_CLD.md` §1 + `HANDOFF_BUILD_AGENT.md` §1–2 | **decorrelation: no artifact; cited source does not exist** |
 | 4.9, 4.10 | counter-measurement 12.88 → 1.00; collapse-regime values | `g26_rank_collapse_diagnosis_20260803T0500Z.md`; `d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`; `d1_programme_free_collapsing_in_training_20260803T1930Z.md`; `d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md` | `~/e0_run/d1_diag/`, `~/e0_run/d1_v1/` |
@@ -2019,10 +2177,21 @@ Reproduced verbatim so that any future quotation can carry it.
   (`NOTEBOOK.md:121`), and 0.80 against RNA's 0.62 on the fixed 16-patient gate batch. They must not be
   quoted interchangeably. The negative control is small but non-zero and same-signed, so of order 10–20%
   of the arm gap may be generic representation quality.
-- **D1 (§4.7).** Channel values are **point estimates without a paired bootstrap**; the official readout
-  is blocked by a stale-path bug. `D1_PAIRED_BOOTSTRAP.json`, when it lands, must **not** be headlined —
-  it scores all 90 non-control targets, 50 of which are `programme_only`'s own supervision. The result is
-  3/3 under R1 and R3, **2/3 under R2**.
+- **D1 (§4.7).** Quote **both** bootstraps or neither: decisive **3/3 on the patient** bootstrap and
+  **2/3 on the cancer-cluster** bootstrap, seed 43's cluster interval reaching **+0.0006**. The cluster
+  estimator is the conservative one and is the one to weight. `D1_PAIRED_BOOTSTRAP.json` (unstratified)
+  must **not** be used — it scores all 90 non-control targets, 50 of which are `programme_only`'s own
+  supervision; the stratified file on the 40 untrained targets is the only admissible one. Separately,
+  the rank result is **3/3 under every canonical statistic** — R1, R2 and R3. The previously quoted
+  "2/3 under R2" rested on a mislabelled statistic and is **withdrawn** (§4.5a).
+- **The `random_control` verdict (§4.7.3, §6.3).** *"The instrument does not manufacture an arm
+  difference; the absolute level is high and separately explained."* Never quote audit check A3 as an
+  unqualified pass. Arm gap −0.022 / −0.007 / −0.032, CIs spanning zero — but absolute level 0.44–0.48
+  against real targets' 0.51–0.62 and a permutation null of 0.147, i.e. ~3× the floor, consistent with
+  T1.4's 76–82%. **No absolute channel level in this paper may be read against an assumed null of zero.**
+- **Our own margin (§4.7.4, §6.3).** The smallest arm difference quoted (0.0705) is about **half** the
+  real-versus-random-control margin (0.139). Any quotation of a D1 or D2 arm difference should carry
+  this, for the same reason §4.1's envelope travels with every rank level.
 - **Dilution (§4.8).** *"Single seed (42) and a single draw of donor assignments… gives no error bar on
   the level-to-level differences."* And: *"The whole curve is one representation."* Detection floor
   censored at ≥ 0.40 from d = 0.09; the source's own §4 **withdraws** the phrase "lower bound".
@@ -2038,8 +2207,11 @@ Reproduced verbatim so that any future quotation can carry it.
 - **D1-A's 9.81 / 1.71 (§4.9).** **Statistic R3**, `[NOT RECOMPUTED]` under R1. *"Nothing about programme
   supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
   defect, not an ablation."*
-- **§5's momentum sweep.** **One seed per momentum value**, centred R3, durability established only to
-  step 600 against a 583-step training duration. The anchoring account is **not confirmed** and should
+- **§5's momentum sweep.** **One seed per momentum value** — because the harness had its seed
+  **hardcoded**, a defect rather than a judgement — centred R3, durability established only to step 600
+  against a 583-step training duration. Its m = 0 against m = 0.999 ratio (2.64×) is **inside** §4.1's
+  2.69× disqualifying envelope; §5.3 states why it is nonetheless reported and what the armed
+  seed-replicated sweep will license either way. The anchoring account is **not confirmed** and should
   not be cited as established; the turnover sharpening was predeclared, tested and **refuted**.
 - **All rank numbers.** RankMe's ε sits outside the division, so its statistic is not the exponential of a
   Shannon entropy and **no number in this paper is comparable to a published RankMe value**.
