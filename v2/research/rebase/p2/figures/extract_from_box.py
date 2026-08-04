@@ -78,6 +78,26 @@ VENDORED = [
     "e0_run/d1_diag/probevar_m0_1.log",
     "e0_run/d1_diag/probevar_m0_2.log",
     "e0_run/d1_diag/probevar_m0_3.log",
+    # The decorrelation ablation at m = 0.999, one seed per level, 400 steps.
+    # F9's whole source: it prints BOTH rank statistics and the RNA-view mutual
+    # cosine on the same rows, which is what makes the dissociation co-measured
+    # rather than compared across tables.
+    "e0_run/d1_diag/ablate_decorr0.0.log",
+    "e0_run/d1_diag/ablate_decorr0.01.log",
+    "e0_run/d1_diag/ablate_decorr0.04.log",
+    # The momentum seed replication behind draft 5.2/5.4. Vendored so the floor
+    # audit can read 10.45 and 3.18 from the bytes rather than from a notebook
+    # entry. mseed_m0.999_s42 is ALSO an independent same-seed repeat of the
+    # decorr = 0.04 arm of the ablation above -- same seed, same momentum, same
+    # capacity, same lr, and `d1_momentum_probe.py` has no schedule that depends
+    # on the step budget -- which is the only like-for-like pair this project has
+    # in the momentum/probe regime. See draft 4.1a.
+    "e0_run/d1_diag/mseed_m0.999_s42.log",
+    "e0_run/d1_diag/mseed_m0.999_s43.log",
+    "e0_run/d1_diag/mseed_m0.999_s44.log",
+    "e0_run/d1_diag/mseed_m0_s42.log",
+    "e0_run/d1_diag/mseed_m0_s43.log",
+    "e0_run/d1_diag/mseed_m0_s44.log",
 ]
 
 # --------------------------------------------------------------------------
