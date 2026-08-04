@@ -194,6 +194,12 @@ def main() -> None:
     parser.add_argument("--n-jobs", type=int, default=1)
     parser.add_argument("--classifier-n", type=int, default=20000)
     parser.add_argument("--assumed-contamination", default="0.20,0.50")
+    # In-sample top-CCA is capacity-inflated, and the inflation depends on n. ALCHEMIST has
+    # 1,106 patients against TCGA-NSCLC's 841, so ALCHEMIST's permutation null sits LOWER and
+    # its null-corrected excess is flattered relative to TCGA's by the size difference alone.
+    # This subsamples ALCHEMIST to TCGA's n so the ratio is read at matched capacity.
+    parser.add_argument("--alchemist-subsample", type=int, default=0,
+                        help="subsample ALCHEMIST to this many patients (0 = use all)")
     args = parser.parse_args()
 
     output = Path(args.output_dir)
@@ -241,6 +247,14 @@ def main() -> None:
           f"({len(set(alch_cancers.tolist()))} histology levels), "
           f"tcga {len(tcga_ids2)} x {tcga_y.shape[1]} "
           f"({sorted(set(tcga_cancers.tolist()))})", flush=True)
+
+    if args.alchemist_subsample and args.alchemist_subsample < len(alch_ids2):
+        pick = np.sort(np.random.default_rng(args.seed).choice(
+            len(alch_ids2), size=args.alchemist_subsample, replace=False))
+        alch_ids2, alch_y = alch_ids2[pick], alch_y[pick]
+        alch_cancers, alch_scanners = alch_cancers[pick], alch_scanners[pick]
+        alch_blocks = [alch_blocks[i] for i in pick]
+        print(f"[match-n] ALCHEMIST subsampled to {len(alch_ids2)} patients", flush=True)
 
     alch_raw = pooled_representation(alch_blocks)
     tcga_raw = pooled_representation(tcga_blocks)
