@@ -241,8 +241,11 @@ fitted parameters, and mean-pooled bags are far more robust than a proportional 
   0.607, 0.333), with the predeclared proportional model `1 − d` and its ±0.15 band overlaid so the
   falsification of D2 is visible, and the half-loss point d ≈ 0.68 marked. Plot the raw ratio as a
   faint second line to show how much the null correction matters.
-- (b) Twin axis: effective rank (196.2 → 161.2, −18%) against null-corrected channel (−67%) over the
-  same levels — this panel does double duty for F11.
+- (b) Twin axis: effective rank against null-corrected channel over the same levels. **Report both
+  curves; make no rank-versus-information claim in the caption** — that claim is made in the companion
+  paper (`paper/P2_FIGURES.md` F4), and the caption must name the **block** each curve is computed on,
+  because rank on the raw block reads 196.2 → 161.2 while rank on the confound-residualised block the
+  channel is actually read from reads 210.2 → 203.7 (`paper/P2_RANK_DRAFT.md` §4.8).
 - (c) Random-control ratio against d (0.815 → 0.727), flat, establishing that non-specificity is a
   property of the readout and not of patch quality.
 
@@ -254,24 +257,22 @@ contamination — **not** a lower bound" phrasing, since the normal-tissue arms 
 
 ---
 
-### F11 — Effective rank does not track information content
+### F11 — **DELETED**
 
-**Claim.** Four independent instances, in both directions.
+**F11 ("Effective rank does not track information content") has been removed from P1 and moved to the
+companion paper in full**, where it is `paper/P2_FIGURES.md` F1. Two reasons, both binding.
 
-**Panel.** A single 2 × 2 panel, one quadrant per instance, each showing Δrank against Δinformation
-with the units named: (1) +107% rank / specificity flat 0.1366 → 0.1367; (2) −17% rank / channel
-−0.002; (3) rank pinned 16/16 while retrieval falls 0.062 → 0.000 (below chance) and within-modality
-cosine rises 0.7089 → 0.9999; (4) −18% rank / −67% channel.
+1. **Dual-submission.** TMLR forbids reuse of *results* — not merely claims — between a submission and
+   any paper submitted in parallel at another archival peer-reviewed venue. P1 §4.11 and P2 §4 must not
+   both be submitted carrying the same instances.
+2. **Two of the four panels were wrong as drawn.** The "rank pinned at 16/16" panel plotted a **hard
+   numerical `matrix_rank`** at a structural ceiling equal to the batch size of 16, not an effective
+   rank, and the centred effective rank of the same objective falls 12.88 → 1.00; and the "−18% rank
+   against −67% channel" panel compared two **different preprocessing blocks**, reading −3.10% when
+   matched (`paper/P2_RANK_DRAFT.md` §4.8, §4.9).
 
-**Data.** (1) `v2/research/rebase/ENGINE_CLD.md`, `HANDOFF_BUILD_AGENT.md`; (2)
-`PHASE1B_TARGETED_READOUT.md` §5; (3) `NOTEBOOK.md` entry 2026-08-02 01:20 UTC, source
-`scratchpad/collapse_diag.py`; (4) `DILUTION_LOWER_BOUND.md` §6.
-
-**Status.** `NEEDS EXTRACTION` for instances (1) and (3) — both are recorded as endpoint numbers in
-markdown, and instance (1) comes from an earlier codebase generation with a different benchmark
-statistic. The caption must say so, and must record that instance (2)'s two arms were not verified
-matched on epochs/LR/step budget. Draw as a labelled comparison chart of recorded values, not as a
-regression.
+P1 §4.11 is now a two-paragraph pointer with no table and no rank numbers. **Do not restore this
+figure to P1.**
 
 ---
 

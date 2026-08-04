@@ -1,5 +1,32 @@
 # P2 — figure and table plan
 
+> **STALE AGAINST THE 2026-08-04 REWRITE — read this first.** The draft was reorganised around a new
+> claim (`P2_RANK_DRAFT.md` §1.3): *effective rank is unusable as a selection signal because its
+> between-arm differences are smaller than its own within-arm reproducibility floor.* The old claim
+> ("effective rank does not track information content") was falsified by the necessity test and is
+> gone. Consequences for this file, to be executed before any figure is drawn:
+>
+> - **The headline figure is no longer F2.** It is now the reproducibility-floor figure (F3 below) plus
+>   a new panel carrying draft §4.1's seven-ratio table against the 2.69× envelope, and a new panel
+>   carrying draft §4.2's variance decomposition (34.5% / 65.5% against 98.0%, F 1.41 against 128.2).
+>   The variance decomposition is the single most important display item in the paper and currently has
+>   no row in this file.
+> - **A defeater-check figure is required** (draft §4.4): subsampling SDs, re-export determinism, the
+>   fixed-seed probe repeats, and the centring/tolerance insensitivity, on one panel. It is the
+>   Leavitt & Morcos §4.2 analogue and a referee will ask for it.
+> - **A verdict-instability figure is required** (draft §4.5): statistic × block × view, three small
+>   multiples, with the information verdict drawn beside it as a flat reference.
+> - **F2 is demoted.** The seed-43 inversion is now reported as implementation-dependent (draft §4.9);
+>   any panel showing it must show all four statistic × block combinations or not be drawn.
+> - **A figure for the necessity test is required** (draft §4.7) and must be placed *before* the
+>   figures that favour the paper, mirroring the draft's order.
+> - **F8 is no longer `PENDING` on the rank side.** D1-B's rank column is filled; only the paired
+>   bootstrap is pending.
+> - **§"Cross-paper deconfliction" is now EXECUTED** — see the end of this file.
+>
+> Everything below the binding constraints is retained because the per-panel data provenance is still
+> correct; only the claim each figure carries and their ordering change.
+
 Companion to `paper/P2_RANK_DRAFT.md`. One row per display item. For each: the **exact data** it must
 be drawn from, the **single claim** it carries, and its **status** — `PLOTTABLE` (data on disk or in a
 cited markdown table, no new computation), `NEEDS EXTRACTION` (data exists but must be pulled from a
@@ -497,7 +524,17 @@ repository; the numbers survive only as prose in `HANDOFF_BUILD_AGENT.md` §1/§
 
 ---
 
-## Cross-paper deconfliction with P1 — requires an author decision before either paper is submitted
+## Cross-paper deconfliction with P1 — **EXECUTED 2026-08-04**
+
+All four edits below were made in this pass. Verification: `paper/P1_FIGURES.md` F11 is replaced by a
+`DELETED` stub with the reason; `paper/P1_CALIBRA_DRAFT.md` §4.11 is now a two-paragraph pointer with no
+table and no rank numbers; §2.6 carries the verified RankMe and Roy & Vetterli citations, drops the Jing
+et al. mis-grouping, and its `[CITATION NEEDED]` is closed in §2.7; `paper/P1_FIGURES.md` F10(b) now
+reports both curves with the block named and makes no rank-versus-information claim. **P1 §4.12(iv)
+retains its one sentence citing D2's rank values, per the note at the end of this section.** The original
+statement of the four edits is preserved below for the record.
+
+### Original statement (for the record)
 
 `paper/P1_FIGURES.md` currently contains **F11 — "Effective rank does not track information content"**,
 a single 2 × 2 panel over the same four instances, and `paper/P1_CALIBRA_DRAFT.md` §4.11 contains the

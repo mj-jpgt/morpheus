@@ -1,5 +1,17 @@
 # What a liveness gate certifies — and four ways we learned it certifies less than we assumed
 
+> **SUPERSEDED AS A SUBMISSION UNIT, 2026-08-04.** This material is now **§5.1 of
+> `paper/P2_RANK_DRAFT.md`**, by the author's decision, and P2 §5 is the canonical version: it carries
+> the same four instances plus the gate's own 650× non-reproducibility, and it frames them as a worked
+> example of effective rank used in the one regime P2 §4.10 defends (collapse detection near the
+> floor). **Do not submit this file separately** — doing so would reuse P2's results. This file is
+> retained as the working source for the four instances and for the numbers P2 §5.1 quotes.
+>
+> Two corrections made when integrating, which apply here too: (i) the MoCo reference now carries an
+> identifier (He, Fan, Wu, Xie & Girshick, CVPR 2020, arXiv:1911.05722) where this repository
+> previously had only a bare "He et al., 2020"; (ii) MoCo advances its account **twice as a
+> hypothesis**, never as an established mechanism, and the falsification below must say so.
+
 *Draft section, 2026-08-03. Companion to `P1_CALIBRA_DRAFT.md`, which asks what an **analysis** would
 have missed; this asks what a **training gate** would have missed. Every number traces to a named
 entry in `NOTEBOOK_ENTRIES/` or a log under `~/e0_run/`. Numbers not measured are marked as such.*

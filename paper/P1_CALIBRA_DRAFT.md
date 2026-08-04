@@ -350,18 +350,31 @@ distinction from CALIBRA is real.
 ### 2.6 Representation-geometry metrics
 
 A parallel line proposes geometric proxies for representation quality: alignment and uniformity on
-the hypersphere (Wang & Isola, ICML 2020), dimensional collapse in contrastive learning (Jing et al.,
-ICLR 2022), the variance and covariance terms of VICReg (Bardes, Ponce & LeCun, arXiv:2105.04906),
-and effective rank as a scalar summary of a spectrum (Roy & Vetterli, 2007). In pathology
-specifically, the Robustness Index (de Jong et al., 2025) and representational-similarity analysis
-(Mishra & Lotter, 2025) are proposed as confound-aware representation diagnostics.
-`[CITATION NEEDED: RankMe, or an equivalent proposal of effective rank as a label-free representation
-quality score. The claim "effective rank is used as a quality proxy" needs one canonical citation and
-we do not currently hold a verified one.]`
+the hypersphere (Wang & Isola, ICML 2020) and the variance and covariance terms of VICReg (Bardes,
+Ponce & LeCun, ICLR 2022, arXiv:2105.04906). The **canonical proposal of effective rank as a
+label-free representation-quality score and hyperparameter-selection criterion is RankMe**: Garrido,
+Balestriero, Najman & LeCun, "RankMe: Assessing the Downstream Performance of Pretrained
+Self-Supervised Representations by Their Rank", *Proceedings of the 40th International Conference on
+Machine Learning* (ICML 2023), PMLR 202, pp. 10929–10974; arXiv:2210.02885. **VERIFIED at full text.**
+The statistic itself is Roy & Vetterli, "The effective rank: a measure of effective dimensionality",
+*EUSIPCO 2007*, pp. 606–610, DOI 10.5281/zenodo.40328 (**VERIFIED at full text**) — who propose it as
+a real-valued relaxation of integer rank for signal-processing optimisation and **make no claim about
+representation quality or downstream performance anywhere.** The quality-proxy claim belongs to
+RankMe and must not be attributed to them.
 
-These metrics describe geometry. Whether geometry tracks the molecular channel is a separate
-empirical question, and §4.11 reports four independent instances in which it does not. For this paper
-the relevance is narrower: a geometric quality metric cannot substitute for a sensitivity statement,
+**Correction to earlier versions of this section.** Jing, Vincent, LeCun & Tian, "Understanding
+Dimensional Collapse in Contrastive Self-Supervised Learning" (ICLR 2022, arXiv:2110.09348) was
+previously grouped here among proposals of geometric proxies for representation quality. A full-text
+search of that paper for any sentence relating the spectrum to downstream performance returns none:
+it is diagnostic and mechanistic about dimensional collapse and **contains no rank→performance
+claim.** It is cited here for the collapse phenomenon only.
+
+In pathology specifically, the Robustness Index (de Jong et al., 2025) and representational-similarity
+analysis (Mishra & Lotter, 2025) are proposed as confound-aware representation diagnostics.
+
+These metrics describe geometry. Whether geometry tracks the molecular channel is a separate empirical
+question and is not this paper's; it is taken up in the companion paper (§4.11). For this paper the
+relevance is narrower: a geometric quality metric cannot substitute for a sensitivity statement,
 because it is computed on the representation rather than through the analysis pipeline whose null is
 in question.
 
@@ -384,9 +397,19 @@ Current status:
 * **Marked `[UNVERIFIED]` above** and not yet checked in any pass: Kather et al. 2020 (exact
   journal/year), Kömen et al. 2024, Carloni et al. 2025, Schmitt et al. 2021, Venet et al. 2011, Leek
   & Storey 2007, Johnson et al. 2007, Muirhead 1982 / Anderson 2003 chapter and page.
-* **Marked `[CITATION NEEDED]`**: the effective-rank-as-quality-proxy citation (§2.6); the four papers
-  underlying the pre-registered ER-status band (§3.9) are recorded in
-  `p1_evidence/inputs/PREREG_known_covariate.json` but have not been re-verified in this pass.
+* **Closed in this pass:** the effective-rank-as-quality-proxy citation formerly marked
+  `[CITATION NEEDED]` in §2.6 is now **RankMe** — Garrido, Balestriero, Najman & LeCun, ICML 2023,
+  PMLR 202:10929–10974, arXiv:2210.02885, **VERIFIED at full text** — with the statistic itself
+  attributed to Roy & Vetterli, EUSIPCO 2007, pp. 606–610, DOI 10.5281/zenodo.40328, **VERIFIED at
+  full text**, who make **no** quality claim. Note that **no IEEE `10.1109/…` DOI exists** for Roy &
+  Vetterli on any record checked; do not invent one. Verification detail is in
+  `paper/P2_RANK_DRAFT.md` §2.1 and §2.6.
+* **Corrected in this pass:** §2.6 previously grouped Jing et al. (ICLR 2022) among proposals of
+  geometric proxies for representation quality. That paper contains no rank→performance claim; the
+  grouping has been removed.
+* **Still marked `[CITATION NEEDED]`**: the four papers underlying the pre-registered ER-status band
+  (§3.9), recorded in `p1_evidence/inputs/PREREG_known_covariate.json` but not re-verified in this
+  pass; and the four positive-control references in §4.9.
 
 ---
 
@@ -1168,29 +1191,24 @@ not be quoted with the words "lower bound" attached unless this paragraph travel
 `pooled`, `matched` and `dx_normal` normal-tissue arms that would settle it need GPU re-embedding and
 were not run.
 
-### 4.11 Effective rank does not track information content — four independent instances
+### 4.11 Why a representation-geometry metric cannot substitute for a sensitivity statement
 
-| # | manipulation | effective rank | information measure | source |
-|---|---|---|---|---|
-| 1 | covariance-decorrelation term added | 49.9 → 103.3, **+107%** | within-cancer specificity 0.1366 → 0.1367, **flat** | `v2/research/rebase/ENGINE_CLD.md`; `HANDOFF_BUILD_AGENT.md` §"Covariance-decorrelation fix" (3 seeds) |
-| 2 | `full` → `programme_only` supervision | 38.48 → 32.06, **−17%** | held-out molecular top-CCA 0.4768 → 0.4748, **−0.002** | `PHASE1B_TARGETED_READOUT.md` §5 |
-| 3 | full training schedule vs contrastive-only | `z_biology` matrix rank **pinned at 16/16 in every arm** | representation collapsed to a point (within-modality off-diagonal cosine 0.7089 → 0.9999; retrieval 0.062 → **0.000**, i.e. *below* chance 0.062) | `NOTEBOOK.md` 2026-08-02 01:20 UTC |
-| 4 | patch-bag contamination d = 0 → 0.80 | 196.2 → 161.2, **−18%** | null-corrected channel 1.000 → 0.333, **−67%** | `DILUTION_LOWER_BOUND.md` §6 |
+A geometric quality metric such as effective rank is computed **on the representation**, not through
+the analysis pipeline whose null is in question, and therefore cannot substitute for a sensitivity
+statement: it has no access to the confound design, the residualisation, the permutation null or the
+detection floor that this paper's readouts are calibrated against. That is the whole of the point for
+this paper, and no rank number is claimed as evidence for anything here.
 
-*Provenance: as in the final column. Instances 3 and 4 are the two limbs of the dissociation — rank
-pinned while information collapses, and rank drifting down gently while information collapses — so
-both directions now have evidence.*
-
-Two honesty notes attach to this table and both must travel with it. Instance 2's two arms were
-**not verified as matched on epochs, learning rate and step budget** (gate G0.4 in our own protocol),
-so it is suggestive rather than causal. Instance 1 comes from an earlier generation of the codebase
-and a different benchmark statistic. Instances 3 and 4 are the strongest. Separately, effective rank
-is **unstable across seeds** for the same configuration (9.14 to 34.12 in three seeds of one arm),
-which is itself an argument against using it as a summary.
-
-**For this paper the point is narrow:** a geometric quality metric is computed on the representation,
-not through the analysis pipeline whose null is in question, and therefore cannot substitute for a
-sensitivity statement. A fuller treatment belongs to a companion paper and is not claimed here.
+**The empirical treatment of effective rank — its reproducibility across retrainings and seeds, its
+behaviour under the dose–response of §4.10, and the instances this project has measured — belongs
+entirely to the companion paper `paper/P2_RANK_DRAFT.md` and is not claimed, tabulated or plotted
+here.** The four-row table and figure F11 that previously appeared in this section have been moved
+there in full, both to avoid reuse of results across parallel archival submissions and because two of
+the four descriptions they carried do not survive that paper's recomputation: the "rank pinned at
+16/16" instance is a **hard numerical matrix rank at a structural ceiling equal to the batch size of
+16** rather than an effective rank — the centred effective rank of the same objective falls 12.88 →
+1.00 — and the "−18% rank against −67% channel" comparison was measured on two **different
+preprocessing blocks**, reading −3.10% when matched.
 
 ### 4.12 An application: a supervision-target ablation read through the instrument
 

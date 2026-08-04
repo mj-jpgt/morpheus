@@ -1,6 +1,7 @@
-# Effective rank fails inside its own stated scope: six dissociations from a cross-modal biological pipeline, and a reproducibility floor that no rank comparison clears
+# Effective rank cannot resolve its own re-measurement: a reproducibility floor inside the regime RankMe reserves for itself
 
-**A negative result about a representation-geometry proxy, reported with its own weakest evidence and its own prior art first.**
+**A negative result about a representation-geometry proxy, reported with the experiment that went
+against it first, and with its own prior art ahead of its own evidence.**
 
 *Working draft, 2026-08-04. Companion to `paper/P1_CALIBRA_DRAFT.md`, which asks what an **analysis**
 would have missed; this asks what a **representation-geometry summary** fails to tell you. Every
@@ -9,92 +10,105 @@ repository; each table carries a `provenance` line. Numbers that do not exist ar
 measured rather than estimated. Every citation carries an explicit verification status (§2.6). Three
 fabricated citations have previously contaminated this project; §2.6 is not a formality.*
 
-> **Status.** Complete except for the **channel** column of §4.8.3, which carries a marked
-> `[D1 CHANNEL PENDING]` slot. D1-B has finished training — all six arms at 40/40, all six artifacts
-> exported to `~/e0_run/d1_v2/artifacts/` — and its **rank** column is filled under the canonical
-> definition. The paired bootstrap is running at the time of writing. Nothing else in this draft
-> depends on it, and the conclusion does not change under any D1-B outcome — §4.8.4 states in advance
-> what each outcome would and would not license.
+> ### Status — read before anything else
 >
-> **Every effective-rank number in this draft was recomputed under one canonical definition on
-> 2026-08-04** and every surviving instance reproduces exactly; two instances are marked
-> `[NOT RECOMPUTABLE — artifact lost]`. Two previously quoted conclusions do not survive as stated:
-> the dilution miscalibration constant (§4.2) and the unqualified form of the seed-43 inversion
-> (§4.3). See §3.1 and
+> **1. This draft's previous claim has been falsified by our own experiment and has been removed.**
+> Earlier versions were organised around *"effective rank does not track information content"* and
+> around a preregistered necessity test that was expected to break RankMe's *necessary-but-not-
+> sufficient* hedge. The test ran. It went the other way: `programme_only` (high rank) beats
+> `programme_free` (low rank) on the measured molecular channel **3/3 seeds** under the canonical
+> statistic (2/3 under the statistic an earlier draft nominated). Per the preregistered instruction in
+> `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md` (outcome **O2**), this is
+> reported **at abstract prominence as a negative for the paper's generality** and is §4.7, ahead of
+> every result that favours us.
+>
+> **2. The claim that survived is different, narrower, and better powered.** It is stated in §1.3 and
+> carried by §4.1–§4.5. It does not depend on any sign count.
+>
+> **3. Pending slots.** The D1 channel numbers in §4.7 are point estimates; the official paired
+> bootstrap has not produced `D1_PAIRED_BOOTSTRAP_STRATIFIED.json` because of a stale-path bug in the
+> D1 audit chain. Those cells carry `[D1 PAIRED BOOTSTRAP PENDING]`. Nothing in §4.1–§4.5 depends on
+> them.
+>
+> **4. Every effective-rank number in this draft was recomputed under one canonical definition on
+> 2026-08-04** and every surviving instance reproduces exactly. Two instances are marked
+> `[NOT RECOMPUTABLE — artifact never existed]` and one `[NOT RECOMPUTED — needs a GPU forward pass]`;
+> they are not carried forward as though they had been measured under the canonical definition. See
+> §3.1 and
 > `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`.
 
 ---
 
 ## Abstract
 
-Effective rank — the exponential of the Shannon entropy of a representation's L1-normalised singular
-values (Roy & Vetterli, EUSIPCO 2007, pp. 606–610) — is proposed as a label-free criterion for
-assessing self-supervised representations and selecting hyperparameters without labels (RankMe;
-Garrido, Balestriero, Najman & LeCun, ICML 2023, arXiv:2210.02885). **We claim no discovery of the
-negative.** Thilak et al. (arXiv:2312.04000) have already reported that RankMe correlates poorly with
-downstream performance (Spearman 0.3174 on VICReg at 100 epochs) and that "a high rank does not
-guarantee superior performance", and a RankMe co-author has since co-signed the statement that
-"current methods like RankMe fail to adequately evaluate representation quality"
-(arXiv:2410.04289). This paper confirms that finding in a domain it has not been tested in, and adds
-three things the existing negatives do not supply.
+Effective rank — the exponential of the Shannon entropy of a matrix's L1-normalised singular values
+(Roy & Vetterli, EUSIPCO 2007, pp. 606–610) — is proposed as a label-free criterion for assessing
+self-supervised representations and for selecting hyperparameters without labels (RankMe; Garrido,
+Balestriero, Najman & LeCun, ICML 2023, arXiv:2210.02885). **We claim no discovery of the negative,
+and we report our own failed prediction first.** We ran a preregistered test of RankMe's
+*necessary-but-not-sufficient* hedge — two arms of one method differing only in objective, three
+seeds — and the hedge held: the higher-rank arm carried the larger held-out molecular channel in
+3/3 seeds, in the same direction as its rank advantage. That is a negative for this paper's
+generality and we state it here, at the prominence a confirmation would have received. It joins
+published prior art we cannot claim novelty over: Aldeneh, Thilak, Higuchi, Theobald & Likhomanenko
+(ICASSP 2025, DOI 10.1109/ICASSP49660.2025.10889651) already report that *"rank does not reliably
+predict the best-performing layer for specific downstream tasks, as lower-ranked layers can
+outperform higher-ranked ones"* — a within-method selection-rule failure with a published
+low-rank/high-information instance.
 
-First, a failure **inside RankMe's own stated scope.** RankMe restricts itself twice — high rank is
-"necessary (but not sufficient)", and "RankMe should however only be used to compare different runs of
-a given method". Most published negatives, and four of our own six dissociations, fall outside those
-restrictions and therefore do not contradict it. One does not: in a three-seed supervision-target
-ablation with arms matched by construction, one method, one architecture, in-distribution held-out
-evaluation and 2,000-repeat paired patient- and cancer-clustered bootstraps on 2,766 patients, the
-arm with the **higher** effective rank loses in one seed (34.12 vs 28.77, Δ = −0.1089) and the two
-arms are **equal to two decimals** in another (9.11 vs 9.14) with the same arm losing by −0.1226. Both
-confidence intervals exclude zero in 3/3 seeds. The rank ordering agrees with the performance ordering
-in one seed of three.
+What survives is a different and better-powered claim, about **usefulness rather than truth**:
 
-Second, a **reproducibility floor** that we believe has not been reported and that constrains the
-within-method use RankMe recommends. On this stack effective rank spans **9.11 to 34.12** across three
-seeds of one configuration, and **8.68 versus 23.39** for one seed retrained with an identical
-configuration — a 2.7× move — while the paired channel difference it would be used to explain is
-stable at −0.1089 to −0.1325 with the same sign 3/3. A criterion used to select between configurations
-must resolve an effect larger than its own run-to-run spread; here it does not.
+> **Effective rank is unusable as a selection signal, because its between-arm differences are smaller
+> than its own within-arm reproducibility floor — inside the regime its proponents explicitly reserve
+> for it** (*"RankMe should however only be used to compare different runs of a given method"*).
 
-Third, a **magnitude miscalibration** measurable only on a dose–response, not on a two-point
-comparison. Under seven levels of information-free patch contamination of a representation with **zero
-fitted parameters**, the null-corrected cross-modal channel falls 1.000 → 0.333 (**−67%**) while
-effective rank falls only **−3.1%** on the same confound-residualised block the channel is read from
-(210.2 → 203.7), or **−18%** on the raw block (196.2 → 161.2). Rank under-reports the loss in every
-implementation and on both blocks, by a factor between **1.95× and 21.5×**; we quote the range rather
-than a constant, because the choice of statistic and of block — neither of which any prior version of
-this work stated — is what sets it (§3.1, §4.2). This is consistent with, not contrary to, RankMe's
-necessary-not-sufficient framing, and we label it as such.
+Four measurements carry it, on 12 frozen artifacts from 4 arms × 3 seeds of two matched-arm
+experiments in cross-modal morphology → bulk-transcriptome learning on 2,766 held-out TCGA patients.
+**(i)** Six of the seven between-arm rank differences this project has ever measured (**1.004× to
+2.19×**) fall inside the **2.69×** envelope produced by retraining one configuration with the same
+seed. **(ii)** A variance decomposition over the 12 artifacts puts effective rank at **34.5% arm /
+65.5% training-seed nuisance**, with the arm term not significant (F(3,8) = 1.41); the molecular
+channel those same artifacts carry is **98.0% arm**, F = 128.2. **(iii)** At a matched training step,
+one arm spans **6.05×** across three seeds while its sibling spans **1.003×** — the floor is a
+property of the *arm*, and is worst exactly where the arm is interesting. **(iv)** The instability is
+in **training, not estimation**: patient-resampling gives a measurement SD of ≈0.1 on a rank of 25,
+re-exporting a surviving checkpoint reproduces to five significant figures, and a controlled
+short-horizon repeat at fixed seed spans 4.7%.
 
-We report the evidence that cuts against us at the same prominence. Centred effective rank **does**
-fall to ~1 under total collapse (12.88 → 1.00 within 50 steps), so the collapse-diagnostic use is
-supported. The instance previously described by this project as its most dramatic — rank pinned at
-16/16 while patient-to-patient cosine reached 0.9999 and retrieval fell below chance to 0.000 — turns
-out on inspection to be a *hard numerical* rank at a structural ceiling, not an effective rank, and we
-withdraw the description. And at effective rank 9.1 of a nominal 256, two representations still read
-held-out channels of 0.5983 and 0.4757 against a permutation null of 0.140, so "low rank means little
-information" is also false outside total collapse. Separately we document that three mutually
-incompatible statistics are implemented under the name `effective_rank` in the single repository that
-produced these results, and that our own historical instances were not all measured with the same one.
+Two further findings constrain any use of the number at all. The between-arm *verdict* flips with the
+choice of rank statistic (3 of 6 pairs), with whether the block is confound-residualised (2 of 3 D2
+seeds), and with which co-trained view of the same model is measured (2 of 6 pairs); the information
+verdict never flips under any of them. And on a seven-level dose–response with a **zero-parameter**
+representation, rank under-reports the information loss by a factor between **1.95× and 21.5×**
+depending on those same choices — **21.5×** on the block the channel is actually read from, a
+correction that moved the result *in our favour* relative to the 3.7× previously published and is
+reported for that reason.
+
+We report what cuts against us at equal prominence. Centred effective rank does fall to ~1 under
+total collapse, so the collapse-diagnostic use is supported; §5 is a worked example of exactly that
+use, in which a training gate and a queue fix are graded in rank. At effective rank 9.1 of a nominal
+256, two representations still read held-out channels of 0.5983 and 0.4757 against a permutation null
+of 0.140, so "low rank means little information" is false outside total collapse. We evaluated three
+published alternatives on the same artifacts and **none is better**: LiDAR picks the
+information-poorer arm 0/3 on the in-scope contrast at every δ over eight orders of magnitude.
+Selection-rule counts on six pairs are reported and are explicitly underpowered — a *flawless* 6/6
+would give p = 0.031 — which is why the argument rests on the variance decomposition instead.
 
 ### Short abstract (~200 words)
 
-Effective rank (Roy & Vetterli 2007) is proposed as a label-free criterion for assessing
-self-supervised representations and for label-free hyperparameter selection (RankMe, ICML 2023). That
-it can fail is known: Thilak et al. (2023) report RankMe Spearman 0.32 against linear-probe accuracy
-and that high rank does not guarantee good representations. We confirm this in cross-modal
-morphology→transcriptome learning and add three things. (i) A failure **inside RankMe's own stated
-scope** — one method, one architecture, arms matched by construction, three seeds, paired bootstraps:
-the higher-rank arm loses (34.12 vs 28.77, Δ = −0.1089) and equal-rank arms differ by −0.1226, with
-both CIs excluding zero 3/3 and rank ordering agreeing once in three. (ii) A **reproducibility floor**:
-rank spans 9.11–34.12 across three seeds of one configuration and 8.68 vs 23.39 for one seed
-retrained, and 6.05× across three seeds of one arm at a fixed training step against 1.003× for its
-sibling arm at the same step, while the paired difference is stable — so a within-method rank
-comparison cannot resolve an effect smaller than 2.7×, and the envelope is a property of the arm. (iii) A **magnitude miscalibration** visible only on a dose–response:
-rank −3.1% on the block the channel is read from (−18% on the raw block) while the channel falls
-−67%. Against this, centred rank does fall to ~1 under total
-collapse, so the collapse-diagnostic use survives. We also document three incompatible statistics
-named `effective_rank` in one codebase.
+Effective rank (Roy & Vetterli 2007) is proposed as a label-free criterion for representation quality
+and hyperparameter selection (RankMe, ICML 2023). We first report a failed prediction: a preregistered
+within-method test of RankMe's necessity hedge confirmed it, 3/3 seeds. What survives is a claim about
+usefulness, not truth: **effective rank's between-arm differences are smaller than its own within-arm
+reproducibility floor, inside the same-method regime RankMe reserves for itself.** Six of seven
+between-arm rank differences ever measured on this project (1.004×–2.19×) lie inside the 2.69×
+envelope of retraining one configuration at one seed. Over 12 artifacts (4 arms × 3 seeds), rank is
+34.5% arm and 65.5% seed nuisance (arm term not significant, F(3,8) = 1.41) while the molecular
+channel is 98.0% arm (F = 128.2). At a matched step one arm spans 6.05× across seeds and its sibling
+1.003×, so the floor belongs to the arm. Measurement noise is negligible (SD ≈ 0.1 on rank 25): the
+instability is in training. The between-arm verdict also flips with the rank statistic, the
+preprocessing block and the measured view; the information verdict never does. Three published
+alternatives were computed on the same artifacts; none is better.
 
 ---
 
@@ -107,145 +121,145 @@ All three are expensive, and in cross-modal biological settings the downstream l
 scarce quantity the representation exists to predict. This creates strong demand for a *label-free*
 scalar computed on the representation matrix alone.
 
-The spectrum supplies the obvious candidate. Given a patient × feature matrix, take its singular
-values, normalise them to a probability vector, and report the exponential of their Shannon entropy —
-a smooth interpolation between 1 (all mass on one direction) and the matrix's rank (a flat spectrum).
-This is Roy & Vetterli's effective rank, and RankMe adopts it verbatim as a label-free criterion for
-self-supervised representation quality and hyperparameter selection (§2.1).
+The spectrum supplies the obvious candidate, and it is genuinely attractive. Given a patient × feature
+matrix, take its singular values, normalise them to a probability vector, and report the exponential
+of their Shannon entropy — a smooth interpolation between 1 (all mass on one direction) and the
+matrix's rank (a flat spectrum). It is cheap, it has a clean spectral definition, it needs no labels,
+and it returns a number in every circumstance. This is Roy & Vetterli's effective rank, and RankMe
+adopts it verbatim as a label-free criterion for self-supervised representation quality and
+hyperparameter selection (§2.1). A paper that opens by sneering at a metric loses the readers who
+use it; the appeal is real and the rest of this paper is about what that appeal does not buy.
 
 The intuition licenses three distinct practices, and they are not equally defensible:
 
-1. **As a collapse diagnostic.** "Rank has fallen to ~1, so the model has collapsed." Supported by
-   the evidence here (§4.9), and the only use we end up recommending — with a caveat that a cheaper
-   statistic does the job better.
+1. **As a collapse diagnostic.** "Rank has fallen to ~1, so the model has collapsed." Supported by the
+   evidence here (§4.10), the only use we end up recommending, and the use demonstrated at length in
+   §5 — with the caveat that a cheaper statistic does the job better.
 2. **As a training objective or a target of regularisation.** Anti-collapse regularisers penalise
    off-diagonal feature covariance in order to raise the occupied dimensionality (VICReg, ICLR 2022;
-   Barlow Twins). §4.5 reports what happened when we did this.
-3. **As a comparative quality score** — "configuration A has higher effective rank than B, therefore
-   A's representation is better". This is the use RankMe formalises, restricts, and this paper reports
-   evidence against **within those restrictions**.
+   Barlow Twins). §4.9 reports what happened when we did this.
+3. **As a comparative selection signal** — "configuration A has higher effective rank than B,
+   therefore A is the one to keep". This is the use RankMe formalises and restricts, and it is the
+   only one this paper argues against.
 
-Use (3) is the one cheap enough to be tempting and the one that, if wrong, is silently wrong: a rank
-number never fails, never returns `NaN`, and never announces that it was not measuring the thing you
-cared about.
+Use (3) is the one cheap enough to be tempting and the one that, if unreliable, is *silently*
+unreliable: a rank number never fails, never returns `NaN`, and never announces that the difference
+you are reading is smaller than the difference you would get by training the same configuration
+twice.
 
 ### 1.2 What is already known, and what we are not claiming
 
-**We claim no discovery of the negative.** The prior art is explicit and we state it before our own
-results rather than after.
+**We claim no discovery of the negative.** The prior art is explicit, some of it is peer-reviewed,
+some of it is in-scope, and we state all of it before our own results rather than after (§2.2).
 
-Thilak et al. (arXiv:2312.04000) report that "RankMe correlates poorly with downstream performance for
-most models", measure Spearman 0.3174 and Kendall τ 0.2056 for RankMe against linear-probe accuracy on
-VICReg at 100 epochs, observe that "peak downstream performance occur[s] far from the point of maximal
-rank", and state in their limitations that "a high rank does not guarantee superior performance". They
-also give the constructive counterexample: appending independent noise dimensions raises rank while
-adding no utility. Separately, a RankMe co-author has co-signed the statement that "current methods
-like RankMe fail to adequately evaluate representation quality, making cross-validation without labels
-infeasible" (arXiv:2410.04289). If our claim were "effective rank does not predict downstream
-performance", it would not be novel.
+The single most constraining item is **Aldeneh, Thilak, Higuchi, Theobald & Likhomanenko, "Towards
+Automatic Assessment of Self-Supervised Speech Models using Rank", ICASSP 2025**, which reports
+verbatim that *"rank does not reliably predict the best-performing layer for specific downstream
+tasks, **as lower-ranked layers can outperform higher-ranked ones**"*. That is a **within-method,
+matched-arm, selection-rule failure** and a **published low-rank/high-information instance**, by an
+author group that includes LiDAR's first author. It pre-empts both the "in-scope failure" framing and
+the necessity-violation framing that earlier drafts of this paper were built on. Earlier drafts
+asserted that *"none [of the prior negatives] tests the within-method, matched-arm, fixed-architecture
+regime that RankMe reserves for itself"*. **That sentence was false and has been deleted.**
 
-**We also do not claim more than RankMe claims.** RankMe hedges in four ways that blunt most negative
-results, including four of our own six (§4.1):
+Also already published: Thilak et al. (LiDAR, ICLR 2024) report RankMe Spearman 0.3174 against
+linear-probe accuracy on VICReg at 100 epochs and state that *"a high rank does not guarantee superior
+performance"*; a RankMe co-author has co-signed the statement that *"current methods like RankMe fail
+to adequately evaluate representation quality, making cross-validation without labels infeasible"*
+(Otero, Mateus & Balestriero, arXiv:2410.04289) — which is itself a named *selection-rule* failure,
+not merely a correlational one.
 
-- Rank is **necessary but not sufficient**: "a necessary (but not sufficient) condition"; "having a
-  high rank is a necessary condition for good downstream performance"; "maximal rank is only a
-  necessary condition". *A high-rank representation with poor performance therefore does not
-  contradict RankMe — RankMe predicts exactly that.*
-- **Same-method comparisons only**: "RankMe should however only be used to compare different runs of a
-  given method, since the embeddings' rank is not the only factor that affects performance."
-- **No monotone transfer to other datasets**: "there is no inherent reason for the rank of embeddings
-  to transfer in a monotonic way to them."
-- **A named failure region**: "Except for some degenerate solutions at full-rank…"
+**We also do not claim more than RankMe claims.** RankMe hedges in four ways, and the hedge that
+matters most to this paper is the one we tested and failed to break:
+
+- Rank is **necessary but not sufficient**: *"a necessary (but not sufficient) condition"*. A
+  high-rank representation with poor performance therefore does not contradict RankMe — RankMe
+  predicts exactly that. §4.7 reports our attempt to produce the configuration that *would* contradict
+  it, and its failure.
+- **Same-method comparisons only**: *"RankMe should however only be used to compare different runs of
+  a given method, since the embeddings' rank is not the only factor that affects performance."* This
+  restriction is the one this paper takes seriously, because the reproducibility floor we measure is
+  measured **inside** it: three seeds of one arm *are* different runs of a given method.
+- **No monotone transfer to other datasets**; and **a named failure region**, *"Except for some
+  degenerate solutions at full-rank…"*.
 
 And **the quality-proxy claim must not be attributed to Roy & Vetterli**, who propose effective rank
-as a real-valued relaxation of rank for signal-processing optimisation and make no claim about
+as a real-valued relaxation of integer rank for signal-processing optimisation and make no claim about
 representation quality anywhere. Nor to Jing et al. (ICLR 2022), whose paper is diagnostic and
 mechanistic about dimensional collapse and contains no sentence claiming the singular-value spectrum
-predicts downstream performance. Both attributions appear in earlier drafts on this project and are
-corrected here (§2.6).
+predicts downstream performance. Both attributions appear in earlier drafts on this project and in
+P1 §2.6, and are corrected here and there (§2.4, §2.6).
 
-### 1.3 What this paper adds
+### 1.3 The claim
 
-> **Effective rank fails inside RankMe's own stated scope, on a within-method comparison with matched
-> arms, three seeds and intervals; and independently of whether it is right on average, it is less
-> reproducible on this stack than the effect it would be used to select on.**
+Following Leavitt & Morcos (ICLR 2021), we state the claim as a property rather than as a performance
+result, and we state the strongest form with its hedge attached:
 
-Three additions to the existing negative:
+> **Effective rank is unusable as a selection signal on this stack, because its between-arm
+> differences are smaller than its own within-arm reproducibility floor — and this is true inside the
+> same-method regime its proponents explicitly reserve for it. Its dynamic range is dominated by the
+> one factor that carries no information: the training seed.**
 
-1. **An in-scope failure.** One method, one architecture, arms matched by construction, varying one
-   supervision target, in-distribution held-out evaluation, non-degenerate ranks, three seeds with
-   paired bootstraps (§4.3). This is the regime RankMe reserves for itself and it is the regime the
-   existing negatives do not test: LiDAR compares across methods and across training checkpoints;
-   Kulkarni et al. work on LLM unembeddings; Cheng works on continual-learning plasticity.
-2. **A reproducibility floor on the statistic itself** (§4.7). We have not found this reported. It
-   applies specifically to the within-method use RankMe recommends: if rank moves 2.7× when the same
-   configuration is retrained with the same seed, no within-method comparison smaller than that can be
-   read.
-3. **A dose–response magnitude miscalibration** (§4.2), which a two-point comparison cannot show and
-   which defeats the natural retreat position that rank is "at least a rough guide": rank and the
-   channel move together and are miscalibrated by 1.95–21.5× depending on two implementation choices
-   that no prior version of this work stated (§4.2); 21.5× under the canonical statistic on the block
-   the channel is measured on.
+Note what this claim is *not*. It is not "rank is uncorrelated with quality" — we did not measure that
+and §4.7 points the other way. It is not "rank is wrong" — the metric is a precise measurement of the
+thing it measures (§4.4). It is a claim about the **ratio of signal to nuisance in the quantity a
+practitioner actually compares**, and it is the form of claim that survives whether or not rank is
+right on average, because a criterion that cannot resolve its own re-measurement cannot select between
+configurations regardless of what it would say if it could.
 
-Plus a new domain — cross-modal morphology → bulk transcriptome on human tumours — which we frame as
-extension and replication, not discovery.
+The practitioner-facing form, which is the sentence we would want quoted:
 
-### 1.4 What this paper is not, and its relationship to P1
+> *Before using a rank difference to select between configurations, retrain one configuration with the
+> same seed and measure the rank spread. If the between-configuration difference does not exceed it,
+> the comparison is uninformative.* On this stack that check would have disqualified six of the seven
+> rank comparisons this project ever made.
+
+### 1.4 Contributions
+
+In descending order of how well evidenced they are.
+
+1. **A measured reproducibility floor on effective rank, and the demonstration that essentially every
+   between-arm difference we have measured is inside it** (§4.1). Six of seven differences,
+   1.004×–2.19×, against a 2.69× same-seed retraining envelope. We have not found this reported.
+2. **A variance decomposition separating the arm term from the seed term** (§4.2). Rank: 34.5% arm,
+   65.5% seed, arm term not significant. Channel: 98.0% arm, F = 128.2. This is the contribution that
+   does not depend on a sign count and it is what the paper rests on.
+3. **The floor is a property of the arm, not of the statistic** (§4.3). At one training step, 6.05×
+   across seeds for one arm against 1.003× for its sibling — so a reproducibility envelope measured on
+   a well-behaved configuration does not transfer to the one being diagnosed, which is the
+   configuration a practitioner is looking at when they reach for rank.
+4. **A defeater check** (§4.4), which the exemplar literature will demand and which earlier drafts
+   lacked: the instability is in training and not in estimation, established four independent ways.
+5. **The verdict is under-determined by choices nobody states** (§4.5): statistic (3/6 pairs), block
+   (2/3 D2 seeds), measured view (2/6 pairs). The information verdict flips under none of them.
+6. **A dose–response magnitude miscalibration, corrected against ourselves** (§4.8): −3.10% rank
+   against −66.7% channel on matched preprocessing, i.e. 21.5×, replacing a previously published 3.74×
+   whose preprocessing was mismatched and unstated.
+7. **A negative for our own generality, preregistered and reported first** (§4.7).
+8. **Three mutually incompatible statistics named `effective_rank` across ten call sites in one
+   repository** (§3.1) — two of them live abort thresholds that kill training runs — reported **and**
+   harmonised, with every recomputable historical instance recomputed under one definition.
+
+Plus a domain in which the within-method matched-arm evaluation of rank as a selection rule has not
+been done: across **453 de-duplicated works** citing RankMe, Roy & Vetterli, LiDAR or α-ReQ, none
+evaluates rank as a selection rule on matched arms in computational pathology or transcriptomics
+(§2.2). That is where the novelty claim is placed, and it is narrow.
+
+### 1.5 What this paper is not, and its relationship to P1
 
 This is a methods and measurement paper. **No biological claim is made anywhere in it.** The
 representation states audited here exist for other work on the same project; here they are specimens.
 
 Its relationship to `paper/P1_CALIBRA_DRAFT.md` must be stated precisely, because the two share
-evidence. P1 is an instrument paper about injection-certified transmission and detection floors for
-confound-adjusted cross-modal analyses. P1 §4.11 currently carries a four-row table of rank
-dissociations and closes it with: *"For this paper the point is narrow… A fuller treatment belongs to
-a companion paper and is not claimed here."* This is that companion paper.
-
-**Required resolution of the overlap, for the authors rather than the reader.** P1 §4.11 and P1 figure
-F11 should be reduced to a two-sentence pointer — that a geometric quality metric is computed on the
-representation rather than through the analysis pipeline whose null is in question, and therefore
-cannot substitute for a sensitivity statement — with the table and the F11 panel moving here in full.
-As currently drafted the two papers carry the same table with the same caveats, and P1's version now
-contains two statements this paper withdraws (§2.6, §4.6). **§4 of this paper and §4.11 of P1 must not
-both be submitted.** `paper/P2_FIGURES.md` §"Cross-paper deconfliction" states the four specific edits.
-
-### 1.5 Contributions
-
-In descending order of how well evidenced they are, and each labelled with whether it contradicts
-RankMe *as stated* or only the looser practice.
-
-1. **An in-scope within-method failure with intervals** (§4.3). Contradicts RankMe's body claims
-   ("RankMe Consistently Predicts Downstream performances From Representations"; "a predictor of
-   representations' performance"). Three seeds, matched by construction, both CIs excluding zero 3/3,
-   rank ordering correct in 1/3. Collected as a routine audit check, not designed as a rank
-   experiment.
-2. **A reproducibility floor on effective rank** (§4.7). 3.75× across seeds of one configuration;
-   2.69× across retrainings at one seed; and **6.05× across three seeds of one arm at the same global
-   step**, against **1.003×** for the sibling arm at that step — so the floor is a property of the arm,
-   not of the statistic. Against a paired difference stable to ±0.012. Six of the seven between-arm
-   rank differences this project has measured are inside the retraining envelope. Contradicts the
-   practicability of RankMe's own recommended within-method use, without contradicting any claim it
-   makes about expectation.
-3. **A dose–response miscalibration of magnitude** (§4.2). Rank −18% against channel −67% over seven
-   levels on a zero-parameter representation. **Consistent with** RankMe's necessary-not-sufficient
-   framing; contradicts the informal practice of reading rank as a health indicator.
-4. **The constraint on our own claim, reported at equal prominence** (§4.6, §4.9). Centred effective
-   rank falls 12.88 → 1.00 and 67.55 → ~2 under total collapse; and at effective rank 9.1 of 256 the
-   representation still reads a channel of 0.4757–0.5983 against a null of 0.140, so even "low rank
-   means little information" fails outside total collapse.
-5. **A withdrawal.** This project previously described "rank pinned at 16/16 while the representation
-   collapsed to cosine 0.9999" as one of its two strongest instances. That column is a **hard
-   numerical rank** at a structural ceiling equal to the batch size, and the centred effective rank of
-   the same objective falls to 1.00. The description is withdrawn here (§4.6).
-6. **Three mutually incompatible statistics named `effective_rank` across ten call sites in one
-   repository** (§3.1), with our own historical instances not all measured with the same one — and a
-   fourth choice, *which matrix the SVD is taken of*, that no version of this work stated. Reported
-   **and** harmonised: there is now one implementation, a canonical definition with its deviations from
-   Roy & Vetterli documented, and every surviving instance recomputed under it (§5.2). The finding is
-   retained because it is itself evidence for the thesis — a scalar whose name is stable while its
-   definition is not gets quoted across contexts it does not survive — and because the recomputation
-   showed the choice is worth up to a factor of three, flips the arm ordering on two of three seeds of
-   our own strongest instance (§4.3), and changes our own headline magnitude by 5.8× (§4.2).
+evidence and would be **parallel archival submissions**. TMLR's editorial policy forbids reuse of
+*results*, not merely of claims, between a submission and any paper "submitted in parallel at another
+archival, peer-reviewed venue". P1 §4.11 previously carried a four-row table of rank dissociations and
+P1 F11 plotted them. **Those have been removed from P1 and moved here**, per the four edits listed in
+`paper/P2_FIGURES.md` §"Cross-paper deconfliction"; the edits were executed in this pass and are
+recorded in §7 of the accompanying notebook entry. P1 §4.11 is now a two-sentence pointer. P1 §4.12(iv)
+retains one sentence citing D2's rank values, because there it discharges an objection to P1's own
+ablation rather than making a claim about rank; that sentence and §4.1 of this paper must not both be
+described as a finding about effective rank.
 
 ---
 
@@ -253,215 +267,325 @@ RankMe *as stated* or only the looser practice.
 
 ### 2.1 Effective rank, and its proposal as a label-free quality criterion
 
-**Definition — VERIFIED at full text.** Roy & Vetterli, "The effective rank: a measure of effective
-dimensionality", 15th European Signal Processing Conference (EUSIPCO 2007), Poznań, 3–7 September
-2007, pp. 606–610; DOI 10.5281/zenodo.40328. Definition 1, verbatim: *"The effective rank of the
+**Definition — VERIFIED at full text.** Olivier Roy & Martin Vetterli, "The effective rank: a measure
+of effective dimensionality", *15th European Signal Processing Conference (EUSIPCO 2007)*, Poznań,
+Poland, 3–7 September 2007, IEEE, **pp. 606–610**; IEEE Xplore document **7098875**; DOI
+**10.5281/zenodo.40328** (a Zenodo/EURASIP archive DOI — **no IEEE `10.1109/…` DOI exists on any
+record checked, and none may be invented**). Definition 1, verbatim: *"The effective rank of the
 matrix A, denoted erank(A), is defined as erank(A) = exp{H(p1, p2,…,pQ)}, where H(p1,p2,…,pQ) is the
 (Shannon) entropy given by H(p1,p2,…,pQ) = − Σ p_k log p_k"*, with *"the singular value distribution
 p_k = σ_k / ‖σ‖₁"* and *"all logarithms are to the base e"*. They prove *"1 ≤ erank(A) ≤ rank(A) ≤
-Q"*.
+Q"* (Property 1) and `erank(cA) = erank(A)` (Property 2).
 
-Two consequences for this paper. **(i)** Our `v2/calibra/spectral.py` implements this statistic —
-raw singular values, L1-normalised, natural log — which retires the definitional defect recorded at
-`v2/research/B1_ledger/1_collapse_remedy.md:26` (covariance eigenvalues) and at
-`HANDOFF_BUILD_AGENT.md:123` ("that error reached a paper draft (mistake #1)"). **It does not
-implement it exactly, and earlier drafts of this section said it did.** Roy & Vetterli take the SVD of
-the matrix as handed to them — *"a complex-valued non-all-zero matrix A of size M × N whose singular
-value decomposition (SVD) is given by A = UDV\*"* — and no preprocessing of any kind appears anywhere
-in their paper. Our implementation **column-centres first**. That is a deliberate deviation, it is
-stated at the definition site and at every table in §4, and §3.1 gives the reason. Their treatment of
-near-zero singular values is also different from both ours and RankMe's: *"we adopt the convention
-that 0 log 0 = 0"*, with **no ε and no tolerance**. **(ii)** Roy &
-Vetterli's abstract is about making rank minimisation tractable — *"Since rank minimization is
-generally not practicable owing to its integer nature, we propose a real-valued extension"* — and
-contains **no claim about representation quality or downstream performance**. Any text on this
-project attributing a quality-proxy claim to them is wrong and must be corrected.
+Two consequences for this paper. **(i)** Roy & Vetterli take the SVD of the matrix as handed to them —
+*"a complex-valued non-all-zero matrix A of size M × N whose singular value decomposition (SVD) is
+given by A = UDV\*"* — and **no preprocessing of any kind appears anywhere in their paper**. Our
+implementation **column-centres first**. That is a deliberate deviation with a stated reason (§3.1),
+and **earlier drafts of this section wrongly said our implementation matched theirs exactly**. Their
+treatment of near-zero singular values also differs from both ours and RankMe's: *"we adopt the
+convention that 0 log 0 = 0"*, with **no ε and no tolerance**. **(ii)** Their abstract is about making
+rank minimisation tractable — *"Since rank minimization is generally not practicable owing to its
+integer nature, we propose a real-valued extension"* — and contains **no claim about representation
+quality or downstream performance**. The closest it comes is "assess the loss incurred by
+dimensionality reduction methods, such as PCA". Any text attributing a quality-proxy claim to them is
+wrong.
 
 **The quality-proxy proposal — VERIFIED at full text.** RankMe: Garrido, Balestriero, Najman & LeCun,
 "RankMe: Assessing the Downstream Performance of Pretrained Self-Supervised Representations by Their
-Rank", *Proceedings of the 40th International Conference on Machine Learning* (ICML 2023),
-arXiv:2210.02885 (v3, 2023-06-26 is the camera-ready). It adopts Roy & Vetterli's definition
-explicitly, with an ε inside the normalisation: `p_k = σ_k(Z)/‖σ(Z)‖₁ + ε`.
+Rank", *Proceedings of the 40th International Conference on Machine Learning* (ICML 2023), PMLR 202,
+pp. 10929–10974; arXiv:2210.02885 (v3, 2023-06-26 is the camera-ready). It adopts Roy & Vetterli's
+definition explicitly, with an ε **outside** the division: `p_k = σ_k(Z)/‖σ(Z)‖₁ + ε`.
 
-What it claims, verbatim, and the claim strengthens between abstract and body:
+What it claims, verbatim — and the claim strengthens between abstract and body:
 
 - Abstract, hedged: *"we develop a simple unsupervised criterion that is indicative of the quality of
-  the learned JE-SSL representations: their effective rank"*; *"allows one to assess the performance of
-  JE-SSL representations, even on different downstream datasets, without requiring any labels"*;
-  *"RankMe can be used for hyperparameter selection with nearly no reduction in final performance
-  compared to the current selection method that involve a dataset's labels"*.
+  the learned JE-SSL representations: their effective rank"*; *"RankMe can be used for hyperparameter
+  selection with nearly no reduction in final performance compared to the current selection method
+  that involve a dataset's labels"*.
 - Body, stronger: section headings *"RankMe Consistently Predicts Downstream performances From
   Representations"* and *"RankMe Predicts Linear Probing performance Even on Unseen Datasets"*;
-  *"RankMe accurately predicts a model's performance"*; *"RankMe computed on the embeddings of the
-  source dataset is a predictor of representations' performance on target datasets"*.
+  *"RankMe accurately predicts a model's performance"*.
 
-What it **restricts**, verbatim — and this is the part a negative result must respect:
+What it **restricts**, verbatim — and this is the part a negative result must respect, and the part
+this paper's claim is built inside:
 
 - *"a necessary (but not sufficient) condition"*; *"having a high rank is a necessary condition for
   good downstream performance"*; *"This further highlights how maximal rank is only a necessary
   condition for good performance."*
-- *"RankMe should however only be used to compare different runs of a given method, since the
-  embeddings' rank is not the only factor that affects performance."*
+- ***"RankMe should however only be used to compare different runs of a given method, since the
+  embeddings' rank is not the only factor that affects performance."*** Three seeds of one arm, one
+  objective, one architecture, one schedule, one cohort **are** different runs of a given method. §4.2
+  is measured entirely inside this sentence.
 - *"there is no inherent reason for the rank of embeddings to transfer in a monotonic way to them."*
 - *"Except for some degenerate solutions at full-rank, RankMe values correlate well with
   in-distribution … and out-of-distribution … classification performance."* (Figure 1 caption.)
 - A self-reported miss: *"We see than RankMe can improve OOD performance for VICReg, but leads to a
   small drop for SimCLR"* (sic).
 
-**Earlier proposal in the same family — PARTIALLY VERIFIED.** α-ReQ (Agrawal, Mondal, Ghosh &
-Richards), assessing representation quality by eigenspectrum decay. The related preprint
-"Investigating Power laws in Deep Representation Learning" (Ghosh, Mondal, Agrawal & Richards,
-arXiv:2202.05808) states verbatim: *"proximity of α to 1, is strongly correlated to the downstream
-generalization performance… α is computable from the representations without knowledge of any labels,
-thereby offering a framework to evaluate the quality of representations in unlabelled datasets."*
-`[COULD-NOT-VERIFY: the NeurIPS 2022 venue. It rests on LiDAR's bibliography entry (a secondary
-source); the OpenReview record `ii9X4vtZGTZ` could not be retrieved. Do not state the venue as
-verified.]` Note that RankMe itself reports α-ReQ failing: *"the power law prior of α-ReQ fails on the
-embeddings and as such those results must be interpreted with care."*
+**The ε discrepancy, unresolved and stated.** RankMe's `+ ε` sits **outside** the division (verified at
+glyph coordinates in the v3 PDF: the `+ ε` glyphs sit to the right of the fraction rule, on the
+fraction axis). Its `p_k` therefore sum to **`1 + min(N,K)·ε`**, not to 1, so **RankMe's statistic is
+not the exponential of a Shannon entropy**. RankMe never states the ε used in that equation — the only
+`10⁻⁷` in the paper belongs to the *contrasting* threshold-rank definition it argues against.
+Consequently **no number in this paper is comparable to a published RankMe value, and no such
+comparison is made.** The practical size of the gap is nonetheless small on our data: a faithful
+RankMe implementation (ε = 1e-7, uncentred) reads 23.391 where the canonical centred statistic reads
+23.387 on the same artifact, and equally close on all 12. **Everything that separates RankMe's score
+from ours is column centring, not ε** — which matters, because "you evaluated a centred variant" is a
+referee's best line of attack and it is answered in §4.4.
+
+**Earlier proposal in the same family — VERIFIED.** α-ReQ: Agrawal, Mondal, Ghosh & Richards, *Advances
+in Neural Information Processing Systems 35* (**NeurIPS 2022**), **pp. 17626–17638**, DOI
+**10.52202/068431-1281**. *The `[COULD-NOT-VERIFY: NeurIPS 2022 venue]` marker carried by earlier
+drafts is now cleared*: four independent records agree (DBLP `conf/nips/AgrawalMGR22`; the NeurIPS
+proceedings page and its official BibTeX; OpenAlex W7133259885; the camera-ready PDF footer). Two
+caveats travel with the citation: the PDF's own title page omits "in Self-Supervised Learning", present
+only in proceedings metadata; and the NeurIPS BibTeX renders the first author "Agrawal, Kumar K" where
+DBLP has "Kumar Krishna Agrawal". α-ReQ states verbatim that *"a task-agnostic measure like α is a
+**necessary but not sufficient condition**"* — the same hedge as RankMe — and describes a *"Goldilocks
+zone"* rather than a monotone rule. RankMe itself reports α-ReQ failing on embeddings.
 
 ### 2.2 Prior negative results — what we must not claim novelty over
 
-**LiDAR — VERIFIED at full text, and the paper that most constrains our claim.** Thilak, Huang,
-Saremi, Dinh, Goh, Nakkiran, Susskind & Littwin, "LiDAR: Sensing Linear Probing Performance in Joint
-Embedding SSL Architectures", arXiv:2312.04000v1, 2023-12-07. `[UNVERIFIED: peer-reviewed venue. The
-arXiv comments field says only "Technical report" and there is no journal-ref. Cite as an arXiv
-preprint.]`
+**This section must be read before §4. A version of this paper that presents §4 as a discovery is not
+submittable.** The census behind it is a Semantic Scholar citation-graph sweep of RankMe (159 citers),
+Roy & Vetterli (581, of which 325 survived a deep-learning-context filter), LiDAR (33) and α-ReQ (15)
+— **453 unique works de-duplicated by normalised title**, ~70 abstracts read in full
+(`NOTEBOOK_ENTRIES/p2_prior_art_citation_graph_sweep_20260803T2326Z.md`).
 
-Verbatim:
+#### The item that constrains us most, and it pre-empts two of our former framings
 
-- *"We observe that (1) RankMe correlates poorly with downstream performance for most models, with the
-  exception of the worst performing model, and (2) LiDAR correlates highly with downstream performance
-  for all models."* (Figure 1 caption.)
-- *"…the rank of a representation inflates early on in training, only to rapidly diminish, with peak
-  downstream performance occurring far from the point of maximal rank… This makes any standard data
-  covariance rank based measures extremely limited in their ability to spot the point of optimal
-  performance in a training run."*
-- *"We highlight that a low regularization loss is achievable by random embeddings, which might be
-  high rank, but devoid of any utility as for downstream tasks. A measure of representation quality
-  which is based on covariance rank alone would therefore, theoretically, fail to capture this failure
-  case."*
-- *"These two factors are not necessarily causally linked; a high rank does not guarantee superior
-  performance."* (Limitations.)
-- Quantitatively: RankMe Spearman **0.3174**, Kendall τ **0.2056** for VICReg at 100 epochs, against
-  LiDAR's 0.9161 / 0.8105.
+**Aldeneh, Thilak, Higuchi, Theobald & Likhomanenko, "Towards Automatic Assessment of Self-Supervised
+Speech Models using Rank", ICASSP 2025.** DOI **10.1109/ICASSP49660.2025.10889651**,
+arXiv:**2409.10787** (v2). **VERIFIED** independently from Crossref (title, five authors,
+container-title *ICASSP 2025 - 2025 IEEE International Conference on Acoustics, Speech and Signal
+Processing*, published 2025-04-06) and the arXiv Atom API.
 
-**Further negatives — PARTIALLY VERIFIED (abstract only).**
+> *"The findings indicate rank correlates with downstream performance **within encoder layers** across
+> various downstream tasks and for in- and out-of-domain scenarios. **However, rank does not reliably
+> predict the best-performing layer for specific downstream tasks, as lower-ranked layers can
+> outperform higher-ranked ones.**"*
 
-- Otero, Mateus & Balestriero, "Self-Supervised Anomaly Detection in the Wild: Favor Joint Embeddings
-  Methods", arXiv:2410.04289v1 (2024-10-05): *"current methods like RankMe fail to adequately evaluate
-  representation quality, making cross-validation without labels infeasible."* Balestriero is a RankMe
-  co-author, so this is a partial retraction of applicability by an original author.
-- Kulkarni, Springer, Subramonian & Swayamdipta, "Disentangling Geometry, Performance, and Training in
-  Language Models", arXiv:2602.20433v2: *"While the best-performing models often exhibit a high
-  effective rank, this trend is not universal across tasks and training setups… none can reliably
-  predict downstream performance."* Domain is LLM unembedding geometry.
-- Cheng, "Local Redundancy: An Information-Theoretic Measure of Plasticity from Synthetic
-  Memorization", arXiv:2607.13432v1: existing measures including effective rank *"lack theoretical
-  grounding and correlate poorly with performance on new tasks."* Domain is continual-learning
-  plasticity.
+This hits two things earlier drafts claimed. It is a **within-method matched-arm selection-rule
+failure** — one encoder, layers as the arms, rank picks the wrong one — so the claim that no prior
+negative tests a within-method regime is false. And *"lower-ranked layers can outperform
+higher-ranked ones"* is a **published low-rank/high-information instance**, which is precisely the
+configuration our necessity test set out to find. Vimal Thilak is LiDAR's first author, so this is a
+negative about rank published by the group proposing the leading replacement.
 
-**Where this leaves us.** Every one of these tests rank *across* methods, *across* checkpoints, or in
-domains other than joint-embedding representation selection. None tests the within-method,
-matched-arm, fixed-architecture regime that RankMe reserves for itself, and none reports a
-reproducibility floor on the statistic. Those two gaps are §4.3 and §4.7 and they are what this paper
-is for. **This section must be read before §4; a version of this paper that presents §4 as a discovery
-is not submittable.**
+**What is still ours after this.** Aldeneh et al. vary **layer depth within one trained encoder**.
+Layers of a single network are not independent training runs, and RankMe's reserved scope is
+*"different runs of a given method"*. Our arms are **separately trained runs** differing in one
+objective term, three seeds each, with a reproducibility floor **measured on the statistic itself**.
+They report rank *correlating* with performance within layers and failing only at the argmax; we report
+a variance decomposition in which the arm term is not significant at all. **The distinction is real and
+it is narrow, and the paper states it rather than implying novelty.**
 
-`[SEARCH INCOMPLETE — must be closed before submission.]` The prior-art sweep behind §2.2 ran through
-the arXiv Atom API and OpenAlex only; the natural-language search path was unavailable. A
-Semantic-Scholar citation-graph sweep of RankMe's citing papers has not been run. Treat §2.2 as a
-lower bound on the prior art. If a paper reporting an *in-scope, within-method* RankMe failure exists,
-contribution (1) of §1.5 collapses to a replication in a new domain and the paper must be reframed
-around contribution (2).
+#### The rest of the prior negatives
 
-### 2.3 Dimensional collapse and anti-collapse regularisation
+| work | status | what it establishes | the regime it does *not* test |
+|---|---|---|---|
+| **LiDAR** — Thilak, Huang, Saremi, Dinh, Goh, Nakkiran, Susskind & Littwin, **ICLR 2024**, arXiv:2312.04000 | **VERIFIED** (content, full text); venue verified via DBLP `conf/iclr/Thilak0SDGNSL24`, OpenReview `f3g5XpL9Kb` | *"RankMe correlates poorly with downstream performance for most models"*; Spearman **0.3174**, Kendall τ **0.2056** vs LiDAR's 0.9161 / 0.8105 on VICReg at 100 epochs; *"a high rank does not guarantee superior performance"*; rank inflates early then diminishes, with *"peak downstream performance occurring far from the point of maximal rank"* | seed-level reproducibility of the statistic; it also *claims* within-method hyperparameter selection for LiDAR, so it already strains any "nobody tests in-scope" statement |
+| **Otero, Mateus & Balestriero**, arXiv:2410.04289v1 | **PARTIALLY VERIFIED** (abstract; authors via arXiv Atom) | *"current methods like RankMe fail to adequately evaluate representation quality, making cross-validation without labels infeasible"* — a **named selection-rule failure**, over 250 experiments with backbone and SSL framework held fixed and class imbalance varied. Balestriero is a RankMe co-author | separately-trained matched arms; a reproducibility floor |
+| **Zhang, Jiang, Gao, Willett & Maire**, "Residual Connections Harm Generative Representation Learning", arXiv:2404.10947v5 | **`[ABSTRACT-LEVEL ONLY — the sign must be confirmed in the body before this is cited as a necessity violation]`** | *"we find **correlation between low effective feature rank and downstream task performance**"*, matched-arm by construction (one MAE / ViT-B/16 scalar varied), better arm reported as the lower-rank one (kNN 27.4% → 63.9%) | — |
+| **Kulkarni, Springer, Subramonian & Swayamdipta**, arXiv:2602.20433v2 | **PARTIALLY VERIFIED** (abstract) | *"While the best-performing models often exhibit a high effective rank, this trend is not universal… none can reliably predict downstream performance."* | LLM unembedding geometry, not joint-embedding selection |
+| **Cheng**, arXiv:2607.13432v1 | **PARTIALLY VERIFIED** (abstract) | existing measures including effective rank *"lack theoretical grounding and correlate poorly with performance on new tasks"* | continual-learning plasticity |
+| **Li, Agrawal, Ghosh, Teru, Santoro, Lajoie & Richards**, arXiv:2509.23024 | `[S2/abstract record only]` | measures **both** RankMe and α-ReQ across pretraining and post-training; *"consistent **non-monotonic** sequence of three geometric phases"*, with a compression phase that **reduces** dimensionality while *"marked with significant improvement in downstream task performance"* | **pre-empts the non-monotonicity limb** within a single run |
+| **Jamali, Cheng & Vargas-Hernández**, arXiv:2510.14217 | `[S2/abstract record only]` | *"richer spectral features do not consistently yield better generalization performance, contradicting common representation heuristics used in self-supervised learning"*, with *"consistently negative correlations"* for local 3D representations | **the closest published relative in a molecular-science domain**; cites RankMe and α-ReQ |
+| **Kokilepersaud, Prabhushankar & Al-Regib**, "AdaDim", arXiv:2505.12576 | `[S2/abstract record only]` | *"the best performing SSL models do not have the highest H(R) nor the lowest I(R;Z)"* | — |
+| **Yusupov et al.**, arXiv:2509.25359 | `[S2/abstract record only]` | geometric metrics' *"apparent discriminative power **collapses once length is controlled**"* — our confound/matched-arm argument, executed for LLMs | — |
+| **Adilova, Petzka, Fischer & Geiger**, arXiv:2606.21593 | `[S2/abstract record only]` | *"low MI does not reliably correspond to geometric compression … a negative and nonlinear relationship **that can reverse when varying training setup**"* | a sign reversal under a controlled training change — the same shape of claim as ours, one level up |
+
+**Cite defensively:** Zaiem, Kemiche, Parcollet, Essid & Ravanelli (Interspeech 2023, arXiv:2306.00452,
+DBLP `conf/interspeech/ZaiemKPER23`; and *Computer Speech and Language*, arXiv:2308.14456) report that
+*"altering the downstream architecture structure leads to significant fluctuations in the performance
+ranking of the evaluated models"*. That attacks the **ground truth** any rank-vs-downstream comparison
+is measured against, **including ours**, and must be conceded in §6 rather than omitted.
+
+#### Where this leaves the novelty claim
+
+Re-scoped, and narrower than earlier drafts:
+
+> **A within-method, matched-arm evaluation of rank as a selection rule in computational pathology /
+> transcriptomics, with a measured seed-level reproducibility floor on the statistic and a variance
+> decomposition separating the arm term from the seed term.**
+
+Across all 453 de-duplicated citers, **none** evaluates rank as a selection rule on matched arms in
+pathology or transcriptomics, and none isolates the seed term from the arm term as the explanatory
+claim. Computational pathology and omics representation learning are otherwise live in this corpus
+(Jaume et al., CVPR 2024 DOI 10.1109/CVPR52733.2024.00920 and ECCV 2024 arXiv:2408.02859; HEST-1k,
+NeurIPS 2024 arXiv:2406.16192; DenAdel et al., **Nature Methods 2026**, DOI 10.1038/s41592-026-03120-y;
+kaiko.ai arXiv:2404.15217; Gustafsson et al. arXiv:2410.00945 on WSI→gene expression, closest to our
+setup).
+
+`[SEARCH RISK — DOWNGRADED, NOT CLOSED.]` The citation-graph leg is now closed for RankMe, Roy &
+Vetterli, LiDAR and α-ReQ. It remains **abstract-level only**: no full texts were read in triage, and
+**12 of 159** RankMe citers had no abstract in the API response and were triaged on title alone. LiDAR
+was nearly missed in exactly that way by the previous OpenAlex-only sweep, which saw roughly **8%** of
+RankMe's citation graph. One item must be read at full text before submission: **Luisto et al.,
+arXiv:2604.14815** (Finnish histopathological reports; *"predict the benefit of domain-specific
+pre-training … from observing the **geometry of embedding changes**"*) — pathology plus a
+rank-geometry selection question, small and unrefereed, and the one item in the sweep that could scoop
+the framing.
+
+### 2.3 The strongest defences of rank, and what we say to each
+
+Earlier drafts cited **none** of these. A negative paper that engages only the weakest form of the
+opposing case is not defensible, so the three strongest are stated in their own words first.
+
+**C1 — the design we claim breaks, reported working, with a power law.** Deng, Sun, Dou & Xu, "Unify
+Variables in Neural Scaling Laws for General Audio Representations via Embedding Effective Rank",
+arXiv:**2510.10948**v1, published 2025-10-13. **VERIFIED** from the arXiv Atom API (title, four
+authors, date). `[UNVERIFIED: peer-reviewed venue — none found; cite as an arXiv preprint.]`
+
+> *"we present a systematic study of scaling laws for general audio representations by utilizing
+> **embedding effective rank (RankMe) as a unifying metric** … allowing us to examine scaling
+> behaviors across a wide hyper-parameter space, including **model size, training data volume,
+> computational budget, architectural configurations**, etc. Our empirical findings reveal a
+> **consistent power-law relationship between RankMe and representation quality**, suggesting that
+> embedding effective rank serves as a **reliable proxy** for assessing and predicting model
+> performance."*
+
+**Our answer, in order of strength.** (i) The sweep is over **capacity-like** variables — model size,
+data volume, compute — which move rank and quality together for reasons that have nothing to do with
+rank being a quality proxy. Our arms are matched **on capacity** and differ only in an objective term
+or a supervision target; that is the case that separates the two accounts, and it is the case a
+practitioner faces when choosing between equally-sized configurations. (ii) They report **no
+seed-level reproducibility floor** for RankMe, and our §4.2 measurement is that the seed term dominates
+the arm term; a power law fitted across a capacity range far larger than the seed spread is not
+evidence that rank resolves differences *inside* that spread. (iii) Audio, not pathology. We do not
+claim their result is wrong, and we do not claim rank fails at capacity scale — **we have not measured
+that**, and §6 records it as unmeasured.
+
+**C2 — a peer-reviewed RankMe-works result inside our own domain.** Awasthi, Mend Mend Arachchige &
+Zhu, "Unsupervised evaluation of pre-trained DNA language model embeddings", ***BMC Genomics*** **26**,
+issue 1, article **710** (2025); DOI **10.1186/s12864-025-11913-2**, published 2025-08-01. **VERIFIED**
+from Crossref (title, three authors, journal, volume, issue, article number, date). PMID 40751178 and
+PMC12315385 are reported by the sweep and were **not** independently verified.
+
+> *"We propose a framework to evaluate DLM embeddings using unsupervised numerical linear
+> algebra-based metrics **RankMe, NESum, and StableRank** … we observed a **positive correlation
+> between unsupervised metrics and supervised performance, supporting the utility of unsupervised
+> metrics as effective proxies for model quality assessment**."*
+
+**This is the single most awkward citation for a paper claiming rank fails on molecular
+representations, and it cannot be left out.** Our answer is narrow and stated as such: it compares
+**six different pre-trained models** — a **cross-method** comparison, which is exactly the regime
+RankMe itself disclaims (*"should however only be used to compare different runs of a given method"*).
+Our comparison is within-method, and our finding is that the same-method regime is where the seed
+nuisance eats the signal. **The two results are compatible**, and a reader should take from the pair
+that rank may separate genuinely different model families while failing to separate runs of one. We
+have not reimplemented their pipeline and make no claim about their numbers.
+
+**C3 — a matched-arm design in which rank tracks transfer, with a proof.** Ruan, Zhang, Wang & Zhang,
+"Muon Learns More Robust and Transferable Features than Adam", arXiv:**2606.09658** (S2
+CorpusId 289099544). `[NOT INDEPENDENTLY VERIFIED — Semantic Scholar record only; verify before
+submission.]` Reports *"we **prove** that Muon attains larger margins and **higher effective rank**
+than Adam and SGD"*, with the same architecture and the optimiser varied. Our answer: an optimiser
+change is arguably a method change; and, more usefully, **their design is the one our §4.1 rule asks
+for a control on** — a proof about expectations says nothing about whether a single pair of runs is
+resolvable.
+
+**Further defences, cited and not rebutted at length** — all `[S2 record only, not independently
+verified]` unless marked: **Zhang, Deidda, Higham & Tudisco**, arXiv:2502.04591 (*"rank-based metrics
+consistently capture oversmoothing, whereas energy-based metrics often fail"*); **Zhuo, Wang, Ma &
+Wang**, ICLR 2023, arXiv:2303.02387 — the strongest *theoretical* case that rank is causally tied to
+representation quality (*"This rank difference will **provably lead to an improvement of effective
+dimensionality**"*); **Kim, Kokilepersaud, Prabhushankar & AlRegib**, **WACV 2026**, DOI
+10.1109/WACV61042.2026.00461, arXiv:2511.06450 — peer-reviewed, rank used prescriptively in a
+**multi-modal fusion** setting, which is also ours; **Sun, Lin, Zhang, Duan & Liu**, **IEEE TIP 2026**,
+DOI 10.1109/TIP.2026.3682105 — effective rank as diagnostic *and* training objective, peer-reviewed
+journal; **Billa**, arXiv:2602.15997 (*"only rankme reliably precedes capability acquisition for hard
+tasks"*); **Gupta**, arXiv:2606.24903 — effective rank as a stopping rule that works (ρ_pool = 0.6366,
+p = 2.9×10⁻⁵⁷; AUC 0.787), `[unrefereed preprint]`. And **Dai, Xu, Wen, Liu & Huang**,
+arXiv:2510.17299, is the closest structural analogue to our contribution outside speech: a within-
+method **checkpoint-selection** rule built from *"a class-relevance measure **and** an effective
+dimensionality measure"*, +3.0 mIoU — a design that **concedes dimensionality alone is insufficient**.
+
+**The honest summary of §2.3.** Rank works in several published settings and fails in several others,
+and the published cases where it works are predominantly cross-method, cross-capacity or
+cross-checkpoint. This paper adds one measurement that discriminates between those regimes rather than
+a verdict on the metric.
+
+### 2.4 Dimensional collapse and anti-collapse regularisation
 
 **VERIFIED at full text.** Jing, Vincent, LeCun & Tian, "Understanding Dimensional Collapse in
-Contrastive Self-Supervised Learning", ICLR 2022, arXiv:2110.09348. Definition, verbatim:
-*"dimensional collapse, whereby the embedding vectors end up spanning a lower-dimensional subspace
-instead of the entire available embedding space"*, diagnosed from the spectrum — *"A number of
-singular values drop to zero, indicating collapsed dimensions."*
+Contrastive Self-Supervised Learning", ICLR 2022, arXiv:2110.09348. Verbatim: *"dimensional collapse,
+whereby the embedding vectors end up spanning a lower-dimensional subspace instead of the entire
+available embedding space"*, diagnosed from the spectrum — *"A number of singular values drop to zero,
+indicating collapsed dimensions."*
 
-**Correction to earlier drafts on this project.** A full-text search of Jing et al. for sentences
-relating the spectrum to downstream performance returns none. The paper is diagnostic and mechanistic
-— its own conclusion identifies "two mechanisms causing dimensional collapse: strong augmentation and
-implicit regularization" — and **contains no claim that rank predicts quality.** P1 §2.6 lists it
-among proposals of "geometric proxies for representation quality"; that grouping is inaccurate for
-this reference and should be amended.
+**Correction to earlier drafts on this project and to P1.** A full-text search of Jing et al. for
+sentences relating the spectrum to downstream performance returns none. The paper is diagnostic and
+mechanistic — its own conclusion identifies "two mechanisms causing dimensional collapse: strong
+augmentation and implicit regularization" — and **contains no claim that rank predicts quality.** P1
+§2.6 grouped it among proposals of "geometric proxies for representation quality"; that grouping was
+inaccurate and **has been corrected in P1 in this pass**.
 
-**VERIFIED.** VICReg: Bardes, Ponce & LeCun, "VICReg: Variance-Invariance-Covariance Regularization
-for Self-Supervised Learning", ICLR 2022, arXiv:2105.04906. Camera-ready abstract, verbatim: *"a
-method that explicitly avoids the collapse problem with two regularizations terms applied to both
-embeddings separately: (1) a term that maintains the variance of each embedding dimension above a
-threshold, (2) a term that decorrelates each pair of variables"* (sic). **Note:** the arXiv metadata
-abstract and the ICLR camera-ready abstract differ; quote whichever is cited and do not mix them.
-VICReg's geometric terms are claimed to *prevent collapse*, not to *indicate downstream quality* —
-which is exactly the gap LiDAR exploits with its high-rank-random-embedding argument.
+**VERIFIED.** VICReg: Bardes, Ponce & LeCun, ICLR 2022, arXiv:2105.04906. Camera-ready abstract,
+verbatim: *"a method that explicitly avoids the collapse problem with two regularizations terms applied
+to both embeddings separately: (1) a term that maintains the variance of each embedding dimension
+above a threshold, (2) a term that decorrelates each pair of variables"* (sic). **Note:** the arXiv
+metadata abstract and the ICLR camera-ready abstract differ; quote whichever is cited and do not mix
+them. VICReg's geometric terms are claimed to *prevent collapse*, not to *indicate downstream quality*.
 
-**VERIFIED.** Wang & Isola, "Understanding Contrastive Representation Learning through Alignment and
-Uniformity on the Hypersphere", ICML 2020, PMLR 119, arXiv:2005.10242. Verbatim: *"Extensive
-experiments on standard vision and language datasets confirm the strong agreement between both metrics
-and downstream task performance."* Correlational and empirical; not predictive and not causal.
+**VERIFIED.** Wang & Isola, ICML 2020, PMLR 119, arXiv:2005.10242: *"Extensive experiments on standard
+vision and language datasets confirm the strong agreement between both metrics and downstream task
+performance."* Correlational and empirical; not predictive and not causal. Note the adjacent
+precedent that this paper must differentiate itself from: Fang, Li, Sun & Wang, "Rethinking the
+Uniformity Metric in Self-Supervised Learning", **ICLR 2024**, arXiv:2403.00642 (verified via DBLP;
+**full text NOT RETRIEVED**) makes the same move one metric over, on *axiomatic* grounds. Ours is
+empirical and about **reproducibility**, which is a different and independent objection. `[Read Fang
+et al. at full text before submission — it is the paper a referee will say this one duplicates.]`
 
 `[UNVERIFIED]` Barlow Twins (Zbontar et al. 2021) — PMLR URL recorded in this repository, no quote
-retrieved. `[UNVERIFIED]` LDReg (Huang et al., arXiv:2401.10474). In pathology specifically, the
-Robustness Index (de Jong et al., 2025) and representational-similarity analysis (Mishra & Lotter,
-2025) are proposed as confound-aware representation diagnostics; both were spot-check verified in a
-2026-07-29 literature audit and not re-verified in this pass.
+retrieved. `[UNVERIFIED]` LDReg (Huang et al., arXiv:2401.10474) — *local* dimensionality, not the same
+construct. In pathology specifically, the Robustness Index (de Jong et al., 2025) and
+representational-similarity analysis (Mishra & Lotter, 2025) are proposed as confound-aware
+representation diagnostics; both were spot-check verified in a 2026-07-29 literature audit and not
+re-verified in this pass.
 
-§4.5 reports what happened when we followed practice (2): adding a covariance-decorrelation term
-raised effective rank by 107% while moving the benchmark statistic by 0.0001, and a later independent
-measurement found that our implementation of the term has a **collapsed global minimum** and
-self-extinguishes at every weight tested. We state that as an observation about our implementation,
-not as a refutation of the published method, which we have not reimplemented faithfully or
-benchmarked.
+§4.9 reports what happened when we followed practice (2): adding a covariance-decorrelation term
+raised effective rank by 107% while moving the then-benchmark statistic by 0.0001, and a later,
+better-sourced measurement found that **our implementation** of the term has a **collapsed global
+minimum** and self-extinguishes at every weight tested. We state that as an observation about our
+implementation, not as a refutation of the published methods, which we have not reimplemented
+faithfully or benchmarked.
 
-### 2.4 Momentum encoders and memory banks
+### 2.5 The published alternatives, computed on our own artifacts
 
-A companion draft in this repository (`paper/QUEUE_ANCHORING.md`) reports a fix to a queued contrastive
-objective and states that it falsifies a mechanism attributed to MoCo. The reference is now verified
-and the companion draft must be corrected in three specific ways before it is submitted.
+A referee is entitled to ask why a paper reporting rank's failure did not evaluate the published
+alternatives. **The `[NOT MEASURED]` marker earlier drafts carried here is now closed.** LiDAR, α-ReQ,
+RankMe-as-published, participation ratio and stable rank were all computed on the same 12 frozen
+artifacts against the same ground truth (§4.6, and
+`NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md`).
 
-**VERIFIED at full text.** He, Fan, Wu, Xie & Girshick, "Momentum Contrast for Unsupervised Visual
-Representation Learning", CVPR 2020, arXiv:1911.05722. The momentum-encoder argument, verbatim:
+**On our data there is no better metric.** LiDAR — the strongest published alternative and the one
+that most constrains our claim — scores **0/3 on the in-scope D2 contrast**, choosing the
+information-poorer arm every time, at **every δ across eight orders of magnitude**. That is not a
+gotcha: LiDAR's own limitations section reports *"instances where **the LiDAR metric exhibits a
+negative correlation with probe accuracy**, particularly pronounced in scenarios like VICReg when
+dealing with higher dimensional embeddings"*, so our observation is a documented failure mode of the
+metric rather than an artifact of our adaptation. LiDAR also supplies a verbatim admission we use in
+§4.8: *"This illustrates that high rank is a necessary but not a sufficient condition for high
+performance."*
 
-> *"Our hypothesis is that good features can be learned by a large dictionary that covers a rich set of
-> negative samples, while the encoder for the dictionary keys is kept as consistent as possible despite
-> its evolution."*
->
-> *"removing the oldest mini-batch can be beneficial, because its encoded keys are the most outdated
-> and thus the least consistent with the newest ones."*
->
-> *"We hypothesize that such failure is caused by the rapidly changing encoder that reduces the key
-> representations' consistency."*
->
-> *"though the keys in the queue are encoded by different encoders (in different mini-batches), the
-> difference among these encoders can be made small. In experiments, a relatively large momentum (e.g.,
-> m = 0.999, our default) works much better than a smaller value (e.g., m = 0.9), suggesting that a
-> slowly evolving key encoder is a core to making use of a queue."*
+**Fidelity, and the one genuine gap.** Our LiDAR implementation matches arXiv:2312.04000v1 §3 Eqs.
+(1)–(4) exactly. The modality-as-view adaptation is **explicitly licensed** by the paper's footnote 4
+(*"Data augmentations, or otherwise data points which are treated as positive samples"*), which our
+patient-paired objective satisfies; their `n > p` recommendation is met (n = 2,766 > p = 256). **The
+gap is q**: they use q = 50 or q = 10, sweep q only over 10–100, and never discuss q = 2 or state a
+minimum; we have **q = 2**, the bare minimum at which Σ_w is estimable. That is disclosed as the one
+respect in which our LiDAR is outside the authors' tested regime. α-ReQ was re-implemented from the
+authors' released `fastssl` code (`stringer_get_powerlaw`, weighted least squares over eigenvalue
+ranks 4–100, weights 1/rank) rather than from the paper text, which is **not sufficient to reproduce a
+number**; the index range must **not** be attributed to the paper. All 12 of our artifacts have
+α between 2.6 and 4.8, far outside α-ReQ's "Goldilocks zone", so on its own terms it declines to
+distinguish them and the `|α − 1|` rule we scored is **ours**, not theirs.
 
-Three required corrections to `paper/QUEUE_ANCHORING.md` and `paper/LIVENESS_GATE_DESIGN.md`:
-(i) add the identifier — the repository currently contains **no** arXiv number, DOI or venue for MoCo
-anywhere, only a bare "He et al., 2020"; (ii) the account is advanced **twice as a hypothesis**
-("Our hypothesis is that…", "We hypothesize that…"), never as an established mechanism, and a
-falsification must say so; (iii) MoCo ties the argument specifically to queue use ("a core to making
-use of a queue"), so a falsification is only in scope if it is in a queue setting — ours is, which
-should be stated rather than left to be inferred. The substantive characterisation in
-`NOTEBOOK_ENTRIES/momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md` — that
-MoCo argues from key-to-key inconsistency across a long queue — is **correct** as verified above.
-
-This paper makes no claim about MoCo. The note is recorded here because §2.6 is a project-wide
-requirement and this was the worst outstanding item on it.
-
-### 2.5 What existing work supplies that would have answered our question better
-
-LiDAR proposes a replacement criterion, not merely a critique, and reports Spearman 0.9161 where
-RankMe reaches 0.3174. `[NOT MEASURED — we have not computed LiDAR, or any published alternative
-criterion, on any representation in this paper.]`
-A referee is entitled to ask why a paper reporting rank's failure did not evaluate the
-published alternative; the honest answer is that the alternative was identified during this draft's
-prior-art sweep and computing it requires a labelled probe on every artifact, which has not been run.
-It is named in §5.2 as the most valuable missing measurement.
+`[STILL NOT MEASURED]` — a labelled linear probe on every artifact, which is the ground truth LiDAR and
+RankMe were validated against. Ours is a held-out canonical correlation against unsupervised molecular
+targets (§3.2), which is a different reference standard and is the one Zaiem et al. would attack.
 
 ### 2.6 Reference verification status
 
@@ -473,111 +597,153 @@ comes to the claim being attributed to it, and state where it falls short.
 
 | reference | status | retrieval | note |
 |---|---|---|---|
-| Roy & Vetterli, EUSIPCO 2007, pp. 606–610, DOI 10.5281/zenodo.40328 | **VERIFIED** | full-text PDF | definition matches `spectral.py` exactly; makes **no** quality claim |
-| RankMe — Garrido, Balestriero, Najman & LeCun, ICML 2023, arXiv:2210.02885v3 | **VERIFIED** | full-text PDF | claims and restrictions both quoted in §2.1 |
-| LiDAR — Thilak et al., arXiv:2312.04000v1 | **VERIFIED (content)**; `[UNVERIFIED: venue]` | full-text PDF | arXiv comments say "Technical report"; no journal-ref. Cite as preprint |
-| Jing, Vincent, LeCun & Tian, ICLR 2022, arXiv:2110.09348 | **VERIFIED** | full-text PDF | contains **no** rank→performance claim; P1 §2.6's grouping is inaccurate |
-| MoCo — He, Fan, Wu, Xie & Girshick, CVPR 2020, arXiv:1911.05722 | **VERIFIED** | full-text PDF | see §2.4 for the three corrections required elsewhere in the repo |
-| VICReg — Bardes, Ponce & LeCun, ICLR 2022, arXiv:2105.04906 | **VERIFIED** | full-text PDF + arXiv API | arXiv abstract ≠ camera-ready abstract; do not mix |
+| Roy & Vetterli, EUSIPCO 2007, pp. 606–610, IEEE Xplore 7098875, DOI 10.5281/zenodo.40328 | **VERIFIED** | full-text PDF + DBLP + OpenAlex | makes **no** quality claim; **no IEEE DOI exists** — do not invent one; `spectral.py` **deviates** by centring |
+| RankMe — Garrido, Balestriero, Najman & LeCun, ICML 2023, PMLR 202:10929–10974, arXiv:2210.02885v3 | **VERIFIED** | full-text PDF + DBLP | claims and restrictions quoted in §2.1; ε **outside** the division |
+| **Aldeneh, Thilak, Higuchi, Theobald & Likhomanenko, ICASSP 2025, DOI 10.1109/ICASSP49660.2025.10889651, arXiv:2409.10787v2** | **VERIFIED** | Crossref + arXiv Atom (abstract) | **leads §2.2**; body not read — `[full text not retrieved]` |
+| LiDAR — Thilak et al., **ICLR 2024**, arXiv:2312.04000v1 | **VERIFIED** (content + venue) | full-text PDF; venue via DBLP `conf/iclr/Thilak0SDGNSL24`, OpenReview `f3g5XpL9Kb` | **earlier drafts' `[UNVERIFIED: venue] / cite as preprint` is now wrong and has been corrected.** ICLR camera-ready **not** retrieved (OpenReview bot challenge); all quotes are from arXiv v1. The paper is internally inconsistent about VICReg's n (10k main text vs 5,000 in Appendix 11.1) — do not cite a single n |
+| α-ReQ — Agrawal, Mondal, Ghosh & Richards, **NeurIPS 2022**, pp. 17626–17638, DOI 10.52202/068431-1281 | **VERIFIED** | DBLP + NeurIPS proceedings BibTeX + OpenAlex + camera-ready PDF | **`[COULD-NOT-VERIFY: venue]` is now cleared.** Title and first-author-name discrepancies noted in §2.1 |
+| **Deng, Sun, Dou & Xu, arXiv:2510.10948v1** | **VERIFIED** (metadata + abstract) | arXiv Atom | `[UNVERIFIED: peer-reviewed venue — none found]` |
+| **Awasthi, Mend Mend Arachchige & Zhu, *BMC Genomics* 26(1):710 (2025), DOI 10.1186/s12864-025-11913-2** | **VERIFIED** | Crossref | PMID/PMCID reported by the sweep, **not** independently verified |
+| Otero, Mateus & Balestriero, arXiv:2410.04289v1 | **PARTIALLY VERIFIED** | arXiv Atom (abstract) | body not read |
+| Zhang, Jiang, Gao, Willett & Maire, arXiv:2404.10947v5 | **PARTIALLY VERIFIED** | arXiv Atom (abstract) | **`[ABSTRACT-LEVEL ONLY — sign must be confirmed in the body]`** |
+| Ruan, Zhang, Wang & Zhang, arXiv:2606.09658 | `[NOT INDEPENDENTLY VERIFIED]` | S2 record only | verify before submission |
+| Kulkarni et al. 2602.20433v2; Cheng 2607.13432v1 | **PARTIALLY VERIFIED** | abstracts | LLM / plasticity domains |
+| Zhuo et al. ICLR 2023 2303.02387; Kim et al. WACV 2026 10.1109/WACV61042.2026.00461; Sun et al. IEEE TIP 2026 10.1109/TIP.2026.3682105; Zhang/Deidda/Higham/Tudisco 2502.04591; Billa 2602.15997; Gupta 2606.24903; Dai et al. 2510.17299; Li et al. 2509.23024; Jamali et al. 2510.14217; Kokilepersaud et al. 2505.12576; Yusupov et al. 2509.25359; Adilova et al. 2606.21593 | `[S2 RECORD ONLY]` | Semantic Scholar | **must be verified against Crossref/arXiv before submission**; none is load-bearing for any number |
+| Zaiem et al., Interspeech 2023 arXiv:2306.00452 (DBLP `conf/interspeech/ZaiemKPER23`) and arXiv:2308.14456 | **PARTIALLY VERIFIED** | DBLP + abstract | cited **against** us in §6 |
+| Jing, Vincent, LeCun & Tian, ICLR 2022, arXiv:2110.09348 | **VERIFIED** | full-text PDF | contains **no** rank→performance claim |
+| MoCo — He, Fan, Wu, Xie & Girshick, CVPR 2020, arXiv:1911.05722 | **VERIFIED** | full-text PDF | see §5.2 for the corrections it forced |
+| VICReg — Bardes, Ponce & LeCun, ICLR 2022, arXiv:2105.04906 | **VERIFIED** | full-text PDF + arXiv API | arXiv abstract ≠ camera-ready abstract |
 | Wang & Isola, ICML 2020, PMLR 119, arXiv:2005.10242 | **VERIFIED** | full-text PDF + arXiv API | "strong agreement", correlational |
-| Otero, Mateus & Balestriero, arXiv:2410.04289v1 | **PARTIALLY VERIFIED** | abstract only | body not read |
-| Kulkarni et al., arXiv:2602.20433v2 | **PARTIALLY VERIFIED** | abstract only | LLM domain |
-| Cheng, arXiv:2607.13432v1 | **PARTIALLY VERIFIED** | abstract only | plasticity domain; "ICML 2026 (Spotlight)" per comments field, not independently checked |
-| α-ReQ — Agrawal, Mondal, Ghosh & Richards | **PARTIALLY VERIFIED**; `[COULD-NOT-VERIFY: NeurIPS 2022 venue]` | related preprint arXiv:2202.05808 full text; venue via LiDAR's bibliography | OpenReview `ii9X4vtZGTZ` blocked |
+| Fang, Li, Sun & Wang, ICLR 2024, arXiv:2403.00642 | **VERIFIED** (bibliographic) | DBLP | **full text NOT RETRIEVED**; nearest neighbour to this paper's genre |
+| Leavitt & Morcos, ICLR 2021, arXiv:2003.01262 | **VERIFIED** | OpenReview API + arXiv API | structural exemplar (§1.3, §4.4); the arXiv record carries no venue field |
 | Barlow Twins — Zbontar et al. 2021 | `[UNVERIFIED]` | — | PMLR URL only |
-| LDReg — Huang et al., arXiv:2401.10474 | `[UNVERIFIED]` | — | *local* dimensionality; not the same construct |
+| LDReg — Huang et al., arXiv:2401.10474 | `[UNVERIFIED]` | — | *local* dimensionality; different construct |
 | de Jong et al. 2025; Mishra & Lotter 2025 | spot-check verified 2026-07-29 | — | not re-verified in this pass |
-| Prior-art census for §2.2 | **INCOMPLETE** | arXiv + OpenAlex only | natural-language search unavailable; citation-graph sweep not run |
+| Prior-art census for §2.2 | **DOWNGRADED FROM INCOMPLETE** | S2 citation graph (453 works) + OpenAlex + Crossref + arXiv + DBLP | abstract-level only; 12/159 RankMe citers had no abstract; Luisto et al. arXiv:2604.14815 must be read at full text |
 
-**One implementation discrepancy, resolved on our side and still open against RankMe.** RankMe uses
-`p_k = σ_k/‖σ‖₁ + ε` with ε **outside** the division (verified at glyph coordinates in the v3 PDF: the
-`+ ε` glyphs sit to the right of the fraction rule, on the fraction axis), so RankMe's `p_k` sum to
-`1 + min(N,K)·ε` and its statistic is **not** the exponential of a Shannon entropy. RankMe never states
-the ε it uses in that equation — the only `10⁻⁷` in the paper belongs to the *contrasting*
-threshold-rank definition it is arguing against. Roy & Vetterli use no ε and adopt the `0 log 0 = 0`
-convention. `v2/calibra/spectral.py` formerly used neither: it **filtered** singular values at an
-**absolute** `> 1e-12`, which broke the scale invariance Roy & Vetterli prove (Property 2,
-`erank(cA) = erank(A)`) — scaling a matrix by 1e-9 emptied the spectrum and returned 0. It now uses the
-standard LAPACK **relative** cut `σ > σ_max·max(n,p)·eps`, plus a scale-relative degeneracy floor so a
-representation collapsed to within float noise still scores 0. **That change moved no number in this
-paper**: the maximum relative difference between the two cuts over all 68 recomputed artifact × block
-combinations is `0.000e+00` (`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
-§2). The RankMe discrepancy remains: **no number in this paper is comparable to a published RankMe
-value**, and no such comparison is made.
+**Could not retrieve, recorded rather than worked around:** Semantic Scholar `/paper/search` (HTTP 429
+throughout); OpenReview forum pages for LiDAR and α-ReQ (bot challenge); numeric δ and ε for LiDAR
+(absent from the paper); any IEEE `10.1109/…` DOI for Roy & Vetterli (none exists on the records
+checked). **OpenAlex is unusable as a citation source for RankMe**: its two RankMe records return 12
+unique citers combined against Semantic Scholar's 159, most likely because PMLR does not mint Crossref
+DOIs.
 
 ---
 
 ## 3. Methods
 
-### 3.1 Three statistics named `effective_rank` across ten call sites, the canonical choice, and how much it matters
+### 3.1 The canonical definition, three statistics under one name, and four unstated degrees of freedom
 
-This repository implemented **three mutually incompatible statistics under the one name
-`effective_rank`, across ten call sites.** They are not variants of one quantity; they have different
-ranges, different maxima and different sensitivity to the collapse mode this paper is about. Two of
-the ten sites are **live abort thresholds that kill training runs**.
+#### The canonical definition, stated explicitly
 
-| # | definition | implementation sites | used for |
+> **Canonical effective rank = Roy & Vetterli 2007, Definition 1, order 1, computed on the
+> column-centred matrix, with rows left at their own norms, and singular values cut at the standard
+> LAPACK relative tolerance `σ > σ_max · max(n, p) · eps`.**
+> `v2/calibra/spectral.py`, `CANONICAL.label == "centred|order1"`.
+
+Every rank number in §4 is this statistic unless the row says otherwise, and every row also names the
+**block** it was computed on (raw or confound-residualised), because that choice is worth more than the
+choice of statistic.
+
+Four choices, each stated because each changes the number:
+
+1. **Order 1, not order 2.** R1 is the published statistic and the only one comparable to anything
+   outside this repository.
+2. **Centred — a deliberate deviation from both source papers, stated at every table.** Neither Roy &
+   Vetterli nor RankMe centres (§2.1). We do, because *uncentred* effective rank is not a property of
+   the representation's spread at all: it is a function of the column mean's magnitude relative to that
+   spread, and it errs in **both** directions. A large shared offset drives the uncentred value of an
+   isotropic, near-full-rank representation to ~1 — reading as total collapse when nothing has
+   collapsed; and on the collapse family `zᵢ = m + aᵢ·u` documented on this project
+   (`NOTEBOOK_ENTRIES/g26_centring_fix_20260803T0730Z.md`), with `m` comparable to the spread, it reads
+   ~2 where there is exactly one direction of variation. The centred value is exactly invariant to a
+   shift. All four statements are pinned by
+   `test_effective_rank_canonical.py::test_uncentred_rank_is_a_function_of_the_mean_and_centred_rank_is_not`.
+   §4.4 shows the choice does not carry the result.
+3. **No row normalisation.** It appears in neither source paper, it discards norm variation that is
+   part of the representation, and it is one of the choices that flips a verdict (§4.5).
+4. **A relative, not absolute, singular-value cut.** The implementation formerly filtered at an
+   **absolute** `> 1e-12`, which breaks the scale invariance Roy & Vetterli prove (Property 2): scaling
+   a matrix by 1e-9 emptied the spectrum and returned 0. A separate *scale-relative* degeneracy floor at
+   1e-12 of the input's own norm keeps a representation collapsed to within float noise scoring 0.
+   **This change moved no number in this paper**: the maximum relative difference between the two cuts
+   over all 68 recomputed artifact × block combinations is `0.000e+00`.
+
+#### And how it differs from RankMe's
+
+RankMe's `p_k = σ_k(Z)/‖σ(Z)‖₁ + ε` places the ε **outside** the division, so its probabilities sum to
+**`1 + min(N,K)·ε`** and **its statistic is not the exponential of a Shannon entropy** (§2.1). Roy &
+Vetterli use no ε and the `0 log 0 = 0` convention. **No number in this paper is comparable to a
+published RankMe value.**
+
+#### Three statistics under one name, across ten call sites
+
+A full AST + SVD scan of the tree at the start of this work found **ten call sites carrying three
+mutually incompatible statistics, all named `effective_rank`**. Two of the ten are **live abort
+thresholds that kill training runs**.
+
+| # | definition | implementation sites (pre-`85c0fa8`) | used for |
 |---|---|---|---|
-| **R1** | Roy & Vetterli's statistic: `exp(−Σ pᵢ ln pᵢ)`, `p = σ/Σσ`, on the **column-centred** matrix | `v2/calibra/spectral.py` (declared "single source of truth"); torch duplicates at `v2/run_rank_ablation.py:35-42`, `v2/tests/test_stress_collapse.py:23-35`, `v2/calibra/e0_basis_transfer.py:432-439`; a fifth inline at `e0_basis_transfer.py:480` with a *different* (float32-eps) tolerance | every CALIBRA readout: instances 2, 4 and 6 |
-| **R2** | order-2 participation ratio of the centred singular values, `(Σσ)²/Σσ²` | `v2/research/rebase/d1_audit.py:149-153` | D1 audit check A5 — the statistic §4.8.3 previously nominated for the D1 table |
-| **R3** | R2 **after L2-normalising each patient row** | `v2/research/rebase/d1_geometry_probe.py:50-53`; `v2/training.py:565-570` (**the in-run rank tripwire, `--rank-tripwire-minimum 4.0`**); `v2/runner.py:939-946` (**the gate probe, same bar**); `v2/research/rebase/d1_collapse_causal_test.py:73-78` | all live-checkpoint geometry probes: 67.55, 9.81, 10.47, 1.71, 7.38, 1.76; the momentum sweep in `paper/QUEUE_ANCHORING.md`; and both admission gates |
+| **R1** | Roy & Vetterli, order 1, column-centred: `exp(−Σ pᵢ ln pᵢ)`, `p = σ/Σσ` | `v2/calibra/spectral.py:14` (declared "single source of truth"); torch duplicates at `v2/run_rank_ablation.py:35`, `v2/tests/test_stress_collapse.py:23`, `v2/calibra/e0_basis_transfer.py:432`; a fifth inline at `e0_basis_transfer.py:480` with a *different* (float32-eps) tolerance | every CALIBRA readout: §4.1, §4.8, §4.9 |
+| **R2** | order-2 participation ratio of the centred singular values, `(Σσ)²/Σσ²` | `v2/research/rebase/d1_audit.py:149` | D1 audit check A5 — the statistic an earlier draft nominated for the D1 table |
+| **R3** | R2 **after L2-normalising each patient row** | `v2/research/rebase/d1_geometry_probe.py:50`; **`v2/training.py:569` (the in-run rank tripwire, `--rank-tripwire-minimum 4.0`)**; **`v2/runner.py:942` (the gate probe, same bar)**; `v2/research/rebase/d1_collapse_causal_test.py:75` | all live-checkpoint geometry probes; the momentum sweep of §5.2; both admission gates |
 
-Additionally, instance 3 (§4.6) is reported in its source not as an effective rank at all but as
-"`z_biology` matrix rank" — a **hard numerical rank**, maximal at the batch size of 16.
+Additionally, the historical instance discussed in §4.9 is reported in its source not as an effective
+rank at all but as "`z_biology` matrix rank" — a **hard numerical rank**, maximal at the batch size of
+16, and a fourth thing again.
 
 **They are not close, and the difference has a fixed sign.** `(Σσ)²/Σσ² = 1/Σpᵢ²` is exactly the
 order-2 Hill number of the same singular-value distribution, of which effective rank is the order-1
 Hill number. Hill numbers are non-increasing in the order, so **R2 ≤ R1 and R3 ≤ R1 for every matrix**,
-with equality only on a flat spectrum. Measured over all 68 artifact × block combinations recomputed
-for this paper, `R2/R1` spans **0.338 to 0.813** (median 0.629) and `R3/R1` spans **0.351 to 0.826**
-(median 0.655). A rank quoted without naming its statistic is uncertain by up to a factor of three.
+with equality only on a flat spectrum (asserted in
+`test_effective_rank_canonical.py::test_order_two_is_never_above_order_one`). Measured over all 68
+recomputed artifact × block combinations:
 
-**A fourth choice, which no version of this project has ever stated.** Beyond centring, row
-normalisation and the order, there is **which matrix the SVD is taken of**. Every CALIBRA readout
-computes `effective_rank(x)` on the **raw** representation block (`run_calibra.py:140`) while the
-channel it is compared against is a `heldout_top_cca` on the **confound-residualised** block.
-`d2_readout.py` reports both. This paper quotes the residualised value for instance 6 and the raw
-value for instances 2 and 4 — and until now said neither. The choice is not cosmetic: on D2 it flips
-the R3 arm ordering in **two of three seeds** (§4.3), and on the dilution sweep it changes the headline
-magnitude by a factor of 5.8 (§4.2). Note also that on the **raw** exported artifacts `R2 ≡ R3`
-exactly, because the model already L2-normalises `z_biology`; the R2/R3 distinction exists only after
-residualisation, which is why it went unnoticed.
+| ratio | min | median | max |
+|---|---:|---:|---:|
+| R2 / R1 | 0.338 | 0.629 | 0.813 |
+| R3 / R1 | 0.351 | 0.655 | 0.826 |
+| R1 uncentred / R1 | 0.116 | **0.995** | 1.000 |
 
-#### The canonical definition adopted here
+*Provenance: `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
+§4; outputs `~/ws_rank/RANK_RECOMPUTE.json`, `~/ws_rank/RANK_RECOMPUTE_P1B.json`; scripts vendored into
+the repository at commit `8609081`.*
 
-> **Canonical effective rank = Roy & Vetterli 2007 Definition 1, order 1, on the column-centred matrix,
-> rows at their own norms, singular values cut at the LAPACK relative tolerance.**
-> `v2/calibra/spectral.py`, `CANONICAL.label == "centred|order1"`.
+**A rank quoted without naming its statistic is uncertain by up to a factor of three.** Note the third
+row: centring, the choice a referee is most likely to attack, is the one that matters *least* at the
+median — a fact §4.4 uses.
 
-Three choices, each with its reason, because each changes the number:
+#### The fourth degree of freedom: which matrix
 
-1. **Order 1, not order 2.** R1 is the published statistic and the only one comparable to anything
-   outside this repository. R2/R3 are a different quantity that happens to share a name.
-2. **Centred — a deliberate deviation from Roy & Vetterli, stated at every table.** Neither Roy &
-   Vetterli nor RankMe centres (§2.1, §2.6). We do, because *uncentred* effective rank is not a
-   property of the representation's spread at all: it is a function of the column mean's magnitude
-   relative to that spread, and it errs in **both** directions. A large shared offset drives the
-   uncentred value of an isotropic, near-full-rank representation to ~1 — reading as total collapse
-   when nothing has collapsed; and on the collapse family `zᵢ = m + aᵢ·u` documented on this project
-   (`NOTEBOOK_ENTRIES/g26_centring_fix_20260803T0730Z.md`), with `m` comparable to the spread, it reads
-   ~2 where there is exactly one direction of variation. The centred value is exactly invariant to a
-   shift. Centring is also what produced the majority of this paper's quoted numbers, so it is the
-   choice under which the historical record is recomputable rather than merely re-derivable.
-3. **No row normalisation.** It appears in neither source paper, it discards norm variation that is
-   part of the representation, and it is one of the choices that flips a published verdict (§4.3).
+Beyond centring, row normalisation and the order there is **which matrix the SVD is taken of**. Every
+CALIBRA readout computes `effective_rank(x)` on the **raw** representation block (`run_calibra.py:140`)
+while the channel it is compared against is a `heldout_top_cca` on the **confound-residualised** block.
+`d2_readout.py` reports both. Earlier drafts quoted the residualised value for one instance and the raw
+value for two others **and said neither**. The choice is not cosmetic: it flips the R3 arm ordering in
+two of three D2 seeds (§4.5) and changes the dilution headline magnitude by a factor of **5.8** (§4.8).
+Note also that on the **raw** exported artifacts `R2 ≡ R3` exactly, because the model already
+L2-normalises `z_biology`; the R2/R3 distinction exists only after residualisation, which is why it went
+unnoticed.
+
+#### One implementation, and a test that keeps it
 
 There is now **one implementation**, imported by all ten sites.
-`v2/tests/test_effective_rank_canonical.py` pins it against hand-computed values on a matrix of known
-spectrum (`σ ∝ (2,1,1)` ⟹ `erank = 2√2`, order-2 `= 8/3`), against Roy & Vetterli's Property 1
-including both equality cases, and against scale invariance; asserts object identity across every
-importable call site; and **fails on an AST scan of the source tree if a second definition, or any
-unallowlisted SVD-based rank, reappears.** The two live abort thresholds retain R3, named explicitly at
-the call site because their 4.0 bar was calibrated against R3 readings, and log the canonical value
-beside it so the bar can be recalibrated on evidence rather than by assumption.
+`v2/tests/test_effective_rank_canonical.py` (13 tests) pins it against hand-computed values on a matrix
+of known spectrum (`σ ∝ (2,1,1)` ⟹ `erank = 2√2 = 2.8284271247461903`, order-2 `= 8/3`), checked both
+uncentred on `diag(2,1,1)` and through a non-zero column mean so that centring is simultaneously proven
+applied; against Roy & Vetterli's Property 1 including both equality cases; against scale invariance;
+against torch ≡ numpy on all six variants; asserts **object identity** across every importable call
+site; and **fails on an AST + SVD scan of the source tree if a second definition, or any unallowlisted
+SVD-based rank, reappears.** The two live abort thresholds retain **R3**, named explicitly at the call
+site because their 4.0 bar was calibrated against R3 readings (6.92–7.25 healthy, 1.46–1.98 collapsed),
+and both now log the canonical value beside it (`biology_effective_rank_canonical`) so the bar can be
+recalibrated on evidence rather than by assumption. Suite: **317 passed** with thread caps (304 before;
++13).
 
 We report the original state as a finding rather than an embarrassment because it is evidence for the
-paper's own thesis, and because it took reading three implementations side by side, while writing this
-paper, to notice. **§4 now names the statistic *and* the block for every number.**
+paper's own thesis — a scalar whose name is stable while its definition is not gets quoted across
+contexts it does not survive — and because it took reading three implementations side by side, while
+writing this paper, to notice.
 
 **We are not exempt from the practice this paper criticises.**
 `v2/calibra/e1_rank_information.py` is a preregistered, gate-enforced, three-seed experiment in this
@@ -597,120 +763,578 @@ level that was *measured*, not assumed.
 |---|---|---|---|
 | **Held-out top canonical correlation ("the channel")** | canonical directions fit on one half of the held-out patients and scored on the other; 16 components per side; both blocks cross-fitted-residualised against a cancer + pooled-tissue-source-site design first | permutation null median **0.145–0.147** (dilution sweep, 2,766 patients); **0.140** (D2, 200 draws, `permutation_p` floor 0.005) | `v2/calibra/spectral.py:78-108`; `v2/calibra/run_calibra.py` |
 | **Null-corrected channel ratio** | `(observed − null median) / (observed₀ − null median₀)` | 0 by construction | `DILUTION_LOWER_BOUND.md` §2 |
-| **Within-cancer specificity** | the benchmark statistic of an earlier codebase generation; **definition not recoverable from any file now in this repository** | not recorded | §4.5, §5.4 |
+| **Within-cancer specificity** | the benchmark statistic of an earlier codebase generation; **definition not recoverable from any file now in this repository** | not recorded | §4.9, §6.4 |
 | **Retrieval accuracy @1** | cross-modal nearest-neighbour retrieval within a fixed 16-patient batch | **0.062** = 1/16 | `NOTEBOOK.md` 2026-08-02 01:20 UTC |
 | **In-batch InfoNCE** | symmetric cross-modal InfoNCE, temperature 0.07 | **ln 16 = 2.7726** (16-patient batch, frozen queue excluded from the candidate count); **ln 80 = 4.38** (earlier configuration, live 64-key queue contributing candidates); **ln 2576 = 7.854** and **ln 4310 = 8.369** at training scale | `v2/losses.py:13`; `NOTEBOOK.md:1554` |
 
-**These chance levels must not be mixed.** `ln 80 = 4.38` belongs to the pre-fix gate configuration
-and `ln 16 = 2.7726` to the post-fix one. Every InfoNCE number in §4 is quoted with its own chance
+**These chance levels must not be mixed.** `ln 80 = 4.38` belongs to the pre-fix gate configuration and
+`ln 16 = 2.7726` to the post-fix one. Every InfoNCE number in this paper is quoted with its own chance
 level attached.
 
 **A null that is not zero.** The permutation null for a 16-component canonical correlation on ~2,700
 patients sits at 0.140–0.147, because a multivariate maximum over 16 fitted directions is upward-biased
-at finite *n*. A raw channel ratio therefore flatters the surviving signal and the null-corrected
-column is the one quoted throughout. This is also why "both arms at chance" is not a testable
-statement for these readouts, and why §4.3's negative control is stated as "controls must score below
-real targets" — necessary and not sufficient
+at finite *n*. A raw channel ratio therefore flatters the surviving signal and the null-corrected column
+is the one quoted throughout. This is also why "both arms at chance" is not a testable statement for
+these readouts, and why §4.7's negative control is stated as "controls must score below real targets" —
+necessary and not sufficient
 (`NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md:59-63`).
+
+**In-sample bias, checked.** The headline channel is fitted at a 16-component budget and is therefore
+upward-biased. Re-run with `heldout_top_cca` (directions fit on half the patients, scored on the other),
+**every arm ordering survives on all three co-trained views, with equal or larger deltas** (e.g. D2 seed
+42 `wsi_biology`: +0.1325 in-sample → +0.1541 held-out). The ground truth is not an in-sample artifact.
 
 ### 3.3 Cohorts, representations and artifacts
 
 All measurements are TCGA. Two cohort configurations appear and are labelled at every table.
 
 - **Maximal paired split — 6,427 patients** (3,118 train / 543 validation / 2,766 test), holding out
-  whole cancers: 11 development cancers, 21 held out. Used by §4.2, §4.3, §4.8.
-- **Earlier configuration — 2,530 held-out patients over 21 test cancers.** Used by §4.4.
+  whole cancers: 11 development cancers, 21 held out. Used by §4.1–§4.8.
+- **Earlier configuration — 2,530 held-out patients over 21 test cancers.** Used by §4.9's instance 2.
 
 Representations are one of:
 
 - **Zero-parameter patch statistics.** `concat(mean, std)` over frozen H-Optimus-0 patch tokens
   (1,536-d), PCA-reduced to 256 dimensions refit on train rows only per level, retained variance
-  0.879–0.923. Used by §4.2 — it has *no fitted parameters*, so the rank change and the channel change
-  cannot be attributed to different training runs.
+  0.879–0.923. Used by §4.8 — it has *no fitted parameters*, so neither the rank change nor the channel
+  change can be attributed to different training runs.
 - **Trained `wsi_biology` states,** 256 output features, exported to `.npz` diagnostic artifacts with a
-  `split` column; test rows only.
+  `split` column; test rows only. Each artifact additionally stores two further co-trained views,
+  `rna_biology` and `full_biology`, which §4.5 exploits.
 
-### 3.4 What "matched" means here, and the two places it fails
+**The 12 artifacts that carry §4.1–§4.7.** Four arms × three seeds, all frozen:
 
-- **§4.3 (D2) is matched by construction.** A single `D2_PAIR_MANIFEST.json` enumerates the 40 common
+| experiment | arms | differ in | artifacts |
+|---|---|---|---|
+| **D2** | **H** = Hallmark pathway supervision, **I** = 128 perturbation-basis coordinates | the supervision **target table** only; both arms `--objective-profile programme_only` | `~/e0_run/d2_v3/d2_v3_s{42,43,44}/artifacts/d2_{h,i}_seed{42,43,44}.npz` |
+| **D1-B** | **P** = `programme_only` (biology head on 50 Hallmark scores), **F** = `programme_free` (no programme regression; patient-paired cross-modal InfoNCE on the biology view) | `--objective-profile` only | `~/e0_run/d1_v2/artifacts/d1_{p,f}_seed{42,43,44}.npz` |
+
+All six D1-B runs are complete and live: `~/e0_run/d1_audit.log` records `[PASS]
+A1_all_six_runs_complete` with `overfit_present: True` and `all_grads_positive: True` for all six.
+
+### 3.4 What "matched" means here, and the three places it fails
+
+- **D2 is matched by construction.** A single `D2_PAIR_MANIFEST.json` enumerates the 40 common
   arguments; both arms record the same `pair_manifest_sha256`
   (`ce1352e0ac7a98334e4fada8178986e8413fac1046ebb67a96f5c3cbc7c2fb0b`) and the same
   `common_config_sha256` (`b7b2441fd9d03a3a00152027efe8c7ada3bedc48e7939f1dfc0b320b02adf1fb`). Both
   arms use `--objective-profile programme_only`; **they differ only in the supervision target table.**
-  This is what makes §4.3 a *within-method* comparison in RankMe's sense.
-- **§4.4 (Phase 1b) is not matched.** Its source states it: *"`full` vs `programme_only` manifests were
-  not verified as matched on epochs/LR/budget in this run (G0.4). Until they are, the rank comparison
-  in §5 is suggestive, not causal"* (`PHASE1B_TARGETED_READOUT.md:147-148`). The three diagnostic
-  artifacts record only `configuration_sha256`, `git_commit`, `git_dirty`, `package`, `package_root`,
-  `source_tree_sha256` — **no epochs, no learning rate, no token budget, no seed** — and `git_dirty` is
-  `True` for all three (`HANDOFF_PHASE_D.md` §D1.0).
-- **§4.5 cannot be assessed at all.** See §5.4.
+  This is a *within-method* comparison in RankMe's sense.
+- **D1-B is matched by construction but differs in the objective.**
+  `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` records `"objective_only_difference": true`. Because the arms
+  differ in *objective*, D1 sits closer to a between-method comparison than D2 does and lands further
+  outside RankMe's stated scope. §4.7 accounts for this in both directions, since the result there is a
+  confirmation of RankMe rather than a refutation.
+- **The three-seed replicates of any one arm are unambiguously in scope.** They differ in nothing but
+  the seed and are therefore *"different runs of a given method"* on RankMe's own words. §4.2 and §4.3
+  are measured there.
+- **§4.9's instance 2 (Phase 1b) is not matched.** Its source states it: *"`full` vs `programme_only`
+  manifests were not verified as matched on epochs/LR/budget in this run (G0.4). Until they are, the
+  rank comparison in §5 is suggestive, not causal"* (`PHASE1B_TARGETED_READOUT.md:147-148`). The three
+  diagnostic artifacts record only `configuration_sha256`, `git_commit`, `git_dirty`, `package`,
+  `package_root`, `source_tree_sha256` — **no epochs, no learning rate, no token budget, no seed** — and
+  `git_dirty` is `True` for all three.
+- **§4.9's instance 1 cannot be assessed at all.** See §6.4.
 
 ### 3.5 Seed reproducibility on this stack, and the rule it forces
 
 Training is **not seed-reproducible** on this hardware. Re-exporting a surviving checkpoint reproduces
 its recorded readout to five significant figures (0.58612 against 0.5861 recorded), so the
 export/readout path is deterministic. Retraining the same seed with the same configuration gives a
-different model: held-out top-CCA 0.6214 versus 0.5861, and R1 effective rank 23.39 versus 8.68
-(`D2_RESULT.md` §4).
+different model: held-out top-CCA **0.6214 versus 0.5861**, and canonical R1 effective rank **23.39
+versus 8.68** (`D2_RESULT.md` §4).
 
-**The rule this forces, and which this paper obeys: quote paired within-run differences, never
-levels.** It applies to §4.3 and §4.8. It does *not* rescue effective rank, because rank is quoted as a
-level in every practice this paper is about — including RankMe's own, which selects between runs by
-comparing their rank values. There is no paired-difference form of "this run has higher rank". §4.7
-develops this into the paper's second contribution.
+**The rule this forces, and which this paper obeys: quote paired within-run differences for the channel,
+never levels.** It does *not* rescue effective rank, because rank is quoted as a **level** in every
+practice this paper is about — including RankMe's own, which selects between runs by comparing their
+rank values. There is no paired-difference form of "this run has higher rank". §4.1 develops this
+asymmetry into the paper's central measurement, and §4.4 establishes that it is a property of training
+rather than of the estimator.
 
 ### 3.6 Reporting rules adopted for this paper
 
-1. §4.1's overview table carries an explicit strength ranking **and** a column stating whether the
-   instance contradicts RankMe *as stated* or only the looser practice. Instances that do not
-   contradict RankMe are labelled as such in their own section heading.
-2. Every instance carries its caveats in the same table row, not in a later paragraph.
-3. Where an instance's own source file corrects, caveats or withdraws it, that text is quoted.
-4. Evidence that cuts against the claim is reported in §4.6 and §4.9 at the same prominence.
-5. No number is compared across the three rank statistics of §3.1, and no number is compared to a
-   published RankMe value (§2.6, implementation discrepancy).
+1. **The result that went against us is §4.7, and it is summarised in the abstract.** Its reading was
+   fixed in advance (`NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`), before any
+   channel number was seen.
+2. Every rank number names its **statistic** and its **block**. Numbers that cannot be recomputed under
+   the canonical definition are marked `[NOT RECOMPUTABLE]` or `[NOT RECOMPUTED]` and are excluded from
+   every count and summary statement rather than carried forward.
+3. **Selection-rule counts carry no rhetorical weight** (§4.6). At n = 6 a flawless 6/6 gives an exact
+   two-sided binomial p = 0.031; 5/6 gives 0.219; 4/6 gives 0.688. The design has just enough power to
+   detect a *perfect* rule and none to detect a good one. No conclusion of the form "metric X beats
+   metric Y" is drawn from six pairs, in either direction.
+4. No number is compared across the statistics of §3.1, and no number is compared to a published RankMe
+   value (§2.1, §2.6).
+5. Where an instance's own source file corrects, caveats or withdraws it, that text is quoted.
+6. Evidence that cuts against the claim is reported in §4.7, §4.10 and §5.3, at the same prominence as
+   the evidence that supports it.
 
 ---
 
 ## 4. Results
 
-### 4.1 Overview: six dissociations, ranked, and what each does and does not contradict
+### 4.1 Six of the seven between-arm rank differences ever measured are inside the statistic's own retraining envelope
 
-Instance numbers 1–4 are inherited from `P1_CALIBRA_DRAFT.md` §4.11 so the two papers can be
-cross-read; instance 5 is D1 (pending, §4.8) and instance 6 is the D2 audit (§4.3). The **strength**
-column is our assessment of evidential weight and is *not* the instance number. The final column is
-the one a referee will read first.
+This is the paper's headline. It is a statement about **usefulness**, and it is measured inside the
+same-method regime RankMe reserves for itself.
 
-| # | manipulation | rank stat. | rank change | information change | strength | contradicts RankMe as stated? |
-|---|---|---|---|---|:---:|---|
-| **6** | supervision target: Hallmark vs perturbation-basis, one method, one architecture, 3 seeds, matched by construction | R1 | 23.39/28.77/9.14 vs 14.87/**34.12**/9.11 | Δ channel −0.1325 / −0.1089 / −0.1226; both CIs exclude zero 3/3 | **1st** | **Yes.** Within-method, in-distribution, non-degenerate ranks — RankMe's own reserved regime. Rank ordering agrees 1/3 |
-| **4** | patch-bag contamination, d = 0 → 0.80, 7 levels, zero-parameter representation | R1, **raw** / **residualised** block | 196.2 → 161.2 (**−18%**) / 210.2 → 203.7 (**−3.1%**) | null-corrected channel 1.000 → 0.333, **−67%** | **2nd** | **No.** High rank with degraded information is exactly the necessary-not-sufficient case. Contradicts the informal health-monitor practice, and adds a magnitude miscalibration — **1.95× to 21.5× depending on statistic and block**, 21.5× on the block matched to the channel — that a two-point comparison cannot show |
-| **2** | objective profile: `full` → `programme_only` | R1 | 38.48 → 32.06, **−17%** | held-out top-CCA 0.4768 → 0.4748, **−0.002** | **3rd** | **No.** Different objectives are arguably different methods; and both differences are inside this stack's retraining noise (§3.5, §4.4) |
-| **3** | full training schedule vs contrastive-only, 16-patient train batch | **hard matrix rank** | pinned at **16/16** in every arm | patient cosine 0.7089 → 0.9999; pos/neg 0.9959 vs 0.9960; retrieval 0.062 → **0.000** | **4th** | **No** — and it is not about effective rank at all. Hard rank at a structural ceiling of 16; the centred effective rank of the same objective falls **12.88 → 1.00** |
-| **1** | covariance-decorrelation term added | unknown | 49.9 → 103.3, **+107%** | within-cancer specificity 0.1366 → 0.1367, **flat** | **5th** | **No.** Earlier codebase generation; benchmark statistic undefined; **cited source file does not exist in this repository** |
-| **5** | D1: `programme_only` vs `programme_free` | **R1 (canonical)** | 29.38/24.67/11.11 vs 13.42/7.60/6.39 (2.19× / 3.25× / 1.74×) | `[D1 CHANNEL PENDING]` | — | see §4.8.3, §4.8.4 |
+**The envelope.** Retraining one configuration — D2 arm H, seed 42, identical arguments, identical
+seed — against the re-export of the surviving original checkpoint:
 
-*Provenance: instance 6 — `v2/research/rebase/nature/D2_RESULT.md` §2, §4; outputs
-`~/e0_run/d2_v3/bootstrap/` and `~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json` on persistent NFS.
-Instance 4 — `v2/research/rebase/nature/DILUTION_LOWER_BOUND.md` §2, §6 and
-`NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`; outputs `p1_evidence/dilution/`.
-Instance 2 — `v2/research/rebase/nature/PHASE1B_TARGETED_READOUT.md` §3, §5, §7; run
-`runs/calibra_v3_targeted`. Instance 3 — `NOTEBOOK.md` entry 2026-08-02 01:20 UTC and
-`NOTEBOOK_ENTRIES/g26_variance_floor_fix_20260803T0210Z.md`; counter-measurement
-`NOTEBOOK_ENTRIES/g26_rank_collapse_diagnosis_20260803T0500Z.md`. Instance 1 —
-`v2/research/rebase/ENGINE_CLD.md` §1 and `HANDOFF_BUILD_AGENT.md` §1–2 only; see §5.4.*
+| | held-out top-CCA | **canonical R1, residualised block** |
+|---|---:|---:|
+| recorded in the original run | 0.5861 | — |
+| re-export of the surviving checkpoint | **0.58612** | **8.6809** |
+| **retrained**, identical configuration and seed | **0.6214** | **23.3868** |
 
-**Read this table with §2.2 in hand.** Four of six instances do not contradict RankMe as written.
-That is not a weakness of the evidence; it is the reason §4.3 and §4.7 are the paper and the others
-are context.
+Re-export is deterministic to five significant figures, so the export and readout path is not the
+source of the variance. Retraining is not deterministic: the channel moves by 0.035 and the effective
+rank by **2.69×**.
 
-### 4.2 Instance 4 — a dose–response in which rank under-reports the loss by between 1.95× and 21.5×, depending on choices nobody was stating *(does not contradict RankMe; contradicts the health-monitor practice)*
+**The comparisons a rank-based selection rule would act on.** Every between-arm rank comparison this
+project has ever measured, all canonical R1, each with the block named in §4.9 or below:
 
-Patch bags were contaminated with same-cancer, different-patient tumour patches at seven nested
-levels. The representation is `concat(mean, std)` over frozen H-Optimus-0 tokens with **no fitted
-parameters**, so nothing here is a different training run. Both quantities are read from the same
-representation at each level, through the same instrument.
+| comparison | arms | rank ratio | inside the 2.69× retraining envelope? |
+|---|---|---:|---|
+| D2 seed 44 (resid.) | H 9.1426 / I 9.1052 | **1.004×** | **yes** |
+| D2 seed 43 (resid.) | H 28.7715 / I 34.1168 | **1.186×** | **yes** |
+| Phase 1b, single seed (raw) | `full` 38.4834 / `programme_only` 32.0594 | **1.200×** | **yes** |
+| D2 seed 42 (resid.) | H 23.3868 / I 14.8675 | **1.573×** | **yes** |
+| D1-B seed 44 (resid.) | P 11.1148 / F 6.3937 | **1.738×** | **yes** |
+| D1-B seed 42 (resid.) | P 29.3813 / F 13.4184 | **2.190×** | **yes** |
+| D1-B seed 43 (resid.) | P 24.6730 / F 7.6003 | 3.246× | no — and only just |
+
+*Provenance: `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
+§5, §6; `v2/research/rebase/nature/D2_RESULT.md` §4; `PHASE1B_TARGETED_READOUT.md` §3, §5, §7. Artifacts
+`~/e0_run/d2_v3/d2_v3_s{42,43,44}/artifacts/`, `~/e0_run/d2_v3/recovered_artifacts/`,
+`~/e0_run/d1_v2/artifacts/`, and the Phase-1b artifacts at
+`/lambda/nfs/geeg/biorag3_persistent_20260711/runs/v21_release_20260720_retry3_resume_safe/artifacts/`.
+Every value recomputed under the canonical implementation on 2026-08-04 and reproducing the published
+figures exactly; outputs `~/ws_rank/RANK_RECOMPUTE.json`, `~/ws_rank/RANK_RECOMPUTE_P1B.json`.*
+
+**Six of seven, spanning 1.004× to 2.19×, are smaller than the spread of the same statistic when one
+configuration is retrained with the same seed.** Against those same D2 runs the paired channel
+difference is **−0.1325 / −0.1089 / −0.1226** — the same sign 3/3, spread 0.024 on a mean of −0.121,
+with both patient- and cancer-clustered bootstrap CIs excluding zero in all three seeds (§4.9). The
+channel readout is **not** exempt from §3.5 either — 0.5861 against 0.6214 is a 6% move at one seed —
+but the channel is quoted as a *paired within-run difference* and rank is not, and the paired difference
+is stable where both levels are not. **That asymmetry is a statement about how the two quantities are
+used, and it is the practical heart of this paper.**
+
+**The consequence for RankMe's own recommended use.** RankMe selects between runs by comparing their
+rank values and restricts that comparison to runs of a given method — exactly the setting above. A
+criterion whose value moves 2.69× when the same configuration is retrained cannot resolve a
+between-configuration difference smaller than that. In particular, the largest D2 difference (1.573×,
+seed 42) is comfortably inside the envelope, which is an independent reason why that seed's "correct"
+ordering carries no weight.
+
+**Stated as a rule a practitioner can apply:** *before using a rank difference to select between
+configurations, retrain one configuration with the same seed and measure the rank spread; if the
+between-configuration difference does not exceed it, the comparison is uninformative.* We have not seen
+this check proposed anywhere. It is cheap — one extra run — and on this stack it would have disqualified
+six of the seven rank comparisons this project made.
+
+**What this rests on, stated plainly.** The envelope is **one retraining pair on one configuration**.
+That is thin, and §4.2 exists because it is thin: the variance decomposition estimates the nuisance term
+from **8 within-arm degrees of freedom** across four arms rather than from a single pair, and reaches
+the same conclusion without depending on the 2.69× number at all.
+
+### 4.2 Where rank's variance lives: 34.5% arm, 65.5% training seed — and the channel is 98.0% arm
+
+Twelve artifacts, four arms (D2-H, D2-I, D1-P, D1-F) × three seeds. The seed changes **nothing** about
+objective, architecture, data, split or schedule. Rank-type metrics are decomposed on the log scale
+(they are multiplicative and span 6.4–34.1); the canonical-correlation ground truth on the raw scale.
+
+| quantity | SS_arm | SS_seed | **arm share** | F(3,8) |
+|---|---:|---:|---:|---:|
+| **canonical effective rank (residualised)** | 1.3047 | 2.4762 | **34.5%** | **1.41** (n.s.) |
+| RankMe as published (raw, uncentred, ε = 1e-7) | 0.9772 | 2.3817 | 29.1% | 1.09 (n.s.) |
+| **ground truth: held-out top-CCA, 40 untrained targets** | 0.0353 | 0.0007 | **98.0%** | **128.20** |
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §4.1; scripts
+`~/e0_run/p2_competing_metrics.py`, `p2_necessity_and_variance.py`; outputs `~/e0_run/P2_METRICS_D2.json`,
+`P2_METRICS_D1.json`. Ground truth reproduces `~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json` to 4 d.p.
+and the recovered Δ values (−0.1325 / −0.1089 / −0.1226) exactly. All 12 artifacts frozen; CPU only,
+thread-capped.*
+
+**Two-thirds of the variation in effective rank across these artifacts is training-seed nuisance. Two
+percent of the variation in the information channel is.** The arm effect on rank is not significant at
+all; the arm effect on the information those same artifacts carry is overwhelming. Note that this holds
+for **RankMe as published** as well as for the centred canonical statistic, and slightly more strongly —
+so it is not an artifact of our centring deviation.
+
+Per arm, holding everything but the seed fixed:
+
+| arm | canonical effective rank across 3 seeds | fold | held-out top-CCA across 3 seeds | fold |
+|---|---|---:|---|---:|
+| D2 H (Hallmark) | 23.387 / 28.771 / 9.143 | **3.15×** | 0.6126 / 0.5970 / 0.5983 | 1.026× |
+| D2 I (perturbation basis) | 14.868 / 34.117 / 9.105 | **3.75×** | 0.4800 / 0.4882 / 0.4757 | 1.026× |
+| D1 P (`programme_only`) | 29.381 / 24.673 / 11.115 | **2.64×** | 0.6117 / 0.6198 / 0.6087 | 1.018× |
+| D1 F (`programme_free`) | 13.418 / 7.600 / 6.394 | **2.10×** | 0.5412 / 0.5336 / 0.5126 | 1.056× |
+
+**This is inside RankMe's own reserved scope.** Three seeds of one arm **are** *"different runs of a
+given method"*. Across them the proxy moves **2.10–3.75×** while the quantity it is a proxy for moves
+**1.8–5.6%**. The between-arm gaps the proxy is being asked to resolve are 12–24% relative. **The
+nuisance-induced range of the proxy exceeds the signal it must resolve by roughly an order of magnitude,
+in the one regime its authors reserve for it.**
+
+The sharpest single instance is strictly within one arm — no arm contrast at all, only a seed:
+
+> **D2 arm H, seed 44 against seed 43: 3.15× apart in effective rank (9.143 against 28.771), and
+> 0.0012 apart in the molecular channel (0.5983 against 0.5970) — with the *lower*-rank run marginally
+> ahead.** Same objective, same target table, same data, same split, same schedule, same architecture.
+
+That single line is the paper's cleanest object. It contains no arm effect to argue about, and it is
+inside RankMe's scope by RankMe's own sentence.
+
+### 4.3 The floor is a property of the arm, not of the statistic
+
+The reproducibility envelope is not a constant of the metric that could be measured once and reused. At
+the **same global training step**, on the **same configuration**, with only the seed differing:
+
+| arm, D1-B, global step 200 (epoch 11) | seed 42 | seed 43 | seed 44 | spread |
+|---|---:|---:|---:|---:|
+| `programme_free` | 7.545 | **45.646** | 12.194 | **6.05×** |
+| `programme_only` | 110.765 | 110.879 | 111.078 | **1.003×** |
+
+*Provenance: `~/e0_run/d1_v2/d1_f_seed{42,43,44}/train_metrics.jsonl` and
+`d1_p_seed{42,43,44}/train_metrics.jsonl`, key `train_rank_tripwire_observed`, epoch 11. **Statistic
+R3** — the tripwire statistic. These are in-training measurements whose states were never saved, so they
+are `[NOT RECOMPUTABLE]` under R1 and are not compared with any R1 number in this paper.
+`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §6.*
+
+The supervised arm reproduces to **0.3%**; the contrastive arm spans **6.05×**. **Rank's
+reproducibility is therefore not a property of the statistic — it is a property of the arm being
+measured, and it is worst exactly where the arm is interesting.** A reproducibility envelope measured on
+a well-behaved configuration does not transfer to the one being diagnosed, and the one being diagnosed
+is the configuration a practitioner is looking at when they reach for rank.
+
+This also disposes of the most natural repair: "calibrate the envelope once, then use it". There is no
+one envelope. On this stack the same statistic, at the same step, is reproducible to three parts in a
+thousand on one arm and unusable on its sibling.
+
+### 4.4 Defeater check — is the metric fine and the estimator bad?
+
+The most obvious way this paper's result could be an artifact is that **our measurement of rank is
+poor**, not that rank is unstable: a badly conditioned SVD, an unlucky definition, too few patients, a
+centring choice the source papers do not make. Given that we report rank spanning 9.1 to 34.1 across
+seeds, this is the first objection a referee will raise, and the exemplar for this genre (Leavitt &
+Morcos, ICLR 2021, §4.2) devotes a section to the analogous check. Four independent measurements rule
+it out.
+
+**(1) Measurement noise on a fixed trained model is negligible.** Patient-subsampling at 80%, 40 draws,
+per artifact — the sampling variability of the statistic **given the model**:
+
+| pair | eff. rank, arm A | eff. rank, arm B | between-arm gap | gap / sd |
+|---|---:|---:|---:|---:|
+| D2 s42 | 23.325 ± 0.072 | 14.834 ± 0.037 | 8.491 | 105.3 |
+| D2 s43 | 28.657 ± 0.115 | 33.912 ± 0.111 | 5.255 | 33.0 |
+| **D2 s44** | **9.132 ± 0.021** | **9.093 ± 0.019** | **0.039** | **1.39** |
+| D1 s42 | 29.244 ± 0.102 | 13.393 ± 0.027 | 15.850 | 150.3 |
+| D1 s43 | 24.584 ± 0.069 | 7.586 ± 0.016 | 16.997 | 238.2 |
+| D1 s44 | 11.098 ± 0.031 | 6.387 ± 0.011 | 4.710 | 145.1 |
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §3; output
+`~/e0_run/P2_METRICS_ALL_SUBSAMPLED.json`.*
+
+The standard deviation is **≈0.1 on a rank of 25**. Effective rank is a *precise* measurement of the
+matrix it is handed. **The instability documented in §4.1–§4.3 is entirely in training, not in
+estimation** — and that distinction must be made explicitly, because §4.1 can otherwise be misread as an
+estimator problem. It also has a consequence for §4.6: at D2 seed 44 the between-arm gap is **1.4
+sampling standard deviations**, an unresolvable tie, against a ground-truth gap of +0.1226 whose paired
+bootstrap CI excludes zero. That "hit" is not a hit.
+
+**(2) The readout path is deterministic.** Re-exporting a surviving checkpoint reproduces its recorded
+channel to five significant figures (0.58612 against 0.5861) and gives a stable rank (8.6809); the 2.69×
+move in §4.1 appears only when the model is retrained (§3.5).
+
+**(3) At a fixed seed and a fixed short horizon, rank is tight.** Three repeats of a controlled 200-step
+probe with **identical inputs**, real streaming batches, live queue: m = 0.999 gives **7.15 / 6.92 /
+7.25**, a relative spread of **4.7%**; m = 0 gives 1.80 / 1.46 / 1.98 (30%), with an empty band from 1.98
+to 6.92. *Provenance: `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md`; logs
+`~/e0_run/d1_diag/probevar_*.log`.*
+
+**These repeats hold the seed fixed and vary only stack non-determinism; the 6.05× row of §4.3 is at the
+same 200 steps on the same objective and varies the seed.** The two are not in conflict and the
+difference is the point: rank at step 200 is reproducible to 4.7% when the seed is held, spans 6.05×
+when it is not, and spans 1.003× on the sibling arm across the same three seeds. **The variance is
+neither intrinsic to the measurement nor merely accumulated over training: it is seed sensitivity that
+is specific to the arm.**
+
+*The honest limit on (3):* three repeats constrain the *typical* spread and essentially not the *tail*.
+On the same stack, the liveness gate diverges at 2/8 = 25%; `P(0 in 3 | p = 0.25) = 0.42` and the exact
+upper 95% bound from 0/3 is `p ≤ 0.63`. The planned design was ten repetitions and was cut to six, then
+three per condition, because the ten-way launch exhausted GPU memory. That is a real weakening and is
+recorded rather than glossed.
+
+**(4) The definitional choices do not carry the result.** The canonicalisation changed **no** published
+value: every surviving instance reproduces to the digits published (§4.9). The absolute-to-relative
+tolerance change moved no number (max relative difference `0.000e+00` over 68 artifact × block
+combinations). **Uncentred R1 is within 0.5% of centred R1 at the median** over those same 68
+combinations, and a faithful RankMe (uncentred, ε = 1e-7) reads **23.391** where the canonical statistic
+reads **23.387** — so the "you evaluated a centred variant, the published metric does better" objection
+is answered numerically: on these artifacts the two are the same number to four significant figures.
+
+**What (4) does *not* answer.** The choice of *statistic* and of *block* does change the between-arm
+**verdict**, on a third of the pairs. That is §4.5, and it is a separate objection which we do not
+dismiss — we adopt it.
+
+**One thing this section cannot establish.** We have two configurations and one stack. We do not know
+whether this variance is a property of effective rank, of this hardware's non-determinism, of this
+architecture, or of the 40-epoch schedule. A controlled repeat design — N retrainings of one
+configuration with rank and channel measured on each — has not been run and is named in §6.2 as the
+most valuable missing measurement after a labelled probe.
+
+### 4.5 The verdict is under-determined: it flips with the statistic, the block and the measured view
+
+Even setting reproducibility aside, "which arm has the higher effective rank" does not have one answer
+on our data, while "which arm carries more molecular information" always does.
+
+**(a) It flips with the statistic — 3 of 6 pairs.** All three statistics computed on the same 12
+artifacts, same residualisation, same ground truth; "OK" means the higher-rank arm is the one that
+carries the larger channel:
+
+| statistic | D2 s42 | D2 s43 | D2 s44 | D1 s42 | D1 s43 | D1 s44 |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| **R1** canonical (Roy–Vetterli, order 1) | OK | **MISS** | **OK** | **OK** | OK | OK |
+| **R2** (`d1_audit.py`, order 2) | OK | **OK** | **MISS** | **MISS** | OK | OK |
+| **R3** (`d1_geometry_probe.py`, order 2, rows normalised) | OK | **OK** | **MISS** | **OK** | OK | OK |
+
+**On 3 of the 6 pairs the three functions return different verdicts** (D2 s43, D2 s44, D1 s42). All
+three are called `effective_rank` in this repository, and all three appear in the published literature.
+
+**(b) It flips with the block — 2 of 3 D2 seeds, for R3.** Raw versus confound-residualised, the choice
+no version of this project stated:
+
+| seed | statistic | H (raw) | I (raw) | higher | H (resid.) | I (resid.) | higher |
+|---|---|---:|---:|:--:|---:|---:|:--:|
+| 43 | R1 | 24.674 | 28.800 | I | 28.772 | 34.117 | I |
+| 43 | R2 | 11.720 | 11.111 | **H** | 13.227 | 12.972 | **H** |
+| 43 | **R3** | 11.720 | 11.111 | **H** | 14.746 | 15.915 | **I** |
+| 44 | R1 | 8.447 | 8.313 | H | 9.143 | 9.105 | H |
+| 44 | R2 | 5.385 | 5.449 | I | 5.733 | 5.815 | I |
+| 44 | **R3** | 5.385 | 5.449 | **I** | 6.564 | 6.302 | **H** |
+
+(Arm H carries the larger channel in all three seeds, so "higher = H" is the ordering a rank rule needs.)
+
+**(c) It flips with which co-trained view of the same model you measure — 2 of 6 pairs.** Each artifact
+stores three co-trained views: `wsi_biology` (the canonical readout view), `rna_biology`,
+`full_biology`.
+
+| pair | information winner (wsi / rna / full) | rank winner (wsi / rna / full) | rank verdict stable? |
+|---|---|---|:---:|
+| D2 s42 | H / H / H | **H / I / I** | **NO** |
+| D2 s43 | H / H / H | I / I / I | yes (and wrong) |
+| D2 s44 | H / H / H | **H / I / I** | **NO** |
+| D1 s42 | P / P / P | P / P / P | yes |
+| D1 s43 | P / P / P | P / P / P | yes |
+| D1 s44 | P / P / P | P / P / P | yes |
+
+**The information ordering is identical under all three views for all six pairs. The rank ordering is
+not.** Aggregated over all 18 (pair × view) comparisons the canonical statistic is right 11/18
+(p ≈ 0.48); restricted to D2, the matched-target-table contrast, it is right **2/9**.
+
+*Caveat, stated plainly:* `rna_biology` → RNA-derived pathway targets is partly circular, and its
+absolute CCA (0.79–0.85) must not be read as a clean image→molecular channel. That is why the canonical
+readout is `wsi_biology`. The **rank** measurements on the other views are unaffected by that
+circularity, and the instability of the rank *verdict* across views stands on its own — but the 2/9
+count inherits the caveat and is not quoted as a rate.
+
+*Provenance for (a)–(c): `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md`
+§4.2, §4.3 and `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
+§4. The two entries' R3 rows differ because one is computed on the raw block and the other on the
+residualised block; the reconciliation is stated in the second entry's §7 and the block is named in every
+row above. Outputs `~/e0_run/P2_ROBUSTNESS.json`, `~/ws_rank/RANK_RECOMPUTE.json`.*
+
+**What (a)–(c) establish, and what they do not.** They do not show that rank is wrong; they show that
+**a rank verdict is not a well-defined object until three implementation choices are stated, and that
+those choices are worth more than the between-arm difference they are used to adjudicate.** The
+information verdict, computed through a single documented pipeline, is invariant to all three. This is
+the paper's own thesis applied to the paper's own instances, and it is reported here rather than in the
+limitations for that reason.
+
+### 4.6 Rank as a selection rule, against the published alternatives — reported, and underpowered
+
+Six matched pairs, one rule: *pick the arm with the higher metric; is it the arm that carries more
+molecular information?* Ground truth is the held-out top canonical correlation against the **40 targets
+neither arm was supervised on** (`heldout_pathway` + `immune_tme` + `tumour_state`), reproducing
+`d2_readout.py`'s residualisation, seed and component budget exactly.
+
+| pair | arm A | arm B | A | B | Δ(A−B) | winner |
+|---|---|---|---:|---:|---:|:---:|
+| D2 s42 | H42 | I42 | 0.6126 | 0.4800 | +0.1325 | H |
+| D2 s43 | H43 | I43 | 0.5970 | 0.4882 | +0.1089 | H |
+| D2 s44 | H44 | I44 | 0.5983 | 0.4757 | +0.1226 | H |
+| D1 s42 | P42 | F42 | 0.6117 | 0.5412 | +0.0705 | P |
+| D1 s43 | P43 | F43 | 0.6198 | 0.5336 | +0.0863 | P |
+| D1 s44 | P44 | F44 | 0.6087 | 0.5126 | +0.0961 | P |
+
+| metric | D2 s42 | D2 s43 | D2 s44 | D1 s42 | D1 s43 | D1 s44 | D2 | D1 | ALL | exact 2-sided binomial *p* |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|---:|
+| canonical effective rank (raw) | OK | MISS | OK | OK | OK | OK | 2/3 | 3/3 | **5/6** | 0.219 |
+| canonical effective rank (resid.) | OK | MISS | OK | OK | OK | OK | 2/3 | 3/3 | **5/6** | 0.219 |
+| **RankMe (raw, as published)** | OK | OK | OK | MISS | OK | MISS | **3/3** | 1/3 | 4/6 | 0.688 |
+| RankMe (residualised) | OK | MISS | OK | OK | OK | OK | 2/3 | 3/3 | 5/6 | 0.219 |
+| participation ratio (raw / resid.) | OK | OK | MISS | MISS | OK | OK | 2/3 | 2/3 | 4/6 | 0.688 |
+| stable rank (raw) | OK | OK | MISS | MISS | OK | MISS | 2/3 | 1/3 | 3/6 | 1.000 |
+| stable rank (resid.) | MISS | OK | MISS | MISS | OK | OK | 1/3 | 2/3 | 3/6 | 1.000 |
+| α-ReQ \|α−1\| (raw / resid.) | OK | MISS | OK | OK | OK | MISS | 2/3 | 2/3 | 4/6 | 0.688 |
+| **LiDAR (raw)** | MISS | MISS | MISS | OK | OK | OK | **0/3** | 3/3 | 3/6 | 1.000 |
+| LiDAR (residualised) | MISS | OK | MISS | OK | OK | OK | 1/3 | 3/3 | 4/6 | 0.688 |
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §3, §6;
+scripts `~/e0_run/p2_competing_metrics.py`, `p2_selection_rule.py`; outputs `~/e0_run/P2_METRICS_D2.json`,
+`P2_METRICS_D1.json`. LiDAR implemented from arXiv:2312.04000v1 §3 Eqs. (1)–(4) with q = 2 and δ swept
+over 1e-8…1e0; α-ReQ from the authors' released `fastssl` estimator. Fidelity and the departures from
+each source are stated in §2.5.*
+
+**Three things must be said about this table, in this order.**
+
+**First, it is underpowered and must not carry rhetorical weight.** At n = 6, the exact two-sided
+binomial gives **p = 0.031 for a flawless 6/6**, 0.219 for 5/6 and 0.688 for 4/6. The design therefore
+has just enough power to detect a *perfect* rule and none at all to detect a merely good one. **No
+conclusion of the form "metric X is better than metric Y" can be drawn from these six pairs, in either
+direction**, and 5/6 against 4/6 is not evidence of anything. This is the main reason the paper rests on
+§4.2's variance decomposition, which uses magnitudes and estimates the nuisance term from 8 within-arm
+degrees of freedom, rather than on any count here.
+
+**Second, one apparent hit is not one.** D2 s44's between-arm rank gap is 1.4 sampling standard
+deviations (§4.4), i.e. unresolvable. Effective rank's honest D2 record is **1 clear hit, 1 clear miss,
+1 pair it cannot resolve at all** — not 2/3.
+
+**Third, the answer to "why did you not just use the better metric" is that on our data there is not
+one.** LiDAR, the strongest published alternative, scores **0/3 on D2** — choosing the
+information-poorer arm every time — and does so at **every δ across eight orders of magnitude**
+(1e-8 → 1e0; the absolute LiDAR value moves from 176.1 to 7.0 over that range, but the *ordering*, which
+is all a selection rule uses, is invariant). RankMe as published wins D2 3/3 and loses D1 1/3; the
+mechanism of its D2 advantage is the **mean-offset direction** its uncentred normalisation retains, and
+that mechanism does not survive to D1. α-ReQ's 4/6 is squeezed out of α differences its own authors
+would call meaningless: all 12 artifacts have α between 2.6 and 4.8, far outside its "Goldilocks zone",
+and `|α − 1|` is our operationalisation, not theirs. **Both halves of the RankMe result must be
+reported**, because "you evaluated a centred variant and the published metric does better" is true on
+D2 and false on D1.
+
+### 4.7 The necessity test, which went against us
+
+**This is the result that falsified this paper's previous framing, and it is reported before the
+instances that favour us.**
+
+#### 4.7.1 What was predeclared
+
+RankMe's defence is that high rank is *"a necessary (but not sufficient) condition for good downstream
+performance"*. Under that hedge, **high rank + low information is predicted and is not a
+counterexample**; only **low rank + high information** breaks it. D1-B was set up to produce that
+configuration: `programme_free` has the lower rank; does it carry a comparable or better molecular
+channel?
+
+The criterion was fixed in `p2_necessity_and_variance.py` before the pair list was inspected:
+
+> a pair (lo, hi) is a violation iff `eff_rank(hi)/eff_rank(lo) ≥ 2.0` **and**
+> `CCA(lo) − CCA(hi) ≥ 0.0705`.
+
+Both thresholds come from quantities established independently of this analysis: 2.0× is *below* the
+2.10–3.75× that the seed alone produces within a single arm (§4.2), so it is a conservative floor; and
+0.0705 is the **smallest** between-arm channel gap this project has accepted as real. The reading of
+each of four outcomes was committed in
+`NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`, written before `d1_audit.log` was
+opened and before any channel value was seen.
+
+#### 4.7.2 Result: necessity is not violated. It is confirmed, 3/3
+
+| seed | rank, `programme_only` | rank, `programme_free` | ratio | channel, `programme_only` | channel, `programme_free` | Δ | patient CI₉₅ | cancer CI₉₅ | rank ordering correct? |
+|---|---:|---:|---:|---:|---:|---:|:---:|:---:|:---:|
+| 42 | **29.381** | **13.418** | 2.19× | 0.6117 | 0.5412 | **+0.0705** | `[D1 PAIRED BOOTSTRAP PENDING]` | `[D1 PAIRED BOOTSTRAP PENDING]` | **yes** |
+| 43 | **24.673** | **7.600** | 3.25× | 0.6198 | 0.5336 | **+0.0863** | `[D1 PAIRED BOOTSTRAP PENDING]` | `[D1 PAIRED BOOTSTRAP PENDING]` | **yes** |
+| 44 | **11.115** | **6.394** | 1.74× | 0.6087 | 0.5126 | **+0.0961** | `[D1 PAIRED BOOTSTRAP PENDING]` | `[D1 PAIRED BOOTSTRAP PENDING]` | **yes** |
+
+*Provenance: rank — `~/e0_run/d1_v2/artifacts/d1_{p,f}_seed{42,43,44}.npz`, **canonical R1 on the
+residualised held-out `wsi_biology` block**, recomputed 2026-08-04
+(`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5).
+Channel — `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §5.2, on the 40
+targets neither arm trained on, reproducing `d2_readout.py`'s residualisation, seed and component budget;
+**point estimates without a paired bootstrap.** The official
+`~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` does not exist: the D1 audit chain's readout step
+fails on a stale absolute path (`/lambda/nfs/.../d1_v2/artifacts/` against the real
+`/home/ubuntu/e0_run/...`), a one-line bug in the chain and not a fault in the data. `D1_PAIRED_BOOTSTRAP.json`
+must **not** be used when it lands — it scores all 90 non-control targets, of which 50 are
+`programme_only`'s own supervision.*
+
+`programme_free` has both the lower rank **and** the lower channel, **3/3 seeds**, in the same direction
+as its rank advantage. This is outcome **O2** of the predeclaration: *"Rank vindicated on this pair.
+Goes in the paper as a limitation, with the same prominence a confirmation would have had. The broad
+claim must then be narrowed or defended on other evidence."* It is, and it has been: the broad claim is
+gone and §1.3 is what replaced it.
+
+**It also trips a preregistered escalation elsewhere.** `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` records
+`"preregistered_prediction": "programme_free >= programme_only on the held-out molecular channel; if
+programme_only wins, the collapse story is wrong -- escalate, do not proceed to D2"`. `programme_only`
+wins 3/3. That escalation is flagged here and is **not** resolved by this paper.
+
+#### 4.7.3 The deflations we tested, and which of them survive
+
+We looked for reasons this result might not mean what it says, and report the outcome of each including
+the ones that failed.
+
+- **"`programme_free` simply collapsed again, so this is the collapse-diagnostic use, not a test of
+  necessity."** *Rejected.* `programme_free` is **not** collapsed this time — canonical ranks 6.4–13.4
+  against the ~1.7 of the defective earlier run — and its channel (0.513–0.541) sits clearly above its
+  own `random_control` (0.443–0.474). This is the "both arms train" branch. The queue fix (§5.2) worked.
+- **"`programme_only` wins because the readout is scored on its own supervision."** *Rejected by
+  construction and by measurement.* The readout was pre-restricted, per
+  `NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md`, to the **40 targets neither arm was
+  supervised on**; the secondary 90-target readout, half of which *is* `programme_only`'s supervision, is
+  explicitly excluded from the headline. And re-estimating with `heldout_top_cca` — directions fit on
+  half the patients, scored on the other half — **preserves every arm ordering on all three views with
+  equal or larger deltas** (§3.2).
+- **"The gap is inside the noise."** *Not resolved, and marked as such.* The paired bootstrap has not
+  run (see the provenance note). The direction is consistent 3/3 and survives held-out estimation, but
+  **the D1 rows must carry CIs before publication** and are marked pending until they do.
+- **"It depends on the rank statistic."** *Partly true, and it is the only qualification that survives.*
+  D1 scores **3/3 under the canonical R1 and under R3, but 2/3 under R2** — the statistic an earlier
+  draft nominated for exactly this table (§4.5a). The honest summary of D1 is therefore *"the rank
+  ordering agrees with the information ordering on 2–3 of 3 seeds depending on which function you call
+  effective rank"*, not a clean 3/3. That qualification weakens the negative slightly; it does not remove
+  it.
+- **"The rank gap is ~9×, so this is a large-gap regime."** *Rejected; the 9× figure was ours and it was
+  wrong.* The "12 versus 111" numbers are the **in-run tripwire** (R3, training batches, step 200), not
+  the quantity the channel is computed on. Measured where the channel is measured — held-out patients,
+  epoch 40, exported artifact — the gap is **1.74–3.25×**. Stating "9× lower rank" in the paper would
+  have been a false statement, and it was caught by the predeclaration rather than by review.
+
+#### 4.7.4 What this costs the paper, and what it does not
+
+It costs the paper the claim it was previously organised around. *"Effective rank does not track
+information content"* is not supported by our own best-matched three-seed experiment, and every version
+of this draft asserting it has been withdrawn.
+
+It does not touch §4.1–§4.5, and the reason is worth stating precisely: **the rank ratios in the table
+above (1.74×, 2.19×, 3.25×) are not larger than the within-arm seed range (2.10–3.75×) of §4.2.** So
+even in the instance where rank gets the answer right, the size of the gap it is reading sits inside its
+own nuisance band, and two of the three are inside the retraining envelope of §4.1. **A metric can be
+right on average and still be unusable for a single comparison**; that is the whole content of this
+paper's surviving claim, and D1 is an example of it rather than a counterexample to it.
+
+**One violation of necessity does exist in our data, and we deliberately do not lead with it.** Scanning
+all 66 ordered pairs of the 12 artifacts against the predeclared criterion, two violate. The usable one
+is **H44 against I43**: 3.73× lower effective rank (9.143 against 34.117) carrying **+0.110** more
+molecular channel — a gap comparable to the headline D2 arm effect, same architecture, cohort, schedule
+and modality pair, differing in arm and seed. It is a genuine low-rank/high-information instance and it
+is the only configuration RankMe's hedge cannot absorb. **But it is a cross-arm, cross-seed comparison,
+and RankMe reserves itself to "different runs of a given method"; a referee will argue H44 and I43 are
+not that.** It is presented here as a *supporting* observation with its scope stated, never as the
+load-bearing one — and, per §2.2, it is in any case **partially pre-empted**: Aldeneh et al. (ICASSP
+2025) have already published *"lower-ranked layers can outperform higher-ranked ones"*. **A version of
+this paragraph that presents low-rank/high-information as novel is not submittable.**
+
+### 4.8 A dose–response magnitude miscalibration, corrected against ourselves
+
+*(This instance does **not** contradict RankMe as stated. It contradicts the informal practice of
+reading rank as a representation-health indicator.)*
+
+Patch bags were contaminated with same-cancer, different-patient tumour patches at seven nested levels.
+The representation is `concat(mean, std)` over frozen H-Optimus-0 tokens with **no fitted parameters**,
+so nothing here is a different training run and §3.5 does not apply. Both quantities are read from the
+same representation at each level, through the same instrument.
 
 | requested d | achieved d | adjusted top-CCA | held-out top-CCA | raw ratio | **null-corrected ratio** | detection floor | attenuation | **R1, raw block** | **R1, residualised block** | perm *p* |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -724,24 +1348,20 @@ representation at each level, through the same instrument.
 
 *Provenance: `v2/research/rebase/nature/DILUTION_LOWER_BOUND.md` §2, §6;
 `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`. Cohort 6,427 patients, 238,610 tumour
-patches, 7,644 slides; 2,766 evaluated on `test`. Instrument: 108-column cancer + pooled-TSS design,
-seed 42, 16 components, 20 draws, 300 permutations (resolution 1/301 = 0.0033). Permutation null
-median 0.145–0.147 at every level. Outputs under `p1_evidence/dilution/`; artifact
-`~/p1_out/dilution/dilution_foreign_tumour_pca256.npz`. Rank statistic **R1 (canonical)**, given for
-both blocks — see below, because the choice of block is what carries the magnitude. Every value in
-both rank columns was recomputed under the canonical implementation on 2026-08-04 and the raw column
-reproduces the originally published figures exactly (196.187, 194.102, 190.532, 187.494, 184.680,
-176.523, 161.226):
-`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5.*
+patches, 7,644 slides; 2,766 evaluated on `test`. Instrument: 108-column cancer + pooled-TSS design, seed
+42, 16 components, 20 draws, 300 permutations (resolution 1/301 = 0.0033). Permutation null median
+0.145–0.147 at every level. Outputs `p1_evidence/dilution/`; artifact
+`~/p1_out/dilution/dilution_foreign_tumour_pca256.npz`. **Statistic R1 (canonical), given for both
+blocks.** Every value in both rank columns recomputed under the canonical implementation on 2026-08-04;
+the raw column reproduces the originally published figures exactly (196.187, 194.102, 190.532, 187.494,
+184.680, 176.523, 161.226).*
 
-**The result, and the correction this paper must carry.** On the **raw** block — which is where the
-originally published numbers came from — effective rank falls **196.2 → 161.2, i.e. −17.8%**, while
-the null-corrected channel falls **1.000 → 0.333, i.e. −66.7%**. But the channel is measured on the
-**confound-residualised** block, not the raw one, and *the two are different representations* (§3.1).
-Measured on the same block the channel is read from, the same canonical statistic falls only
-**210.2 → 203.7, i.e. −3.10%**.
-
-**The direction of the result survives every implementation choice; the magnitude does not.**
+**The correction this paper must carry.** On the **raw** block — where the originally published numbers
+came from — effective rank falls **196.2 → 161.2, i.e. −17.8%**, while the null-corrected channel falls
+**1.000 → 0.333, i.e. −66.7%**. But **the channel is measured on the confound-residualised block, and the
+two are different representations** (§3.1). Measured on the same block the channel is read from, the same
+canonical statistic falls only **210.2 → 203.7, i.e. −3.10%**, and the miscalibration is **21.5×**, not
+the 3.7× previously published.
 
 | block | statistic | 0.00 → 0.80 | rank lost | miscalibration against the channel's −66.7% |
 |---|---|---|---:|---:|
@@ -753,634 +1373,571 @@ Measured on the same block the channel is read from, the same canonical statisti
 | residualised | R2 | 170.674 → 160.946 | 5.70% | 11.70× |
 | residualised | R3 | 173.348 → 165.545 | 4.50% | 14.82× |
 
-Rank under-reports the information loss in **every** cell, by between **1.95× and 21.5×**. The
-previously quoted constant of "3.7×" is the value of one cell of that table, and its provenance —
-raw-block rank against residualised-block channel — was never stated. **This paper therefore quotes
-the range, and quotes 21.5× as the matched-preprocessing figure with 3.74× as the raw-block
-sensitivity.** The correction moves the result in the paper's own favour, which is exactly why it must
-be stated rather than left as the more flattering single number.
-
-**What this does and does not contradict.** It does **not** contradict RankMe: high rank with degraded
-information is precisely the necessary-not-sufficient case RankMe reserves, and LiDAR's noise-dimension
-argument already establishes that high rank can be uninformative. What it adds is a **magnitude**.
-Level by level on the raw block, the ratio (fraction of rank retained) / (fraction of channel
-retained) reads **1.000, 0.990, 1.003, 1.056, 1.171, 1.482, 2.467** — essentially 1 for the first two
-levels and then rising steeply, i.e. rank tracks the channel while almost nothing is happening and
-diverges from it exactly when the damage becomes real. (The dip to 0.990 at d = 0.091 is a single-seed
-wobble on a level where the channel changed by 0.001; nothing is claimed about strict monotonicity of
-the ratio.) On the residualised block the divergence is present from the first level and larger
-throughout. Either way it defeats the natural retreat position — "rank is at least a rough guide" —
-which neither the necessary-condition framing nor a correlation coefficient addresses.
-
-**Why it is nonetheless the second-strongest instance.** Three properties no other instance has
-together. (i) It is a **dose–response over seven monotone levels**, not a two-point comparison.
-(ii) The representation has **zero fitted parameters** — no training run, no seed, no optimiser
-non-determinism, so §3.5 does not apply. (iii) Both quantities pass through the **same instrument at
-the same level**, with attenuation 0.855–1.130 (≈ 1) throughout, so the instrument is not itself
-degrading with dilution.
-
-**What travels with it,** quoted from the source: the detection floor is **censored** — the grid tops
-out at 0.40 and the floor reads 0.40 from d = 0.09 onward, so it is "≥ 0.40"; the transmission floor
-reads 0.05 everywhere, the finest level, so it is censored from below too. *"The whole curve is one
-representation"* — a trained attention aggregator could plausibly down-weight foreign patches, so the
-number is a property of unweighted mean pooling, not of the modality. And it is a **single seed (42)
-and a single draw of donor assignments**, which "gives no error bar on the level-to-level differences";
-monotonicity over seven levels is what carries the result in the absence of intervals.
-
-A labelling caveat the source imposes on itself and which travels with any quotation: the file is named
-`DILUTION_LOWER_BOUND.md` and its own §4 **withdraws** the phrase "lower bound". The measured quantity
-is *"the cost of preparation-matched, information-free contamination"*. Nothing in this paper turns on
-which bound it is — both quantities are affected identically by the contaminant's nature.
-
-### 4.3 Instance 6 — the rank ordering inverts inside RankMe's own reserved regime
-
-Two arms were trained differing **only** in the molecular target table they are supervised on: curated
-Hallmark pathway scores (arm H) versus 128 perturbation-basis coordinates (arm I). Both use
-`--objective-profile programme_only`, the same architecture, the same 40 shared arguments and the same
-manifest hash (§3.4). Three seeds each, 40 epochs, the 6,427-patient split. The readout is a
-16-component held-out top-CCA with a 2,000-repeat paired patient- and cancer-clustered bootstrap on
-2,766 held-out test patients, restricted to the **40 targets neither arm trained on**.
-
-**This is a within-method, single-architecture, in-distribution comparison at non-degenerate ranks —
-the regime RankMe reserves for itself** (*"RankMe should however only be used to compare different runs
-of a given method"*).
-
-| seed | channel, arm H | channel, arm I | Δ (I − H) | patient CI₉₅ | cancer CI₉₅ | **R1 rank, H** | **R1 rank, I** | higher rank | rank ordering correct? |
-|---|---:|---:|---:|:---:|:---:|---:|---:|:---:|:---:|
-| 42 | 0.6126 | 0.4800 | **−0.1325** | [−0.1605, −0.0993] | [−0.1792, −0.0632] | 23.39 | 14.87 | H | ✅ |
-| 43 | 0.5970 | 0.4882 | **−0.1089** | [−0.1460, −0.0749] | [−0.1623, −0.0118] | 28.77 | **34.12** | **I** | ❌ inverted |
-| 44 | 0.5983 | 0.4757 | **−0.1226** | [−0.1502, −0.0866] | [−0.1653, −0.0411] | 9.14 | 9.11 | ~equal | ❌ no signal |
-
-*Provenance: `v2/research/rebase/nature/D2_RESULT.md` §2, §4. Run `d2_v3`; outputs under
-`~/e0_run/d2_v3/bootstrap/` and `~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json`; artifacts
-`~/e0_run/d2_v3/d2_v3_s{42,43,44}/artifacts/`. Rank statistic **R1 (canonical)** on the **residualised**
-held-out `wsi_biology` block, 256 nominal dimensions — both the statistic and the block are load-bearing
-here and are stated for the reason given below. All six values were recomputed under the canonical
-implementation on 2026-08-04 and reproduce exactly: 23.3868 / 14.8675 / 28.7715 / 34.1168 / 9.1426 /
-9.1052 (`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
-§5). Permutation null 0.140 for every group at `permutation_p = 0.005`, the floor for 200 draws.
-Negative control on 90 `random_control` targets: Δ = −0.0099 / −0.0280 / −0.0268, 4–13× smaller, cancer
-CI covering zero 3/3 and patient CI 2/3.*
-
-**The result.** A rank-based selection rule applied to these three seeds would pick the correct arm
-once, pick the wrong arm once, and be unable to choose once. In seed 43 the losing arm has **higher**
-effective rank (34.12 against 28.77) and still loses by −0.1089 with both CIs excluding zero. In seed
-44 the two ranks are equal to two decimals (9.11 against 9.14) and the same arm still loses by
-−0.1226. The performance ordering is stable in all three seeds; the rank ordering is not.
-
-**The inversion holds under the canonical definition and not under one of the alternatives, and we
-state that before anything else.** Seed 43 is this paper's single strongest sentence, and it is
-sensitive to the choice §3.1 describes:
-
-| seed | R1 canonical (resid.) | R2 (resid.) | R3 (resid.) | R2 = R3 (raw) |
-|---|---|---|---|---|
-| 42 | H 23.39 > I 14.87 — ordering **correct** | H 10.73 > I 8.19 — correct | H 12.61 > I 9.14 — correct | H 9.63 > I 7.67 — correct |
-| 43 | H 28.77 < I **34.12** — **inverted** | H **13.23 > I 12.97** — correct | H 14.75 < I **15.92** — inverted | H **11.72 > I 11.11** — correct |
-| 44 | H 9.14 > I 9.11 — correct by 0.4% | H 5.73 < I 5.82 — inverted by 1.4% | H 6.56 > I 6.30 — correct by 4.2% | H 5.39 < I 5.45 — inverted by 1.2% |
-
-Arm H wins the channel in all three seeds, so "correct" means the higher rank belongs to H. Under the
-canonical R1 the inversion is in seed 43 and the paper's account stands verbatim. Under **R2** — the
-statistic `d1_audit.py` implements and which §4.8.3 previously nominated for the D1 table — the seed-43
-inversion **disappears** and reappears in seed 44 instead. Under **R3** the verdict additionally
-depends on whether the block is residualised, flipping in *both* seeds 43 and 44.
-
-What survives all of it: **the rank ordering is wrong in one of three seeds under every one of the four
-combinations above, and it is never the same seed.** What does not survive: any statement of the form
-"in seed 43 the higher-rank arm loses" without naming the statistic and the block. This is the paper's
-own thesis applied to the paper's own strongest instance, and it is reported here rather than in the
-limitations for that reason.
-
-**Why this is the strongest instance.**
-
-- **It is in scope.** One method, one architecture, matched by construction, one variable changed,
-  in-distribution held-out evaluation, ranks well away from the full-rank degeneracy RankMe excludes.
-  Neither LiDAR nor the other published negatives test this regime.
-- **It has intervals on the information side.** Three seeds, paired patient- and cancer-clustered
-  bootstraps, both CIs excluding zero 3/3. No other instance in this paper has that.
-- **It was not designed to produce this conclusion.** The rank column exists because it is audit check
-  A5 of a predeclared post-training checklist whose instruction reads *"reported, **not
-  interpreted**"* (`NOTEBOOK.md:1114`), added for an unrelated worry — that WSI biology states are
-  strongly mutually collinear at initialisation, so a narrower rank might reflect resistance to an
-  already-collapsed view. The numbers were recorded before anyone asked whether they would order
-  correctly. *(Two values for that collinearity appear in this evidence base and are not the same
-  measurement: **0.7362 (std 0.0314)** against RNA's 0.2740 on the full cohort, measured 2026-08-01
-  and recorded at `NOTEBOOK.md:121`; and **0.80** for WSI against 0.62 for RNA on the fixed
-  16-patient gate batch, `NOTEBOOK_ENTRIES/g26_rank_collapse_diagnosis_20260803T0500Z.md`. The A5
-  note quotes the second. Nothing in this paper depends on which is used, but they should not be
-  quoted interchangeably.)*
-- **It contains its own within-seed control.** Seed 44's arms are equal in rank and differ by −0.1226
-  in channel — a matched-rank pair with a large, interval-backed information difference. That single
-  line is the cleanest refutation of "rank explains the gap" in this evidence base.
-
-**What travels with it.** The negative control is small but not exactly zero and points the same way,
-so of order 10–20% of the arm gap may be generic representation quality rather than supervision
-content — which, if anything, tightens the argument, since that is the component a rank explanation
-would be entitled to. Per §3.5, no individual point estimate here is reproducible from the seed alone;
-only the paired within-run difference is quoted, and the rank column is quoted as a **level** precisely
-because levels are what rank practice depends on. Three seeds is a small number; the finding is that
-rank ordering is unreliable, not a quantified error rate.
-
-**A second, independent observation from the same table** is developed in §4.7: the rank column spans
-9.11 to 34.12 across three seeds of one configuration while the channel difference is stable at
-−0.1089 to −0.1325.
-
-### 4.4 Instance 2 — a 17% rank change with the channel unmoved *(and both differences inside the noise)*
-
-Two exported artifacts of one architecture, differing in objective profile, scored through the CALIBRA
-targeted readout on 2,530 held-out-cancer TCGA patients over 21 test cancers, with 13 spike levels, 40
-draws, 2,000 permutations, 16 components per side and a 99-column cancer + pooled-TSS adjustment,
-seed 42.
-
-| run | state | held-out top-CCA | **R1 effective rank** | detection floor | attenuation | perm *p* |
-|---|---|---:|---:|---:|---:|---:|
-| `full` | `wsi_biology` | 0.4768 | **38.48** | 0.2 | 1.086 | 0.0005 |
-| `programme_only` | `wsi_biology` | **0.4748** | **32.06** | 0.2 | 1.103 | 0.0005 |
-| **change** | | **−0.002** | **−17%** | — | — | — |
-| `full` | `wsi_identity` | 0.5393 | 191.07 | 0.3 | 1.228 | 0.0005 |
-| `identity_only` | `wsi_identity` | 0.5393 | 191.07 | 0.3 | 1.228 | 0.0005 |
-
-*Provenance: `v2/research/rebase/nature/PHASE1B_TARGETED_READOUT.md` §3, §5, §7; run
-readout `runs/calibra_v3_targeted`; source artifacts survive at
-`/lambda/nfs/geeg/biorag3_persistent_20260711/runs/v21_release_20260720_retry3_resume_safe/artifacts/`.
-`permutation_p = 0.0005 = 1/2001` throughout. Rank statistic **R1 (canonical)** on the **raw** block.
-Recomputed 2026-08-04 and reproduces exactly (38.4834, 32.0594); the direction is robust across every
-variant — −16.7% (R1 raw), −18.9% (R2/R3 raw), −18.4% (R1 residualised), −22.6% (R1 uncentred)
-(`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5).*
-
-**The result as originally read.** The representation changes materially between arms — direct array
-comparison gives `max|diff| = 1.4e-01` on `wsi_biology` — loses 17% of its effective rank, and its
-molecular channel is unchanged at the second decimal.
-
-**The `wsi_identity` rows are the instance's own internal control.** That head is the frozen MLP-CLIP
-teacher passed through: `max|diff| = 2.6e-04` between arms, i.e. numerically invariant, and both its
-rank and its channel are identical to four significant figures. So the instrument does return "nothing
-changed" when nothing changed, in the same run on the same artifacts, which rules out the reading that
-the flat channel is an insensitivity of the readout.
-
-**Why it ranks third, and the honest re-reading.** Three caveats, all from the source file.
-
-1. **The arms were never verified matched** on epochs, learning rate or step budget (gate G0.4).
-   Quoted: *"Until they are, the rank comparison in §5 is **suggestive, not causal**."*
-2. **Single seed, and no interval on the difference.** Quoted: *"No CI on any between-run difference;
-   a paired bootstrap on the biology gap is still required before the C2 numbers are quoted as a
-   difference."* Given §3.5 — the same seed retrained moves a channel estimate by 0.035 and a rank
-   estimate by 2.7× — a 0.002 channel difference and a 6.42-point rank difference are **both** inside
-   this stack's run-to-run noise. **Instance 2 should therefore be read as showing that neither
-   quantity is resolvable at one seed, not as showing that one moved and the other did not.** We state
-   this rather than letting "unchanged" do work it has not earned, and we retain the instance because
-   it is the origin of the project's "both directions" framing and withdrawing it silently would
-   misrepresent how the claim was arrived at.
-3. **A claim from the same run has already been withdrawn.** The neighbouring F2 claim — "the head
-   trained for biology is worse at biology than the head trained for identity" — was withdrawn when E3
-   showed the identity head to be a passed-through frozen teacher
-   (`PHASE1B_TARGETED_READOUT.md` §4). That is why this paper treats the run's other between-arm
-   statements conservatively.
-
-### 4.5 Instance 1 — the weakest, and why we still report it
-
-Adding a covariance-decorrelation term to the biology head raised effective rank **49.9 → 103.3**
-(+107%, ~2.1×, reported over 3 seeds) while the benchmark statistic — within-cancer specificity —
-moved **0.1366 → 0.1367**.
-
-*Provenance: `v2/research/rebase/ENGINE_CLD.md` §1; `HANDOFF_BUILD_AGENT.md` §1 and §2.*
-
-**This is the weakest item in the paper and must be labelled as such wherever it appears.** Four
-reasons:
-
-1. **The primary source does not exist.** `HANDOFF_BUILD_AGENT.md:98` cites `paper/.../RESULTS.md`.
-   There is no `RESULTS.md` anywhere in this repository. The numbers survive only as prose in two
-   summary documents written after the fact. No per-seed values, no run output, no artifact.
-2. **The benchmark statistic is not recoverable.** "Within-cancer specificity" is defined in no file
-   now present and is none of the statistics in §3.2. We cannot state what 0.1366 measures, what its
-   chance level was, or whether it could resolve a change.
-3. **The rank statistic is unknown.** It predates `spectral.py`'s consolidation and cannot be assigned
-   to R1, R2 or R3.
-4. **It comes from an earlier codebase generation** whose defects are documented — the same generation
-   produced the instrument failure that is P1's motivating example.
-
-**Why we report it anyway.** It is the observation that started this line of work — `ENGINE_CLD.md` §1
-names it O1, "we manufactured capacity with no information in it" — and omitting it would present the
-project's reasoning as cleaner than it was. It is **provenance for the hypothesis, not evidence for the
-conclusion**, and it is excluded from every count and summary statement in this paper. If the paper is
-submitted, instance 1 belongs in a history paragraph, not a results table.
-
-**One thing it does contribute, from a later and better-sourced measurement.** The same decorrelation
-term was independently characterised on a live objective: its global minimum **is** a collapsed state
-(38.97 for a healthy batch against 1.19e-17 for an all-identical one); it collapses at every weight
-from 0.001 to 4.0 within 25 steps while driving itself to zero (20.74 → 0.00); and a per-dimension
-variance floor provably cannot stop it, because the rank-1 family `zᵢ = m + aᵢ·u` satisfies one
-(`NOTEBOOK.md` decision of 2026-08-03; `NOTEBOOK_ENTRIES/g26_term_isolation_20260803T0930Z.md`;
-`NOTEBOOK_ENTRIES/g26_centring_fix_20260803T0730Z.md`). **We state this about our implementation, not
-about VICReg or Barlow Twins, which we have not reimplemented faithfully or benchmarked.** A
-regulariser introduced to raise rank whose own minimum is collapse is a sharper cautionary tale than
-the +107% number ever was.
-
-### 4.6 Instance 3 — a withdrawal: what "pinned at 16/16" actually was
-
-This is the most dramatic *collapse* in the evidence base and the **weakest of the four historical
-*rank* instances**. This project previously listed it among its two strongest. We withdraw that
-description here, before the numbers rather than after.
-
-Three arms were trained on one fixed 16-patient batch from the real cohort, 800 steps, seed 42, hidden
-512 / 4 layers / 8 heads, programme head 256, frozen 64-key memory queue, differing only in loss
-weights.
-
-| arm | in-batch InfoNCE (chance 2.7726) | retrieval acc@1 (chance 0.062) | cross-modal pos cos | cross-modal neg cos | WSI within-modality off-diag cos | `z_biology` **matrix rank** |
-|---|---|---|---|---:|---:|:---:|
-| **A** full `programme_free` schedule | 3.4681 → **2.7734** | 0.062 → **0.000** | 0.0538 → 0.9959 | 0.0816 → 0.9960 | 0.7089 → **0.9999** | **16/16** |
-| **B** contrastive only | 3.4681 → **2.0789** | 0.062 → **0.188** | 0.0538 → 0.9988 | 0.0816 → **0.4922** | 0.7089 → **0.4946** | **16/16** |
-| **C** contrastive only, lr 3e-3 | 3.4681 → 2.7724 | 0.062 → 0.125 | 0.0538 → 0.9998 | 0.0816 → 0.9997 | 0.7089 → 0.9998 | **16/16** |
-
-*Provenance: `NOTEBOOK.md` entry 2026-08-02 01:20 UTC, source `scratchpad/collapse_diag.py` on the
-A100; `NOTEBOOK_ENTRIES/g26_variance_floor_fix_20260803T0210Z.md`. Raw inputs are separable: raw
-H-Optimus patient-mean off-diagonal cosine 0.3265, raw RNA 0.0587.*
-
-**Arm A is total representational collapse.** Every patient's `z_biology` converges to the same vector
-(off-diagonal cosine 0.9999); cross-modal positive and negative pairs become indistinguishable (0.9959
-versus 0.9960 — the negatives marginally *higher*); retrieval falls to 0.000, **below** its chance
-level of 0.062. Extended to 5,000 steps a sibling arm reaches patient cosine 1.0000 with InfoNCE pinned
-at exactly ln 16 = 2.7726 from step 2,500 onward
-(`NOTEBOOK_ENTRIES/g26_stepbudget_sweep_20260803T0340Z.md`). No measure applied to this representation
-finds information in it.
-
-**And the rank column reads 16/16 in every arm, including the collapsed one.** Taken at face value
-this is the most striking single line the project has produced. **Four reasons it must not be taken at
-face value.**
-
-1. **That column is a hard numerical matrix rank, not an effective rank.** Its source labels it
-   "`z_biology` matrix rank". It is none of R1, R2 or R3 (§3.1). A hard rank counts non-zero singular
-   values, and a 16 × 256 float matrix has full row rank under essentially any perturbation, including
-   the residual variation that survives a collapse to cosine 0.9999. "Hard rank is insensitive to
-   near-collapse" is true, unsurprising, and not a finding about effective rank.
-2. **Its maximum is 16 because the batch is 16** — a structural ceiling set by the experiment's
-   design, not by the representation.
-3. **The centred effective rank of the same objective does fall — to 1.00.** A later diagnostic on the
-   same gate, same cohort, same seed, running clean in-batch InfoNCE, records `eff-rank 12.88 → 1.00
-   by step 50`, with positive and worst-negative cosines converging to 0.9993 and minimum margin to
-   −0.0001 (`NOTEBOOK_ENTRIES/g26_rank_collapse_diagnosis_20260803T0500Z.md`). **Effective rank
-   detected this collapse.** Reporting instance 3 as an effective-rank failure while that measurement
-   sits in the same evidence base would be a selection error.
-4. **It is a train batch, not held-out,** with n = 16.
-
-**What instance 3 does establish, and it is worth keeping.** Two things, neither of them "effective
-rank fails". First, **hard/numerical rank is worthless as a collapse diagnostic** — and it is
-nonetheless what a `matrix_rank` call returns, and `d1_geometry_probe.py:53` computes and prints one
-alongside the effective rank, so this is a live confusion in our own tooling. Second, **effective rank
-works in this regime**, which is the boundary of our claim; instance 3 is the strongest *positive*
-evidence in this paper for the collapse-diagnostic use defended in §4.9.
-
-**Recorded as a correction.** P1 §4.11 lists instance 3 as one of the two "strongest" instances and
-describes it as "rank pinned while information collapses". On the evidence assembled here that
-description is not sustainable for effective rank, and the P1 text must be amended when P1 §4.11 is
-reduced per §1.4.
-
-### 4.7 Effective rank is less reproducible than the difference it would select on
-
-This is the contribution we believe is not in the prior art, and it applies specifically to the
-within-method use RankMe recommends. **Every row below is the canonical R1 on the residualised
-held-out `wsi_biology` block except the two marked R3, which are in-training measurements whose states
-were never saved and therefore cannot be recomputed under any other statistic.**
-
-| what varies | values | spread | statistic | provenance |
-|---|---|---:|---|---|
-| **retraining, same seed, same configuration** (D2 arm H, seed 42) | re-export **8.6809** vs retrained **23.3868** | **2.69×** | R1 | `~/e0_run/d2_v3/recovered_artifacts/` vs `d2_v3_s42/artifacts/`; `D2_RESULT.md` §4 |
-| seeds 42/43/44 of one configuration (D2 arm H) | 23.3868 / 28.7715 / 9.1426 | 3.15× | R1 | `d2_v3_s{42,43,44}/artifacts/` |
-| seeds 42/43/44 of one configuration (D2 arm I) | 14.8675 / 34.1168 / 9.1052 | **3.75×** | R1 | as above |
-| seeds 42/43/44 (D1-B `programme_only`) | 29.3813 / 24.6730 / 11.1148 | 2.64× | R1 | `~/e0_run/d1_v2/artifacts/` |
-| seeds 42/43/44 (D1-B `programme_free`) | 13.4184 / 7.6003 / 6.3937 | 2.10× | R1 | as above |
-| **seeds 42/43/44 in flight, global step 200** (D1-B `programme_free`) | **7.545 / 45.646 / 12.194** | **6.05×** | **R3** | `~/e0_run/d1_v2/d1_f_seed{42,43,44}/train_metrics.jsonl`, `train_rank_tripwire_observed`, epoch 11 |
-| same step, same run family (D1-B `programme_only`) | 110.765 / 110.879 / 111.078 | **1.003×** | R3 | as above |
-
 *Provenance: `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
-§6; `D2_RESULT.md` §4; outputs `~/ws_rank/RANK_RECOMPUTE.json`.*
+§5; `~/ws_rank/RANK_RECOMPUTE.json`.*
 
-**The last two rows are the sharpest measurement in this paper.** At the *same* global step, on the
-*same* configuration, with only the seed differing, the supervised arm reproduces to **0.3%** and the
-contrastive arm spans **6.05×**. Rank's reproducibility is therefore not a property of the statistic —
-it is a property of the arm being measured, and it is worst exactly where the arm is interesting. A
-reproducibility envelope measured on a well-behaved configuration does not transfer to the one being
-diagnosed, which is the configuration a practitioner is looking at when they reach for rank.
+**The direction survives every implementation choice; the magnitude does not.** Rank under-reports the
+information loss in **every** cell, by between **1.95× and 21.5×**. The previously quoted constant of
+"3.7×" is one cell of that table, and its provenance — raw-block rank against residualised-block channel
+— was never stated. **This paper therefore quotes the range, with 21.5× as the matched-preprocessing
+figure and 3.74× as the raw-block sensitivity.**
 
-**Across retrainings at a fixed seed**, with the channel beside it:
+**This correction moved the result in our own favour, and is reported for that reason.** Matched
+preprocessing makes the under-reporting nearly six times larger than the number we had been quoting. A
+correction that flatters the correcting party is exactly the kind that gets left undone, so it is stated
+here rather than absorbed silently — and the more flattering single number is not used anywhere.
 
-| | held-out top-CCA | **R1 effective rank** |
-|---|---:|---:|
-| recorded in the original run, arm H seed 42 | 0.5861 | — |
-| re-export of the surviving arm-H seed-42 checkpoint | **0.58612** | **8.6809** |
-| **retrained** arm H seed 42, identical configuration | **0.6214** | **23.3868** |
+**What it adds and what it does not contradict.** It does **not** contradict RankMe: high rank with
+degraded information is precisely the necessary-not-sufficient case RankMe reserves, and LiDAR's own text
+says so — *"This illustrates that high rank is a necessary but not a sufficient condition for high
+performance."* What is added is a **magnitude**, which a two-point comparison cannot show. Level by level
+on the raw block, the ratio (fraction of rank retained) / (fraction of channel retained) reads **1.000,
+0.990, 1.003, 1.056, 1.171, 1.482, 2.467** — essentially 1 while almost nothing is happening, rising
+steeply exactly when the damage becomes real. (The dip to 0.990 at d = 0.091 is a single-seed wobble on a
+level where the channel changed by 0.001; nothing is claimed about strict monotonicity.) On the
+residualised block the divergence is present from the first level and larger throughout. Either way it
+defeats the natural retreat position — "rank is at least a rough guide" — which neither the
+necessary-condition framing nor a correlation coefficient addresses.
 
-Re-export is deterministic to five significant figures; the export and readout path is not the source
-of the variance. Retraining with the same seed and the same configuration is not deterministic: the
-channel moves by 0.035 and the effective rank by **2.69×**. Across the D2 runs the paired channel
-difference is **−0.1325 / −0.1089 / −0.1226** — a spread of 0.024 on a mean of −0.121, with overlapping
-CIs and the same sign 3/3, against a rank column spanning **9.11 to 34.12**.
+**What travels with it,** quoted from the source: the detection floor is **censored** — the grid tops out
+at 0.40 and the floor reads 0.40 from d = 0.09 onward, so it is "≥ 0.40"; the transmission floor reads
+0.05 everywhere, the finest level, so it is censored from below too. *"The whole curve is one
+representation"* — a trained attention aggregator could plausibly down-weight foreign patches, so the
+number is a property of unweighted mean pooling, not of the modality. And it is a **single seed (42) and
+a single draw of donor assignments**, which "gives no error bar on the level-to-level differences";
+monotonicity over seven levels is what carries the result in the absence of intervals. Finally, the
+source file is named `DILUTION_LOWER_BOUND.md` and **its own §4 withdraws the phrase "lower bound"**: the
+measured quantity is *"the cost of preparation-matched, information-free contamination"*. Nothing here
+turns on which bound it is, since both quantities are affected identically by the contaminant's nature.
 
-**The consequence for RankMe's own recommended use.** RankMe selects between runs by comparing their
-rank values, and restricts that comparison to runs of a given method — which is exactly the setting
-above. A criterion whose value moves 2.69× when the same configuration is retrained cannot resolve a
-between-configuration difference smaller than that. **Six of the seven between-arm rank differences
-this project has ever measured are smaller than that envelope:**
+### 4.9 The historical instances, recomputed — what survives, what is qualified, what is withdrawn
 
-| comparison | between-arm rank ratio | inside the 2.69× retraining envelope? |
-|---|---:|---|
-| D2 seed 42 (§4.3) | 1.573× | **yes** |
-| D2 seed 43 (§4.3) | 1.186× | **yes** |
-| D2 seed 44 (§4.3) | 1.004× | **yes** |
-| Phase 1b, single seed (§4.4) | 1.200× | **yes** |
-| D1-B seed 42 (§4.8.3) | 2.190× | **yes** |
-| D1-B seed 44 (§4.8.3) | 1.738× | **yes** |
-| D1-B seed 43 (§4.8.3) | 3.246× | no, and only just |
+Four instances predate this paper and were previously presented as a set of "dissociations". They are
+retained because they are the provenance of the hypothesis and because withdrawing them silently would
+misrepresent how the claim was arrived at. **They are not a count, and none of them carries §1.3's
+claim.**
 
-In particular, §4.3's largest rank difference is 1.57× (23.39 against 14.87 in seed 42), comfortably
-inside the statistic's own reproducibility envelope — a second, independent reason seed 42's "correct"
-ordering carries no weight.
+| instance | manipulation | statistic & block | rank | information | verdict now |
+|---|---|---|---|---|---|
+| **D2** (§4.6) | supervision target table: Hallmark vs perturbation basis; one method, one architecture, 3 seeds, matched by construction | R1, residualised | 23.39 / 28.77 / 9.14 vs 14.87 / **34.12** / 9.11 | Δ channel −0.1325 / −0.1089 / −0.1226; both CIs exclude zero 3/3 | **Survives, but restated** — see below |
+| **dilution** (§4.8) | patch-bag contamination, d = 0 → 0.80, 7 levels, zero fitted parameters | R1, **both blocks** | 196.2 → 161.2 (−17.8%) raw / 210.2 → 203.7 (**−3.10%**) resid. | null-corrected channel 1.000 → 0.333 (−66.7%) | **Survives with a corrected magnitude**; does not contradict RankMe |
+| **Phase 1b** | objective profile `full` → `programme_only`, single seed, arms **not verified matched** | R1, raw | 38.4834 → 32.0594 (−16.7%) | held-out top-CCA 0.4768 → 0.4748 (−0.002) | **Neither quantity is resolvable at one seed** — see below |
+| **"16/16"** | full schedule vs contrastive-only, 16-patient train batch | **hard `matrix_rank`** — none of R1/R2/R3 | pinned at **16/16** in every arm | patient cosine 0.7089 → 0.9999; retrieval 0.062 → **0.000**, below chance | **WITHDRAWN as a rank instance** |
+| **decorrelation** | covariance-decorrelation term added | **unknown** | 49.9 → 103.3 (+107%) | "within-cancer specificity" 0.1366 → 0.1367 | **`[NOT RECOMPUTABLE — artifact never existed]`**; history only |
 
-**Stated as a rule a practitioner can apply:** *before using a rank difference to select between
-configurations, retrain one configuration and measure the rank spread. If the between-configuration
-difference does not exceed it, the comparison is uninformative.* We have not seen this check proposed
-anywhere, and on this stack it would have disqualified every rank comparison this project made.
+*Provenance: D2 — `D2_RESULT.md` §2, §4, outputs `~/e0_run/d2_v3/bootstrap/` and
+`D2_PER_ARTIFACT_READOUT.json`. Dilution — as §4.8. Phase 1b — `PHASE1B_TARGETED_READOUT.md` §3, §5, §7;
+readout `runs/calibra_v3_targeted`. "16/16" — `NOTEBOOK.md` 2026-08-02 01:20 UTC and
+`NOTEBOOK_ENTRIES/g26_variance_floor_fix_20260803T0210Z.md`. Decorrelation —
+`v2/research/rebase/ENGINE_CLD.md` §1 and `HANDOFF_BUILD_AGENT.md` §1–2 only. Recomputation:
+`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5.*
 
-**The asymmetry is deliberate and we state it.** The channel readout is **not** exempt from §3.5
-either — 0.5861 versus 0.6214 is a 6% move on the same seed. But the channel is quoted as a *paired
-within-run difference* and rank is not, and the paired difference is stable where both levels are not.
-That is a statement about how the two quantities are used, and it is the practical heart of this
-paper.
+**D2 seed 43, restated as implementation-dependent.** Earlier drafts called *"in seed 43 the higher-rank
+arm loses (34.12 against 28.77)"* the paper's single strongest sentence. Under the canonical R1 it is
+true and the arithmetic reproduces exactly. **It is false under R2**, which orders H above I (13.23
+against 12.97), and under R3 it depends on the block (§4.5b). What survives all four combinations is
+narrower and is what we now state:
 
-**What is not established, and one apparent contradiction resolved.** Two configurations and one
-stack. We do not know whether this variance is a property of effective rank, of this hardware's
-non-determinism, of this architecture, or of the 40-epoch schedule. A controlled repeat design — N
-retrainings of one configuration, rank and channel measured on each — has not been run and is named in
-§5.2.
+> **The rank ordering is wrong in 1 of 3 seeds under every combination of statistic and block we
+> computed — and it is never the same seed.**
 
-A short-horizon controlled probe on this same stack finds rank *tight*: three repeats at 200 steps with
-**identical inputs** give 7.15 / 6.92 / 7.25, a relative spread of 4.7%
-(`NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md`). The 6.05× row above is at the *same
-200 steps* on the *same* objective. The two are not in conflict and the difference is the point: the
-probe repeats hold the **seed** fixed and vary only stack non-determinism, while the 6.05× row varies
-the **seed**. So rank at 200 steps is reproducible to 4.7% when the seed is held and spans 6.05× when
-it is not — and the sibling `programme_only` arm spans 1.003× across the same three seeds. **The
-variance is neither intrinsic to the measurement nor purely accumulated over training: it is seed
-sensitivity that is specific to the arm.** That is a sharper statement than the previous draft made,
-and it is what the instability claim should rest on.
+What does *not* survive is any sentence of the form "in seed 43 the higher-rank arm loses" without
+naming the statistic and the block. D2's other useful property is unchanged and does not depend on the
+inversion: seed 44's arms are **equal in rank to two decimals** (9.1426 against 9.1052, a 0.4% gap that
+§4.4 shows is 1.4 sampling SDs, i.e. no gap at all) while differing by **−0.1226** in channel with both
+CIs excluding zero. Its rank column was recorded as audit check A5 of a predeclared post-training
+checklist whose instruction reads *"reported, **not** interpreted"*, added for an unrelated worry, so it
+was not collected to support any conclusion.
 
-### 4.8 D1 — rank filled under the canonical definition, `[D1 CHANNEL PENDING]`
+**Phase 1b, re-read honestly.** The originally reported reading was "the representation loses 17% of its
+effective rank and its molecular channel is unchanged at the second decimal". Its `wsi_identity` rows are
+a genuine internal control — that head is a frozen MLP-CLIP teacher passed through, `max|diff| = 2.6e-04`
+between arms, with rank and channel identical to four significant figures, so the instrument does return
+"nothing changed" when nothing changed. But given §3.5 — the same seed retrained moves a channel estimate
+by 0.035 and a rank estimate by 2.69× — **a 0.002 channel difference and a 6.42-point rank difference are
+both inside this stack's run-to-run noise. Instance 2 shows that neither quantity is resolvable at one
+seed, not that one moved and the other did not.** Its own source adds that the arms were never verified
+matched (G0.4) and that *"no CI on any between-run difference; a paired bootstrap on the biology gap is
+still required"*, and that a neighbouring claim from the same run has already been withdrawn.
 
-> **This section is a placeholder with a fixed shape. It will be filled from D1-B when the run
-> completes. Nothing elsewhere in this paper depends on it, and §6 does not change under any outcome.
-> §4.8.4 states in advance what each outcome would and would not license, so the section cannot be
-> written to suit the result.**
+**The "16/16" instance is withdrawn, and it is evidence *for* the collapse-diagnostic use.** Arm A is
+total representational collapse: every patient's `z_biology` converges to the same vector (off-diagonal
+cosine 0.9999), cross-modal positive and negative pairs become indistinguishable (0.9959 against 0.9960 —
+the negatives marginally *higher*), and retrieval falls to 0.000, **below** its chance level of 0.062;
+extended to 5,000 steps a sibling arm reaches patient cosine 1.0000 with InfoNCE pinned at exactly
+ln 16 = 2.7726 from step 2,500 onward. The rank column reads 16/16 in every arm including that one — and
+**four reasons it must not be taken at face value**: (i) its source labels it "`z_biology` matrix rank",
+a **hard numerical rank**, none of R1/R2/R3, and a 16 × 256 float matrix has full row rank under
+essentially any perturbation; (ii) its maximum is 16 **because the batch is 16**, a structural ceiling set
+by the experiment's design; (iii) **the centred effective rank of the same objective does fall — to
+1.00**, recorded as `eff-rank 12.88 → 1.00 by step 50` on the same gate, cohort and seed with positive and
+worst-negative cosines converging to 0.9993; (iv) it is a train batch of 16, not held-out. This project
+previously listed it among its two strongest instances and **that description is withdrawn**, here and in
+P1. What it does establish is that **hard/numerical rank is worthless as a collapse diagnostic** — and it
+is nonetheless what a `matrix_rank` call returns, and `d1_geometry_probe.py:53` computes and prints one
+beside the effective rank, so this is a live confusion in our own tooling.
 
-#### 4.8.1 What D1 is
+**The decorrelation instance is history, not evidence.** `HANDOFF_BUILD_AGENT.md:98` cites
+`paper/.../RESULTS.md`; **no such file exists in this repository**. "Within-cancer specificity" is defined
+in no file now present and is none of the statistics in §3.2. The rank statistic predates `spectral.py`'s
+consolidation and cannot be assigned to R1, R2 or R3. It is `[NOT RECOMPUTABLE]`, it is excluded from
+every count and summary statement in this paper, and it belongs in a history paragraph rather than a
+results table. One thing it does contribute, from a later and better-sourced measurement: the same
+decorrelation term was independently characterised on a live objective and **its global minimum is a
+collapsed state** (38.97 on a healthy batch against 1.19e-17 on an all-identical one); it self-extinguishes
+at every weight from 0.001 to 4.0 within 25 steps (20.74 → 0.00); and a per-dimension variance floor
+provably cannot stop it, because the rank-1 family `zᵢ = m + aᵢ·u` satisfies one. **A regulariser
+introduced to raise rank whose own minimum is collapse is a sharper cautionary tale than the +107% number
+ever was** — and we state it about **our implementation**, not about VICReg or Barlow Twins, which we have
+not reimplemented faithfully or benchmarked.
 
-D1 trains two arms from a single command differing only in `--objective-profile`: `programme_only`
-(biology head supervised on 50 Hallmark pathway scores) and `programme_free` (no programme regression;
-a patient-paired cross-modal InfoNCE on the biology view instead), seeds 42/43/44, 40 epochs, on the
-6,427-patient maximal split. It is the arm the withdrawn F2 claim never had
-(`PHASE1B_TARGETED_READOUT.md` §4: *"there is no biology head trained without programme supervision
-anywhere on disk"*), and it is the only place on this project where a rank gap and a channel gap will
-be measured on arms **matched by construction, with three seeds and a paired bootstrap on both**.
+**One further instance is `[NOT RECOMPUTED]` rather than recomputable.** The D1-A geometry probe's
+`programme_only` 9.81 / 10.47 against `programme_free` 1.71 (epoch 39, 282 held-out patients) is **R3 on
+live checkpoints**; recomputing it under R1 needs a GPU forward pass from the surviving checkpoints
+(`~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt`; `f43` and `f44` were never written — the gate refused
+them) and the GPU was occupied by a training run that was not contended for. It is quoted nowhere in this
+paper as a rank instance, and its source entry forbids the reading in any case: *"Nothing about programme
+supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
+defect, not an ablation."*
 
-Note for §4.1: because the two arms differ in *objective*, D1 sits closer to a between-method
-comparison than §4.3 does, and therefore lands further outside RankMe's stated scope. §4.8.4 accounts
-for this.
-
-#### 4.8.2 What is already measured, from D1-A, and why it is not the result
-
-D1-A was the first launch. Its `programme_free` arms were subject to a collapse defect since diagnosed
-and fixed, so **D1-A is a control documenting the defect, not the ablation.**
-
-Measured on the final epoch-39 checkpoints, 282 held-out test patients, **statistic R3**
-(`v2/research/rebase/d1_geometry_probe.py`):
-
-| arm | seed | epoch | **R3 effective rank** | hard rank @1e-3 | RNA–RNA mutual cos | feature std |
-|---|---:|---:|---:|---:|---:|---:|
-| `programme_only` | 42 | 39 | **9.81** | 136 | 0.258 | 0.0056 |
-| `programme_only` | 43 | 39 | **10.47** | 158 | 0.265 | 0.0063 |
-| `programme_free` | 42 | 39 | **1.71** | 11 | 0.986 | 0.0156 |
-
-*Provenance: `NOTEBOOK_ENTRIES/d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`.
-Statistic R3; maximum is `n_patients` = 282. At epoch 21 the same probe read 7.38 / 7.35 for
-`programme_only` and 1.76 for `programme_free`.*
-
-The gap is **5.7–6.1×**, with the two `programme_only` seeds agreeing (9.81 / 10.47).
-
-**Four reasons this is not instance 5 and must not be quoted as it.**
-
-1. **The `programme_free` arm never trained.** Seeds 43 and 44 were refused by the in-runner liveness
-   gate (contrastive 0.50883 and 2.14122 against a threshold of 0.10; the latter close to chance
-   ln 16 = 2.7726), and `programme_only` seed 44 stopped at 27 epochs. There is one `programme_free`
-   seed, not three.
-2. **The source entry forbids the reading.** Quoted: *"Nothing about programme supervision may be
-   concluded from it — the contrastive arm never trained, so the comparison measures a defect, not an
-   ablation."*
-3. **No channel was measured.** `run_d1` raises on the first non-zero return code, so **no exports, no
-   CALIBRA readout and no bootstrap were produced.** The information side of instance 5 does not exist
-   in any form.
-4. **A rank gap between a trained arm and a collapsed arm is not a dissociation.** It is the
-   collapse-diagnostic use working correctly (§4.9). If it is all D1 ever delivers, it belongs in §4.6
-   as further support for the one-sided claim, not in §4.1 as a sixth dissociation.
-
-#### 4.8.3 The slot
-
-D1-B is the rerun with the queue fix (a momentum key encoder). **All six arms have since reached
-40/40** and all six diagnostic artifacts exist at `~/e0_run/d1_v2/artifacts/`, so the rank side of the
-slot is no longer pending. The channel side is being computed at the time of writing
-(`d2_compare` → `D1_PAIRED_BOOTSTRAP_STRATIFIED.json`).
-
-**The rank column, filled** — canonical R1 on the residualised held-out `wsi_biology` block, recomputed
-2026-08-04:
-
-| seed | rank, `programme_only` | rank, `programme_free` | rank ratio | channel, `programme_only` | channel, `programme_free` | Δ | patient CI₉₅ | cancer CI₉₅ | ordering correct? |
-|---|---:|---:|---:|---:|---:|---:|:---:|:---:|:---:|
-| 42 | **29.3813** | **13.4184** | 2.19× | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` |
-| 43 | **24.6730** | **7.6003** | 3.25× | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` |
-| 44 | **11.1148** | **6.3937** | 1.74× | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` | `[PENDING]` |
-
-*Provenance: rank — `~/e0_run/d1_v2/artifacts/d1_{p,f}_seed{42,43,44}.npz`, recomputed by
-`~/ws_rank/recompute_rank.py` under the canonical implementation
-(`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5).
-Channel, to be recorded on completion: `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` (headline),
-`D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json` (negative control), `D1_PAIRED_BOOTSTRAP.json` (secondary —
-**do not headline**, it scores all 90 non-control targets of which 50 are `programme_only`'s own
-supervision), on the 40 targets neither arm trained on (`heldout_pathway` + `immune_tme` +
-`tumour_state`), per the preregistration in
-`NOTEBOOK_ENTRIES/d1_readout_preregistration_20260803T1700Z.md`.*
-
-**A change of statistic since this slot was drafted.** Earlier drafts stated the rank column "will be
-**statistic R2**" (`d1_audit.py:149-153`). It is now the canonical **R1**, for the reasons in §3.1;
-`d1_audit.py` check A5 has been changed to report R1 as the headline with R2 and R3 alongside for
-continuity. R2 would have given roughly 60% of the values above. The values are still **not**
-comparable with the 9.81 / 1.71 numbers of §4.8.2, which are R3 on raw live-checkpoint states of a
-different run (D1-A) on 282 patients.
-
-#### 4.8.4 Preregistered reading of each outcome
-
-| outcome | what it licenses | what it does not |
-|---|---|---|
-| Both arms train; large rank gap, **large** channel gap in the same direction | Rank tracked information in this instance. **Report as a negative for this paper's generality**, in §4.1 and the abstract, at the same prominence as the six that dissociate. | It does not overturn §4.3 (in-scope, three seeds) or §4.7 (reproducibility floor), and one agreeing instance does not restore a proxy. |
-| Both arms train; large rank gap, **small or absent** channel gap | A seventh dissociation, and the first with matched-by-construction arms, three seeds and a paired bootstrap on **both** quantities. Would be promoted to 1st in §4.1 — *but see the scope note*: the arms differ in objective, so it lands further outside RankMe's stated scope than §4.3, and §4.3 stays the in-scope result. | Still one architecture, one cohort, one modality pair. |
-| `programme_free` collapses again (R2 rank ≈ 2, channel at or near the permutation null ~0.14) | Further support for the **collapse-diagnostic** use (§4.9) and nothing more. Belongs in §4.6. | **No** statement about programme supervision, per §4.8.2 item 2. |
-| Fewer than three `programme_free` seeds complete | Report the completed seeds with the count in the table caption and mark instance 5 as under-powered. | Do not quote a two-seed gap as if it were three. |
-
-**A standing constraint that applies to every outcome.** The liveness gate that admits arms to D1 has
-been measured to be non-reproducible: eight runs with identical inputs, identical seed and an identical
-2,400-step budget gave `final_biology_contrastive` values spanning **650×** (0.00859, 0.01076, 0.01770,
-0.02019, 0.02407, 0.03266, 0.38009, 5.58511), a **6/8 pass rate** against an unchanged 0.10 threshold,
-and a bimodal shape — six clustered within 4× and two divergent
-(`NOTEBOOK_ENTRIES/g26_is_not_reproducible_20260804T0700Z.md`). At a 75% per-arm pass rate the
-probability of all three contrastive arms clearing the gate is **0.42**. Any D1 table must state which
-arms were admitted, because admission is itself a stochastic filter and arms that fail it are not a
-random sample.
-
-### 4.9 The use that survives, and where its boundary actually is
+### 4.10 The use that survives, and where its boundary actually is
 
 **Rank does detect total collapse.** Every measurement here of a representation collapsed to a single
 direction shows a centred effective rank at or near 1–2:
 
-| regime | rank statistic | value | co-measured evidence of collapse |
+| regime | statistic | value | co-measured evidence of collapse |
 |---|---|---:|---|
 | clean in-batch InfoNCE, step 50 | centred eff-rank (diagnostic script) | 12.88 → **1.00** | pos cos 0.9993, worst-neg cos 0.9993, min margin −0.0001 |
 | `programme_free` at training scale, step 150 | R3 | 67.55 → **~2** | RNA-view mutual cosine 0.9813 |
 | `programme_free`, epoch 21 / epoch 39, 282 held-out patients | R3 | **1.76** / **1.71** | RNA–RNA mutual cosine 0.977 / 0.986; hard rank 9 / 11 |
 
 *Provenance: `NOTEBOOK_ENTRIES/g26_rank_collapse_diagnosis_20260803T0500Z.md`;
-`NOTEBOOK_ENTRIES/d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`;
-`NOTEBOOK_ENTRIES/d1_programme_free_collapsing_in_training_20260803T1930Z.md`;
-`NOTEBOOK_ENTRIES/d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`.*
+`d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`;
+`d1_programme_free_collapsing_in_training_20260803T1930Z.md`;
+`d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`. **Statistic named per row**; the
+first is a diagnostic-script centred effective rank and the rest are R3, so no two rows are compared.*
 
-**But the boundary is much lower than "low rank".** At R1 effective rank **9.11 and 9.14** of a nominal
-256 dimensions — 3.6% of ambient, a number any rank-monitoring practice would read as severe collapse —
-the two D2 seed-44 arms still read held-out channels of **0.5983 and 0.4757** against a permutation
-null of **0.140** (§4.3). A representation at 3.6% of its nominal rank was carrying a large,
-permutation-significant molecular channel.
+**But the boundary is far lower than "low rank".** At canonical R1 effective rank **9.11 and 9.14 of a
+nominal 256** — 3.6% of ambient, a number any rank-monitoring practice would read as severe collapse —
+the two D2 seed-44 arms still read held-out channels of **0.5983 and 0.4757** against a permutation null
+of **0.140**. A representation at 3.6% of its nominal rank was carrying a large, permutation-significant
+molecular channel.
 
 So the defensible statement is not "low rank means little information". It is:
 
-> Effective rank near its floor (≈ 1–2, with patient-to-patient mutual cosine ≈ 1) is reliable
-> evidence of total collapse. Anywhere above that — including at 3.6% of nominal dimensionality — it
-> is uninformative about the channel, in both directions, and non-monotone with respect to it.
+> Effective rank near its floor (≈ 1–2, with patient-to-patient mutual cosine ≈ 1) is reliable evidence
+> of total collapse. Anywhere above that — including at 3.6% of nominal dimensionality — it is
+> uninformative about the channel, in both directions, and non-monotone with respect to it.
 
 **And even for the surviving use, rank is not the best instrument.** Patient-to-patient mutual cosine
 reaches 0.977–0.999 in every collapsed arm above, is a single matrix product, needs no SVD, and has a
-natural scale with a meaningful maximum. In every instance here where rank correctly signalled
-collapse, mutual cosine signalled it too and more legibly. We therefore recommend mutual cosine as the
-primary collapse diagnostic, with rank as secondary confirmation.
+natural scale with a meaningful maximum. In every instance here where rank correctly signalled collapse,
+mutual cosine signalled it too and more legibly. **As a partial remedy: if you report effective rank, at
+least also report the patient-to-patient mutual cosine and the seed spread of both.**
 
-**What we have not shown.** We have not found a case of total collapse that effective rank missed. Our
-one-sided claim is therefore asymmetric on the evidence as well as in its statement, and §4.9 should
-be read as "we did not falsify the collapse-diagnostic use", not as "we verified it".
+**A second scalar fails too, and in the opposite direction**, so this is not a recommendation of
+per-feature spread. `programme_free` at epoch 21 has **higher** mean per-feature standard deviation than
+`programme_only` (0.0137 against 0.0044) and **lower** effective rank (1.76 against 7.38), because the
+collapse is to the family `zᵢ = m + aᵢ·u` rather than to a point. At epoch 39: 0.0156 against 0.0056, and
+1.71 against 9.81 / 10.47. Isotropic per-feature std for d = 256 is 0.0625.
+
+**What we have not shown.** We have not found a case of total collapse that effective rank missed. The
+one-sided claim is therefore asymmetric on the evidence as well as in its statement, and this section
+should be read as *"we did not falsify the collapse-diagnostic use"*, not as *"we verified it"*.
 
 ---
 
-## 5. Limitations
+## 5. A worked example: the metric used inside the one regime this paper says it works
 
-### 5.1 Novelty, stated at its narrowest
+The two sections that follow were drafted separately as `paper/LIVENESS_GATE_DESIGN.md` and
+`paper/QUEUE_ANCHORING.md` and are integrated here by the author's decision. They belong in this paper
+for a reason that is not merely convenience: **they are the same metric, on the same stack, used
+throughout as a collapse diagnostic — the one use §4.10 defends — and they are therefore the paper's
+demonstration of what the surviving recommendation looks like in practice.** §5.3 states, without
+softening, the one place where the demonstration strains against §4.1.
 
-The core negative — that effective rank does not predict downstream quality — **is already published**
-(§2.2). Thilak et al. report RankMe Spearman 0.3174 and state that "a high rank does not guarantee
-superior performance"; a RankMe co-author has co-signed the claim that RankMe "fail[s] to adequately
-evaluate representation quality". This paper's claim to novelty is confined to (i) the in-scope
-within-method failure of §4.3, (ii) the reproducibility floor of §4.7, (iii) the dose–response
-magnitude miscalibration of §4.2, and (iv) the domain.
+### 5.1 What a liveness gate certifies, and four ways we learned it certifies less than we assumed
 
-The prior-art census behind §2.2 is **incomplete**: the natural-language search path was unavailable
-and no citation-graph sweep of RankMe's citing papers has been run. **If a paper reporting an
-in-scope, within-method RankMe failure exists, contribution (i) collapses to a replication and this
-paper must be reframed around (ii).** Closing that census is the first pre-submission task.
+**Claim.** A liveness gate that certifies a model **can fit** a small, fixed, favourable problem does
+**not** certify that the objective **will learn** at the scale and duration it is about to run at. The
+two differ whenever the training regime contains a dynamic the gate's regime removes — and gates are
+usually designed to remove exactly such dynamics, because that is what makes them fast and
+deterministic.
 
-### 5.2 What is not measured
+Four independent instances from one objective over two days. Each was believed to be a completed fix at
+the time; each was falsified by extending the gate's regime toward the run's.
+
+**Instance 1 — the window was shorter than the failure.** `programme_free`'s biology head was observed
+collapsing under a covariance penalty. A per-dimension variance floor was added and the collapse
+disappeared: at 800 steps the contrastive term descended to 2.0875 with patient-to-patient cosine
+0.7261. Extending the same run to 5,000 steps reversed the verdict — 2.4626 at step 1,000, then pinned
+at ln 16 = 2.7726 from step 2,500 onward with patient cosine **1.0000**. The fix delayed the failure past
+the observation window; nothing about the 800-step measurement was wrong, it was answering "has it
+collapsed *yet*". *Provenance: `NOTEBOOK_ENTRIES/g26_variance_floor_fix_20260803T0210Z.md`,
+`g26_stepbudget_sweep_20260803T0340Z.md`.*
+
+**Instance 2 — the batch was smaller than the problem.** The repaired gate memorises one fixed
+16-patient batch. With the objective's regularisers excluded it reaches contrastive 0.012–0.057,
+retrieval 16/16, patient cosine 0.0597 and **effective rank 5.81** — a clean pass on a criterion of
+≤ 0.10, on three seeds. The same objective at cohort scale, 3,118 streaming patients, collapses to
+**effective rank ~1.8 by epoch 21**, against the supervised arm's 7.38 / 7.35 on two seeds, measured on
+282 held-out patients. Memorising sixteen items is a capacity question; representing three thousand is a
+learning question. *Provenance: `NOTEBOOK_ENTRIES/g26_passes_20260803T1100Z.md`,
+`d1_programme_free_collapsing_in_training_20260803T1930Z.md`. Statistic **R3** throughout this section
+unless stated.*
+
+**Instance 3 — the gate removed the dynamic that causes the failure.** The subtlest of the four, because
+the removal was deliberate, documented, and correct on its own terms. The objective uses a queue of
+detached negative keys. Replaying one batch against a *live* queue makes the queue fill with
+re-encodings of that same batch, so the negatives become the queries; the gate therefore **freezes** the
+queue at 64 keys. That fix was correct and necessary — measured reduction 0.054 → 0.394, unique keys
+16 → 64. But a frozen queue supplies a fixed reference frame and training's queue does not: its 4,096
+keys are written by the query encoder itself, one step behind. Under a live queue the same objective
+collapses to effective rank ~2 within 150 steps from an initialisation of 67.55, under **every** setting
+of both regularisers suspected of causing it — including both at zero:
+
+| `decorrelation` | `biology_full_consistency` | step 50 | 100 | 150 | 200 | 250 |
+|---|---|---:|---:|---:|---:|---:|
+| 0.04 | 1.0 | 4.08 | 1.95 | 2.16 | 1.68 | 1.59 |
+| 0.0 | 1.0 | 2.62 | 2.16 | 2.47 | 1.94 | 2.17 |
+| 0.04 | 0.1 | 2.99 | 3.43 | — | — | — |
+| 0.0 | 0.1 | 2.97 | 2.00 | 2.50 | — | — |
+| 0.0 | 0.0 | 2.98 | 1.98 | 1.86 | — | — |
+
+*Provenance: `NOTEBOOK_ENTRIES/d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`; logs
+`~/e0_run/d1_diag/`. **Centred R3 on a fixed 256-patient held-out probe**, one verified common
+initialisation (67.55 at step 0).*
+
+The pathology is therefore not in the objective's weighting; it is in the key set. **The gate froze the
+queue to remove a *known* pathology, and in doing so removed the *unknown* one.**
+
+**Instance 4 — the gate was read from a re-implementation of itself.** The sharpest of the four and the
+cheapest to have avoided. To decide whether the objective was ready to launch, the gate function
+(`_overfit_programme_free_contrastive`) was run from a standalone harness that reconstructed its inputs.
+Three seeds passed with margin; the run was launched; the gate then failed *inside the runner*. For
+identical seeds and an identical 2,400-step budget:
+
+| seed | standalone harness | inside the runner |
+|---|---:|---|
+| 42 | 0.01871 | passed |
+| 43 | 0.01206 | **0.50883** ✗ |
+| 44 | 0.05666 | **2.14122** ✗ |
+
+Three of three pass in the harness; one of three in the runner. Seed 44's in-runner value is close to
+chance (ln 16 = 2.7726) — not a marginal miss. **The harness did not merely give optimistic numbers, it
+inverted the verdict on two of three seeds.** Neither measurement is incorrect: the runner reaches the
+gate having constructed the model from the full experiment configuration and having consumed a different
+quantity of RNG, so `copy.deepcopy(model)` starts the memorisation loop from a different initialisation
+and different dropout draws. The harness reproduced the gate's *code* and not the gate's *caller*. This
+cost two launches: one aborted immediately, and one that lost two of three contrastive arms mid-experiment
+after three arms had already trained to completion. *Provenance:
+`NOTEBOOK_ENTRIES/d1_relaunch_20260803T1530Z.md`, `queue_size_implicates_the_key_set_20260803T2200Z.md`,
+`d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`.*
+
+**Design rule, in two halves — and the second half is the one usually missing.** *A liveness gate must be
+read from the process that will perform the training, never from a harness that reconstructs the setup.*
+**And: a gate that rejects runs a harness would have approved is not too strict — it is the component
+working.** Every arm this gate refused belonged to an objective later measured, independently and at full
+training duration, sitting at effective rank 1.71 against the supervised arm's 9.81; the gate's
+strictness saved roughly twelve GPU-hours of training an objective that could not learn. The tempting
+response to a gate that fails two of three seeds is to suspect the gate; here that would have been
+exactly wrong. **The failure was where we read the gate, not how strict it was.**
+
+**And the gate is itself not reproducible, which §4.1's argument applies to as well.** Eight runs with
+identical inputs, identical seed and an identical 2,400-step budget gave `final_biology_contrastive`
+values spanning **650×** (0.00859, 0.01076, 0.01770, 0.02019, 0.02407, 0.03266, 0.38009, 5.58511), a
+**6/8 pass rate** against an unchanged 0.10 threshold, and a bimodal shape — six clustered within 4× and
+two divergent (`NOTEBOOK_ENTRIES/g26_is_not_reproducible_20260804T0700Z.md`). At a 75% per-arm pass rate
+the probability of all three contrastive arms clearing the gate is **0.42**. **Any table reporting arms
+admitted by this gate must state which arms were admitted, because admission is a stochastic filter and
+arms that fail it are not a random sample.** The replacement rank probe is far better behaved (§4.4(3):
+4.7% spread, unimodal, 3.5× separation with an empty band from 1.98 to 6.92) but on *divergence rate*
+specifically it currently rests on a thinner basis, not a better one — three repeats cannot rule out a
+25% tail — and should be read as best-of-N rather than trusted for having looked tidy three times.
+
+**What this implies for gate design.** (0) Read the gate from the process that will train, and do not
+soften a gate that then fails. (1) State what the gate certifies, *in* the gate: "this model can memorise
+16 patients against a frozen key set" is a different sentence from "this objective will learn", and only
+the first is supported. (2) A gate's regime must match the run's in every dimension the run's failure can
+live in; ours differed in three simultaneously — duration (800 steps vs 40 epochs), problem size (16 vs
+3,118 patients) and key-set dynamics (frozen vs live) — and a fourth hid in the gap between the gate and
+a faithful re-implementation of it. (3) Simplifications made to defeat one pathology are the first place
+to look for the next. (4) A gate that cannot fail on the training pathology should not be quoted as
+evidence about it.
+
+### 5.2 A queued contrastive objective needs an independent reference frame, not fresher keys — graded in rank
+
+**The failing configuration.** A patient-paired cross-modal InfoNCE with a queue of detached negative
+keys, refreshed every step from the **query encoder itself** — the standard "end-to-end with a memory
+bank" arrangement. At cohort scale (3,118 training patients, 4,096-key queue, 214-patient batches) the
+representation collapses from effective rank 67.55 at initialisation to **~2 within 150 steps** and does
+not recover. The collapse is invisible to the memorisation gate (§5.1, instance 3) and is **not** a
+regularisation failure (the five-arm sweep above).
+
+**The fix.** Give the queue its own **momentum key encoder**: an EMA copy of the query encoder,
+`θ_k ← m·θ_k + (1−m)·θ_q`, kept out of the optimiser and used only to encode keys before enqueueing.
+Measured with **capacity held at 4,096 in every arm**, so the number of negatives is identical and only
+the key-writing encoder differs; all four arms start from the same verified initialisation. 40 epochs of
+this objective is **583 steps**, so the table spans the real duration:
+
+| step | m = 0 | m = 0.9 | m = 0.99 | m = 0.999 |
+|---:|---:|---:|---:|---:|
+| 0 | 67.55 | 67.55 | 67.55 | 67.55 |
+| 50 | 4.10 | 3.88 | 8.65 | 9.35 |
+| 100 | 1.62 | 3.51 | 6.49 | 7.03 |
+| 150 | 1.62 | 2.15 | 4.56 | 6.99 |
+| 200 | 2.26 | 1.65 | 5.70 | 7.60 |
+| 300 | 3.32 | 2.70 | 6.01 | 7.33 |
+| 400 | 2.18 | 2.31 | 5.50 | 7.84 |
+| 500 | 2.43 | 2.34 | 5.50 | 7.61 |
+| **600** | **2.81** | **2.23** | **5.88** | **7.42** |
+
+*Provenance: `NOTEBOOK_ENTRIES/queue_size_implicates_the_key_set_20260803T2200Z.md`,
+`momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; logs `~/e0_run/d1_diag/`.
+**Centred R3 on a fixed held-out probe.** One seed per momentum value.*
+
+Three things this table shows that a single number would not. The effect is **monotone in m** and large —
+2.6–3.3× at every step past 150. It is **durable**: both working arms are flat from step 200 to 600,
+spanning the full training duration, which matters because two earlier "fixes" on this objective looked
+correct inside a short window and failed outside it. And `m = 0.9` **fails**, tracking the no-momentum arm
+rather than the working ones, so there is a threshold and it lies between 0.9 and 0.99. **`m = 0.999` is
+used because it measured best in this sweep. No mechanism is claimed.**
+
+**The explanation we expected, and why it is wrong.** The natural account is MoCo's — **He, Fan, Wu, Xie
+& Girshick, "Momentum Contrast for Unsupervised Visual Representation Learning", CVPR 2020,
+arXiv:1911.05722**, VERIFIED at full text. Three corrections that the standalone drafts required and that
+are made here. **(i)** The repository previously contained *no* arXiv number, DOI or venue for MoCo
+anywhere, only a bare "He et al., 2020"; the identifier is now stated. **(ii)** MoCo advances the account
+**twice as a hypothesis** — *"Our hypothesis is that good features can be learned by a large dictionary
+… while the encoder for the dictionary keys is kept as consistent as possible despite its evolution"*
+and *"We hypothesize that such failure is caused by the rapidly changing encoder that reduces the key
+representations' consistency"* — never as an established mechanism, and a falsification must say so.
+**(iii)** MoCo ties the argument specifically to queue use — *"a slowly evolving key encoder is a core to
+making use of a queue"* — so a falsification is only in scope if it is in a queue setting. **Ours is**,
+and that is stated rather than left to be inferred.
+
+**Three independent measurements rule the staleness account out.** (1) **The queue is never stale**: with
+214-patient batches into 4,096 slots it **turns over completely every 19 steps**, so no key is ever more
+than nineteen steps old — an argument available by arithmetic before any experiment. (2) **Key-to-encoder
+agreement does not predict rank**: cosine(stored key, fresh re-encoding by the current query encoder) at
+step 100 is 0.427 / **0.908** / 0.441 for no-momentum / m = 0.99 / m = 0.999 against effective ranks
+2.58 / 6.65 / **6.89** — the best-agreeing arm does not have the best rank. (3) **The healthiest queue
+holds the freshest keys**: sweeping capacity at fixed key encoder, the strongest arm is capacity 64,
+entirely overwritten every single step (effective rank 6.17 against 2.16 at capacity 4,096).
+
+**What we think is happening instead, stated as unconfirmed.** When the query encoder also writes the
+keys, a transformation applied to **all patients at once** moves queries and keys *identically*; the
+similarity structure between them is preserved, so the loss does not penalise it. **Collapse is free.** A
+decoupled key encoder holds a slowly-moving reference frame, so a global transformation of the queries
+now costs loss. On this account the queue's defect is that it supplies **no independent frame**, not that
+its contents are old — an *anchoring* story rather than a *staleness* story. It is consistent with all
+three measurements and with the memorisation gate passing on a frozen queue (a perfect anchor), and it
+explains why no loss-weight setting helped. **It is not confirmed, and one sharpening of it was
+predeclared, tested and refuted:** that the EMA time constant `τ = 1/(1−m)` must exceed queue turnover
+`T = capacity/batch`. Five predictions were committed before the runs; **four were wrong and the
+discriminating one inverted** — at m = 0.95 the arm with the *lowest* `τ/T` (0.52, capacity 8,192) was
+the healthiest of its group at 3.67, where the criterion required it to be the worst. What the data
+supports is narrower: rank is monotone in `m` and nearly flat in capacity, with a threshold between
+`τ = 20` (fails) and `τ = 100` (works) that appears in the same place at every capacity tested. We record
+that as an observation and explicitly do **not** advance it as a mechanism; it would be the fourth
+proposed explanation, resting on the data that refuted the third.
+
+**Why this may matter beyond one codebase.** The failing arrangement — a queue refreshed from the query
+encoder each step — is a common simplification of MoCo, adopted precisely because it avoids maintaining a
+second encoder. If the reason MoCo's second encoder is necessary is *anchoring* rather than *staleness*,
+the simplification is unsafe **even when the queue is short enough that staleness is impossible**, which
+is exactly the regime where practitioners reason it should be harmless. The turnover calculation is the
+cheap diagnostic: it tells you staleness cannot be your problem, and on the anchoring account that is no
+reassurance at all.
+
+### 5.3 Why §5 is a demonstration and not a contradiction — and the one place it strains
+
+Every rank number in §5.1 and §5.2 is used in the regime §4.10 defends: **as a collapse diagnostic, near
+the floor, with independently co-measured evidence of collapse.** The readings that carry decisions are
+`~1.6–2.9` (collapsed) against `5.9–9.4` (not collapsed), and in every case a second, cheaper measurement
+agrees — patient-to-patient mutual cosine 0.977–1.0000, retrieval at or below chance, InfoNCE pinned at
+`ln 16`. The gate's own bar (R3 ≥ 4.0) sits **inside an empty band** between the two distributions
+(1.98 to 6.92), not near either. Nothing in §5 selects between two healthy configurations on a rank
+difference, which is the practice §4.1 disqualifies.
+
+**Where it strains, stated rather than defended away.** In §5.2 the decision between `m = 0` and
+`m = 0.999` at step 600 rests on **2.81 against 7.42, a 2.64× ratio — which is inside the 2.69×
+retraining envelope of §4.1**, and the sweep is **one seed per momentum value**. Taken as an isolated
+two-point rank comparison, §4.1's own rule would disqualify it. Three things are why we nonetheless
+report the fix as real, and a reader is entitled to weigh them:
+
+1. **It is not a two-point comparison.** The effect is **monotone across four values of m** and **flat
+   from step 200 to 600** in both working arms — nine time points × four arms, not one ratio. §4.1's rule
+   is about single between-configuration differences; a monotone, durable trend across a swept
+   hyperparameter is a different and stronger object.
+2. **The readings are at the floor, where §4.10 says rank is reliable**, and the collapsed arms are
+   independently confirmed collapsed by mutual cosine. §4.1 constrains rank as a *selection signal
+   between healthy configurations*; §5.2's failing arms are not healthy.
+3. **The controlled repeat measurement exists and is tight**: three repeats at step 200 with identical
+   inputs give 7.15 / 6.92 / 7.25 for m = 0.999 against 1.80 / 1.46 / 1.98 for m = 0 — a **3.5×
+   separation with an empty band**, which is the very check §4.1 asks a practitioner to run, and which
+   this comparison passes where six of seven arm comparisons in §4.1 fail it.
+
+**But point 3 is also the sharpest thing that cuts against §5.2 as published**, and we say so: those
+repeats hold the **seed** fixed, and §4.3 shows the same arm at the same step spans **6.05×** across
+seeds. **No seed replication of the momentum sweep exists.** So the honest status of the momentum choice
+is: monotone and durable at one seed, tight under stack non-determinism at one seed, and **untested
+against seed variation** — which is precisely the nuisance term §4.2 measures as dominant. `m = 0.999` is
+retained because it measured best and because the objective now trains, not because the rank difference
+that selected it clears this paper's own bar. **A seed replication of the momentum sweep is the single
+measurement that would close the gap between §4 and §5, and it has not been run** (§6.2).
+
+**Two further honest limits carried from the source drafts.** Instance 3's *cause* is established only as
+far as "the key set, not the objective's weighting"; the mechanism is open, MoCo's staleness account was
+predicted, tested and falsified, and no replacement has been confirmed. The capacity effect remains
+confounded — capacity changes both anchoring quality and negative count, and we have not separated them.
+And all of §5 is one objective, one architecture, one cohort; we claim the failure mode is real and cheap
+to test for, not a general rate at which liveness gates mislead.
+
+---
+
+## 6. Limitations
+
+Structured as named objections with answers, after Eklund et al. (2016), rather than as a list of
+caveats.
+
+### 6.1 "This is not novel"
+
+**Largely correct, and the claim is stated at its narrowest.** The core negative — that effective rank is
+an unreliable selection signal — **is already published**, including *within-method* (Aldeneh et al.,
+ICASSP 2025), including as a named selection-rule failure (Otero, Mateus & Balestriero), including by the
+authors of the leading replacement (LiDAR, ICLR 2024), and including a published low-rank/high-information
+instance. **The necessity-violation framing this paper was previously built on is both pre-empted and, on
+our own best experiment, unsupported (§4.7).**
+
+What remains: (i) the **reproducibility floor** and the demonstration that essentially every between-arm
+difference we measured is inside it (§4.1); (ii) the **arm/seed variance decomposition** (§4.2) and the
+finding that the floor belongs to the arm (§4.3); (iii) the corrected **dose–response magnitude** (§4.8);
+(iv) the domain. We have not found (i)–(iii) reported. The census that supports that statement is
+abstract-level over 453 works and is a **lower bound on the prior art** (§2.2); if a paper reporting a
+seed-level reproducibility floor on effective rank exists, contribution (i) collapses and this paper
+should be withdrawn to a replication.
+
+### 6.2 "You did not measure the thing that would settle it"
 
 | would-be measurement | why it is absent |
 |---|---|
-| **LiDAR, or any published alternative criterion, computed on our artifacts** | Identified during this draft's prior-art sweep; requires a labelled probe on every artifact; not run. **The most valuable missing measurement in this paper** (§2.5). |
-| A controlled repeat design for §4.7 (N retrainings of one configuration, rank and channel on each) | Not run. §4.7 rests on three seeds plus one accidental retrain, and cannot distinguish rank-specific variance from stack non-determinism, architecture or schedule. |
+| **A controlled repeat design for §4.1** — N retrainings of one configuration, rank and channel measured on each | **Not run.** §4.1's envelope rests on **one** retraining pair plus three-seed spreads. §4.2 exists because of this and reaches the same conclusion from 8 within-arm d.f. without the 2.69× number, but a proper repeat design is the single measurement that would make §4.1 unimpeachable. **This is now the most valuable missing measurement in the paper.** |
+| **A seed replication of §5.2's momentum sweep** | Not run. §5.3 states the consequence: the hyperparameter choice §5 reports rests on a rank difference that has not been tested against the nuisance term §4.2 measures as dominant. |
+| **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
+| **The D1 paired bootstrap** (§4.7) | Blocked by a one-line stale-path bug in the D1 audit chain; `D1_PAIRED_BOOTSTRAP_STRATIFIED.json` does not exist. The D1 rows carry `[D1 PAIRED BOOTSTRAP PENDING]` and must not be quoted as interval-backed. |
 | An error bar on any dilution rank or channel value | Single seed, single donor draw; bootstrapping donor assignments is CPU-only and unrun. |
-| An equivalence test on instance 2's channel difference | The paired bootstrap the source says "is still required" was never run. §4.4 states that "unchanged" means the point estimates differ by 0.002 and nothing more. |
-| Rank and channel measured with **one** statistic across all instances | **Done for instances 2, 4, 5 and 6.** There is now one implementation (§3.1) and every surviving artifact has been recomputed under it, reproducing the published values exactly (§4.2, §4.3, §4.4, §4.8.3; `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §5). It remains impossible for **instance 1** (artifacts never existed; the cited source file is absent) and **instance 3** (a train-time batch of 16, never exported — and its column was a hard `matrix_rank`, none of R1/R2/R3). D1-A's 9.81 / 1.71 (§4.8.2) are `[NOT RECOMPUTED]`: they need a GPU forward pass from the surviving checkpoints and the GPU was in use by a training run. |
-| Any instance on a **second architecture, cohort or modality pair** | All six are one architecture family (transformer aggregator over frozen H-Optimus-0 patch tokens with a biology head), one cohort (TCGA), one modality pair (morphology → bulk expression). `claim_guards.no_external_cohort` is undischarged for every morphology result on this project. |
-| **E1**, the preregistered rank-versus-information experiment | Built (`v2/calibra/e1_rank_information.py`, `aggregate_e1.py`, equivalence margin 0.10, three-seed requirement) and **never run**. It is the experiment this paper should have been built on. |
-| A case where the collapse diagnostic **fails** | We have not found one (§4.9). |
-| Rank computed with RankMe's ε convention | Our implementation filters at `> 1e-12` instead (§2.6). No number here is comparable to a published RankMe value. |
+| An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run. §4.9 states that "unchanged" means the point estimates differ by 0.002 and nothing more. |
+| Rank and channel under **one** statistic across **all** instances | **Done for D2, dilution, Phase 1b and D1-B** — one implementation, every surviving artifact recomputed, published values reproduced exactly. **Impossible** for the decorrelation instance (artifacts never existed; the cited source file is absent) and the "16/16" instance (a train-time batch of 16, never exported, and a hard `matrix_rank`). D1-A's 9.81 / 1.71 are `[NOT RECOMPUTED]` — a GPU forward pass from surviving checkpoints, and the GPU was in use. |
+| Any instance on a **second architecture, cohort or modality pair** | All of it is one architecture family (transformer aggregator over frozen H-Optimus-0 patch tokens with a biology head), one cohort (TCGA), one modality pair (morphology → bulk expression). `claim_guards.no_external_cohort` is undischarged for every morphology result on this project. |
+| **E1**, the preregistered rank-versus-information experiment in this repository | Built (`v2/calibra/e1_rank_information.py`, `aggregate_e1.py`, equivalence margin 0.10, three-seed requirement) and **never run**. It is the experiment this paper should have been built on. |
+| Rank at **capacity scale**, where Deng et al. report a power law | Not measured. §2.3 argues their sweep is over capacity-like variables and ours is not; **we do not claim rank fails at capacity scale.** |
+| A case where the collapse diagnostic **fails** | We have not found one (§4.10). |
+| Rank computed with RankMe's exact ε convention as a *published-comparable* number | Not attempted; §2.1's discrepancy means no number here is comparable to a published RankMe value. (A faithful RankMe *was* computed on our artifacts for §4.2 and §4.6 — that is an internal comparison, not a cross-paper one.) |
 
-### 5.3 Instance-specific limitations
+### 6.3 "Your ground truth is the weak link"
 
-Stated in each instance's own section and gathered here: §4.2 — censored floors, single seed and donor
-draw, one pooling scheme, "lower bound" label withdrawn by the source. §4.3 — negative control small
-but non-zero and same-signed, so 10–20% of the gap may be generic quality; point estimates not
-reproducible from the seed; three seeds is a small number and the finding is unreliability, not a
-quantified error rate. §4.4 — G0.4 not discharged, single seed, no interval, both differences inside
-the stack's retraining noise. §4.5 — primary source file does not exist; benchmark statistic
-undefined; rank statistic unknown. §4.6 — hard rank not effective rank, structural ceiling of 16,
-train batch of 16, and a same-objective effective-rank measurement that cuts the other way. §4.7 — two
-configurations, one stack, no controlled repeat design. §4.8 — pending, with a non-reproducible
-admission gate.
+Conceded, and the citation that makes the objection sharpest is ours to supply: Zaiem et al.
+(Interspeech 2023; *Computer Speech and Language*) report that *"altering the downstream architecture
+structure leads to significant fluctuations in the performance ranking of the evaluated models"*. Our
+reference standard is a 16-component held-out canonical correlation against confound-residualised
+molecular targets, with a measured permutation null of 0.140–0.147. Four things partially answer the
+objection and none of them dismisses it: the ordering is **98.0% arm** with F = 128.2 (§4.2); it is
+**identical across all three co-trained views for all six pairs** (§4.5c); it **survives held-out
+re-estimation with equal or larger deltas** (§3.2); and each arm clears its own `random_control` (§4.7).
+What is not answered: it is one readout, and a different downstream task could order the arms
+differently. **If the ground truth moves, §4.6's counts move with it — but §4.1–§4.3 do not, because they
+are statements about rank's own variance and require the ground truth only to establish that the
+information ordering is stable, which it is under every perturbation we applied.**
 
-### 5.4 A defect in our own evidence base, reported not repaired
+### 6.4 A defect in our own evidence base, reported not repaired
 
-Instance 1's cited source (`paper/.../RESULTS.md`) does not exist in this repository. We have not
-attempted to reconstruct it. The number is retained in §4.5 as history and is excluded from every count
-and summary statement. Any future citation of "+107% rank at flat benchmark" from this project must
-carry this paragraph.
+The decorrelation instance's cited source (`paper/.../RESULTS.md`) does not exist in this repository. We
+have not attempted to reconstruct it. Its benchmark statistic, "within-cancer specificity", is defined in
+no file now present, so we cannot state what 0.1366 measures, what its chance level was, or whether it
+could resolve a change. The number is retained in §4.9 as history, is marked `[NOT RECOMPUTABLE]`, and is
+excluded from every count and summary statement. **Any future citation of "+107% rank at flat benchmark"
+from this project must carry this paragraph.**
 
-### 5.5 The claim is about a scalar, not about geometry
+### 6.5 "The claim is about a scalar, not about geometry"
 
-Nothing here says representation geometry is uninformative. It says one scalar summary of the spectrum
-is, in one regime. Alignment, uniformity, the full singular-value profile, LiDAR's statistic,
-per-feature spread and mutual cosine may each behave differently, and §4.9 recommends one of them over
-rank. Per-feature spread is *also* misleading in at least one place: `programme_free` at epoch 21 has
-**higher** per-feature std than `programme_only` (0.0137 against 0.0044) and **lower** rank, because
-the collapse is to the family `zᵢ = m + aᵢ·u` rather than to a point
-(`NOTEBOOK_ENTRIES/d1_programme_free_collapsing_in_training_20260803T1930Z.md`). We report that as a
-second scalar failing, not as a recommendation.
+Nothing here says representation geometry is uninformative. It says one scalar summary of the spectrum is
+unusable *as a selection signal*, in one regime, on one stack. Alignment, uniformity, the full
+singular-value profile, LiDAR's statistic, per-feature spread and mutual cosine may each behave
+differently — and §4.10 recommends one of them over rank. Per-feature spread is *also* misleading in at
+least one place, in the opposite direction (§4.10), which is reported as a second scalar failing rather
+than as a recommendation.
 
-### 5.6 Scope of the negative
+### 6.6 Scope of the negative
 
 This paper does not claim that anti-collapse regularisation is useless, that rank should never be
-computed, that RankMe is wrong about what it claims, or that the published methods in §2.3 are wrong.
-It claims that within RankMe's own reserved regime the criterion misordered two of three seeds on our
-data; that its run-to-run variance on this stack exceeds the differences it would be used to select
-on; and that the informal reading of rank as a representation-health indicator is contradicted by a
-dose–response in which rank under-reports information loss by 1.95–21.5× — 21.5× under the canonical
-statistic on the block the channel is measured on.
+computed, that RankMe is wrong about what it claims, or that the published defences in §2.3 are wrong. On
+our own best-matched three-seed experiment RankMe's necessity hedge **held** (§4.7). What is claimed is
+narrower and is about usefulness: that on this stack, inside RankMe's own reserved same-method regime,
+effective rank's between-arm differences are smaller than its own within-arm reproducibility floor; that
+two-thirds of its variance across matched artifacts is training-seed nuisance while the information those
+artifacts carry is 98% arm; that the floor is a property of the arm and so cannot be calibrated once and
+reused; and that the between-arm verdict is not even well defined until three unstated implementation
+choices are fixed.
+
+Following the exemplar's phrasing: **one caveat to our results is that they are limited to one
+cross-modal biomedical pipeline, one cohort and one architecture family. It is possible our findings are
+due to idiosyncrasies of this stack's non-determinism and would not generalise.** The reason to report
+them anyway is the same reason the metric is used everywhere: a scalar promoted as a general, label-free
+criterion has to work in the places people will apply it, and showing that it does not resolve its own
+re-measurement *anywhere* is informative about the practice of quoting it *everywhere*.
 
 ---
 
-## 6. Conclusion
+## 7. Conclusion
 
-Effective rank is cheap, label-free and never fails to return a number. Those three properties are why
-it is used to select between representations, and they are also why it is silently unreliable in that
-use. That it can be unreliable is known: Thilak et al. reported it in 2023, and a RankMe co-author has
-since agreed.
+Effective rank is cheap, label-free and never fails to return a number. Those three properties are why it
+is used to select between representations, and they are also why it is silently unreliable in that use.
 
-What we add is a failure inside the boundary RankMe draws around itself. In a within-method,
-single-architecture, in-distribution comparison with arms matched by construction and three seeds with
-paired bootstraps, a rank-based selection rule picks the right arm once, the wrong arm once, and cannot
-choose once — while the performance ordering is stable in all three. And independently of whether rank
-is right on average, on this stack it moves 2.7× when one configuration is retrained with the same
-seed and spans 3.7× across three seeds, against a paired difference stable to ±0.012. A criterion that
-cannot resolve its own re-measurement cannot select between configurations, and we propose the check
-that would have caught this: retrain one configuration, measure the rank spread, and require the
-between-configuration difference to exceed it.
+**We begin with what went against us.** We ran a preregistered test designed to break RankMe's
+necessary-but-not-sufficient hedge, on two arms of one method with three seeds, and the hedge held: the
+higher-rank arm carried the larger held-out molecular channel 3/3. Rank was right about which arm to keep.
+That result is not a footnote to this paper; it removed the claim this paper used to make, and the claim
+that replaced it had to be one that survives rank being right on average.
 
-We report the evidence that constrains this at equal prominence. Centred effective rank does fall to
-~1 under total collapse, so the collapse-diagnostic use survives — though a patient-to-patient cosine
-is cheaper and more legible for the same job. The instance this project previously called its most
-dramatic turns out to be a *hard* matrix rank at a structural ceiling, and we withdraw that
-description. And a representation at 3.6% of its nominal dimensionality still carried a large,
-permutation-significant channel, so "low rank means little information" is also false outside total
-collapse.
+It is. **The metric's between-arm differences are smaller than its own within-arm reproducibility floor,
+inside the regime its authors reserve for it.** Six of the seven between-arm rank differences this project
+ever measured — 1.004× to 2.19× — are inside the 2.69× envelope of retraining one configuration with the
+same seed. Across twelve matched artifacts, 65.5% of the variance in effective rank is training-seed
+nuisance and the arm term is not significant; across the same twelve, 98.0% of the variance in the
+molecular channel is the arm, at F = 128.2. And the floor is not a constant that could be calibrated once
+and reused: at a fixed training step, one arm spans 6.05× across three seeds while its sibling spans
+1.003×. The instability is in training, not in estimation — the statistic itself is precise to about 0.1
+on a rank of 25 — which is what makes it fatal rather than fixable by measuring harder. So we propose the
+check that would have caught it: **retrain one configuration, measure the rank spread, and require the
+between-configuration difference to exceed it.**
+
+We report at equal prominence the evidence that constrains this. Centred effective rank does fall to ~1
+under total collapse, so the collapse-diagnostic use survives — and §5 is that use, at length, on a
+training gate and a queue fix that this project actually made and that this paper grades in rank, with the
+one place the demonstration strains against §4.1 stated rather than defended away. A representation at
+3.6% of its nominal dimensionality still carried a large, permutation-significant channel, so "low rank
+means little information" is false outside total collapse. The instance this project once called its most
+dramatic turns out to be a *hard* matrix rank at a structural ceiling, and that description is withdrawn
+here and in P1. Three published alternatives were computed on the same artifacts and none is better — the
+strongest of them picks the information-poorer arm 3/3 on our in-scope contrast at every value of its
+unspecified constant — and every selection-rule count in this paper is reported with the statement that
+six pairs cannot support such a count. Our own headline miscalibration constant moved from 3.74× to 21.5×
+when we matched the preprocessing, in our favour, and the flattering number is not used.
 
 Finally, we report that three mutually incompatible statistics were implemented under the name
 `effective_rank`, across ten call sites, in the repository that produced these results — two of them
-thresholds that abort training runs — and that our own historical instances were not all measured with
-the same one. We found this while writing this paper. It is the best single illustration of the thesis
-we could have asked for, and we did not design it. We then fixed it, and the fix is itself part of the
-result: under one definition every surviving instance reproduces exactly, but the choice of statistic
-is worth up to a factor of three, it reverses the arm ordering on two of the three seeds of our
-strongest instance, and a fourth choice nobody had been stating — whether the rank is taken of the raw
-or the confound-residualised block — moves our own headline miscalibration from 3.7× to 21.5×. A
-scalar this sensitive to unstated implementation detail should not be used to select between
-representations, and that is a stronger conclusion than the one we set out to defend.
+thresholds that abort training runs — and that our own historical instances were not all measured with the
+same one. We found this while writing this paper. We then fixed it, and the fix is part of the result:
+under one definition every surviving instance reproduces exactly, but the choice of statistic is worth up
+to a factor of three, it reverses the arm ordering on a third of our pairs, a fourth choice nobody had been
+stating — raw or confound-residualised block — moves our own headline magnitude by 5.8×, and simply
+measuring a different co-trained view of the same model flips the verdict on two pairs in six. The
+information verdict flips under none of them.
+
+**It's critical to empirically verify that a cheap summary actually reflects a functionally relevant
+property of the system being examined** — and the cheapest such verification, for any spectral summary, is
+to run the thing twice.
 
 ---
 
@@ -1388,64 +1945,85 @@ representations, and that is a stronger conclusion than the one we set out to de
 
 | § | claim | source file(s) | box path |
 |---|---|---|---|
-| 2.1 | Roy & Vetterli definition; RankMe claims and restrictions | full-text PDFs, verified 2026-08-04 | — |
-| 2.2 | LiDAR quotes and Spearman/Kendall values | full-text PDF, arXiv:2312.04000v1 | — |
-| 3.1 | canonical definition, and R1/R2/R3 as variants of it | `v2/calibra/spectral.py` (`CANONICAL`, `RANK_VARIANTS`); test `v2/tests/test_effective_rank_canonical.py` | — |
-| 3.1 | the ten historical call sites and three statistics | `spectral.py`, `d1_audit.py:149`, `d1_geometry_probe.py:50`, `training.py:565`, `runner.py:939`, `d1_collapse_causal_test.py:73`, `run_rank_ablation.py:35`, `test_stress_collapse.py:23`, `e0_basis_transfer.py:432` and `:480` (pre-`85c0fa8`) | — |
-| 3.1, 4.2, 4.3, 4.8.3 | recomputation of every surviving instance under the canonical definition | `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` | `~/ws_rank/RANK_RECOMPUTE.json`, `~/ws_rank/RANK_RECOMPUTE_P1B.json` |
+| 2.1 | Roy & Vetterli definition; RankMe claims, restrictions and the ε placement | full-text PDFs, verified 2026-08-04 | — |
+| 2.2 | Aldeneh et al. quote and identifiers | Crossref `10.1109/ICASSP49660.2025.10889651`; arXiv Atom `2409.10787` | — |
+| 2.2 | LiDAR quotes, Spearman/Kendall values, ICLR 2024 venue | full-text PDF arXiv:2312.04000v1; DBLP `conf/iclr/Thilak0SDGNSL24` | — |
+| 2.2 | the 453-work census and its limits | `NOTEBOOK_ENTRIES/p2_prior_art_citation_graph_sweep_20260803T2326Z.md` | — |
+| 2.3 | Deng et al. and Awasthi et al. quotes and identifiers | arXiv Atom `2510.10948`; Crossref `10.1186/s12864-025-11913-2` | — |
+| 2.5, 4.6 | competing metrics computed on our artifacts; LiDAR δ sweep; α-ReQ estimator | `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §3, §6 | `~/e0_run/P2_METRICS_D2.json`, `P2_METRICS_D1.json`, `p2_competing_metrics.py`, `p2_selection_rule.py` |
+| 3.1 | canonical definition; R1/R2/R3 as Hill numbers; the ten call sites; the raw/residualised choice | `v2/calibra/spectral.py` (`CANONICAL`, `RANK_VARIANTS`); `v2/tests/test_effective_rank_canonical.py`; `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §1–§4 | `~/ws_rank/RANK_RECOMPUTE.json` |
 | 3.1 | E1 built, never run | `v2/calibra/e1_rank_information.py`, `aggregate_e1.py:38`; absence confirmed against `GATE_LOG.md` and `runs/` | — |
-| 3.2 | channel statistic and null | `v2/calibra/spectral.py:78-108`, `v2/calibra/run_calibra.py` | — |
-| 3.4 | D2 pair-manifest hashes | `D2_PAIR_MANIFEST.json`; `NOTEBOOK.md` 2026-08-01 20:35 UTC | `~/e0_run/d2_v3/` |
-| 3.5, 4.7 | seed non-reproducibility | `D2_RESULT.md` §4 | `~/e0_run/d2_v3/` |
-| 4.2 | dilution table, both blocks | `DILUTION_LOWER_BOUND.md` §2, §6; `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md` | `p1_evidence/dilution/`; artifact `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` |
-| 4.3 | D2 table | `D2_RESULT.md` §2, §4 | `~/e0_run/d2_v3/bootstrap/`, `~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json` |
-| 4.4 | Phase 1b table | `PHASE1B_TARGETED_READOUT.md` §3, §5, §7 | readout `runs/calibra_v3_targeted`; **source artifacts survive** at `/lambda/nfs/geeg/biorag3_persistent_20260711/runs/v21_release_20260720_retry3_resume_safe/artifacts/` — recomputed exactly |
-| 4.5 | +107% instance | `ENGINE_CLD.md` §1; `HANDOFF_BUILD_AGENT.md` §1–2 | **no artifact; cited source does not exist** |
-| 4.5 | decorrelation minimum is collapse | `NOTEBOOK.md` 2026-08-03 decision; `NOTEBOOK_ENTRIES/g26_term_isolation_20260803T0930Z.md` | `~/e0_run/d1_diag/` |
-| 4.6 | three-arm collapse table | `NOTEBOOK.md` 2026-08-02 01:20 UTC; `NOTEBOOK_ENTRIES/g26_variance_floor_fix_20260803T0210Z.md` | `scratchpad/collapse_diag.py` on the A100 |
-| 4.6 | counter-measurement 12.88 → 1.00 | `NOTEBOOK_ENTRIES/g26_rank_collapse_diagnosis_20260803T0500Z.md` | `~/e0_run/d1_diag/` |
-| 4.7 | short-horizon probe repeats | `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md` | `~/ws_d1/probevar_*.log` |
-| 4.8 | D1-A epoch-39 geometry | `NOTEBOOK_ENTRIES/d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md` | `~/e0_run/d1_v1/` |
-| 4.8 | gate non-reproducibility, 8 runs | `NOTEBOOK_ENTRIES/g26_is_not_reproducible_20260804T0700Z.md` | `~/ws_d1/gatevar_*.log` |
-| 4.9 | collapse-regime rank values | `g26_rank_collapse_diagnosis`, `d1b_premise_fails_all_five_arms_collapse`, `d1_programme_free_collapsing_in_training`, `d1a_control_complete_and_gate_fails_2of3_in_runner` | `~/e0_run/d1_diag/`, `~/e0_run/d1_v1/` |
+| 3.2 | channel statistic, nulls, held-out re-estimation | `v2/calibra/spectral.py:78-108`, `v2/calibra/run_calibra.py`; metrics entry §4.4 | — |
+| 3.4 | D2 and D1 pair-manifest hashes and `objective_only_difference` | `D2_PAIR_MANIFEST.json`; `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` | `~/e0_run/d2_v3/`, `~/e0_run/d1_v2/` |
+| 3.5, 4.1 | seed non-reproducibility; re-export vs retrain | `D2_RESULT.md` §4 | `~/e0_run/d2_v3/recovered_artifacts/` |
+| 4.1 | the seven between-arm ratios and the 2.69× envelope | recomputation entry §6 | `~/ws_rank/RANK_RECOMPUTE.json` |
+| 4.2 | variance decomposition and per-arm folds | metrics entry §4.1 | `~/e0_run/p2_necessity_and_variance.py` |
+| 4.3 | step-200 in-flight R3, 6.05× vs 1.003× | `~/e0_run/d1_v2/d1_{f,p}_seed{42,43,44}/train_metrics.jsonl`, `train_rank_tripwire_observed` | — |
+| 4.4 | subsampling SDs; probe repeats; tolerance and centring insensitivity | metrics entry §3; `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md`; recomputation entry §2, §4 | `~/e0_run/P2_METRICS_ALL_SUBSAMPLED.json`, `~/e0_run/d1_diag/probevar_*.log` |
+| 4.5 | statistic / block / view flips | metrics entry §4.2, §4.3; recomputation entry §4, §7 | `~/e0_run/P2_ROBUSTNESS.json` |
+| 4.7 | necessity test, predeclaration, escalation | `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`; metrics entry §5; `d1_readout_preregistration_20260803T1700Z.md` | `~/e0_run/d1_v2/`, `~/e0_run/d1_audit.log` |
+| 4.8 | dilution table, both blocks, the 1.95–21.5× range | `DILUTION_LOWER_BOUND.md` §2, §6; `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`; recomputation entry §5 | `p1_evidence/dilution/`; `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` |
+| 4.9 | D2, Phase 1b, "16/16", decorrelation | `D2_RESULT.md` §2, §4; `PHASE1B_TARGETED_READOUT.md` §3, §5, §7; `NOTEBOOK.md` 2026-08-02 01:20 UTC; `ENGINE_CLD.md` §1 + `HANDOFF_BUILD_AGENT.md` §1–2 | **decorrelation: no artifact; cited source does not exist** |
+| 4.9, 4.10 | counter-measurement 12.88 → 1.00; collapse-regime values | `g26_rank_collapse_diagnosis_20260803T0500Z.md`; `d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`; `d1_programme_free_collapsing_in_training_20260803T1930Z.md`; `d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md` | `~/e0_run/d1_diag/`, `~/e0_run/d1_v1/` |
+| 5.1 | four gate instances; gate non-reproducibility over 8 runs | `g26_variance_floor_fix`, `g26_stepbudget_sweep`, `g26_passes`, `d1b_premise_fails_all_five_arms_collapse`, `d1_relaunch`, `d1a_control_complete_and_gate_fails_2of3_in_runner`, `g26_is_not_reproducible_20260804T0700Z.md` | `~/ws_d1/gatevar_*.log` |
+| 5.2 | momentum sweep, staleness falsification, turnover | `queue_size_implicates_the_key_set_20260803T2200Z.md`; `momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; `turnover_criterion_FALSIFIED_20260804T0330Z.md` | `~/e0_run/d1_diag/` |
 
 ## Appendix B — code index
 
 | function | file:line | used by |
 |---|---|---|
-| `effective_rank` — **the only implementation**, canonical R1 by default, R2/R3 reachable as named variants | `v2/calibra/spectral.py` | §4.2, §4.3, §4.4, §4.7, §4.8.3 — and every other call site |
-| `RANK_VARIANTS` (R1/R2/R3 + uncentred/row-normalised combinations) | `v2/calibra/spectral.py` | §3.1, §4.2, §4.3 |
-| single-definition + no-duplicate test | `v2/tests/test_effective_rank_canonical.py` | §3.1 |
-| R3 retained under a calibrated abort threshold | `v2/training.py:565` (tripwire), `v2/runner.py:939` (gate probe) | §3.1, §4.8.2, §4.9 |
+| `effective_rank` — **the only implementation**, canonical R1 by default, R2/R3 reachable as named variants | `v2/calibra/spectral.py` | every rank number in this paper |
+| `RANK_VARIANTS` (R1/R2/R3 + uncentred / row-normalised combinations) | `v2/calibra/spectral.py` | §3.1, §4.5, §4.8 |
+| single-definition + no-duplicate AST/SVD test | `v2/tests/test_effective_rank_canonical.py` | §3.1 |
+| R3 retained under a calibrated abort threshold, canonical logged beside it | `v2/training.py:569` (tripwire), `v2/runner.py:942` (gate probe) | §3.1, §4.3, §5.1 |
 | `heldout_top_cca` | `v2/calibra/spectral.py:78` | every channel number |
 | `heldout_single_direction_correlation` | `v2/calibra/spectral.py:111` | detection-floor-scale controls |
 | `cross_fitted_residuals`, `confound_design` | `v2/calibra/residualise.py` | all adjusted readouts |
 | `permutation_null` | `v2/calibra/calibration.py` | all nulls in §3.2 |
-| paired bootstrap | `v2/paired_bootstrap.py` | §4.3, §4.8 |
-| `symmetric_infonce` | `v2/losses.py:13` | §4.6 |
-| `stable_rank` | `v2/calibra/e1_rank_information.py` | not used in this paper |
+| paired bootstrap | `v2/paired_bootstrap.py` | §4.6, §4.7 (pending), §4.9 |
+| `symmetric_infonce` | `v2/losses.py:13` | §4.9, §5 |
+| rank recomputation scripts, vendored | `v2/research/rebase/recompute_rank.py`, `recompute_p1b.py` (commit `8609081`) | §3.1, §4.1, §4.8, §4.9 |
+| `stable_rank` | `v2/calibra/e1_rank_information.py` | §4.6 only |
 
-## Appendix C — the caveat that must travel with each instance
+## Appendix C — the caveat that must travel with each number
 
-Reproduced verbatim so that any future quotation of a number can carry it.
+Reproduced verbatim so that any future quotation can carry it.
 
-- **Instance 6 (§4.3).** *"REPORTED, NOT INTERPRETED (blocker 5). WSI states are ~0.80 collinear at
-  init, so a narrower rank may reflect resistance to an already-collapsed view rather than dictionary
-  content."* (`v2/research/rebase/d1_audit.py`, A5 note.)
-- **Instance 4 (§4.2).** *"Single seed (42) and a single draw of donor assignments… gives no error bar
-  on the level-to-level differences."* And: *"The whole curve is one representation."*
-- **Instance 2 (§4.4).** *"`full` vs `programme_only` manifests were not verified as matched on
+- **The 2.69× envelope (§4.1).** One retraining pair, one configuration, one stack. It cannot distinguish
+  rank-specific variance from stack non-determinism, architecture or schedule. The claim does not depend
+  on it alone; §4.2 reaches the same conclusion from 8 within-arm degrees of freedom.
+- **The variance decomposition (§4.2).** Four arms × three seeds = 12 artifacts, two experiments, one
+  stack. Log-scale decomposition for rank-type metrics, raw scale for the channel.
+- **The 6.05× / 1.003× pair (§4.3).** **Statistic R3**, in-training, states never saved, therefore
+  `[NOT RECOMPUTABLE]` under R1 and never compared with an R1 number.
+- **D2 (§4.6, §4.9).** *"REPORTED, NOT INTERPRETED (blocker 5). WSI states are ~0.80 collinear at init, so
+  a narrower rank may reflect resistance to an already-collapsed view rather than dictionary content."*
+  (`v2/research/rebase/d1_audit.py`, A5 note.) Two values for that collinearity exist in this evidence
+  base and are **not the same measurement** — 0.7362 (std 0.0314) against RNA's 0.2740 on the full cohort
+  (`NOTEBOOK.md:121`), and 0.80 against RNA's 0.62 on the fixed 16-patient gate batch. They must not be
+  quoted interchangeably. The negative control is small but non-zero and same-signed, so of order 10–20%
+  of the arm gap may be generic representation quality.
+- **D1 (§4.7).** Channel values are **point estimates without a paired bootstrap**; the official readout
+  is blocked by a stale-path bug. `D1_PAIRED_BOOTSTRAP.json`, when it lands, must **not** be headlined —
+  it scores all 90 non-control targets, 50 of which are `programme_only`'s own supervision. The result is
+  3/3 under R1 and R3, **2/3 under R2**.
+- **Dilution (§4.8).** *"Single seed (42) and a single draw of donor assignments… gives no error bar on
+  the level-to-level differences."* And: *"The whole curve is one representation."* Detection floor
+  censored at ≥ 0.40 from d = 0.09; the source's own §4 **withdraws** the phrase "lower bound".
+- **Phase 1b (§4.9).** *"`full` vs `programme_only` manifests were not verified as matched on
   epochs/LR/budget in this run (G0.4). Until they are, the rank comparison in §5 is suggestive, not
-  causal."*
-- **Instance 3 (§4.6).** The column is labelled *"`z_biology` matrix rank"* in its source. It is a hard
-  numerical rank whose maximum is the batch size of 16, and the centred effective rank of the same
+  causal."* Both differences are inside this stack's retraining noise.
+- **"16/16" (§4.9).** The column is labelled *"`z_biology` matrix rank"* in its source. It is a **hard
+  numerical rank** whose maximum is the batch size of 16, and the centred effective rank of the same
   objective falls 12.88 → 1.00. **The project's earlier description of this as a strong effective-rank
   instance is withdrawn.**
-- **Instance 1 (§4.5).** Earlier codebase generation; different benchmark statistic, undefined in this
-  repository; rank statistic unknown; **cited source file does not exist**.
-- **Instance 5 (§4.8).** Pending. D1-A's 9.81 / 1.71 numbers are a control documenting a defect:
-  *"Nothing about programme supervision may be concluded from it — the contrastive arm never trained,
-  so the comparison measures a defect, not an ablation."*
-- **All instances.** RankMe restricts itself to same-method comparisons and to a necessary-not-
-  sufficient reading. Four of the six instances do not contradict it as written, and each is labelled
-  in §4.1.
+- **Decorrelation (§4.9).** Earlier codebase generation; benchmark statistic undefined in this
+  repository; rank statistic unknown; **cited source file does not exist**. `[NOT RECOMPUTABLE]`.
+- **D1-A's 9.81 / 1.71 (§4.9).** **Statistic R3**, `[NOT RECOMPUTED]` under R1. *"Nothing about programme
+  supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
+  defect, not an ablation."*
+- **§5's momentum sweep.** **One seed per momentum value**, centred R3, durability established only to
+  step 600 against a 583-step training duration. The anchoring account is **not confirmed** and should
+  not be cited as established; the turnover sharpening was predeclared, tested and **refuted**.
+- **All rank numbers.** RankMe's ε sits outside the division, so its statistic is not the exponential of a
+  Shannon entropy and **no number in this paper is comparable to a published RankMe value**.

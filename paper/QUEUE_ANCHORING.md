@@ -1,5 +1,25 @@
 # A queued contrastive objective needs an independent reference frame, not fresher keys
 
+> **SUPERSEDED AS A SUBMISSION UNIT, 2026-08-04.** This material is now **§5.2 of
+> `paper/P2_RANK_DRAFT.md`**, by the author's decision. **Do not submit this file separately.**
+>
+> Three things the integration added and which this file should be read with. (i) **MoCo now carries an
+> identifier** — He, Fan, Wu, Xie & Girshick, "Momentum Contrast for Unsupervised Visual Representation
+> Learning", CVPR 2020, arXiv:1911.05722, verified at full text — where this repository previously had
+> only a bare "He et al., 2020". (ii) **MoCo advances the staleness account twice as a hypothesis**
+> (*"Our hypothesis is that…"*, *"We hypothesize that…"*), never as an established mechanism, and the
+> falsification below is written to say so. (iii) MoCo ties the argument specifically to **queue** use
+> (*"a slowly evolving key encoder is a core to making use of a queue"*), so the falsification is in
+> scope only because ours is a queue setting — which is now stated rather than left to be inferred.
+>
+> **And one thing the integration exposed, recorded here because it belongs with the numbers.** The
+> `m = 0` versus `m = 0.999` decision at step 600 rests on **2.81 against 7.42, a 2.64× ratio, which is
+> inside the 2.69× same-seed retraining envelope P2 §4.1 measures** — and this sweep is **one seed per
+> momentum value**. P2 §5.3 states why the fix is nonetheless reported as real (monotone across four m
+> values, flat over 400 steps, readings at the collapse floor, and a tight fixed-seed repeat with a
+> 3.5× separation and an empty band) and states equally plainly that **no seed replication of this
+> sweep exists**, which is the measurement that would close the gap.
+
 *Draft section, 2026-08-03. Companion to `LIVENESS_GATE_DESIGN.md`. Every number traces to a named
 entry in `NOTEBOOK_ENTRIES/` or a log under `~/e0_run/d1_diag/`. Claims not measured are marked as
 such. This section reports a fix that works and an explanation that does **not**, and is written that
