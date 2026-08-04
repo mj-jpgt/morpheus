@@ -380,7 +380,8 @@ Tests `v2/tests/test_p4_inductive_wiring.py`, 15 tests.
 Outputs `~/ws_p4i/out/{A_plant_inductive_f50, B_inductive_f50, B_transductive_exposure_f50,
 C_inductive_f50, C_inductive_f70, C_transductive_exposure_f50, C_transductive_REGRESSION,
 site_coverage_probe}.json`, vendored into `v2/research/rebase/nature/p4_certification/out/`.
-Probe driver `site_coverage_probe.py`, vendored beside them.
+Probe driver `v2/research/rebase/nature/p4_certification/site_coverage_probe.py` (it defines no
+statistic either — it imports `prepare_state` and `certify_axes` unchanged).
 Operator `v2/calibra/inductive_adjustment.py`, used unchanged. Reference digest of the f = 0.5
 discovery-fold operator, as fitted for Tests B and C:
 `2060a635fa83756a1c3b7aa8506b7b19fcc4431f5d1a303da39b3cb2bf9d62ce`. The planted-axis ladder fits its
