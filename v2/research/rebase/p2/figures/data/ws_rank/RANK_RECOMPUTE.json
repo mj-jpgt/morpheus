@@ -1,0 +1,555 @@
+{
+  "canonical": "centred|order1",
+  "variant_order": [
+    "R1",
+    "R2",
+    "R3",
+    "R1_uncentred",
+    "R1_rownorm",
+    "R2_uncentred"
+  ],
+  "instances": {
+    "instance6_D2": {
+      "H42": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 20.138974292485937,
+          "R2": 9.633110283562699,
+          "R3": 9.633110264773775,
+          "R1_uncentred": 4.27562977433185,
+          "R1_rownorm": 20.13897426158377,
+          "R2_uncentred": 1.929049511321906
+        },
+        "raw_legacy_R1_absolute_cut": 20.138974292485937,
+        "residualised": {
+          "R1": 23.38680302245344,
+          "R2": 10.733257283303892,
+          "R3": 12.613752030749167,
+          "R1_uncentred": 23.38680302245344,
+          "R1_rownorm": 27.55765098401751,
+          "R2_uncentred": 10.733257283303898
+        },
+        "residualised_legacy_R1_absolute_cut": 23.38680302245344,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/d2_v3_s42/artifacts/d2_h_seed42.npz"
+      },
+      "I42": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 13.710406921404056,
+          "R2": 7.671843012039919,
+          "R3": 7.671843014827899,
+          "R1_uncentred": 2.5493947029606883,
+          "R1_rownorm": 13.71040693931975,
+          "R2_uncentred": 1.474146632231752
+        },
+        "raw_legacy_R1_absolute_cut": 13.710406921404056,
+        "residualised": {
+          "R1": 14.867530034943492,
+          "R2": 8.18708580932643,
+          "R3": 9.140836579748147,
+          "R1_uncentred": 14.867530034943485,
+          "R1_rownorm": 16.91600417562238,
+          "R2_uncentred": 8.18708580932643
+        },
+        "residualised_legacy_R1_absolute_cut": 14.867530034943492,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/d2_v3_s42/artifacts/d2_i_seed42.npz"
+      },
+      "H43": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 24.673932196337365,
+          "R2": 11.719613835357308,
+          "R3": 11.719613839011044,
+          "R1_uncentred": 11.25041116262349,
+          "R1_rownorm": 24.673932182146565,
+          "R2_uncentred": 4.2739627331144145
+        },
+        "raw_legacy_R1_absolute_cut": 24.673932196337365,
+        "residualised": {
+          "R1": 28.77147195466611,
+          "R2": 13.226601681101512,
+          "R3": 14.745584221917605,
+          "R1_uncentred": 28.771471954666087,
+          "R1_rownorm": 32.089524378676586,
+          "R2_uncentred": 13.226601681101512
+        },
+        "residualised_legacy_R1_absolute_cut": 28.77147195466611,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/d2_v3_s43/artifacts/d2_h_seed43.npz"
+      },
+      "I43": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 28.799801941890077,
+          "R2": 11.110817552865637,
+          "R3": 11.110817525085961,
+          "R1_uncentred": 3.326824327430303,
+          "R1_rownorm": 28.799801711558302,
+          "R2_uncentred": 1.5790842203490314
+        },
+        "raw_legacy_R1_absolute_cut": 28.799801941890077,
+        "residualised": {
+          "R1": 34.11676100121169,
+          "R2": 12.972204510527737,
+          "R3": 15.915318264110347,
+          "R1_uncentred": 34.11676100121168,
+          "R1_rownorm": 42.154610828652274,
+          "R2_uncentred": 12.972204510527733
+        },
+        "residualised_legacy_R1_absolute_cut": 34.11676100121169,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/d2_v3_s43/artifacts/d2_i_seed43.npz"
+      },
+      "H44": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 8.447078723072597,
+          "R2": 5.385332469035257,
+          "R3": 5.385332484736041,
+          "R1_uncentred": 2.4373195018544007,
+          "R1_rownorm": 8.447078765440144,
+          "R2_uncentred": 1.50963356703109
+        },
+        "raw_legacy_R1_absolute_cut": 8.447078723072597,
+        "residualised": {
+          "R1": 9.142597538004145,
+          "R2": 5.733148913084256,
+          "R3": 6.564123393644654,
+          "R1_uncentred": 9.142597538004145,
+          "R1_rownorm": 10.540773580361977,
+          "R2_uncentred": 5.733148913084256
+        },
+        "residualised_legacy_R1_absolute_cut": 9.142597538004145,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/d2_v3_s44/artifacts/d2_h_seed44.npz"
+      },
+      "I44": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 8.313156243590825,
+          "R2": 5.449430357778299,
+          "R3": 5.44943036171475,
+          "R1_uncentred": 1.9527687083593777,
+          "R1_rownorm": 8.313156284339676,
+          "R2_uncentred": 1.3220532774201454
+        },
+        "raw_legacy_R1_absolute_cut": 8.313156243590825,
+        "residualised": {
+          "R1": 9.105243030679366,
+          "R2": 5.814623464621706,
+          "R3": 6.301544389222953,
+          "R1_uncentred": 9.105243030679366,
+          "R1_rownorm": 10.18248164446403,
+          "R2_uncentred": 5.8146234646217065
+        },
+        "residualised_legacy_R1_absolute_cut": 9.105243030679366,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/d2_v3_s44/artifacts/d2_i_seed44.npz"
+      },
+      "H42_recovered_reexport": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 7.924946083225932,
+          "R2": 4.806739440969843,
+          "R3": 4.806739458455831,
+          "R1_uncentred": 2.063525530175814,
+          "R1_rownorm": 7.924946173526435,
+          "R2_uncentred": 1.3690356897512659
+        },
+        "raw_legacy_R1_absolute_cut": 7.924946083225932,
+        "residualised": {
+          "R1": 8.680900737861744,
+          "R2": 5.264296588806054,
+          "R3": 6.002283676924136,
+          "R1_uncentred": 8.680900737861748,
+          "R1_rownorm": 10.167398348818208,
+          "R2_uncentred": 5.264296588806054
+        },
+        "residualised_legacy_R1_absolute_cut": 8.680900737861744,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/recovered_artifacts/d2_h_seed42.npz"
+      },
+      "I42_recovered_epoch13": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 6.53521576816456,
+          "R2": 3.4443337695214247,
+          "R3": 3.4443337885863023,
+          "R1_uncentred": 1.3643689212270145,
+          "R1_rownorm": 6.535215793711054,
+          "R2_uncentred": 1.1162227232478992
+        },
+        "raw_legacy_R1_absolute_cut": 6.53521576816456,
+        "residualised": {
+          "R1": 7.080800231972525,
+          "R2": 3.578550663197529,
+          "R3": 4.9488831930092205,
+          "R1_uncentred": 7.080800231972524,
+          "R1_rownorm": 10.502037942232466,
+          "R2_uncentred": 3.578550663197529
+        },
+        "residualised_legacy_R1_absolute_cut": 7.080800231972525,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d2_v3/recovered_artifacts/d2_i_seed42_EPOCH13.npz"
+      }
+    },
+    "instance4_dilution": {
+      "wsi_dilution_000": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 196.18712261969037,
+          "R2": 147.03892747142396,
+          "R3": 150.49316541415203,
+          "R1_uncentred": 193.75188726928312,
+          "R1_rownorm": 198.22070381477192,
+          "R2_uncentred": 142.81979235343843
+        },
+        "raw_legacy_R1_absolute_cut": 196.18712261969037,
+        "residualised": {
+          "R1": 210.1789530501931,
+          "R2": 170.6743959417838,
+          "R3": 173.34838339920296,
+          "R1_uncentred": 210.1789530501931,
+          "R1_rownorm": 211.76725287417432,
+          "R2_uncentred": 170.6743959417838
+        },
+        "residualised_legacy_R1_absolute_cut": 210.1789530501931,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      },
+      "wsi_dilution_010": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 194.10176521641083,
+          "R2": 143.496243976053,
+          "R3": 147.7130820450406,
+          "R1_uncentred": 191.2939999176689,
+          "R1_rownorm": 196.55714252686326,
+          "R2_uncentred": 138.65700872420248
+        },
+        "raw_legacy_R1_absolute_cut": 194.10176521641083,
+        "residualised": {
+          "R1": 210.23017905647438,
+          "R2": 170.84517381793447,
+          "R3": 173.63620784872452,
+          "R1_uncentred": 210.2301790564742,
+          "R1_rownorm": 211.88553610070656,
+          "R2_uncentred": 170.8451738179344
+        },
+        "residualised_legacy_R1_absolute_cut": 210.23017905647438,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      },
+      "wsi_dilution_020": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 190.5317570064339,
+          "R2": 137.7636695389421,
+          "R3": 143.10555419945092,
+          "R1_uncentred": 187.25681767391538,
+          "R1_rownorm": 193.64334302344488,
+          "R2_uncentred": 132.24440770796292
+        },
+        "raw_legacy_R1_absolute_cut": 190.5317570064339,
+        "residualised": {
+          "R1": 209.47228038754136,
+          "R2": 169.8094727988741,
+          "R3": 172.85806446926864,
+          "R1_uncentred": 209.47228038754156,
+          "R1_rownorm": 211.28944418517105,
+          "R2_uncentred": 169.80947279887405
+        },
+        "residualised_legacy_R1_absolute_cut": 209.47228038754136,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      },
+      "wsi_dilution_030": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 187.4934693722574,
+          "R2": 133.1188749724958,
+          "R3": 139.27149992945172,
+          "R1_uncentred": 183.86858649058073,
+          "R1_rownorm": 191.1150088225998,
+          "R2_uncentred": 127.15232040441171
+        },
+        "raw_legacy_R1_absolute_cut": 187.4934693722574,
+        "residualised": {
+          "R1": 208.43619334983916,
+          "R2": 168.25182688969184,
+          "R3": 171.52693744245536,
+          "R1_uncentred": 208.43619334983936,
+          "R1_rownorm": 210.40238971054177,
+          "R2_uncentred": 168.25182688969184
+        },
+        "residualised_legacy_R1_absolute_cut": 208.43619334983916,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      },
+      "wsi_dilution_040": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 184.6794740324831,
+          "R2": 129.1082172545766,
+          "R3": 135.71786286532375,
+          "R1_uncentred": 180.7896968644188,
+          "R1_rownorm": 188.6270140745392,
+          "R2_uncentred": 122.85034642635915
+        },
+        "raw_legacy_R1_absolute_cut": 184.6794740324831,
+        "residualised": {
+          "R1": 207.00282695149798,
+          "R2": 166.10134228323082,
+          "R3": 169.51953489257863,
+          "R1_uncentred": 207.00282695149798,
+          "R1_rownorm": 209.0829217200853,
+          "R2_uncentred": 166.10134228323082
+        },
+        "residualised_legacy_R1_absolute_cut": 207.00282695149798,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      },
+      "wsi_dilution_060": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 176.5226295527681,
+          "R2": 117.13163406623005,
+          "R3": 124.65785803358264,
+          "R1_uncentred": 171.74277424475548,
+          "R1_rownorm": 181.25323460807525,
+          "R2_uncentred": 109.98850133242759
+        },
+        "raw_legacy_R1_absolute_cut": 176.5226295527681,
+        "residualised": {
+          "R1": 205.14326810302708,
+          "R2": 163.30447510420802,
+          "R3": 167.03417094186452,
+          "R1_uncentred": 205.14326810302708,
+          "R1_rownorm": 207.43971139791472,
+          "R2_uncentred": 163.30447510420805
+        },
+        "residualised_legacy_R1_absolute_cut": 205.14326810302708,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      },
+      "wsi_dilution_080": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 161.22616977657373,
+          "R2": 96.85409530831168,
+          "R3": 105.21456097255093,
+          "R1_uncentred": 155.11560987371567,
+          "R1_rownorm": 167.30356313420145,
+          "R2_uncentred": 89.27686780928208
+        },
+        "raw_legacy_R1_absolute_cut": 161.22616977657373,
+        "residualised": {
+          "R1": 203.66687787806814,
+          "R2": 160.9458841769287,
+          "R3": 165.54529400568146,
+          "R1_uncentred": 203.66687787806814,
+          "R1_rownorm": 206.5415962782962,
+          "R2_uncentred": 160.94588417692864
+        },
+        "residualised_legacy_R1_absolute_cut": 203.66687787806814,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/p1_out/dilution/dilution_foreign_tumour_pca256.npz"
+      }
+    },
+    "instance5_D1B": {
+      "d1_p_seed42": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 25.307390313477963,
+          "R2": 11.042410148094996,
+          "R3": 11.04241019523043,
+          "R1_uncentred": 3.6356156680500478,
+          "R1_rownorm": 25.307390407501277,
+          "R2_uncentred": 1.6833021243841417
+        },
+        "raw_legacy_R1_absolute_cut": 25.307390313477963,
+        "residualised": {
+          "R1": 29.381308933624176,
+          "R2": 12.55514927234973,
+          "R3": 14.762493122508083,
+          "R1_uncentred": 29.38130893362419,
+          "R1_rownorm": 34.508092746724685,
+          "R2_uncentred": 12.555149272349729
+        },
+        "residualised_legacy_R1_absolute_cut": 29.381308933624176,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d1_v2/artifacts/d1_p_seed42.npz"
+      },
+      "d1_p_seed43": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 21.48004943659455,
+          "R2": 10.251685766241849,
+          "R3": 10.251685729675891,
+          "R1_uncentred": 3.6814143854443686,
+          "R1_rownorm": 21.48004935003288,
+          "R2_uncentred": 1.7342881955995884
+        },
+        "raw_legacy_R1_absolute_cut": 21.48004943659455,
+        "residualised": {
+          "R1": 24.672962002469852,
+          "R2": 11.56865121027398,
+          "R3": 13.173018410917502,
+          "R1_uncentred": 24.672962002469852,
+          "R1_rownorm": 28.793694585683753,
+          "R2_uncentred": 11.568651210273984
+        },
+        "residualised_legacy_R1_absolute_cut": 24.672962002469852,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d1_v2/artifacts/d1_p_seed43.npz"
+      },
+      "d1_p_seed44": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 10.089156221608304,
+          "R2": 6.376607585077249,
+          "R3": 6.376607594969173,
+          "R1_uncentred": 2.3335823597611607,
+          "R1_rownorm": 10.089156274441171,
+          "R2_uncentred": 1.4420040197932935
+        },
+        "raw_legacy_R1_absolute_cut": 10.089156221608304,
+        "residualised": {
+          "R1": 11.114807879257674,
+          "R2": 7.0147283867651495,
+          "R3": 7.621530172649017,
+          "R1_uncentred": 11.114807879257668,
+          "R1_rownorm": 12.222867114980579,
+          "R2_uncentred": 7.01472838676515
+        },
+        "residualised_legacy_R1_absolute_cut": 11.114807879257674,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d1_v2/artifacts/d1_p_seed44.npz"
+      },
+      "d1_f_seed42": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 12.531683951996145,
+          "R2": 8.249564935854846,
+          "R3": 8.249564940714041,
+          "R1_uncentred": 10.715649316829497,
+          "R1_rownorm": 12.5316839582155,
+          "R2_uncentred": 6.679223240743045
+        },
+        "raw_legacy_R1_absolute_cut": 12.531683951996145,
+        "residualised": {
+          "R1": 13.418404591667246,
+          "R2": 8.670586620620288,
+          "R3": 9.11826663873451,
+          "R1_uncentred": 13.418404591667246,
+          "R1_rownorm": 14.191072329896608,
+          "R2_uncentred": 8.670586620620288
+        },
+        "residualised_legacy_R1_absolute_cut": 13.418404591667246,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d1_v2/artifacts/d1_f_seed42.npz"
+      },
+      "d1_f_seed43": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 6.949890305153851,
+          "R2": 4.5494535852067335,
+          "R3": 4.549453587052848,
+          "R1_uncentred": 3.167951836221643,
+          "R1_rownorm": 6.9498903145532145,
+          "R2_uncentred": 1.9070201847369515
+        },
+        "raw_legacy_R1_absolute_cut": 6.949890305153851,
+        "residualised": {
+          "R1": 7.6002589980597755,
+          "R2": 4.858301207745426,
+          "R3": 5.320402835327442,
+          "R1_uncentred": 7.6002589980597755,
+          "R1_rownorm": 8.896466889109565,
+          "R2_uncentred": 4.858301207745427
+        },
+        "residualised_legacy_R1_absolute_cut": 7.6002589980597755,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d1_v2/artifacts/d1_f_seed43.npz"
+      },
+      "d1_f_seed44": {
+        "n_rows": 2766,
+        "n_features": 256,
+        "raw": {
+          "R1": 6.007604412203896,
+          "R2": 4.083857338942922,
+          "R3": 4.083857341883621,
+          "R1_uncentred": 3.5399818450765865,
+          "R1_rownorm": 6.007604423744638,
+          "R2_uncentred": 2.209175459826307
+        },
+        "raw_legacy_R1_absolute_cut": 6.007604412203896,
+        "residualised": {
+          "R1": 6.393658339897704,
+          "R2": 4.191164116917912,
+          "R3": 4.726249908703028,
+          "R1_uncentred": 6.393658339897706,
+          "R1_rownorm": 7.724109400600533,
+          "R2_uncentred": 4.1911641169179115
+        },
+        "residualised_legacy_R1_absolute_cut": 6.393658339897704,
+        "n_sites_kept": 84,
+        "path": "/home/ubuntu/e0_run/d1_v2/artifacts/d1_f_seed44.npz"
+      }
+    },
+    "instability_tripwire_step200_R3": {
+      "d1_p_seed42": {
+        "epoch": 11,
+        "R3_at_step_200": 110.76536560058594,
+        "source": "/home/ubuntu/e0_run/d1_v2/d1_p_seed42/train_metrics.jsonl"
+      },
+      "d1_p_seed43": {
+        "epoch": 11,
+        "R3_at_step_200": 110.87931060791016,
+        "source": "/home/ubuntu/e0_run/d1_v2/d1_p_seed43/train_metrics.jsonl"
+      },
+      "d1_p_seed44": {
+        "epoch": 11,
+        "R3_at_step_200": 111.07820892333984,
+        "source": "/home/ubuntu/e0_run/d1_v2/d1_p_seed44/train_metrics.jsonl"
+      },
+      "d1_f_seed42": {
+        "epoch": 11,
+        "R3_at_step_200": 7.544902801513672,
+        "source": "/home/ubuntu/e0_run/d1_v2/d1_f_seed42/train_metrics.jsonl"
+      },
+      "d1_f_seed43": {
+        "epoch": 11,
+        "R3_at_step_200": 45.645790100097656,
+        "source": "/home/ubuntu/e0_run/d1_v2/d1_f_seed43/train_metrics.jsonl"
+      },
+      "d1_f_seed44": {
+        "epoch": 11,
+        "R3_at_step_200": 12.193572998046875,
+        "source": "/home/ubuntu/e0_run/d1_v2/d1_f_seed44/train_metrics.jsonl"
+      }
+    }
+  }
+}

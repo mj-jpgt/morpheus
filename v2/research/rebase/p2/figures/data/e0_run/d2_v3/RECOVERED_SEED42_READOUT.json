@@ -1,0 +1,52 @@
+{
+  "H42_recovered": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/recovered_artifacts/d2_h_seed42.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 7.924946083225932,
+    "effective_rank_residualised": 8.680900737861748,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5861222245473453
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5781223907266543
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4488207963560225
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5851139152240687
+      }
+    }
+  },
+  "I42_recovered_epoch13": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/recovered_artifacts/d2_i_seed42_EPOCH13.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 6.53521576816456,
+    "effective_rank_residualised": 7.08080023197252,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5169840479612293
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5058441228427862
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4316577564437598
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5387261851050966
+      }
+    }
+  }
+}

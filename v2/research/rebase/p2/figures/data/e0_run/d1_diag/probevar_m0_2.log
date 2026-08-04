@@ -1,0 +1,14 @@
+momentum=0.0  decorrelation=0.04  capacity=4096  steps=200  probe=256
+tau=0.0 steps   T=capacity/214=19.1 steps   tau/T=0.00
+  step  eff-rank  feat-std  rna-rna  contrastive
+     0     67.55    0.0342   0.3650          nan
+    50      4.11    0.0198   0.8350       6.1967
+        STALENESS age:cos  0:0.410
+   100      3.20    0.0343   0.7400       5.9445
+        STALENESS age:cos  0:0.239
+   150      1.80    0.0229   0.8223       5.8008
+        STALENESS age:cos  0:0.714
+   200      1.46    0.0073   0.8725       7.7149
+        STALENESS age:cos  0:0.909
+
+DONE momentum=0.0 decorr=0.04 final_eff_rank=1.46 rna_rna=0.8725

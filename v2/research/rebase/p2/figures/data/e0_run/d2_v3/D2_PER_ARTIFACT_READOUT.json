@@ -1,0 +1,458 @@
+{
+  "H42": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s42/artifacts/d2_h_seed42.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 20.138974292485937,
+    "effective_rank_residualised": 23.38680302245344,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.6214146053343567,
+        "null_mean": 0.14099059127555205,
+        "null_sd": 0.009108071072373878,
+        "null_p95": 0.1559267704484389,
+        "null_max": 0.1640474372717474,
+        "excess_over_null_mean": 0.48042401405880464,
+        "z_vs_null": 52.74706469034936,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.6125515560670497,
+        "null_mean": 0.14140086960032774,
+        "null_sd": 0.009570567404704407,
+        "null_p95": 0.15730194877977466,
+        "null_max": 0.16897392927871877,
+        "excess_over_null_mean": 0.471150686466722,
+        "z_vs_null": 49.229127860812945,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4671163352274094,
+        "null_mean": 0.14135295357276567,
+        "null_sd": 0.009316489189235567,
+        "null_p95": 0.15560819012303612,
+        "null_max": 0.16158134045820957,
+        "excess_over_null_mean": 0.32576338165464375,
+        "z_vs_null": 34.96632422769689,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.6203039312859415,
+        "null_mean": 0.1396255555323587,
+        "null_sd": 0.010118606614300083,
+        "null_p95": 0.15865189649198042,
+        "null_max": 0.16561046978741212,
+        "excess_over_null_mean": 0.48067837575358285,
+        "z_vs_null": 47.50440392398158,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "I42": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s42/artifacts/d2_i_seed42.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 13.710406921404056,
+    "effective_rank_residualised": 14.867530034943492,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.48547305554261694,
+        "null_mean": 0.13941206795989117,
+        "null_sd": 0.009843352336221065,
+        "null_p95": 0.15711324078749953,
+        "null_max": 0.1691258529852501,
+        "excess_over_null_mean": 0.34606098758272574,
+        "z_vs_null": 35.15682216406175,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.4800258605072433,
+        "null_mean": 0.13937166338675258,
+        "null_sd": 0.009651120134270141,
+        "null_p95": 0.15642341767890922,
+        "null_max": 0.16689006866387351,
+        "excess_over_null_mean": 0.3406541971204907,
+        "z_vs_null": 35.29685594844711,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.45719730057939956,
+        "null_mean": 0.14040163190358404,
+        "null_sd": 0.00961490863888775,
+        "null_p95": 0.1558772969946258,
+        "null_max": 0.1670247596762988,
+        "excess_over_null_mean": 0.31679566867581554,
+        "z_vs_null": 32.9483805383784,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5112483261217402,
+        "null_mean": 0.13930809524609944,
+        "null_sd": 0.009813603154161198,
+        "null_p95": 0.15742777559379212,
+        "null_max": 0.16459219286209079,
+        "excess_over_null_mean": 0.37194023087564076,
+        "z_vs_null": 37.900476005892834,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "H43": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s43/artifacts/d2_h_seed43.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 24.673932196337365,
+    "effective_rank_residualised": 28.77147195466611,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.6079875610897741,
+        "null_mean": 0.1403018682205938,
+        "null_sd": 0.009220684311637419,
+        "null_p95": 0.15815105432141058,
+        "null_max": 0.16541916461233075,
+        "excess_over_null_mean": 0.4676856928691804,
+        "z_vs_null": 50.721364820929246,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5970180659703436,
+        "null_mean": 0.14021967580910327,
+        "null_sd": 0.009517197304224267,
+        "null_p95": 0.15587631576918753,
+        "null_max": 0.1672992973058175,
+        "excess_over_null_mean": 0.4567983901612403,
+        "z_vs_null": 47.99715457811172,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4680722539658723,
+        "null_mean": 0.1409281465612222,
+        "null_sd": 0.009708490686000994,
+        "null_p95": 0.15562675202467433,
+        "null_max": 0.17046673766900997,
+        "excess_over_null_mean": 0.3271441074046501,
+        "z_vs_null": 33.69670095850949,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.6008654429391549,
+        "null_mean": 0.13983092513814938,
+        "null_sd": 0.009890539036268011,
+        "null_p95": 0.15546336005521746,
+        "null_max": 0.18082388801259008,
+        "excess_over_null_mean": 0.4610345178010055,
+        "z_vs_null": 46.61368972008701,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "I43": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s43/artifacts/d2_i_seed43.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 28.799801941890077,
+    "effective_rank_residualised": 34.11676100121169,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5003296952042298,
+        "null_mean": 0.14062712158400142,
+        "null_sd": 0.010559319388942228,
+        "null_p95": 0.15778300044480953,
+        "null_max": 0.18041388333102387,
+        "excess_over_null_mean": 0.35970257362022834,
+        "z_vs_null": 34.064939260849584,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.48815008139035565,
+        "null_mean": 0.1408787299265359,
+        "null_sd": 0.011083754303162288,
+        "null_p95": 0.15937401071872886,
+        "null_max": 0.17497201223418835,
+        "excess_over_null_mean": 0.3472713514638197,
+        "z_vs_null": 31.331563472562745,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4400273776520837,
+        "null_mean": 0.14158509980653272,
+        "null_sd": 0.010274133223102694,
+        "null_p95": 0.15809160414891482,
+        "null_max": 0.17031255032562254,
+        "excess_over_null_mean": 0.298442277845551,
+        "z_vs_null": 29.047927583269566,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5222152890991273,
+        "null_mean": 0.1404070292367862,
+        "null_sd": 0.010633017108505527,
+        "null_p95": 0.15946943916070086,
+        "null_max": 0.17425352569464678,
+        "excess_over_null_mean": 0.3818082598623411,
+        "z_vs_null": 35.907800764933064,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "H44": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s44/artifacts/d2_h_seed44.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 8.447078723072597,
+    "effective_rank_residualised": 9.142597538004145,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.6075158472855208,
+        "null_mean": 0.1402609066290011,
+        "null_sd": 0.00875342836254504,
+        "null_p95": 0.1539596041017428,
+        "null_max": 0.17028452684673007,
+        "excess_over_null_mean": 0.4672549406565197,
+        "z_vs_null": 53.37964981307808,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5982672623910414,
+        "null_mean": 0.14032677293706436,
+        "null_sd": 0.008824751156112386,
+        "null_p95": 0.15487670868176934,
+        "null_max": 0.169554114420198,
+        "excess_over_null_mean": 0.4579404894539771,
+        "z_vs_null": 51.892736843552655,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.46367282994532183,
+        "null_mean": 0.1411042388358828,
+        "null_sd": 0.009230921687074808,
+        "null_p95": 0.158170016875986,
+        "null_max": 0.16689781754417662,
+        "excess_over_null_mean": 0.32256859110943903,
+        "z_vs_null": 34.944353559092754,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.6075744864400102,
+        "null_mean": 0.1412559755077311,
+        "null_sd": 0.00951982945130824,
+        "null_p95": 0.15663327315189624,
+        "null_max": 0.16997515299651958,
+        "excess_over_null_mean": 0.4663185109322791,
+        "z_vs_null": 48.98391439861314,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "I44": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s44/artifacts/d2_i_seed44.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 8.313156243590825,
+    "effective_rank_residualised": 9.105243030679366,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.4882779083017052,
+        "null_mean": 0.13928512214407207,
+        "null_sd": 0.009018925360433225,
+        "null_p95": 0.15359678007178426,
+        "null_max": 0.1610701356858945,
+        "excess_over_null_mean": 0.34899278615763313,
+        "z_vs_null": 38.69560642875408,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.4756549231036225,
+        "null_mean": 0.13994289044839214,
+        "null_sd": 0.009285678137587747,
+        "null_p95": 0.1551890969562279,
+        "null_max": 0.16760878293487144,
+        "excess_over_null_mean": 0.33571203265523036,
+        "z_vs_null": 36.153744258730285,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.43687316109907043,
+        "null_mean": 0.14006315333757327,
+        "null_sd": 0.008805479976713484,
+        "null_p95": 0.15416461082502506,
+        "null_max": 0.16951103168723167,
+        "excess_over_null_mean": 0.29681000776149713,
+        "z_vs_null": 33.70741953265756,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.49266386693558234,
+        "null_mean": 0.13984060385684094,
+        "null_sd": 0.009655808286898339,
+        "null_p95": 0.1568354501365777,
+        "null_max": 0.16504578945383946,
+        "excess_over_null_mean": 0.3528232630787414,
+        "z_vs_null": 36.5400029283386,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "H42_recovered": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/recovered_artifacts/d2_h_seed42.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 7.924946083225932,
+    "effective_rank_residualised": 8.680900737861744,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5861222245473448,
+        "null_mean": 0.1395225671135787,
+        "null_sd": 0.008825373622581057,
+        "null_p95": 0.153579963983224,
+        "null_max": 0.16345573319256684,
+        "excess_over_null_mean": 0.44659965743376606,
+        "z_vs_null": 50.60405106148403,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5781223907266542,
+        "null_mean": 0.13975460829064,
+        "null_sd": 0.008689554329696024,
+        "null_p95": 0.15546336605314412,
+        "null_max": 0.16897272233683877,
+        "excess_over_null_mean": 0.43836778243601415,
+        "z_vs_null": 50.44767151497274,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4488207963560227,
+        "null_mean": 0.1416136841778493,
+        "null_sd": 0.009641517682246564,
+        "null_p95": 0.15849333806626018,
+        "null_max": 0.16371734560010875,
+        "excess_over_null_mean": 0.30720711217817337,
+        "z_vs_null": 31.862941323423602,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5851139152240686,
+        "null_mean": 0.14050599630613142,
+        "null_sd": 0.008999909148221593,
+        "null_p95": 0.1563289679048893,
+        "null_max": 0.16337168591176465,
+        "excess_over_null_mean": 0.4446079189179372,
+        "z_vs_null": 49.401378569003995,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  },
+  "I42_recovered_epoch13": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/recovered_artifacts/d2_i_seed42_EPOCH13.npz",
+    "n_test": 2766,
+    "n_sites_kept": 84,
+    "effective_rank_raw": 6.53521576816456,
+    "effective_rank_residualised": 7.080800231972525,
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5169840479612291,
+        "null_mean": 0.1402196421865463,
+        "null_sd": 0.008806114347044525,
+        "null_p95": 0.15445302002571448,
+        "null_max": 0.16773944674087385,
+        "excess_over_null_mean": 0.3767644057746828,
+        "z_vs_null": 42.78440989142175,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5058441228427865,
+        "null_mean": 0.1401072623524625,
+        "null_sd": 0.009134165623057251,
+        "null_p95": 0.1535052544893141,
+        "null_max": 0.16935807325335853,
+        "excess_over_null_mean": 0.36573686049032395,
+        "z_vs_null": 40.04053304738632,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.43165775644376064,
+        "null_mean": 0.13972926989146692,
+        "null_sd": 0.009669068990534801,
+        "null_p95": 0.15689291752963533,
+        "null_max": 0.17154244919440328,
+        "excess_over_null_mean": 0.29192848655229375,
+        "z_vs_null": 30.191995407010438,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5387261851050973,
+        "null_mean": 0.14104317616449283,
+        "null_sd": 0.008928302109567732,
+        "null_p95": 0.15476927647497318,
+        "null_max": 0.1660807244717307,
+        "excess_over_null_mean": 0.3976830089406045,
+        "z_vs_null": 44.54184054932909,
+        "permutation_p": 0.004975124378109453,
+        "n_permutations": 200
+      }
+    }
+  }
+}

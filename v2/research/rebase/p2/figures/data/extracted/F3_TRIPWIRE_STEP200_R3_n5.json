@@ -1,0 +1,101 @@
+{
+ "block": "training batch (in-run); states never saved, so [NOT RECOMPUTABLE] under R1",
+ "epoch": 11,
+ "global_step": 200,
+ "key": "train_rank_tripwire_observed",
+ "runs": {
+  "d1_f_seed42": {
+   "arm": "programme_free",
+   "epoch": 11,
+   "seed": 42,
+   "source": "/home/ubuntu/e0_run/d1_v2/d1_f_seed42/train_metrics.jsonl",
+   "source_bytes": 74383,
+   "source_sha256": "77fab096c8d031feec17004412d0b95b93d2809b6efcf07b418673254dd57f3f",
+   "value": 7.544902801513672
+  },
+  "d1_f_seed43": {
+   "arm": "programme_free",
+   "epoch": 11,
+   "seed": 43,
+   "source": "/home/ubuntu/e0_run/d1_v2/d1_f_seed43/train_metrics.jsonl",
+   "source_bytes": 74404,
+   "source_sha256": "665bb5160cea72d3e6c3db3d2000e0b52afe636529574055dddd4ece000af7d7",
+   "value": 45.645790100097656
+  },
+  "d1_f_seed44": {
+   "arm": "programme_free",
+   "epoch": 11,
+   "seed": 44,
+   "source": "/home/ubuntu/e0_run/d1_v2/d1_f_seed44/train_metrics.jsonl",
+   "source_bytes": 74373,
+   "source_sha256": "db89c870ea5009ecaad54349dc0326f8f4fa4746d8afb77c8447e6f5e92cf926",
+   "value": 12.193572998046875
+  },
+  "d1_f_seed45": {
+   "arm": "programme_free",
+   "epoch": 11,
+   "seed": 45,
+   "source": "/home/ubuntu/e0_run/d1_seeds4546/d1_f_seed45/train_metrics.jsonl",
+   "source_bytes": 76885,
+   "source_sha256": "a7ed2d56fe22d76fd09facb36f0dd0f81c99e6c75526c54ab5a24acfb145837b",
+   "value": 18.88138695887022
+  },
+  "d1_f_seed46": {
+   "arm": "programme_free",
+   "epoch": 11,
+   "seed": 46,
+   "source": "/home/ubuntu/e0_run/d1_seeds4546/d1_f_seed46/train_metrics.jsonl",
+   "source_bytes": 76884,
+   "source_sha256": "abf8d4c685f82ffde46781003472a684de2d9bb8e57dd7c8636e2b9270157e67",
+   "value": 22.51759381824863
+  },
+  "d1_p_seed42": {
+   "arm": "programme_only",
+   "epoch": 11,
+   "seed": 42,
+   "source": "/home/ubuntu/e0_run/d1_v2/d1_p_seed42/train_metrics.jsonl",
+   "source_bytes": 102186,
+   "source_sha256": "690a832cdca1a75d798874a0479cc143e79571dc67640c9e8beac81fc4baef78",
+   "value": 110.76536560058594
+  },
+  "d1_p_seed43": {
+   "arm": "programme_only",
+   "epoch": 11,
+   "seed": 43,
+   "source": "/home/ubuntu/e0_run/d1_v2/d1_p_seed43/train_metrics.jsonl",
+   "source_bytes": 102203,
+   "source_sha256": "21a4bd39cce1fc2b66825a7f1a32124768f09eddf80f411a83680f926654f2ea",
+   "value": 110.87931060791016
+  },
+  "d1_p_seed44": {
+   "arm": "programme_only",
+   "epoch": 11,
+   "seed": 44,
+   "source": "/home/ubuntu/e0_run/d1_v2/d1_p_seed44/train_metrics.jsonl",
+   "source_bytes": 102209,
+   "source_sha256": "92a5f2ef99e5090eb9ff1e8fa5214311f1f47139a1a63b75f290cf954ea87603",
+   "value": 111.07820892333984
+  },
+  "d1_p_seed45": {
+   "arm": "programme_only",
+   "epoch": 11,
+   "seed": 45,
+   "source": "/home/ubuntu/e0_run/d1_seeds4546/d1_p_seed45/train_metrics.jsonl",
+   "source_bytes": 104596,
+   "source_sha256": "402ea03fd310b5b6a37bc33e3bdefb43ae848a6a111e6f53e3acc2a540b31c86",
+   "value": 94.95166617064918
+  },
+  "d1_p_seed46": {
+   "arm": "programme_only",
+   "epoch": 11,
+   "seed": 46,
+   "source": "/home/ubuntu/e0_run/d1_seeds4546/d1_p_seed46/train_metrics.jsonl",
+   "source_bytes": 104653,
+   "source_sha256": "67d7ec51005840244b65d64c7ea12299a81c4bfc091ca71697bb21d25190d29a",
+   "value": 112.07783036657985
+  }
+ },
+ "statistic": "R3",
+ "statistic_definition": "centred + L2-row-normalised, order-2 Hill number of the singular values",
+ "statistic_site": "v2/calibra/spectral.py RANK_VARIANTS['R3']; emitted by training.py as the in-run tripwire"
+}

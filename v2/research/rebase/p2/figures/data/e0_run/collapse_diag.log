@@ -1,0 +1,33 @@
+==============================================================
+H2 CHECK -- is the information present in the RAW inputs?
+  raw H-Optimus patient mean   offdiag cos mean 0.3265  (1.0 = identical patients)
+  raw RNA                      offdiag cos mean 0.0587  (1.0 = identical patients)
+  inputs are separable in BOTH modalities -> the information is present.
+==============================================================
+H1 CHECK -- does the model destroy it, and is another term cancelling?
+
+--- A. full programme_free schedule (the gate as it runs today)
+  in-batch InfoNCE   3.4681 -> 2.7734   (chance 2.7726, perfect ~0)
+  retrieval acc@1    0.062 -> 0.000          (chance 0.062)
+  cross pos cos      0.0538 -> 0.9959
+  cross neg cos      0.0816 -> 0.9960
+  WSI within-modality offdiag cos 0.7089 -> 0.9999
+  z_biology matrix rank 16 -> 16  (max 16)
+
+--- B. contrastive ONLY (all other weights zeroed)
+  in-batch InfoNCE   3.4681 -> 2.0789   (chance 2.7726, perfect ~0)
+  retrieval acc@1    0.062 -> 0.188          (chance 0.062)
+  cross pos cos      0.0538 -> 0.9988
+  cross neg cos      0.0816 -> 0.4895
+  WSI within-modality offdiag cos 0.7089 -> 0.4918
+  z_biology matrix rank 16 -> 16  (max 16)
+
+--- C. contrastive only, lr 3e-3
+  in-batch InfoNCE   3.4681 -> 2.7724   (chance 2.7726, perfect ~0)
+  retrieval acc@1    0.062 -> 0.125          (chance 0.062)
+  cross pos cos      0.0538 -> 0.9997
+  cross neg cos      0.0816 -> 0.9997
+  WSI within-modality offdiag cos 0.7089 -> 0.9998
+  z_biology matrix rank 16 -> 16  (max 16)
+
+DIAG_DONE

@@ -1,0 +1,206 @@
+{
+  "H42": {
+    "wsi_biology": {
+      "eff_rank": 23.38680302245344,
+      "cca_insample": 0.6125515560670494,
+      "cca_heldout": 0.587055770108972
+    },
+    "rna_biology": {
+      "eff_rank": 23.031218761248624,
+      "cca_insample": 0.8476190224737804,
+      "cca_heldout": 0.8267750831990577
+    },
+    "full_biology": {
+      "eff_rank": 25.16447033872885,
+      "cca_insample": 0.8515757529295541,
+      "cca_heldout": 0.8318052520905869
+    }
+  },
+  "I42": {
+    "wsi_biology": {
+      "eff_rank": 14.867530034943492,
+      "cca_insample": 0.4800258605072436,
+      "cca_heldout": 0.4330047615568629
+    },
+    "rna_biology": {
+      "eff_rank": 27.761219588916898,
+      "cca_insample": 0.8019261930869888,
+      "cca_heldout": 0.7857373552856033
+    },
+    "full_biology": {
+      "eff_rank": 31.066166543889754,
+      "cca_insample": 0.7957922357594077,
+      "cca_heldout": 0.7821538617885025
+    }
+  },
+  "H43": {
+    "wsi_biology": {
+      "eff_rank": 28.771471954666076,
+      "cca_insample": 0.597018065970344,
+      "cca_heldout": 0.573727447520819
+    },
+    "rna_biology": {
+      "eff_rank": 25.72073691828961,
+      "cca_insample": 0.846456101212959,
+      "cca_heldout": 0.8269649363617646
+    },
+    "full_biology": {
+      "eff_rank": 27.736285658292292,
+      "cca_insample": 0.8487162841217112,
+      "cca_heldout": 0.8295880801828268
+    }
+  },
+  "I43": {
+    "wsi_biology": {
+      "eff_rank": 34.11676100121171,
+      "cca_insample": 0.4881500813903558,
+      "cca_heldout": 0.4539454725736979
+    },
+    "rna_biology": {
+      "eff_rank": 28.705193513580138,
+      "cca_insample": 0.7898653524237403,
+      "cca_heldout": 0.7681132738295433
+    },
+    "full_biology": {
+      "eff_rank": 28.912488385405997,
+      "cca_insample": 0.7895645241614238,
+      "cca_heldout": 0.7678319823295098
+    }
+  },
+  "H44": {
+    "wsi_biology": {
+      "eff_rank": 9.142597538004145,
+      "cca_insample": 0.5982672623910417,
+      "cca_heldout": 0.5684015444707147
+    },
+    "rna_biology": {
+      "eff_rank": 23.356015616243305,
+      "cca_insample": 0.8498283824195523,
+      "cca_heldout": 0.831784891318077
+    },
+    "full_biology": {
+      "eff_rank": 26.001141195866676,
+      "cca_insample": 0.8463344122730743,
+      "cca_heldout": 0.8289112551222035
+    }
+  },
+  "I44": {
+    "wsi_biology": {
+      "eff_rank": 9.10524303067937,
+      "cca_insample": 0.47565492310362284,
+      "cca_heldout": 0.4169525546605732
+    },
+    "rna_biology": {
+      "eff_rank": 28.913705227164538,
+      "cca_insample": 0.7949626826645838,
+      "cca_heldout": 0.7774436353064135
+    },
+    "full_biology": {
+      "eff_rank": 29.65271773732284,
+      "cca_insample": 0.7961399145691178,
+      "cca_heldout": 0.7786317549866973
+    }
+  },
+  "P42": {
+    "wsi_biology": {
+      "eff_rank": 29.38130893362416,
+      "cca_insample": 0.6116834763388966,
+      "cca_heldout": 0.5831206909789272
+    },
+    "rna_biology": {
+      "eff_rank": 27.635434785761746,
+      "cca_insample": 0.8533463863073802,
+      "cca_heldout": 0.8312469992233311
+    },
+    "full_biology": {
+      "eff_rank": 30.257121354215105,
+      "cca_insample": 0.852960595875474,
+      "cca_heldout": 0.8320830202316798
+    }
+  },
+  "F42": {
+    "wsi_biology": {
+      "eff_rank": 13.418404591667239,
+      "cca_insample": 0.5411789792013619,
+      "cca_heldout": 0.4914875741208381
+    },
+    "rna_biology": {
+      "eff_rank": 15.649734623020674,
+      "cca_insample": 0.8221999856424406,
+      "cca_heldout": 0.7933059769009242
+    },
+    "full_biology": {
+      "eff_rank": 13.45729432026776,
+      "cca_insample": 0.5548642473165458,
+      "cca_heldout": 0.5057218370226259
+    }
+  },
+  "P43": {
+    "wsi_biology": {
+      "eff_rank": 24.672962002469852,
+      "cca_insample": 0.6198440780017844,
+      "cca_heldout": 0.5975623745744384
+    },
+    "rna_biology": {
+      "eff_rank": 27.703512225341914,
+      "cca_insample": 0.8468474352279642,
+      "cca_heldout": 0.828609544121599
+    },
+    "full_biology": {
+      "eff_rank": 28.182042516988325,
+      "cca_insample": 0.8471984672298551,
+      "cca_heldout": 0.8284653297639308
+    }
+  },
+  "F43": {
+    "wsi_biology": {
+      "eff_rank": 7.6002589980597755,
+      "cca_insample": 0.5335539168779119,
+      "cca_heldout": 0.5092975949822862
+    },
+    "rna_biology": {
+      "eff_rank": 9.71301797039319,
+      "cca_insample": 0.8309693708364453,
+      "cca_heldout": 0.8084977522805105
+    },
+    "full_biology": {
+      "eff_rank": 7.816012592038773,
+      "cca_insample": 0.5465069244665476,
+      "cca_heldout": 0.5215722735981543
+    }
+  },
+  "P44": {
+    "wsi_biology": {
+      "eff_rank": 11.114807879257674,
+      "cca_insample": 0.6087073807253248,
+      "cca_heldout": 0.5767104538126877
+    },
+    "rna_biology": {
+      "eff_rank": 29.061587129793875,
+      "cca_insample": 0.8506981628236052,
+      "cca_heldout": 0.8334830558546887
+    },
+    "full_biology": {
+      "eff_rank": 34.02502263738375,
+      "cca_insample": 0.85076640885608,
+      "cca_heldout": 0.8325379010571027
+    }
+  },
+  "F44": {
+    "wsi_biology": {
+      "eff_rank": 6.393658339897704,
+      "cca_insample": 0.512572673593902,
+      "cca_heldout": 0.4984886266513182
+    },
+    "rna_biology": {
+      "eff_rank": 9.643004307660307,
+      "cca_insample": 0.8080425791303066,
+      "cca_heldout": 0.7828354261985513
+    },
+    "full_biology": {
+      "eff_rank": 6.481196504873218,
+      "cca_insample": 0.5200984698114473,
+      "cca_heldout": 0.5064091953456535
+    }
+  }
+}

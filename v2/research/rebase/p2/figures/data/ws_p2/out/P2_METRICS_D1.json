@@ -1,0 +1,553 @@
+{
+  "_config": {
+    "seed": 42,
+    "alpha_index_range": [
+      11,
+      50
+    ],
+    "lidar_delta": 0.0001,
+    "subsamples": 40,
+    "subsample_fraction": 0.8,
+    "targets": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/data/frozen_rna_targets.npz"
+  },
+  "P42": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_p_seed42.npz",
+    "n_test": 2766,
+    "metrics": {
+      "effective_rank_raw": 25.307390313477963,
+      "effective_rank_residualised": 29.38130893362416,
+      "rankme_raw": 3.636355818827361,
+      "rankme_residualised": 29.386102895143594,
+      "participation_ratio_raw": 3.6773185662092036,
+      "participation_ratio_residualised": 4.416116801220988,
+      "stable_rank_raw": 2.1755703463559946,
+      "stable_rank_residualised": 2.6317425683647446,
+      "alpha_req_raw": {
+        "alpha": 2.226263769325292,
+        "n_points": 39,
+        "fit_r2": 0.9883064935522112,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "alpha_req_residualised": {
+        "alpha": 2.140859292369798,
+        "n_points": 39,
+        "fit_r2": 0.9855380232326086,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "lidar_raw": {
+        "lidar": 40.82376851275684,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      },
+      "lidar_residualised": {
+        "lidar": 40.90774346718038,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      }
+    },
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.6163704569899371
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.6116834763388966
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.47276997949045285
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.6136196632830838
+      }
+    },
+    "subsample": {
+      "effective_rank_residualised": {
+        "mean": 29.24361083784738,
+        "sd": 0.10201481234298895,
+        "n": 40,
+        "frac": 0.8
+      },
+      "rankme_raw": {
+        "mean": 3.63336051782415,
+        "sd": 0.01052277902701125,
+        "n": 40,
+        "frac": 0.8
+      },
+      "participation_ratio_residualised": {
+        "mean": 4.3960128384932515,
+        "sd": 0.0462347303613848,
+        "n": 40,
+        "frac": 0.8
+      },
+      "lidar_residualised": {
+        "mean": 40.82263897703213,
+        "sd": 0.07653355851688298,
+        "n": 40,
+        "frac": 0.8
+      }
+    }
+  },
+  "F42": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_f_seed42.npz",
+    "n_test": 2766,
+    "metrics": {
+      "effective_rank_raw": 12.53168395199615,
+      "effective_rank_residualised": 13.418404591667239,
+      "rankme_raw": 10.717924690596334,
+      "rankme_residualised": 13.421115181180346,
+      "participation_ratio_raw": 4.8602152643028145,
+      "participation_ratio_residualised": 4.967686865643535,
+      "stable_rank_raw": 3.3716051143777834,
+      "stable_rank_residualised": 3.2537655812600326,
+      "alpha_req_raw": {
+        "alpha": 5.548609230259163,
+        "n_points": 39,
+        "fit_r2": 0.9504853929169629,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "alpha_req_residualised": {
+        "alpha": 5.456451248227114,
+        "n_points": 39,
+        "fit_r2": 0.9509112978698088,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "lidar_raw": {
+        "lidar": 16.919523901218934,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      },
+      "lidar_residualised": {
+        "lidar": 20.33207365046397,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      }
+    },
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5473305772566878
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5411789792013619
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.450400115571971
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5446918136871817
+      }
+    },
+    "subsample": {
+      "effective_rank_residualised": {
+        "mean": 13.393349492584099,
+        "sd": 0.026841522418250288,
+        "n": 40,
+        "frac": 0.8
+      },
+      "rankme_raw": {
+        "mean": 10.7040454018299,
+        "sd": 0.025002215489603213,
+        "n": 40,
+        "frac": 0.8
+      },
+      "participation_ratio_residualised": {
+        "mean": 4.9628246978641855,
+        "sd": 0.027305997204400422,
+        "n": 40,
+        "frac": 0.8
+      },
+      "lidar_residualised": {
+        "mean": 20.268328434147016,
+        "sd": 0.07376192542109683,
+        "n": 40,
+        "frac": 0.8
+      }
+    }
+  },
+  "P43": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_p_seed43.npz",
+    "n_test": 2766,
+    "metrics": {
+      "effective_rank_raw": 21.480049436594566,
+      "effective_rank_residualised": 24.672962002469852,
+      "rankme_raw": 3.682181535436717,
+      "rankme_residualised": 24.67713439354114,
+      "participation_ratio_raw": 4.006865645596179,
+      "participation_ratio_residualised": 4.760027347649563,
+      "stable_rank_raw": 2.377673634975583,
+      "stable_rank_residualised": 2.9611616919112476,
+      "alpha_req_raw": {
+        "alpha": 2.914869008721842,
+        "n_points": 39,
+        "fit_r2": 0.944819704573066,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "alpha_req_residualised": {
+        "alpha": 2.7891366127320114,
+        "n_points": 39,
+        "fit_r2": 0.9261005878799449,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "lidar_raw": {
+        "lidar": 40.64225707045229,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      },
+      "lidar_residualised": {
+        "lidar": 40.82534607610028,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      }
+    },
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.62918436039555
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.6198440780017844
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.48104508798368106
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.6261782827620094
+      }
+    },
+    "subsample": {
+      "effective_rank_residualised": {
+        "mean": 24.5835792738117,
+        "sd": 0.06945364811029894,
+        "n": 40,
+        "frac": 0.8
+      },
+      "rankme_raw": {
+        "mean": 3.6789304855401865,
+        "sd": 0.010304477399937388,
+        "n": 40,
+        "frac": 0.8
+      },
+      "participation_ratio_residualised": {
+        "mean": 4.7470105073248,
+        "sd": 0.034744843354981195,
+        "n": 40,
+        "frac": 0.8
+      },
+      "lidar_residualised": {
+        "mean": 40.74195271165947,
+        "sd": 0.09775935960248454,
+        "n": 40,
+        "frac": 0.8
+      }
+    }
+  },
+  "F43": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_f_seed43.npz",
+    "n_test": 2766,
+    "metrics": {
+      "effective_rank_raw": 6.9498903051538505,
+      "effective_rank_residualised": 7.6002589980597755,
+      "rankme_raw": 3.1687176446408523,
+      "rankme_residualised": 7.601826797399387,
+      "participation_ratio_raw": 2.999963611526506,
+      "participation_ratio_residualised": 3.239388507160181,
+      "stable_rank_raw": 2.1773131402809875,
+      "stable_rank_residualised": 2.4825844348226616,
+      "alpha_req_raw": {
+        "alpha": 3.6036835898275776,
+        "n_points": 39,
+        "fit_r2": 0.9863818577559559,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "alpha_req_residualised": {
+        "alpha": 3.6214580024907206,
+        "n_points": 39,
+        "fit_r2": 0.9867982171984467,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "lidar_raw": {
+        "lidar": 5.80961787258982,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      },
+      "lidar_residualised": {
+        "lidar": 6.84558564472576,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      }
+    },
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5436287578533816
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.5335539168779119
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4738342530848546
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5502064454886543
+      }
+    },
+    "subsample": {
+      "effective_rank_residualised": {
+        "mean": 7.586400295442249,
+        "sd": 0.016335111517157525,
+        "n": 40,
+        "frac": 0.8
+      },
+      "rankme_raw": {
+        "mean": 3.1672929444046125,
+        "sd": 0.004526339370241177,
+        "n": 40,
+        "frac": 0.8
+      },
+      "participation_ratio_residualised": {
+        "mean": 3.2385220001906254,
+        "sd": 0.01128921018358102,
+        "n": 40,
+        "frac": 0.8
+      },
+      "lidar_residualised": {
+        "mean": 6.836917891666973,
+        "sd": 0.032847019125598856,
+        "n": 40,
+        "frac": 0.8
+      }
+    }
+  },
+  "P44": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_p_seed44.npz",
+    "n_test": 2766,
+    "metrics": {
+      "effective_rank_raw": 10.08915622160831,
+      "effective_rank_residualised": 11.114807879257674,
+      "rankme_raw": 2.3341745142831622,
+      "rankme_residualised": 11.117084720611318,
+      "participation_ratio_raw": 3.26804079357588,
+      "participation_ratio_residualised": 4.0450784303595615,
+      "stable_rank_raw": 2.068969298910333,
+      "stable_rank_residualised": 2.736160061437673,
+      "alpha_req_raw": {
+        "alpha": 4.272087130233349,
+        "n_points": 39,
+        "fit_r2": 0.9777923615809263,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "alpha_req_residualised": {
+        "alpha": 4.244889277495201,
+        "n_points": 39,
+        "fit_r2": 0.9781566117913664,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "lidar_raw": {
+        "lidar": 40.57346815594567,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      },
+      "lidar_residualised": {
+        "lidar": 40.75065671919713,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      }
+    },
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.6127684817283924
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.6087073807253248
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.47465991097478666
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.5993055496870194
+      }
+    },
+    "subsample": {
+      "effective_rank_residualised": {
+        "mean": 11.097678343208136,
+        "sd": 0.03054298731468513,
+        "n": 40,
+        "frac": 0.8
+      },
+      "rankme_raw": {
+        "mean": 2.3335823162408387,
+        "sd": 0.004035914037535582,
+        "n": 40,
+        "frac": 0.8
+      },
+      "participation_ratio_residualised": {
+        "mean": 4.039784890715351,
+        "sd": 0.02253745079742844,
+        "n": 40,
+        "frac": 0.8
+      },
+      "lidar_residualised": {
+        "mean": 40.676291338703514,
+        "sd": 0.07632975394655889,
+        "n": 40,
+        "frac": 0.8
+      }
+    }
+  },
+  "F44": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_f_seed44.npz",
+    "n_test": 2766,
+    "metrics": {
+      "effective_rank_raw": 6.007604412203895,
+      "effective_rank_residualised": 6.393658339897704,
+      "rankme_raw": 3.5408539869989935,
+      "rankme_residualised": 6.3950424085570825,
+      "participation_ratio_raw": 2.866754232798964,
+      "participation_ratio_residualised": 2.6865827047971886,
+      "stable_rank_raw": 2.2280850823078833,
+      "stable_rank_residualised": 1.9598096473212985,
+      "alpha_req_raw": {
+        "alpha": 3.5975685793794656,
+        "n_points": 39,
+        "fit_r2": 0.9618052191332781,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "alpha_req_residualised": {
+        "alpha": 3.5805717196609295,
+        "n_points": 39,
+        "fit_r2": 0.9688744604099603,
+        "trange": [
+          11,
+          50
+        ],
+        "source": "authors fastssl/utils/powerlaw.py stringer_get_powerlaw, trange=arange(3,100)"
+      },
+      "lidar_raw": {
+        "lidar": 6.991554058574234,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      },
+      "lidar_residualised": {
+        "lidar": 8.050011593243893,
+        "delta": 0.0001,
+        "q": 2,
+        "n_classes": 2766
+      }
+    },
+    "points": {
+      "unrestricted": {
+        "n_targets": 90,
+        "top_cca": 0.5183864784393428
+      },
+      "untrained40": {
+        "n_targets": 40,
+        "top_cca": 0.512572673593902
+      },
+      "random_control": {
+        "n_targets": 90,
+        "top_cca": 0.4424709472565498
+      },
+      "hallmark_in_training": {
+        "n_targets": 50,
+        "top_cca": 0.521013501520524
+      }
+    },
+    "subsample": {
+      "effective_rank_residualised": {
+        "mean": 6.387234037785187,
+        "sd": 0.011005720782304896,
+        "n": 40,
+        "frac": 0.8
+      },
+      "rankme_raw": {
+        "mean": 3.5384308746048987,
+        "sd": 0.0035419334506679072,
+        "n": 40,
+        "frac": 0.8
+      },
+      "participation_ratio_residualised": {
+        "mean": 2.6834684598680694,
+        "sd": 0.015498090633692717,
+        "n": 40,
+        "frac": 0.8
+      },
+      "lidar_residualised": {
+        "mean": 8.02886514848463,
+        "sd": 0.03394963966785969,
+        "n": 40,
+        "frac": 0.8
+      }
+    }
+  }
+}

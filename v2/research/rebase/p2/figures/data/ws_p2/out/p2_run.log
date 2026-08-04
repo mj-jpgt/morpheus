@@ -1,0 +1,276 @@
+===== p2_competing_metrics D2 =====
+H42                      er_res=  23.387 rankme_raw=   4.277 pr_res=   4.151 alpha_res= 2.451 lidar_res=  34.730 cca40=0.6126
+I42                      er_res=  14.868 rankme_raw=   2.550 pr_res=   4.101 alpha_res= 3.087 lidar_res=  39.656 cca40=0.4800
+H43                      er_res=  28.771 rankme_raw=  11.253 pr_res=   5.179 alpha_res= 2.212 lidar_res=  45.664 cca40=0.5970
+I43                      er_res=  34.117 rankme_raw=   3.327 pr_res=   4.189 alpha_res= 1.793 lidar_res=  42.243 cca40=0.4882
+H44                      er_res=   9.143 rankme_raw=   2.438 pr_res=   3.131 alpha_res= 3.003 lidar_res=  34.672 cca40=0.5983
+I44                      er_res=   9.105 rankme_raw=   1.953 pr_res=   3.543 alpha_res= 3.828 lidar_res=  40.279 cca40=0.4757
+wrote P2_METRICS_D2.json
+===== p2_competing_metrics D1 =====
+P42                      er_res=  29.381 rankme_raw=   3.636 pr_res=   4.416 alpha_res= 2.141 lidar_res=  40.908 cca40=0.6117
+F42                      er_res=  13.418 rankme_raw=  10.718 pr_res=   4.968 alpha_res= 5.456 lidar_res=  20.332 cca40=0.5412
+P43                      er_res=  24.673 rankme_raw=   3.682 pr_res=   4.760 alpha_res= 2.789 lidar_res=  40.825 cca40=0.6198
+F43                      er_res=   7.600 rankme_raw=   3.169 pr_res=   3.239 alpha_res= 3.621 lidar_res=   6.846 cca40=0.5336
+P44                      er_res=  11.115 rankme_raw=   2.334 pr_res=   4.045 alpha_res= 4.245 lidar_res=  40.751 cca40=0.6087
+F44                      er_res=   6.394 rankme_raw=   3.541 pr_res=   2.687 alpha_res= 3.581 lidar_res=   8.050 cca40=0.5126
+wrote P2_METRICS_D1.json
+===== p2_selection_rule =====
+============================================================================================================
+GROUND TRUTH -- top-CCA with the 40 untrained targets (residualised)
+============================================================================================================
+  D2 s42: H42=0.6126  I42=0.4800   delta(H42-I42)=+0.1325   winner=H42
+  D2 s43: H43=0.5970  I43=0.4882   delta(H43-I43)=+0.1089   winner=H43
+  D2 s44: H44=0.5983  I44=0.4757   delta(H44-I44)=+0.1226   winner=H44
+  D1 s42: P42=0.6117  F42=0.5412   delta(P42-F42)=+0.0705   winner=P42
+  D1 s43: P43=0.6198  F43=0.5336   delta(P43-F43)=+0.0863   winner=P43
+  D1 s44: P44=0.6087  F44=0.5126   delta(P44-F44)=+0.0961   winner=P44
+
+============================================================================================================
+SELECTION-RULE SCORE -- does the metric pick the arm that carries more molecular information?
+============================================================================================================
+metric                                  D2 s42    D2 s43    D2 s44    D1 s42    D1 s43    D1 s44    D2    D1   ALL       p
+--------------------------------------------------------------------------------------------------------------------------
+effective_rank_raw                          OK      MISS        OK        OK        OK        OK   2/3   3/3   5/6   0.219
+effective_rank_residualised                 OK      MISS        OK        OK        OK        OK   2/3   3/3   5/6   0.219
+rankme_raw (as published)                   OK        OK        OK      MISS        OK      MISS   3/3   1/3   4/6   0.688
+rankme_residualised                         OK      MISS        OK        OK        OK        OK   2/3   3/3   5/6   0.219
+participation_ratio_raw                     OK        OK      MISS      MISS        OK        OK   2/3   2/3   4/6   0.688
+participation_ratio_residualised            OK        OK      MISS      MISS        OK        OK   2/3   2/3   4/6   0.688
+stable_rank_raw                             OK        OK      MISS      MISS        OK      MISS   2/3   1/3   3/6   1.000
+stable_rank_residualised                  MISS        OK      MISS      MISS        OK        OK   1/3   2/3   3/6   1.000
+alpha_ReQ_raw |alpha-1|                     OK      MISS        OK        OK        OK      MISS   2/3   2/3   4/6   0.688
+alpha_ReQ_resid |alpha-1|                   OK      MISS        OK        OK        OK      MISS   2/3   2/3   4/6   0.688
+LiDAR_raw                                 MISS      MISS      MISS        OK        OK        OK   0/3   3/3   3/6   1.000
+LiDAR_residualised                        MISS        OK      MISS        OK        OK        OK   1/3   3/3   4/6   0.688
+
+============================================================================================================
+WITHIN-ARM SEED VARIABILITY -- the dynamic range of each metric under a nuisance change
+(same arm, same objective, same data, same schedule; only the training seed differs.
+ RankMe explicitly reserves this comparison for itself: 'should only be used to compare
+ different runs of a given method'.)
+============================================================================================================
+arm                                     eff_rank (3 seeds)   fold          untrained40 CCA (3 seeds) rel.range
+D2 H (Hallmark)                   23.387   28.771    9.143  3.15x           0.6126   0.5970   0.5983      2.6%
+D2 I (PBS)                        14.868   34.117    9.105  3.75x           0.4800   0.4882   0.4757      2.6%
+D1 P (programme_only)             29.381   24.673   11.115  2.64x           0.6117   0.6198   0.6087      1.8%
+D1 F (programme_free)             13.418    7.600    6.394  2.10x           0.5412   0.5336   0.5126      5.4%
+
+The between-arm information gap each metric is being asked to resolve:
+   D2 s42: |delta CCA| = 0.1325 (24.3% relative)
+   D2 s43: |delta CCA| = 0.1089 (20.1% relative)
+   D2 s44: |delta CCA| = 0.1226 (22.8% relative)
+   D1 s42: |delta CCA| = 0.0705 (12.2% relative)
+   D1 s43: |delta CCA| = 0.0863 (15.0% relative)
+   D1 s44: |delta CCA| = 0.0961 (17.1% relative)
+
+============================================================================================================
+POOLED ASSOCIATION across all 12 artifacts (reported for completeness; the paired
+comparison above is the operative one, since pooling mixes within- and between-arm variance)
+============================================================================================================
+effective_rank_raw                   spearman=+0.343 (p=0.276)   pearson=+0.283 (p=0.373)
+effective_rank_residualised          spearman=+0.343 (p=0.276)   pearson=+0.281 (p=0.376)
+rankme_raw (as published)            spearman=+0.441 (p=0.152)   pearson=+0.189 (p=0.556)
+rankme_residualised                  spearman=+0.343 (p=0.276)   pearson=+0.281 (p=0.376)
+participation_ratio_raw              spearman=+0.259 (p=0.417)   pearson=+0.214 (p=0.503)
+participation_ratio_residualised     spearman=+0.350 (p=0.265)   pearson=+0.354 (p=0.259)
+stable_rank_raw                      spearman=-0.175 (p=0.587)   pearson=-0.116 (p=0.721)
+stable_rank_residualised             spearman=-0.028 (p=0.931)   pearson=+0.104 (p=0.748)
+alpha_ReQ_raw |alpha-1|              spearman=-0.273 (p=0.391)   pearson=-0.196 (p=0.541)
+alpha_ReQ_resid |alpha-1|            spearman=-0.273 (p=0.391)   pearson=-0.195 (p=0.543)
+LiDAR_raw                            spearman=-0.063 (p=0.846)   pearson=+0.175 (p=0.587)
+LiDAR_residualised                   spearman=+0.189 (p=0.557)   pearson=+0.256 (p=0.421)
+
+--- D2 only (n=6) ---
+  effective_rank_raw                   spearman=+0.314 (p=0.544)
+  effective_rank_residualised          spearman=+0.314 (p=0.544)
+  rankme_raw (as published)            spearman=+0.543 (p=0.266)
+  rankme_residualised                  spearman=+0.314 (p=0.544)
+  participation_ratio_raw              spearman=+0.257 (p=0.623)
+  participation_ratio_residualised     spearman=+0.143 (p=0.787)
+  stable_rank_raw                      spearman=+0.086 (p=0.872)
+  stable_rank_residualised             spearman=-0.371 (p=0.468)
+  alpha_ReQ_raw |alpha-1|              spearman=-0.486 (p=0.329)
+  alpha_ReQ_resid |alpha-1|            spearman=-0.486 (p=0.329)
+  LiDAR_raw                            spearman=-0.829 (p=0.042)
+  LiDAR_residualised                   spearman=-0.429 (p=0.397)
+--- D1 only (n=6) ---
+  effective_rank_raw                   spearman=+0.886 (p=0.019)
+  effective_rank_residualised          spearman=+0.886 (p=0.019)
+  rankme_raw (as published)            spearman=+0.314 (p=0.544)
+  rankme_residualised                  spearman=+0.886 (p=0.019)
+  participation_ratio_raw              spearman=+0.657 (p=0.156)
+  participation_ratio_residualised     spearman=+0.657 (p=0.156)
+  stable_rank_raw                      spearman=-0.086 (p=0.872)
+  stable_rank_residualised             spearman=+0.600 (p=0.208)
+  alpha_ReQ_raw |alpha-1|              spearman=-0.429 (p=0.397)
+  alpha_ReQ_resid |alpha-1|            spearman=-0.429 (p=0.397)
+  LiDAR_raw                            spearman=+0.886 (p=0.019)
+  LiDAR_residualised                   spearman=+0.886 (p=0.019)
+
+============================================================================================================
+METRIC NOISE FLOOR vs BETWEEN-ARM GAP
+(subsampling patients at 80%, 40 draws. If the between-arm gap in a metric is smaller
+ than the metric's own sampling spread, that metric cannot resolve the pair at all.)
+============================================================================================================
+
+  --- effective_rank_residualised ---
+    D2 s42: H42=  23.325+- 0.072  I42=  14.834+- 0.037  gap=  8.491  gap/sd=105.28
+    D2 s43: H43=  28.657+- 0.115  I43=  33.912+- 0.111  gap=  5.255  gap/sd= 32.96
+    D2 s44: H44=   9.132+- 0.021  I44=   9.093+- 0.019  gap=  0.039  gap/sd=  1.39
+    D1 s42: P42=  29.244+- 0.102  F42=  13.393+- 0.027  gap= 15.850  gap/sd=150.26
+    D1 s43: P43=  24.584+- 0.069  F43=   7.586+- 0.016  gap= 16.997  gap/sd=238.23
+    D1 s44: P44=  11.098+- 0.031  F44=   6.387+- 0.011  gap=  4.710  gap/sd=145.09
+
+  --- rankme_raw ---
+    D2 s42: H42=   4.272+- 0.011  I42=   2.548+- 0.007  gap=  1.724  gap/sd=131.39
+    D2 s43: H43=  11.226+- 0.039  I43=   3.324+- 0.011  gap=  7.902  gap/sd=193.24
+    D2 s44: H44=   2.437+- 0.004  I44=   1.953+- 0.004  gap=  0.484  gap/sd= 89.59
+    D1 s42: P42=   3.633+- 0.011  F42=  10.704+- 0.025  gap=  7.071  gap/sd=260.66
+    D1 s43: P43=   3.679+- 0.010  F43=   3.167+- 0.005  gap=  0.512  gap/sd= 45.46
+    D1 s44: P44=   2.334+- 0.004  F44=   3.538+- 0.004  gap=  1.205  gap/sd=224.38
+
+  --- participation_ratio_residualised ---
+    D2 s42: H42=   4.144+- 0.031  I42=   4.094+- 0.024  gap=  0.050  gap/sd=  1.28
+    D2 s43: H43=   5.173+- 0.031  I43=   4.187+- 0.017  gap=  0.986  gap/sd= 27.83
+    D2 s44: H44=   3.127+- 0.018  I44=   3.542+- 0.016  gap=  0.414  gap/sd= 17.24
+    D1 s42: P42=   4.396+- 0.046  F42=   4.963+- 0.027  gap=  0.567  gap/sd= 10.56
+    D1 s43: P43=   4.747+- 0.035  F43=   3.239+- 0.011  gap=  1.508  gap/sd= 41.29
+    D1 s44: P44=   4.040+- 0.023  F44=   2.683+- 0.015  gap=  1.356  gap/sd= 49.59
+
+  --- lidar_residualised ---
+    D2 s42: H42=  34.660+- 0.106  I42=  39.581+- 0.072  gap=  4.920  gap/sd= 38.44
+    D2 s43: H43=  45.489+- 0.204  I43=  42.145+- 0.100  gap=  3.344  gap/sd= 14.73
+    D2 s44: H44=  34.619+- 0.081  I44=  40.207+- 0.088  gap=  5.589  gap/sd= 46.79
+    D1 s42: P42=  40.823+- 0.077  F42=  20.268+- 0.074  gap= 20.554  gap/sd=193.37
+    D1 s43: P43=  40.742+- 0.098  F43=   6.837+- 0.033  gap= 33.905  gap/sd=328.76
+    D1 s44: P44=  40.676+- 0.076  F44=   8.029+- 0.034  gap= 32.647  gap/sd=390.80
+===== p2_necessity_and_variance =====
+========================================================================================================
+(A) VARIANCE DECOMPOSITION -- arm (signal) vs training seed (nuisance)
+========================================================================================================
+Design: 4 arms (D2-H, D2-I, D1-P, D1-F) x 3 seeds (42/43/44), one frozen artifact each.
+The seed changes nothing about objective, architecture, data, split or schedule.
+
+quantity                                   scale      SS_arm     SS_seed   arm share    F(3,8)
+--------------------------------------------------------------------------------------------------------
+effective rank (residualised)                log      1.3047      2.4762      34.5%      1.41
+RankMe (raw, as published)                   log      0.9772      2.3817      29.1%      1.09
+GROUND TRUTH: untrained40 top-CCA            raw      0.0353      0.0007      98.0%    128.20
+
+Reading: the ground-truth information channel is almost entirely an ARM effect --
+the seed barely moves it. If effective rank were a proxy for that channel it would have
+to show the same structure. The arm share above is what says whether it does.
+
+arm                                 eff.rank seeds    fold                     CCA seeds    fold
+--------------------------------------------------------------------------------------------------------
+H                         23.387   28.771    9.143   3.15x      0.6126   0.5970   0.5983  1.026x
+I                         14.868   34.117    9.105   3.75x      0.4800   0.4882   0.4757  1.026x
+P                         29.381   24.673   11.115   2.64x      0.6117   0.6198   0.6087  1.018x
+F                         13.418    7.600    6.394   2.10x      0.5412   0.5336   0.5126  1.056x
+
+========================================================================================================
+(B) NECESSITY SCAN -- looking for LOW RANK carrying HIGH INFORMATION
+========================================================================================================
+RankMe's hedge: high rank is 'a necessary (but not sufficient) condition for good
+downstream performance'. High-rank/low-information is therefore PREDICTED by the hedge
+and is NOT a counterexample. Only the reverse breaks it.
+
+PRE-DECLARED violation criterion (fixed before inspecting the pairs):
+  a pair (lo, hi) is a violation iff  eff_rank(hi)/eff_rank(lo) >= 2.0
+  AND  CCA(lo) - CCA(hi) >= 0.0705
+  i.e. the LOWER-rank artifact carries at least as much more information as the
+  smallest between-arm gap this project has accepted as real (D1 seed 42, +0.0705),
+  while sitting at least 2.0x lower in rank.
+
+  2 violating pair(s) of 66 examined:
+
+     lower-rank artifact     rank      CCA   |  higher-rank artifact     rank      CCA      fold     dCCA  scope
+                     P44   11.115   0.6087   |                   I43   34.117   0.4882     3.07x  +0.1206  cross-experiment
+                     H44    9.143   0.5983   |                   I43   34.117   0.4882     3.73x  +0.1101  within-experiment, across arms
+
+--------------------------------------------------------------------------------------------------------
+SECONDARY (does not break necessity, but breaks USEFULNESS): large rank change with a
+negligible information change, WITHIN a single arm -- i.e. two runs of the same method.
+--------------------------------------------------------------------------------------------------------
+                  pair   rank lo   rank hi    fold    CCA lo    CCA hi      dCCA
+            H42 vs H43    23.387    28.771   1.23x    0.6126    0.5970   -0.0155
+            H44 vs H42     9.143    23.387   2.56x    0.5983    0.6126   +0.0143
+            H44 vs H43     9.143    28.771   3.15x    0.5983    0.5970   -0.0012
+            I42 vs I43    14.868    34.117   2.29x    0.4800    0.4882   +0.0081
+            I44 vs I42     9.105    14.868   1.63x    0.4757    0.4800   +0.0044
+            I44 vs I43     9.105    34.117   3.75x    0.4757    0.4882   +0.0125
+            P43 vs P42    24.673    29.381   1.19x    0.6198    0.6117   -0.0082
+            P44 vs P42    11.115    29.381   2.64x    0.6087    0.6117   +0.0030
+            P44 vs P43    11.115    24.673   2.22x    0.6087    0.6198   +0.0111
+            F43 vs F42     7.600    13.418   1.77x    0.5336    0.5412   +0.0076
+            F44 vs F42     6.394    13.418   2.10x    0.5126    0.5412   +0.0286
+            F44 vs F43     6.394     7.600   1.19x    0.5126    0.5336   +0.0210
+===== p2_rank_variants =====
+ artifact          R1          R2          R3          PR  PR_rownorm     CCA40
+      H42      23.387      10.733      12.614       4.151       4.930    0.6126
+      I42      14.868       8.187       9.141       4.101       4.773    0.4800
+      H43      28.771      13.227      14.746       5.179       5.748    0.5970
+      I43      34.117      12.972      15.915       4.189       4.825    0.4882
+      H44       9.143       5.733       6.564       3.131       3.767    0.5983
+      I44       9.105       5.815       6.302       3.543       3.842    0.4757
+      P42      29.381      12.555      14.762       4.416       5.482    0.6117
+      F42      13.418       8.671       9.118       4.968       5.286    0.5412
+      P43      24.673      11.569      13.173       4.760       5.500    0.6198
+      F43       7.600       4.858       5.320       3.239       3.329    0.5336
+      P44      11.115       7.015       7.622       4.045       4.566    0.6087
+      F44       6.394       4.191       4.726       2.687       2.928    0.5126
+
+SELECTION RULE by rank statistic (does higher rank = more information?)
+        stat   D2 s42   D2 s43   D2 s44   D1 s42   D1 s43   D1 s44    D2    D1   ALL
+          R1       OK     MISS       OK       OK       OK       OK   2/3   3/3   5/6
+          R2       OK       OK     MISS       OK       OK       OK   2/3   3/3   5/6
+          R3       OK     MISS       OK       OK       OK       OK   2/3   3/3   5/6
+          PR       OK       OK     MISS     MISS       OK       OK   2/3   2/3   4/6
+  PR_rownorm       OK       OK     MISS       OK       OK       OK   2/3   3/3   5/6
+wrote P2_RANK_VARIANTS.json
+===== p2_robustness =====
+H42 [wsi] er= 23.387 cca_in=0.6126 cca_out=0.5871 [rna] er= 23.031 cca_in=0.8476 cca_out=0.8268 [ful] er= 25.164 cca_in=0.8516 cca_out=0.8318
+I42 [wsi] er= 14.868 cca_in=0.4800 cca_out=0.4330 [rna] er= 27.761 cca_in=0.8019 cca_out=0.7857 [ful] er= 31.066 cca_in=0.7958 cca_out=0.7822
+H43 [wsi] er= 28.771 cca_in=0.5970 cca_out=0.5737 [rna] er= 25.721 cca_in=0.8465 cca_out=0.8270 [ful] er= 27.736 cca_in=0.8487 cca_out=0.8296
+I43 [wsi] er= 34.117 cca_in=0.4882 cca_out=0.4539 [rna] er= 28.705 cca_in=0.7899 cca_out=0.7681 [ful] er= 28.912 cca_in=0.7896 cca_out=0.7678
+H44 [wsi] er=  9.143 cca_in=0.5983 cca_out=0.5684 [rna] er= 23.356 cca_in=0.8498 cca_out=0.8318 [ful] er= 26.001 cca_in=0.8463 cca_out=0.8289
+I44 [wsi] er=  9.105 cca_in=0.4757 cca_out=0.4170 [rna] er= 28.914 cca_in=0.7950 cca_out=0.7774 [ful] er= 29.653 cca_in=0.7961 cca_out=0.7786
+P42 [wsi] er= 29.381 cca_in=0.6117 cca_out=0.5831 [rna] er= 27.635 cca_in=0.8533 cca_out=0.8312 [ful] er= 30.257 cca_in=0.8530 cca_out=0.8321
+F42 [wsi] er= 13.418 cca_in=0.5412 cca_out=0.4915 [rna] er= 15.650 cca_in=0.8222 cca_out=0.7933 [ful] er= 13.457 cca_in=0.5549 cca_out=0.5057
+P43 [wsi] er= 24.673 cca_in=0.6198 cca_out=0.5976 [rna] er= 27.704 cca_in=0.8468 cca_out=0.8286 [ful] er= 28.182 cca_in=0.8472 cca_out=0.8285
+F43 [wsi] er=  7.600 cca_in=0.5336 cca_out=0.5093 [rna] er=  9.713 cca_in=0.8310 cca_out=0.8085 [ful] er=  7.816 cca_in=0.5465 cca_out=0.5216
+P44 [wsi] er= 11.115 cca_in=0.6087 cca_out=0.5767 [rna] er= 29.062 cca_in=0.8507 cca_out=0.8335 [ful] er= 34.025 cca_in=0.8508 cca_out=0.8325
+F44 [wsi] er=  6.394 cca_in=0.5126 cca_out=0.4985 [rna] er=  9.643 cca_in=0.8080 cca_out=0.7828 [ful] er=  6.481 cca_in=0.5201 cca_out=0.5064
+
+================================================================================================================
+ARM ORDERING under each representation and each CCA estimator
+(ground truth must survive the held-out estimator or it is not a ground truth)
+================================================================================================================
+
+--- wsi_biology ---
+pair        cca_in A  cca_in B     d_in  cca_out A  cca_out B    d_out     rank A  rank B    info winner rank winner  agree?
+D2 s42        0.6126    0.4800  +0.1325     0.5871     0.4330  +0.1541     23.387  14.868            H42         H42     YES
+D2 s43        0.5970    0.4882  +0.1089     0.5737     0.4539  +0.1198     28.771  34.117            H43         I43      NO
+D2 s44        0.5983    0.4757  +0.1226     0.5684     0.4170  +0.1514      9.143   9.105            H44         H44     YES
+D1 s42        0.6117    0.5412  +0.0705     0.5831     0.4915  +0.0916     29.381  13.418            P42         P42     YES
+D1 s43        0.6198    0.5336  +0.0863     0.5976     0.5093  +0.0883     24.673   7.600            P43         P43     YES
+D1 s44        0.6087    0.5126  +0.0961     0.5767     0.4985  +0.0782     11.115   6.394            P44         P44     YES
+
+--- rna_biology ---
+pair        cca_in A  cca_in B     d_in  cca_out A  cca_out B    d_out     rank A  rank B    info winner rank winner  agree?
+D2 s42        0.8476    0.8019  +0.0457     0.8268     0.7857  +0.0410     23.031  27.761            H42         I42      NO
+D2 s43        0.8465    0.7899  +0.0566     0.8270     0.7681  +0.0589     25.721  28.705            H43         I43      NO
+D2 s44        0.8498    0.7950  +0.0549     0.8318     0.7774  +0.0543     23.356  28.914            H44         I44      NO
+D1 s42        0.8533    0.8222  +0.0311     0.8312     0.7933  +0.0379     27.635  15.650            P42         P42     YES
+D1 s43        0.8468    0.8310  +0.0159     0.8286     0.8085  +0.0201     27.704   9.713            P43         P43     YES
+D1 s44        0.8507    0.8080  +0.0427     0.8335     0.7828  +0.0506     29.062   9.643            P44         P44     YES
+
+--- full_biology ---
+pair        cca_in A  cca_in B     d_in  cca_out A  cca_out B    d_out     rank A  rank B    info winner rank winner  agree?
+D2 s42        0.8516    0.7958  +0.0558     0.8318     0.7822  +0.0497     25.164  31.066            H42         I42      NO
+D2 s43        0.8487    0.7896  +0.0592     0.8296     0.7678  +0.0618     27.736  28.912            H43         I43      NO
+D2 s44        0.8463    0.7961  +0.0502     0.8289     0.7786  +0.0503     26.001  29.653            H44         I44      NO
+D1 s42        0.8530    0.5549  +0.2981     0.8321     0.5057  +0.3264     30.257  13.457            P42         P42     YES
+D1 s43        0.8472    0.5465  +0.3007     0.8285     0.5216  +0.3069     28.182   7.816            P43         P43     YES
+D1 s44        0.8508    0.5201  +0.3307     0.8325     0.5064  +0.3261     34.025   6.481            P44         P44     YES
+===== DONE =====

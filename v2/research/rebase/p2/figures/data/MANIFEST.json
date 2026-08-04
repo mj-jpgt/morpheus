@@ -1,0 +1,139 @@
+{
+ "box": "ubuntu@150.136.45.194",
+ "fetched_utc": "2026-08-04T06:03:02Z",
+ "files": {
+  "e0_run/collapse_diag.log": {
+   "box_path": "~/e0_run/collapse_diag.log",
+   "bytes": 1550,
+   "produced_by": null,
+   "sha256": "bedadc2300d68e798d93c575b05eeb7e1a575a2362327411b104cdc4069601dc"
+  },
+  "e0_run/d1_diag/diag_d.log": {
+   "box_path": "~/e0_run/d1_diag/diag_d.log",
+   "bytes": 879,
+   "produced_by": null,
+   "sha256": "d2b49035e174db9b62dca95d3bed163cd6fc5e0aa8da41ec6af12231babb40f7"
+  },
+  "e0_run/d1_diag/probevar_m0.999_1.log": {
+   "box_path": "~/e0_run/d1_diag/probevar_m0.999_1.log",
+   "bytes": 633,
+   "produced_by": null,
+   "sha256": "69e21fd00114e3388491c3fb54701f48f513e99fc0aee0fbc1f2f0bebbab4964"
+  },
+  "e0_run/d1_diag/probevar_m0.999_2.log": {
+   "box_path": "~/e0_run/d1_diag/probevar_m0.999_2.log",
+   "bytes": 633,
+   "produced_by": null,
+   "sha256": "ee07aa9f429ef3f977fe9d237fa06e1ce809d77c70c060ad2a7546fc273f3911"
+  },
+  "e0_run/d1_diag/probevar_m0.999_3.log": {
+   "box_path": "~/e0_run/d1_diag/probevar_m0.999_3.log",
+   "bytes": 633,
+   "produced_by": null,
+   "sha256": "96c85afa2186a9a2e6c5a3d080015adbc04329c164893191593a6ff246a21ad8"
+  },
+  "e0_run/d1_diag/probevar_m0_1.log": {
+   "box_path": "~/e0_run/d1_diag/probevar_m0_1.log",
+   "bytes": 625,
+   "produced_by": null,
+   "sha256": "a5533c8bcd4b7e543c6b76ae05864c0278a6cfce462c3191f701bd20b14e82a8"
+  },
+  "e0_run/d1_diag/probevar_m0_2.log": {
+   "box_path": "~/e0_run/d1_diag/probevar_m0_2.log",
+   "bytes": 625,
+   "produced_by": null,
+   "sha256": "cb4de604f199aa44192f451cb1abbe29d73e15d0ce742e01cb0babf770e3d74e"
+  },
+  "e0_run/d1_diag/probevar_m0_3.log": {
+   "box_path": "~/e0_run/d1_diag/probevar_m0_3.log",
+   "bytes": 625,
+   "produced_by": null,
+   "sha256": "2f54dac4b8fe82d296e7fd375945d1a0fa0a7389057bfd18a890890186efae95"
+  },
+  "e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json": {
+   "box_path": "~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json",
+   "bytes": 4364,
+   "produced_by": null,
+   "sha256": "5ed83836d69b53cbd72c99bd8e7dc5899cc37bbf382f7cd24604a0d980af2876"
+  },
+  "e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json": {
+   "box_path": "~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json",
+   "bytes": 3973,
+   "produced_by": null,
+   "sha256": "605917017b46c9622384c2d3b18dd1487829ffa25d5eae789bc59d83cf423f3c"
+  },
+  "e0_run/d1_v2/D1_PAIR_MANIFEST.json": {
+   "box_path": "~/e0_run/d1_v2/D1_PAIR_MANIFEST.json",
+   "bytes": 2270,
+   "produced_by": null,
+   "sha256": "48ba27c9460e275d5285f9338823b90c983de76ab3aed3b2948d1278de1fd272"
+  },
+  "e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json": {
+   "box_path": "~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json",
+   "bytes": 16381,
+   "produced_by": null,
+   "sha256": "5bcd530e2c90d7baccf043fc39bf1c5d222d85224c2ecda2d355a16fc2f35e6a"
+  },
+  "e0_run/d2_v3/RECOVERED_SEED42_READOUT.json": {
+   "box_path": "~/e0_run/d2_v3/RECOVERED_SEED42_READOUT.json",
+   "bytes": 1434,
+   "produced_by": null,
+   "sha256": "9e17834c75c504896da49c704d1bffc5f13b175363fe122f2373eb22e824159a"
+  },
+  "extracted/F1_RETRAINING_REPEAT.json": {
+   "box_path": null,
+   "bytes": 840,
+   "produced_by": "extract_from_box.py",
+   "sha256": "75f11cd5aee4534a88f2ed873f2d27474ac494360a446a5f60829d70b22f814a"
+  },
+  "extracted/F3_TRIPWIRE_STEP200_R3_n5.json": {
+   "box_path": null,
+   "bytes": 3462,
+   "produced_by": "extract_from_box.py",
+   "sha256": "7c17e904b548f82a9adec429a0fb4b4d5eae7f71914b2ba6e536413e306d5c19"
+  },
+  "ws_p2/out/P2_METRICS_D1.json": {
+   "box_path": "~/ws_p2/out/P2_METRICS_D1.json",
+   "bytes": 15162,
+   "produced_by": null,
+   "sha256": "ac58a80495d18afba23c778c9d1eccf862867ee8e0b71f2cb99a86f5b951a90f"
+  },
+  "ws_p2/out/P2_METRICS_D2.json": {
+   "box_path": "~/ws_p2/out/P2_METRICS_D2.json",
+   "bytes": 15227,
+   "produced_by": null,
+   "sha256": "a6db7d706c805ea7ec3048b15a4805dd09e555a5c10fa5c065d9408ccd28ce86"
+  },
+  "ws_p2/out/P2_RANK_VARIANTS.json": {
+   "box_path": "~/ws_p2/out/P2_RANK_VARIANTS.json",
+   "bytes": 3554,
+   "produced_by": null,
+   "sha256": "130dd8253af3cde95f74cfb4cdb77bdbc1e53d3cd4f9823a14a4bb180515ec63"
+  },
+  "ws_p2/out/P2_ROBUSTNESS.json": {
+   "box_path": "~/ws_p2/out/P2_ROBUSTNESS.json",
+   "bytes": 5496,
+   "produced_by": null,
+   "sha256": "9923973270d67cd286212102379d935e2f4eb1bac3a41070a1f8219bc9f09f64"
+  },
+  "ws_p2/out/p2_run.log": {
+   "box_path": "~/ws_p2/out/p2_run.log",
+   "bytes": 22524,
+   "produced_by": null,
+   "sha256": "efda4cf196c3d4af501d6914bf87586d76d08f1dd7079c8d1b1edc0c1be8978c"
+  },
+  "ws_rank/RANK_RECOMPUTE.json": {
+   "box_path": "~/ws_rank/RANK_RECOMPUTE.json",
+   "bytes": 19399,
+   "produced_by": null,
+   "sha256": "8855142a73bfea58b55a329f5d5ca56455e65e1da1eefbbbcdadfb2abe39c4fe"
+  },
+  "ws_rank/RANK_RECOMPUTE_P1B.json": {
+   "box_path": "~/ws_rank/RANK_RECOMPUTE_P1B.json",
+   "bytes": 18036,
+   "produced_by": null,
+   "sha256": "7ae3bfbdfc1f6f9153df2c77dd9febfc8acec53fd6526719d329f234e136c51a"
+  }
+ },
+ "note": "Written by extract_from_box.py. Figures read from here and nowhere else."
+}

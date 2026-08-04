@@ -1,0 +1,124 @@
+{
+  "experiment": "D1",
+  "arm_a": "programme_only",
+  "arm_b": "programme_free",
+  "target_groups": [
+    "heldout_pathway",
+    "immune_tme",
+    "tumour_state"
+  ],
+  "n_targets": 40,
+  "pairs": [
+    {
+      "programme_only": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_p_seed42.npz",
+      "programme_free": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_f_seed42.npz",
+      "n_test": 2766,
+      "point_programme_only": 0.6116834763388962,
+      "point_programme_free": 0.5411789792013624,
+      "programme_free_minus_programme_only": {
+        "patient": {
+          "n_valid": 2000,
+          "mean_delta": -0.06955571543014932,
+          "ci95_low": -0.09383305478028457,
+          "ci95_high": -0.044444143747372676,
+          "p_improve": 0.0,
+          "mode": "patient",
+          "repeats": 2000,
+          "point_delta": -0.07050449713753382
+        },
+        "cancer": {
+          "n_valid": 2000,
+          "mean_delta": -0.06165074214951694,
+          "ci95_low": -0.09573376087849648,
+          "ci95_high": -0.01798146591285244,
+          "p_improve": 0.0045,
+          "mode": "cancer",
+          "repeats": 2000,
+          "point_delta": -0.07050449713753382
+        }
+      },
+      "confounds": {
+        "columns": [
+          "cancer",
+          "tss"
+        ],
+        "min_site_count": 10,
+        "n_distinct_sites_kept": 84
+      }
+    },
+    {
+      "programme_only": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_p_seed43.npz",
+      "programme_free": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_f_seed43.npz",
+      "n_test": 2766,
+      "point_programme_only": 0.6198440780017849,
+      "point_programme_free": 0.5335539168779119,
+      "programme_free_minus_programme_only": {
+        "patient": {
+          "n_valid": 2000,
+          "mean_delta": -0.0841978290903996,
+          "ci95_low": -0.1185607439129323,
+          "ci95_high": -0.052190267006839125,
+          "p_improve": 0.0,
+          "mode": "patient",
+          "repeats": 2000,
+          "point_delta": -0.086290161123873
+        },
+        "cancer": {
+          "n_valid": 2000,
+          "mean_delta": -0.07143469744328045,
+          "ci95_low": -0.1386366651499099,
+          "ci95_high": 0.0005794361705953196,
+          "p_improve": 0.0255,
+          "mode": "cancer",
+          "repeats": 2000,
+          "point_delta": -0.086290161123873
+        }
+      },
+      "confounds": {
+        "columns": [
+          "cancer",
+          "tss"
+        ],
+        "min_site_count": 10,
+        "n_distinct_sites_kept": 84
+      }
+    },
+    {
+      "programme_only": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_p_seed44.npz",
+      "programme_free": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_v2/artifacts/d1_f_seed44.npz",
+      "n_test": 2766,
+      "point_programme_only": 0.6087073807253252,
+      "point_programme_free": 0.5125726735939018,
+      "programme_free_minus_programme_only": {
+        "patient": {
+          "n_valid": 2000,
+          "mean_delta": -0.09504313691143622,
+          "ci95_low": -0.1313534408656645,
+          "ci95_high": -0.061837990034475966,
+          "p_improve": 0.0,
+          "mode": "patient",
+          "repeats": 2000,
+          "point_delta": -0.09613470713142336
+        },
+        "cancer": {
+          "n_valid": 2000,
+          "mean_delta": -0.0780325369513207,
+          "ci95_low": -0.1534711251915491,
+          "ci95_high": -0.0015967540012032954,
+          "p_improve": 0.024,
+          "mode": "cancer",
+          "repeats": 2000,
+          "point_delta": -0.09613470713142336
+        }
+      },
+      "confounds": {
+        "columns": [
+          "cancer",
+          "tss"
+        ],
+        "min_site_count": 10,
+        "n_distinct_sites_kept": 84
+      }
+    }
+  ]
+}
