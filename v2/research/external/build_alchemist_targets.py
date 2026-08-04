@@ -235,6 +235,17 @@ def main() -> None:
     tcga_shared = tcga_full.loc[~tcga_full.index.duplicated(keep="first")].loc[shared]
     alch_shared = alchemist.loc[shared]
 
+    # Cancer labels must travel WITH the target block. Without them the downstream
+    # confound design silently collapses to a single level and the LUAD/LUSC adjustment
+    # that the TCGA arm is supposed to carry quietly stops happening.
+    frozen_cancer = dict(zip(frozen["patient_ids"].astype(str), frozen["cancers"].astype(str)))
+    alch_cancer = dict(zip(catalog["case_id"].astype(str), catalog["cancer"].astype(str)))
+    cancer_of = {"tcga_nsclc": lambda pid: frozen_cancer.get(pid, "NA"),
+                 "alchemist": lambda pid: alch_cancer.get(pid, "NA")}
+    patient_of = {"tcga_nsclc": lambda pid: pid,
+                  "alchemist": dict(zip(catalog["case_id"].astype(str),
+                                        catalog["patient"].astype(str))).get}
+
     results = {}
     for label, matrix, id_of in (
             ("tcga_nsclc", tcga_shared, lambda c: sample_patient[c]),
@@ -255,9 +266,12 @@ def main() -> None:
               if name in set(results["alchemist"]["names"])]
     for label in results:
         keep = [results[label]["names"].index(name) for name in common]
+        ids = results[label]["ids"]
         np.savez_compressed(
             output / f"{label}_targets.npz",
-            patient_ids=results[label]["ids"],
+            patient_ids=np.asarray([patient_of[label](i) or i for i in ids], dtype=str),
+            case_ids=np.asarray(ids, dtype=str),
+            cancers=np.asarray([cancer_of[label](i) for i in ids], dtype=str),
             target_names=np.asarray(common),
             target_groups=np.asarray([dict(zip(frozen_names, frozen_groups))[n] for n in common]),
             scores=results[label]["scores"][:, keep].astype(np.float32),
