@@ -4,9 +4,9 @@
 `NOTEBOOK_ENTRIES/PREDECLARED_nonlinear_adjustment_channel_20260804T2015Z.md`, committed `010d9c4`,
 **before** the instrument existed and before any number below existed. **How obtained:**
 `v2/calibra/nonlinear_adjustment.py` (new, 25 tests) on the A100 box (150.136.45.194), workspaces
-`~/ws_nla{,2,3,4}` and `~/ws_nlabase`, each deployed by `git -c core.autocrlf=false archive HEAD` and
-verified file-by-file against `git ls-tree -r HEAD` blob SHA-1 — **669 files, 0 mismatches, every
-time**. Thread caps `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`, process parallelism, CPU only; the box
+`~/ws_nla{,2,3,4,5}` and `~/ws_nlabase`, each deployed by `git -c core.autocrlf=false archive HEAD` and
+verified file-by-file against `git ls-tree -r HEAD` blob SHA-1 — **669–670 files, 0 mismatches,
+every time**. Thread caps `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`, process parallelism, CPU only; the box
 carried a co-tenant load of 20–50 on 30 cores throughout. Outputs
 `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/p1_evidence/nonlinear_adjustment/`.
 
@@ -14,13 +14,15 @@ carried a co-tenant load of 20–50 on 30 cores throughout. Outputs
 
 ### 0. The answer, in the order the brief asked for it
 
-**Does the channel survive nonlinear adjustment, and by how much? It survives entirely — retention of
-excess-over-null 0.987–1.007 on `d2_h` and 0.995–1.047 on `d2_i`, under every arm — but by the letter of the predeclaration this is
-Reading 4 (NO TEST), not Reading 1, and that distinction is kept.** No arm cleared the predeclared
-step-3 validity bar (k-NN ≤ 2.0× chance on both targets), and §6 shows *why no arm could*: the
-measured floor for **any** cross-fitted adjustment on this cohort is 1.45–1.75× design chance,
-because the adjustment itself puts structure there. The bar was unattainable when it was written.
-That is stated as a defect of the bar, not as a pass.
+**Does the channel survive nonlinear adjustment, and by how much? It survives entirely** — retention
+of excess-over-null **0.987–1.007** across eleven adjusted arms on `d2_h` and **0.995–1.047** on
+`d2_i`, including a random forest, a six-cell RBF kernel-ridge grid, the saturated cell-mean limit
+and a second-moment arm — **but by the letter of the predeclaration this is Reading 4 (NO TEST), not
+Reading 1, and that distinction is kept.** No arm cleared the predeclared step-3 validity bar (k-NN
+≤ 2.0× chance on both targets), and §6 shows *why no arm could*: the measured chance floor for
+**any** cross-fitted adjustment on this cohort is **1.43–1.75×** design chance on the site target,
+because the adjustment itself puts structure there. The bar was unattainable when it was written,
+and that is stated as a defect of the bar rather than converted into a pass.
 
 The question the brief actually asks — *is the residual large enough to produce the channel?* — is
 answered anyway, from three directions that do not depend on step 3:
@@ -36,7 +38,7 @@ answered anyway, from three directions that do not depend on step 3:
    **0.1237** (additive design) — against the real channel's own null median of **0.1483**. In excess
    over each block's own null, that is **6.0%** and **11.2%** of the channel's excess.
 3. **The residual, re-measured against a null that can see the adjustment (§6).** Still real, still at
-   the permutation floor, but **2.4–3.3× chance for site** and **3.1–3.7× for cancer**, not 4.3–4.9×.
+   the permutation floor, but **2.4–3.3× chance for site** and **2.8–3.7× for cancer**, not 4.3–4.9×.
 
 **Verdict against the predeclared bands: Reading 4 on the letter**, with the question answered by §4
 and §5 instead. Reading 4 was predeclared as *not* a favourable result and is not written as one.
@@ -118,6 +120,10 @@ permutations, p floor 0.0005. **Retention** is `nonlinear_adjustment.retention_o
 | kernel ridge α=1 γ=0.25 | RBF on the one-hot design | 0.6052 | 0.1473 | 0.4579 | **1.002** | 0.5837 | 22.50 | 0.9993 |
 | kernel ridge α=1 γ=0.5 | RBF on the one-hot design | 0.6052 | 0.1477 | 0.4575 | **1.001** | 0.5837 | 22.50 | 0.9995 |
 | kernel ridge α=1 γ=1 | RBF on the one-hot design | 0.6053 | 0.1478 | 0.4575 | **1.001** | 0.5838 | 22.50 | 0.9993 |
+| kernel ridge α=0.1 γ=0.25 | RBF on the one-hot design | 0.6051 | 0.1486 | 0.4565 | **0.999** | 0.5836 | 22.50 | 0.9992 |
+| **kernel ridge α=0.1 γ=0.5** (selected) | RBF on the one-hot design | 0.6051 | 0.1486 | 0.4565 | **0.999** | 0.5836 | 22.50 | 0.9992 |
+| kernel ridge α=0.1 γ=1 | RBF on the one-hot design | 0.6051 | 0.1486 | 0.4564 | **0.999** | 0.5836 | 22.50 | 0.9992 |
+| **random forest, 300 trees** | axis-aligned thresholds + interaction | 0.6054 | 0.1487 | 0.4568 | **1.000** | 0.5838 | 22.50 | 0.9992 |
 | location–scale (2nd moment) | per-cell mean **and** SD | 0.5978 | 0.1468 | 0.4510 | **0.987** | 0.5719 | 42.41 | 0.9889 |
 | in-sample saturated | cell means, exactly zero | 0.6054 | 0.1453 | 0.4601 | **1.007** | 0.5825 | 22.55 | 0.9943 |
 
@@ -170,6 +176,17 @@ four decimals and its residuals correlate with the incumbent's at a per-axis med
 
 This was written down as a prediction in the predeclaration §2 before any of it was run, precisely so
 that it could not be offered afterwards as an excuse. It is now measured.
+
+**The predeclared kernel grid, all six cells.** The quoted cell was fixed in advance to be the one
+**minimising the step-3 k-NN recovery** — the adjustment-validity criterion, never the channel — and
+that is α = 0.1, γ = 0.5 (site 4.32×, cancer 4.34× design chance, the joint minimum). Its channel:
+S1 **0.6051**, retention **0.999**. The selection rule is moot here because **the grid is flat**:
+S1 spans 0.6051–0.6053 and retention 0.999–1.002 across all six cells, and the k-NN recovery spans
+4.32–4.64× (site) and 4.30–4.40× (cancer) — no cell is a working adjustment. The **random forest**,
+the declared second family, lands in the same place from a completely different hypothesis class:
+S1 **0.6054**, retention **1.000**, k-NN site **4.28×** and cancer **4.26×**, per-axis agreement with
+the incumbent 0.9992. Its 200-permutation channel null cost 788 s of wall time at 4 workers; both
+counts are as declared and neither was cut.
 
 **Consequence for the brief's step 1.** "Build a cross-fitted nonlinear adjustment against the same
 `cancer + pooled TSS` design and re-measure the channel" is a well-posed instruction whose answer on
@@ -231,6 +248,11 @@ chance on both targets.
 | saturated cell mean | 0.0497 | 4.23 | 0.2065 | 4.34 | **not verified** |
 | kernel ridge α=1 γ=0.25 | 0.0546 | 4.64 | 0.2067 | 4.34 | **not verified** |
 | kernel ridge α=1 γ=0.5 | 0.0518 | 4.40 | 0.2096 | 4.40 | **not verified** |
+| kernel ridge α=1 γ=1 | 0.0535 | 4.55 | 0.2067 | 4.34 | **not verified** |
+| kernel ridge α=0.1 γ=0.25 | 0.0512 | 4.35 | 0.2088 | 4.38 | **not verified** |
+| **kernel ridge α=0.1 γ=0.5** (selected) | 0.0508 | **4.32** | 0.2066 | **4.34** | **not verified** |
+| kernel ridge α=0.1 γ=1 | 0.0509 | 4.32 | 0.2049 | 4.30 | **not verified** |
+| **random forest, 300 trees** | 0.0503 | **4.28** | 0.2030 | **4.26** | **not verified** |
 | location–scale | 0.0494 | 4.20 | 0.2102 | 4.41 | **not verified** |
 | in-sample saturated | 0.0603 | 5.13 | 0.2125 | 4.46 | **not verified** |
 
@@ -314,23 +336,42 @@ assumed one. 200 permutations, p floor 0.0050.
 | kernel ridge α=1 γ=0.5 | cancer | 0.2096 | 4.40 | 0.0579 | 1.22 | **3.62** | 0.0050 |
 | location–scale | site | 0.0494 | 4.20 | 0.0205 | 1.75 | **2.41** | 0.0050 |
 | location–scale | cancer | 0.2102 | 4.41 | 0.0594 | 1.25 | **3.54** | 0.0050 |
+| kernel ridge α=1 γ=1 | site | 0.0535 | 4.55 | 0.0185 | 1.57 | **2.89** | 0.0050 |
+| kernel ridge α=1 γ=1 | cancer | 0.2067 | 4.34 | 0.0576 | 1.21 | **3.59** | 0.0050 |
+| kernel ridge α=0.1 γ=0.25 | site | 0.0512 | 4.35 | 0.0197 | 1.68 | **2.60** | 0.0050 |
+| kernel ridge α=0.1 γ=0.25 | cancer | 0.2088 | 4.38 | 0.0581 | 1.22 | **3.59** | 0.0050 |
+| **kernel ridge α=0.1 γ=0.5** (selected) | site | 0.0508 | 4.32 | 0.0199 | 1.69 | **2.56** | 0.0050 |
+| **kernel ridge α=0.1 γ=0.5** (selected) | cancer | 0.2066 | 4.34 | 0.0582 | 1.22 | **3.55** | 0.0050 |
+| kernel ridge α=0.1 γ=1 | site | 0.0509 | 4.32 | 0.0199 | 1.70 | **2.55** | 0.0050 |
+| kernel ridge α=0.1 γ=1 | cancer | 0.2049 | 4.30 | 0.0581 | 1.22 | **3.52** | 0.0050 |
 | in-sample saturated | site | 0.0603 | 5.13 | 0.0181 | 1.54 | **3.33** | 0.0050 |
 | in-sample saturated | cancer | 0.2125 | 4.46 | 0.0571 | 1.20 | **3.72** | 0.0050 |
 
-**`d2_i_seed42`.** Incumbent: site 0.0507 (4.31× design chance) against a regenerated null median of
-0.0170 (1.45×), **corrected 2.98×**; cancer 0.1738 (3.65×) against 0.0567 (1.19×), **corrected
-3.06×**. Saturated: site 0.0519 (4.41×) against 0.0180 (1.53×); cancer 0.1779 (3.74×) against 0.0572
-(1.20×). Every p = 0.0050.
+**`d2_i_seed42`, `wsi_biology`, test partition**
+
+| arm | target | observed | × design chance | regenerated null median | × design chance | **corrected multiple** | p |
+|---|---|---:|---:|---:|---:|---:|---:|
+| ridge (incumbent) | site | 0.0507 | 4.31 | 0.0170 | 1.45 | **2.98** | 0.0050 |
+| ridge (incumbent) | cancer | 0.1738 | 3.65 | 0.0567 | 1.19 | **3.06** | 0.0050 |
+| saturated | site | 0.0519 | 4.41 | 0.0180 | 1.53 | **2.89** | 0.0050 |
+| saturated | cancer | 0.1779 | 3.74 | 0.0572 | 1.20 | **3.11** | 0.0050 |
+| location–scale | site | 0.0507 | 4.31 | 0.0181 | 1.54 | **2.80** | 0.0050 |
+| location–scale | cancer | 0.1590 | 3.34 | 0.0571 | 1.20 | **2.79** | 0.0050 |
+| in-sample saturated | site | 0.0494 | 4.20 | 0.0168 | 1.43 | **2.94** | 0.0050 |
+| in-sample saturated | cancer | 0.1742 | 3.66 | 0.0567 | 1.19 | **3.07** | 0.0050 |
+
+**Across both artifacts and every arm the regenerated null median sits at 1.43–1.75× design chance
+for site and 1.19–1.25× for cancer**, where the probe's denominator assumed 1.00×.
 
 **What this changes and what it does not.**
 
-* **It does not overturn the previous entry's direction.** The residual is real. Every corrected
-  multiple is ≥ 2.4 and every p is at the floor, against a null that contains the adjustment.
+* **It does not overturn the previous entry's direction.** The residual is real. Every one of the 28
+  corrected multiples is ≥ 2.4 and every p is at the floor, against a null that contains the adjustment.
 * **It does change the magnitudes.** The publishable multiple for site on `d2_h` is **2.73×**, not
   4.34×; for cancer **3.66×**, not 4.46×. The probe's denominator assumed a chance rate of 1.00×
-  design chance; the measured rate under the adjustment is **1.19–1.75×** design chance across every
-  arm and both targets. That gap is the adjustment reading itself back.
-* **It explains why nothing passes step 3.** For **site** the measured floor is 1.45–1.75× design
+  design chance; the measured rate under the adjustment is **1.43–1.75×** (site) and **1.19–1.25×**
+  (cancer) design chance, across every arm and both artifacts. That gap is the adjustment reading itself back.
+* **It explains why nothing passes step 3.** For **site** the measured floor is 1.43–1.75× design
   chance under *any* cross-fitted adjustment, so a bar of "≤ 2.0× chance" left a window of only
   0.25–0.55× for the adjustment to work in. For **cancer** the floor is lower (1.19–1.25×) and the
   bar was in principle reachable; nothing reached it. The predeclared bar was, on the site half,
@@ -412,8 +453,9 @@ Per the rules for this run, `NOTEBOOK.md`, the paper drafts and `claim_guards.py
    1.58× (site) / 1.50× (cancer) at p = 0.0249 / 0.0149 after the same adjustment.
 2. **Same entry, every "× chance" for an *adjusted* arm** (§0, §3, §3b, §8 — the 4.3–4.9× site and
    3.4–4.9× cancer figures). The multiplier is against `1/n_classes`, which is the chance rate for a
-   *raw* block. Against the adjustment's own measured rate — **1.19–1.75×** design chance, not 1.00× —
-   the same readings are **2.4–3.3× (site)** and **3.1–3.7× (cancer)**. The *significance* is
+   *raw* block. Against the adjustment's own measured rate — **1.43–1.75×** (site) and
+   **1.19–1.25×** (cancer) design chance, not 1.00× —
+   the same readings are **2.4–3.3× (site)** and **2.8–3.7× (cancer)**. The *significance* is
    unchanged; only the magnitude moves. The raw-arm multiples are unaffected.
 
    **Scope.** The inflation is a property of the *null*, not of the estimator, so it applies to every
@@ -451,7 +493,7 @@ and flagged, not fixed, since it is not this run's file. Locally (numpy 2.4.3 / 
 passes at both commits, so it is an environment-sensitive exact-equality assertion.
 
 **Files.** `v2/calibra/nonlinear_adjustment.py`, `v2/tests/test_nonlinear_adjustment.py` — commits
-`52154ef`, `1ab5586`, `efee0f8`, `73caac7`, `b7c189c` on `research/rebase-vision`. Predeclaration
+`52154ef`, `1ab5586`, `efee0f8`, `73caac7`, `b7c189c`, `b7f9e49` on `research/rebase-vision`. Predeclaration
 `010d9c4`. **No statistic is computed inline anywhere**: `top_canonical_correlation`,
 `heldout_top_cca`, `effective_rank`, `cross_fitted_residuals`, `confound_design`,
 `pooled_tissue_source_site`, `probe_state`, `knn_balanced_accuracy_oof`, `global_permutations`,
