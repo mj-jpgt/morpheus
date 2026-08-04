@@ -114,7 +114,7 @@ floor were a property of the metric.
   **rank (R1, residualised, log)** 28.320 / **8.834** / 28.348 / 29.106 / 28.959, spread
   **×3.295**; **channel (top-CCA, 40 untrained targets, linear)** 0.6182 / **0.5859** / 0.6123 /
   0.6110 / 0.6098, spread **×1.055**. The five values are plotted individually and **never as a mean
-  or a band**: the distribution is bimodal, and a band would invite the reader to imagine a
+  or a band**: the distribution is bimodal **on this block**, and a band would invite the reader to imagine a
   distribution the data does not have. Repeat 2 is annotated. The strips are stacked rather than on a
   twin axis, because the two are different quantities in different units and the comparison being made
   is between their *spreads*.
@@ -645,11 +645,15 @@ tests in `v2/tests/test_p2_figures.py`; reported in
 
 **Status.** `PLOTTABLE`.
 
-**Caption must carry.** (i) **One seed per level, 400 steps, one objective, one cohort.** (ii) The
-rank change is **inside §4.1's floor**, and the floor drawn is on a **different arm, duration and
-block** — canonical R1 on the residualised exported `wsi_biology` block, `programme_only`, 40 epochs
-— while these runs are `programme_free` at 400 steps on a fixed held-out probe **for which no floor
-has been measured**, so the band is indicative (§4.1a rows 48–50). (iii) The correction the figure
+**Caption must carry.** (i) **One seed per level, 400 steps, one objective, one cohort** — the
+`ablate_decorr*` logs do carry `steps=400`, unlike §5.2a's, which carry 200. (ii) **The floor drawn must
+now be the probe block's own.** These runs are `programme_free` on a **fixed held-out probe at step
+400**, and that block has since been measured: **1.449× under R3 and 1.570× under canonical R1**
+(T10). Against those the 1.854× / 1.940× rank change **clears**. §4.1's 3.295× is canonical R1 on the
+residualised **exported** `wsi_biology` block of a **different arm** at 40 epochs and must not be drawn
+here at all — drawing it was what made the earlier caption read as a failure the criterion had never
+been applied to (§4.1a rows 54–55). **Clearing is not what the figure claims**: one seed per level
+means the magnitude carries nothing, and the monotonicity and the cosine do. (iii) The correction the figure
 carries: ***"`feature_decorrelation` is defective" was conditional on a query-written queue.***
 Without a momentum key encoder the same term *aggravated* the collapse (1.59 against 2.17 at step
 250, §5.1 instance 3); with one it raises rank. **Every claim this project makes about that term
@@ -763,6 +767,53 @@ switch views: on that view every difference is resolvable and the rank ordering 
 pairs, against **1 of 6** on `wsi_biology`. **(4)** RankMe's 1.811× against our 3.111× is **on the raw
 block only**; on the residualised block, where the mean offset is already gone, the two coincide at
 3.295×, which is the evidence for the mechanism rather than a qualification of it.
+
+### T10 — The fixed held-out probe has a floor, it is carried by the collapsed arm, and it is not bimodal — **NEW 2026-08-04**
+
+**Draft section.** §4.1a, §5.4.
+
+**Claim.** The block **every rank number in §5 sits on** now has a retraining floor, from ten
+same-seed repeats — five of each of the two arms §5 compares. Two properties of it are results in
+their own right: **the collapsed arm carries it by about a factor of two**, and **it is not bimodal
+anywhere**, which scopes §4.1's bimodality to the exported artifact block.
+
+**Panel A — the floor, per reading step, both statistics, and per arm.**
+
+| step | **R1 floor** | m = 0.999 alone | m = 0 alone | **R3 floor** | m = 0.999 alone | m = 0 alone |
+|---:|---:|---:|---:|---:|---:|---:|
+| 100 | **1.333×** | 1.112× | 1.333× | **1.494×** | 1.119× | 1.494× |
+| 200 | **2.057×** | 1.143× | 2.057× | **2.041×** | 1.137× | 2.041× |
+| 250 | **1.933×** | 1.165× | 1.933× | **2.035×** | 1.153× | 2.035× |
+| 400 | **1.570×** | 1.101× | 1.570× | **1.449×** | 1.105× | 1.449× |
+| 500 | **1.367×** | 1.089× | 1.367× | **1.516×** | 1.103× | 1.516× |
+
+**The per-arm columns are the point of the panel and must not be dropped for space.** The stable arm
+alone gives 1.089×–1.165× across every step; the collapsed arm gives 1.333×–2.057×. Measuring the
+healthy arm alone — the natural choice, and what F1's exported floor does — would have published
+about 1.1× and flattered every row of T8 by a factor of two.
+
+**Panel B — every other statistic at step 500**, same block: RankMe 1.300×, stable rank 1.339×,
+canonical R1 1.367×, α-ReQ |α−1| 1.490×, R2/R3 1.516×, PR/PR_rownorm 1.594×, LiDAR 1.447× on its own
+paired pseudo-block, hard numerical rank **1.000×** (pinned at 256, the probe size).
+
+**Data.** `v2/research/rebase/p2/figures/data/e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json`, written
+by `v2/research/rebase/p2/p2_probe_floors.py`, which **imports** its statistic table, its fold, its
+bimodality rule, α-ReQ's index range and LiDAR's ridge from `p2_envelope_floors.py`. Ten runs of
+`d1_momentum_probe.py` at m ∈ {0.999, 0}, decorrelation 0.04, capacity 4,096, lr 2e-4, seed 42, 500
+steps, from one verified initialisation (R1 101.38 / R3 67.55). Workspace verified 568/568 files
+against `git ls-tree`.
+
+**Status.** `PLOTTABLE` (text table).
+
+**Caption must carry.** **(1)** n = 5 **per arm**, one seed, one configuration, one stack, one
+learning rate — a floor twice over in F1's sense. **(2)** The reading **step is part of the block**: a
+step-500 floor may not be applied to a step-600 reading, which is why one §5.4 row remains
+unjudgeable. **(3)** **Not bimodal at any step, statistic or arm** — remaining-four folds of
+1.17×–1.64×, nowhere near the 1.05× a four-run agreement requires — so divergence here is *graded*
+where divergence on the exported block is *one run falling off a cliff*. **(4)** This floor is what
+moved eight of §5's eleven unjudgeable selections into `clears`, including the momentum fix itself;
+**no threshold in this paper was changed, and the exported-block floor of 3.295× never licensed those
+rows in the first place.**
 
 ### T1 — Rank as a selection rule against the published alternatives — **and it is underpowered**
 
@@ -964,8 +1015,8 @@ with the learning rate and is not a property of m, so the annotation must carry 
 `NOTEBOOK_ENTRIES/momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; logs
 `~/e0_run/d1_diag/`.
 
-**Status.** `PLOTTABLE` as drawn — **and the seed replication has now landed, so the panel's marker
-must change rather than be dropped. Draft §5.2 and the new §5.4 are rewritten around it; this panel is
+**Status.** `PLOTTABLE` as drawn — **and both the seed replication and the probe-block floor have now
+landed, so the panel's marker must change rather than be dropped. Draft §5.2 and the new §5.4 are rewritten around it; this panel is
 not yet redrawn.** The original sweep is **one seed per momentum value**, and §4.2
 measures the seed term as dominant for exactly this statistic on this stack. The single seed was a
 **defect, not a design choice** — the momentum harness had its seed hardcoded, so the sweep could not
@@ -980,11 +1031,12 @@ draws one**.
 
 **But the panel must now carry the awkward number instead.** The worst-case separation is
 **min(m = 0.999) / max(m = 0) = 10.45 / 3.18 = 3.29×, against F1's measured retraining floor of
-3.295×**. **That floor is on a different block**, and the fixed held-out probe these runs are read
-on has never had one measured, so the correct word is **unjudgeable**, not "not resolvable": the
-criterion cannot reach the comparison in either direction, and the panel must say that rather than
-print a failure it cannot support. On R3 it is 6.85 / 2.81 = 2.44×, likewise unjudgeable. **The panel
-must also point at S9**: the mechanism behind this fix is not momentum but the learning rate, and the
+3.295×**. **That floor is on a different block.** The fixed held-out probe these runs are read on has
+since had its own floor measured (T10): **1.367× under canonical R1 at step 500**, from ten same-seed
+repeats. Against it the separation **clears by a factor of 2.4**, and on R3 6.85 / 2.81 = 2.44× against
+1.516× clears too. **The panel must print the sequence, not just the outcome** — *fails 3.295× by
+0.3%* → *unjudgeable, wrong floor* → *clears its own floor by 2.4×* — because no threshold changed
+between the three and a reader will otherwise assume one did. **It must also point at S9**: the mechanism behind this fix is not momentum but the learning rate, and the
 threshold in `m` this panel draws is a property of the one learning rate it was measured at. Three caveats make this indicative rather than a like-for-like
 disqualification, and none of them rescues it: the floor was measured on `programme_only` at 40 epochs
 on an exported artifact, and these runs are `programme_free` at 500 steps on a held-out probe —
@@ -1098,7 +1150,7 @@ input.
 phenomenon. Learning rate separates the outcomes perfectly; momentum separates none of them at the
 high rate. Momentum is **neither necessary nor sufficient**.
 
-**Panel.** Six arms as a 2 × 2 (+2) grid, all 400 steps from the same verified initialisation
+**Panel.** Six arms as a 2 × 2 (+2) grid, all **200 steps** from the same verified initialisation
 **67.55**, centred **R3** on the fixed held-out probe, with the RNA-view mutual cosine printed in each
 cell:
 
@@ -1119,10 +1171,12 @@ cells were predeclared before they ran.** The panel must show the empty cells as
 `lr_test_and_decorrelation_reversal_20260804T1130Z.md`; L5/L6 in
 `NOTEBOOK_ENTRIES/learning_rate_is_the_mechanism_20260805T0100Z.md`.
 
-**Status.** `PENDING VENDORING` — the six logs are **not** in the vendored `d1_diag` directory, unlike
-the `ablate_decorr*` and `mseed_*` logs beside them, so no value in this panel is re-parsed from a copy
-in this repository. It is `PLOTTABLE` from the draft's table and must not be drawn as though its
-provenance were equal to F9's. Closing it is a file copy; draft §6.4 states the gap.
+**Status.** `PLOTTABLE`. **The six logs are vendored** beside the `ablate_decorr*` and `mseed_*` logs,
+and every value in this panel is re-parsed from the copy in this repository by
+`v2/tests/test_p2_floor_audit.py` (audit rows 57–60). **Vendoring corrected the panel's step budget:
+these arms ran 200 steps, not 400** — the logs echo `steps=200` and the predeclaration had fixed step
+200 in advance. Every rank value was unaffected. It also recovered decorrelation 0.04 and seed 42,
+which no notebook entry had recorded, so the panel is now reproducible from this repository.
 
 **Caption must carry.** **(1)** This is the **fourth** account proposed for this collapse and the
 **first to survive a predeclared test**; MoCo staleness, the `τ/T` turnover criterion and **momentum
@@ -1144,7 +1198,7 @@ account is not excluded (§4.10, §6.2).
 |---|---|---|
 | ~~**A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each~~ | **CLOSED at N = 5 (2026-08-04), and this row was stale.** F1 panel (a) is that design: five identical `programme_only` retrains at seed 42, rank and channel measured on each, giving a **3.295×** floor against a **1.055×** channel spread. It replaced the n = 1 estimate of 2.69×. What it still cannot do is attribute retraining variance to the metric rather than to this stack, and it is measured on the stable arm at a fixed seed, so it is a floor rather than an envelope. F2 remains the panel that does not depend on it. | §4.1, §4.4, §6.2 |
 | ~~A seed replication of S4's momentum sweep~~ | **REPORTED 2026-08-04, and it does not clear F1's floor.** Three seeds per momentum, 500 steps; every m = 0.999 seed exceeds every m = 0 seed, closing a single-seed defect that was **hardcoded in the harness**, not a design choice. But the worst-case separation is **3.29×** against a **3.295×** floor measured on a *different block*, and the block these runs are read on has no floor at all — so the comparison is **unjudgeable**, not failing. S4 and §5.4 now carry that word, and the draft rests the fix on a binary training outcome (§5.4) rather than on the ratio. | §5.2, §5.4, §6.2 |
-| **The six `lr_L*.log` learning-rate logs, vendored** | **Not vendored, and this is the weakest provenance in the paper's only established mechanism result.** `ablate_decorr*` and `mseed_*` were copied into the vendored `d1_diag` directory under `v2/research/rebase/p2/figures/data/` and every value read from them is re-parsed from the copy by `v2/tests/test_p2_floor_audit.py`. `lr_L{1..6}.log` were not, so §5.2a's four audit rows resolve against **the draft's own table** — the weakest of the three source kinds the audit supports. **Closing it is a file copy; nothing needs re-running.** | §5.2a, §6.4, S9 |
+| ~~**The six `lr_L*.log` learning-rate logs, vendored**~~ | **CLOSED 2026-08-04, and closing it found four errors in §5's prose** — the step budget (200, not 400), the two run families §5.2 presents as one, "40 epochs = 583 steps" against a 1,500-step budget, and §6.4's "six rows" for four. Every affected value re-resolved exactly; only the provenance and the prose moved. *Superseded text:* **Not vendored, and this was the weakest provenance in the paper's only established mechanism result.** `ablate_decorr*` and `mseed_*` were copied into the vendored `d1_diag` directory under `v2/research/rebase/p2/figures/data/` and every value read from them is re-parsed from the copy by `v2/tests/test_p2_floor_audit.py`. `lr_L{1..6}.log` were not, so §5.2a's four audit rows resolve against **the draft's own table** — the weakest of the three source kinds the audit supports. **Closing it is a file copy; nothing needs re-running.** | §5.2a, §6.4, S9 |
 | **The RNA-view mutual cosine on the CENTRED representation, for the three `lr = 1e-3` arms** | **Not measured.** Rank reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred cosine reads 0.9946 / 0.9257 / 0.5207. Either rank is insensitive at the collapse floor or the whole difference is in the mean-offset direction centring removes — the same asymmetry that makes RankMe more reproducible than our statistic (T9, §4.1b). Needs the runs' activations, which the logs do not carry. | §4.10, §6.2, S9 |
 | **A like-for-like retraining floor for the momentum regime** | **Not measured — but one same-seed PAIR in that regime now has been, and it is concordant** (`ablate_decorr0.04` against `mseed_m0.999_s42`: 1.066× at step 400, ≤ 1.128× over the shared steps; draft §4.1a row 56). **n = 2 is a pair, not a floor**, and §4.1's own argument is that a pair drawn from concordant repeats can license everything, so it is recorded and not used. F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets. | §3.2, §6.2, §6.3 |
@@ -1169,7 +1223,7 @@ account is not excluded (§4.10, §6.2).
 | D1 paired bootstrap, 40 targets | **F6(b), F6(c)** | **RESOLVED.** `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` (00:08 UTC) and `D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json` (02:40 UTC); folded into draft §4.7.2 at commit `a11549a`. Draw **both** estimators; weight the cancer-cluster one. |
 | §4.5(a)'s statistic labels | **F5(a)** | **RESOLVED.** Corrected in the draft at `a11549a`; plot from `~/ws_p2/out/P2_RANK_VARIANTS.json`. |
 | **Momentum seed replication** | **S4** | **REPORTED 2026-08-04. The draft is now rewritten around it (§5.2, §5.4); S4 itself is still to be redrawn.** Three seeds per momentum at 500 steps (`~/e0_run/d1_diag/mseed_*`): canonical R1 11.26 / 10.45 / 10.55 at m = 0.999 against 3.18 / 1.13 / 2.36 at m = 0, so every m = 0.999 seed exceeds every m = 0 seed on both statistics and the single-seed defect is closed. **But the worst-case separation is 3.29× against F1's 3.295× floor**, so S4 must carry that the fix's *rank* difference is not resolvable by §4.1's own criterion — different arm, duration and block, so indicative rather than a like-for-like disqualification, and all three mismatches point toward a larger floor in this regime. **S4 must also carry what the fix does rest on**, per new draft §5.4: `programme_free` completing 40 epochs uncollapsed **0 of 3** seeds before the fix and **3 of 3** after, with a channel and paired bootstrap intervals where no export existed at all. Numbers in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3. |
-| **Controlled retraining repeat design** | **F1(a), F1(b), F1(d), F4, F6(b)** | **RESOLVED at N = 5, 2026-08-04.** `~/e0_run/d1_envelope/rep{1..5}.npz`, readout `~/e0_run/d1_envelope_readout.log`, vendored and extracted to `v2/research/rebase/p2/figures/data/extracted/F1_RETRAINING_REPEAT.json`. Rank floor **3.295×** residualised / **3.111×** raw against a **1.055×** channel spread. Do **not** draw it as a fitted distribution or a confidence band: it is **bimodal** (four repeats within 2%, one at a third) and it is a **floor**, measured on the stable arm at a fixed seed. F1(a) plots the five values individually for that reason. |
+| **Controlled retraining repeat design** | **F1(a), F1(b), F1(d), F4, F6(b)** | **RESOLVED at N = 5, 2026-08-04.** `~/e0_run/d1_envelope/rep{1..5}.npz`, readout `~/e0_run/d1_envelope_readout.log`, vendored and extracted to `v2/research/rebase/p2/figures/data/extracted/F1_RETRAINING_REPEAT.json`. Rank floor **3.295×** residualised / **3.111×** raw against a **1.055×** channel spread. Do **not** draw it as a fitted distribution or a confidence band: it is **bimodal on this block** (four repeats within 2%, one at a third) and it is a **floor**, measured on the stable arm at a fixed seed. F1(a) plots the five values individually for that reason. **The bimodality does not transfer**: the probe block's own floor (T10) is not bimodal at any step, statistic or arm, so no caption may call bimodality a property of the metric. |
 | **Per-block ground truth for the selection rule** | **T1** | **RESOLVED for the D2 half, 2026-08-04.** `v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json` re-scores both D2 arms on six target blocks; `v2/research/rebase/p2/p2_selection_rule_blocks.py` re-runs the rule with each as truth. Every metric row's D2 count moves; the ordering between canonical effective rank and RankMe reverses on two blocks. **Unresolved for the D1 half** — those arms were never scored on any block but the gene sets, so T1's band holds D1 fixed and says so. |
 | Per-step arrays for the collapse tracks | F8(b) | **RESOLVED, split.** The rank track has per-step values and is extracted (`v2/research/rebase/p2/collapse_tracks/diag_d.log`); the collapse-evidence quantities have endpoints only and keep the paired-marker treatment. Statistic corrected to **R3**. |
 | Synthetic `(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` inset | F5 | **RESOLVED.** `v2/research/rebase/p2/p2_hill_order_inset.py` + `v2/tests/test_p2_hill_order_inset.py`; R2/PR spans 1.000 to 5.923 over `a ∈ [0, 2]`. |

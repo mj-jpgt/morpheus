@@ -31,11 +31,13 @@
 > figure of 2.69× quoted in this header was the superseded n = 1 estimate and **must not be quoted as
 > the floor**. Different arm, duration and block make the comparison indicative rather than a
 > like-for-like disqualification, and all three mismatches point toward a *larger* floor in this regime
-> rather than a smaller one. **The accurate verdict, and the word P2 §5.4 now uses throughout, is
-> `unjudgeable` rather than "not resolvable"**: these runs are read on the fixed held-out probe, which
-> has **no measured retraining floor** and cannot get one from the five exported repeats, so the
-> criterion has not been applied to the comparison in either direction. §5.4's conclusion is unaffected
-> — it rests on the binary outcome below.
+> rather than a smaller one. **And the probe block now has a floor of its own** — ten same-seed
+> repeats, five of each of the two arms compared here, at five reading steps — against which the
+> separation **clears by a factor of 2.4** (3.286× against 1.367×, canonical R1, step 500). The verdict
+> went *fails 3.295× by 0.3%* → *unjudgeable, wrong block* → *clears its own floor*, and **no threshold
+> moved at any point**: 3.295× is the exported artifact's floor for a different arm at 40 epochs and
+> never licensed this comparison. §5.4's conclusion is unaffected either way — it rests on the binary
+> outcome below, not on the ratio.
 >
 > **And the mechanism is not momentum.** A predeclared learning-rate test (P2 §5.2a, `f68a7ac`) shows
 > this collapse is primarily a **learning-rate** phenomenon: at `lr = 1e-3` the representation sits at
@@ -107,6 +109,11 @@ this objective is used for amounts to **583 steps**, so the table spans the real
 Three things this table shows that a single number would not. The effect is **monotone in m** and
 large — the per-step fold `m = 0.999 / m = 0` is **3.363× (200), 2.208× (300), 3.596× (400), 3.132×
 (500), 2.641× (600)**, a range of **2.208×–3.596×** past step 150, and **4.340×** at step 100.
+*These are **run family A**, `long_m*.log`, launched at a **1,500-step** budget and read to 600; the
+583 steps below is the epoch equivalence of the training this objective is used for, not the harness
+budget. The staleness measurement in §2 is a **different family** at the same configuration
+(`mom_*.log`, 300-step budget) and the two disagree by 1.593× on the m = 0 arm at step 100 — see draft
+§5.2.*
 *An earlier version of this sentence said "2.6–3.3× at every step past 150"; **both ends of that range
 are wrong against the table above** and it is corrected here (draft §4.1a, row 47).* It is **durable**:
 both working arms are flat from step 200 to
@@ -193,8 +200,8 @@ constant, not a ratio **at the one learning rate this sweep was run at**. We rec
 observation and explicitly did **not** advance it as a mechanism.
 
 **And it has since been falsified, by the experiment the Limits section below named as the next
-testable shape.** A predeclared learning-rate test (draft §5.2a, `f68a7ac`) ran six arms at 400 steps
-from one initialisation. At `lr = 1e-3` the representation sits at **1.06 / 1.05 / 1.05** across
+testable shape.** A predeclared learning-rate test (draft §5.2a, `f68a7ac`) ran six arms at **200
+steps** from one initialisation. At `lr = 1e-3` the representation sits at **1.06 / 1.05 / 1.05** across
 `m = 0 / 0.9 / 0.999` — the momentum threshold buys nothing, a spread of **1.01×**; at `lr = 4e-5` it
 reaches **12.30** with `m = 0`, **27.88** at `m = 0.99` and **35.24** at `m = 0.999`. **Learning rate
 predicts the outcome perfectly and momentum predicts none of it at the high rate.** So the `τ`

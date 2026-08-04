@@ -1,7 +1,8 @@
 ## 2026-08-05 01:00 UTC — The two missing cells report: it is the learning rate. Momentum is neither necessary nor sufficient, and this is the fourth account for this collapse and the first to survive a predeclared test
 
 **Logged:** 2026-08-05 01:00 UTC. **How obtained:** `~/e0_run/d1_diag/lr_L{5,6}.log`, read against
-`~/e0_run/d1_diag/lr_L{1,2,3,4}.log`. 400 steps, `programme_free`, fixed held-out probe, capacity
+`~/e0_run/d1_diag/lr_L{1,2,3,4}.log`. **200 steps** — see the correction note below; this entry
+originally said 400 — `programme_free`, fixed held-out probe, capacity
 4,096, one verified initialisation (**67.55**). Predeclaration
 `PREDECLARED_learning_rate_test_20260804T2200Z.md` (`f68a7ac`), committed before any arm ran; the two
 missing cells were predeclared a second time, with their discriminating predictions, in
@@ -136,6 +137,28 @@ nothing needs re-running. Recorded in draft §6.4 and in `P2_FIGURES.md` S9.
   carries the missing centred-cosine measurement; **§6.4** carries the vendoring gap.
 - **`floor_audit.json`** gains rows 57–60; the audit is now 60 rows. The 25-selection split is
   unchanged at **13 fail / 11 unjudgeable / 1 clears** because all four new rows are `direction`.
+
+### CORRECTION, 2026-08-04: the step budget in this entry was wrong
+
+The six logs were vendored after this entry was written
+(`lr_logs_vendored_and_the_step_budget_they_contradict_20260804T1400Z.md`). Each echoes its own
+resolved argv on line 1 as **`steps=200`**, and step 200 is the **last** row each log has — which is
+what makes the values quoted here the "final eff-rank". **This entry said 400 steps, and so did draft
+§5.2a in four places.** Every rank value in §1 above agrees with the logs exactly; only the budget was
+wrong. Two things settle which side is right: the log is the primary artifact and this entry is a
+report of it, and `PREDECLARED_learning_rate_test_20260804T2200Z.md` fixed the reading rule in advance
+as *"centred effective rank on the held-out probe at step 200"* — so the logs agree with the
+predeclaration and this entry did not. The disagreement was recorded in `floor_audit.json`'s
+`known_source_disagreements` before being corrected anywhere.
+
+Vendoring also recovered two facts this entry could not state: the six arms ran at **decorrelation
+0.04** and **seed 42**. §5.2a is reproducible from the repository as a result. And §7 below is
+**closed**: the logs are vendored, hashed, and audit rows 57–60 now resolve against them rather than
+against the draft's own table.
+
+*The equivalent correction to `lr_test_and_decorrelation_reversal_20260804T1130Z.md` §1 is not made
+here — that is another agent's entry and the record is append-only — but its "400 steps" is wrong in
+the same way and for the same reason.*
 
 ### Files / commits
 
