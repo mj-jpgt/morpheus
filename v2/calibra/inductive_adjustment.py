@@ -39,6 +39,28 @@ cohort (which invalidates the published numbers) or to refit on all rows (which
 introduces a model no reference row was ever scored by, and which no identity
 test can validate). The K-model ensemble is the only option that both preserves
 identity and uses exclusively models that are already fitted and persisted.
+
+**One row at a time equals the whole block -- exactly in everything the operator
+controls, and to 4 eps in what BLAS controls.** This is the operator's defining
+property: a single new slide must be adjusted identically to that slide inside a
+batch, or "adjusting one slide" is not a well-defined operation. It holds
+bit-exactly in every respect this module owns. The design encoding is strictly
+row-wise (:class:`DesignSpec` freezes the levels and the numeric mean/s.d.
+against the reference, so nothing is recomputed from the incoming rows), and a
+row's adjusted coordinates are bit-identical under *any* change to the other
+rows of a block of the same size -- different cancers, different sites, values
+scaled by 100 -- and under any permutation of the block. Those are the
+assertions that would break if a cohort statistic leaked, and they are asserted
+with ``array_equal``.
+
+What is not bit-exact is a change to the block's *size*, and the cause is
+outside this module: ``numpy`` dispatches ``(1, d) @ (d, k)`` to a BLAS GEMV and
+``(m, d) @ (d, k)`` to a blocked GEMM, which sum the ``d`` products in different
+orders. ``A[i:i+1] @ B != (A @ B)[i:i+1]`` for dense operands on every
+environment tested. See :data:`NEW_ROW_BLOCK_INVARIANCE_ATOL` for the measured
+size of that deviation, why it cannot hide a real leak, and why it is exactly
+zero on all 14 deployed operators. Use :func:`block_invariance_deviation` to
+measure it rather than re-deriving it.
 """
 from __future__ import annotations
 
@@ -55,10 +77,123 @@ from sklearn.model_selection import KFold
 from .residualise import apply_pooled_tissue_source_site, pooled_tissue_source_site
 
 __all__ = ["DesignSpec", "SitePooling", "InductiveResidualiser", "ConfoundAdjustmentOperator",
-           "UnseenLevelError"]
+           "UnseenLevelError", "block_invariance_deviation",
+           "NEW_ROW_BLOCK_INVARIANCE_ATOL", "NEW_ROW_BLOCK_INVARIANCE_RTOL",
+           "NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL",
+           "NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL_DEPLOYED",
+           "COHORT_STATISTIC_LEAK_SMALLEST_MEASURED"]
 
 #: Written into the persisted file so a future reader can tell which contract it holds.
 OPERATOR_FORMAT_VERSION = 1
+
+# --------------------------------------------------------------------- block invariance
+#
+# "One row at a time equals the whole block" is the operator's defining property. The
+# numbers below are what it costs, measured rather than assumed, so that no caller and
+# no test has to re-derive them. See the module docstring for the mechanism.
+
+#: Worst ``max |block - single|`` measured over a sweep of 3 synthetic cohorts x 3
+#: residualiser settings ((5, 1.0, 42), (3, 1.0, 7), (10, 2.0, 1)) x block sizes
+#: {2, 12, 64, 240}, on a 19-column design that contains a *continuous* covariate.
+#: 8.882e-16 is 4 x ``np.finfo(np.float64).eps``, on adjusted values as large as 7.24 --
+#: i.e. the deviation is at the last bit of the representation, not in it.
+NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL = 8.882e-16
+
+#: The same measurement over the 14 persisted TCGA operators at
+#: ``runs_misc/tcga_operators/`` (design widths 22 and 99, 256 output columns, block
+#: sizes 8 and 64): **exactly zero**. Their designs are purely categorical, so every
+#: row of the design is one-hot; the products are exactly representable and the
+#: remaining terms are zeros, which re-associate exactly. Every deployed operator --
+#: including the ones ALCHEMIST's external comparison runs through -- satisfies the
+#: property bit-for-bit, and no published number depends on the tolerance below.
+NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL_DEPLOYED = 0.0
+
+#: The smallest *real* cohort-statistic leak measured on the same 12-row block: encoding
+#: a numeric covariate with the new cohort's mean/s.d. instead of the reference's moves
+#: the adjusted values by 1.285e-01. (Re-centring on the new block -- what the
+#: transductive ``cross_fitted_residuals`` does -- moves them by 2.018e+00.) This is the
+#: quantity the tolerance must not be able to absorb.
+COHORT_STATISTIC_LEAK_SMALLEST_MEASURED = 1.285e-01
+
+#: Tolerance for block-size invariance of the new-row path. It sits ~1.1e3 above the
+#: measured deviation and ~1.3e11 *below* the smallest real leak, so it has room for a
+#: different BLAS and still cannot hide a cohort statistic. ``RTOL`` carries the same
+#: guarantee to representations on a much larger scale than the ones measured here.
+NEW_ROW_BLOCK_INVARIANCE_ATOL = 1e-12
+NEW_ROW_BLOCK_INVARIANCE_RTOL = 1e-12
+
+
+def block_invariance_deviation(operator, matrix, frame, *, patient_ids=None,
+                               on_unseen_level: str = "refuse") -> dict:
+    """Measure how far ``adjust``-ing rows one at a time is from ``adjust``-ing the block.
+
+    Returns the deviation, never a verdict -- callers compare it against
+    :data:`NEW_ROW_BLOCK_INVARIANCE_ATOL`. Reported both in absolute terms and in
+    units of ``eps``, because the whole question is whether the disagreement is at
+    the last bit of a float or in the number.
+
+    ``composition_bit_exact`` is the part that actually tests for a leaked cohort
+    statistic: it re-runs row 0 inside a block of the *same size* whose other rows
+    have been replaced by different data, so a design or centring recomputed from
+    the incoming rows would move it while a BLAS blocking difference cannot.
+    """
+    import pandas as pd
+
+    matrix = np.asarray(matrix, dtype=np.float64)
+    frame = pd.DataFrame(frame).reset_index(drop=True)
+    ids = None if patient_ids is None else np.asarray(patient_ids)
+    n = len(matrix)
+
+    block, _ = operator.adjust(matrix, frame, patient_ids=ids,
+                               on_unseen_level=on_unseen_level)
+    max_abs = max_rel = 0.0
+    max_ulp = n_differing = 0
+    design_bit_exact = True
+    block_design, _ = operator._frame_and_design(frame, ids, on_unseen_level)
+    for i in range(n):
+        row_ids = None if ids is None else ids[i:i + 1]
+        row_frame = frame.iloc[i:i + 1]
+        single, _ = operator.adjust(matrix[i:i + 1], row_frame, patient_ids=row_ids,
+                                    on_unseen_level=on_unseen_level)
+        row_design, _ = operator._frame_and_design(row_frame, row_ids, on_unseen_level)
+        design_bit_exact &= bool(np.array_equal(row_design, block_design[i:i + 1]))
+        a, b = single.ravel(), block[i:i + 1].ravel()
+        deviation = np.abs(a - b)
+        n_differing += int(np.count_nonzero(deviation))
+        max_abs = max(max_abs, float(deviation.max()) if deviation.size else 0.0)
+        nonzero = np.abs(b) > 0
+        if nonzero.any():
+            max_rel = max(max_rel, float((deviation[nonzero] / np.abs(b[nonzero])).max()))
+        max_ulp = max(max_ulp, int(np.max(np.abs(a.view(np.int64) - b.view(np.int64)))))
+
+    # Same block SIZE, entirely different companions: only a leaked cohort statistic
+    # can move row 0 here, because BLAS blocking depends on the shape, not the values.
+    composition_bit_exact = True
+    if n > 1:
+        rng = np.random.default_rng(20260804)
+        other = np.argsort(rng.random(n - 1)) + 1
+        shuffled_frame = pd.concat([frame.iloc[0:1], frame.iloc[other]]).reset_index(drop=True)
+        shuffled_matrix = np.vstack([matrix[0:1], matrix[other] * 100.0])
+        shuffled_ids = None if ids is None else np.concatenate([ids[0:1], ids[other]])
+        alternative, _ = operator.adjust(shuffled_matrix, shuffled_frame,
+                                         patient_ids=shuffled_ids,
+                                         on_unseen_level=on_unseen_level)
+        composition_bit_exact = bool(np.array_equal(alternative[0:1], block[0:1]))
+
+    eps = float(np.finfo(np.float64).eps)
+    return {
+        "n_rows": int(n),
+        "max_abs": max_abs,
+        "max_abs_in_eps": max_abs / eps,
+        "max_rel": max_rel,
+        "max_ulp": max_ulp,
+        "n_differing": n_differing,
+        "n_total": int(block.size),
+        "max_abs_value": float(np.max(np.abs(block))) if block.size else 0.0,
+        "design_bit_exact": bool(design_bit_exact),
+        "composition_bit_exact": composition_bit_exact,
+        "eps": eps,
+    }
 
 
 class UnseenLevelError(ValueError):

@@ -10,8 +10,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from morpheus.v2.calibra.inductive_adjustment import (ConfoundAdjustmentOperator, DesignSpec,
-                                                      SitePooling, UnseenLevelError)
+from morpheus.v2.calibra.inductive_adjustment import (COHORT_STATISTIC_LEAK_SMALLEST_MEASURED,
+                                                      NEW_ROW_BLOCK_INVARIANCE_ATOL,
+                                                      NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL,
+                                                      NEW_ROW_BLOCK_INVARIANCE_RTOL,
+                                                      ConfoundAdjustmentOperator, DesignSpec,
+                                                      SitePooling, UnseenLevelError,
+                                                      block_invariance_deviation)
 from morpheus.v2.calibra.residualise import (apply_pooled_tissue_source_site, confound_design,
                                              cross_fitted_residuals, pooled_tissue_source_site)
 
@@ -163,22 +168,138 @@ def test_single_new_row_is_adjustable_at_all():
     assert report["path"] == "inductive_fold_ensemble"
 
 
+def _new_rows(matrix, n=12, seed=23, with_purity=True):
+    rng = np.random.default_rng(seed)
+    ids = np.asarray([f"TCGA-0{i % 2 + 1}-8{i:03d}" for i in range(n)])
+    columns = {"cancer": rng.choice(CANCERS, n), "tss": ""}
+    if with_purity:
+        columns["purity"] = rng.uniform(0.2, 0.9, n)
+    return ids, pd.DataFrame(columns), rng.normal(size=(n, matrix.shape[1]))
+
+
 def test_one_row_at_a_time_equals_the_whole_block():
     """No cohort statistic leaks into the new-row path: adjusting rows one by one must
     equal adjusting them together. This is the property the transductive function
-    lacks, and the reason it could not be deployed."""
+    lacks, and the reason it could not be deployed.
+
+    Asserted in two pieces, because they have different strengths and conflating
+    them is what made the original single ``atol=0, rtol=0`` assertion untenable.
+
+    *Everything this operator controls is bit-exact* -- the design encoding is
+    row-wise, and a row's answer does not move when the OTHER rows of a block of the
+    same size are replaced with different data. Those are the assertions a leaked
+    cohort statistic breaks, and they use ``array_equal``.
+
+    *What BLAS controls is not.* ``numpy`` sends ``(1, d) @ (d, k)`` to a GEMV and
+    ``(m, d) @ (d, k)`` to a blocked GEMM, which sum the ``d`` products in different
+    orders, so changing the block's SIZE moves the last bit. This is not a property
+    of this module: ``A[i:i+1] @ B != (A @ B)[i:i+1]`` for dense operands under
+    numpy 2.2.6 and 2.4.3 alike (both scipy-openblas). It is bounded here rather
+    than waved through -- see
+    ``test_the_block_size_tolerance_cannot_absorb_a_cohort_statistic``.
+    """
     operator, patient_ids, frame, matrix = _fit()
-    rng = np.random.default_rng(23)
-    new_ids = np.asarray([f"TCGA-0{i%2+1}-8{i:03d}" for i in range(12)])
-    new_frame = pd.DataFrame({"cancer": rng.choice(CANCERS, 12), "tss": "",
-                              "purity": rng.uniform(0.2, 0.9, 12)})
-    new_matrix = rng.normal(size=(12, matrix.shape[1]))
+    new_ids, new_frame, new_matrix = _new_rows(matrix)
+    deviation = block_invariance_deviation(operator, new_matrix, new_frame,
+                                           patient_ids=new_ids)
+
+    # (a) exact, in everything the operator owns.
+    assert deviation["design_bit_exact"], "the design encoding is not row-wise"
+    assert deviation["composition_bit_exact"], \
+        "a row's answer moved when the rest of the block changed: a cohort statistic leaked"
+
+    # (b) at the last bit, in what BLAS owns. Both a scale-free bound (the deviation
+    #     must stay within a few ulps of the values themselves) and the flat tolerance
+    #     the published contract quotes.
+    assert deviation["max_abs"] <= 64 * deviation["eps"] * max(1.0, deviation["max_abs_value"])
+    assert deviation["max_abs"] <= NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL
 
     block, _ = operator.adjust(new_matrix, new_frame, patient_ids=new_ids)
     for i in range(12):
         single, _ = operator.adjust(new_matrix[i:i + 1], new_frame.iloc[i:i + 1],
                                     patient_ids=new_ids[i:i + 1])
-        assert np.allclose(single, block[i:i + 1], atol=0, rtol=0)
+        assert np.allclose(single, block[i:i + 1], atol=NEW_ROW_BLOCK_INVARIANCE_ATOL,
+                           rtol=NEW_ROW_BLOCK_INVARIANCE_RTOL)
+
+
+def test_a_row_is_unmoved_by_whatever_else_is_in_its_block():
+    """The bit-exact half, stated on its own because it is the real guarantee.
+
+    Same block size, row 0 held fixed, every other row replaced by a different
+    cancer, a different site and values 100x larger. Nothing the operator does may
+    notice: the levels, the numeric mean/s.d. and the centre are all frozen against
+    the reference. A permutation of the block must likewise return every row
+    unchanged.
+    """
+    operator, patient_ids, frame, matrix = _fit()
+    new_ids, new_frame, new_matrix = _new_rows(matrix)
+    block, _ = operator.adjust(new_matrix, new_frame, patient_ids=new_ids)
+
+    rng = np.random.default_rng(999)
+    other_ids, other_frame, other_matrix = new_ids.copy(), new_frame.copy(), new_matrix.copy()
+    other_ids[1:] = np.asarray([f"TCGA-{'ZZ' if i % 2 else '05'}-7{i:03d}" for i in range(1, 12)])
+    other_frame.loc[1:, "cancer"] = rng.choice(CANCERS, 11)
+    other_frame.loc[1:, "purity"] = rng.uniform(0.2, 0.9, 11)
+    other_matrix[1:] = rng.normal(size=(11, matrix.shape[1])) * 100.0
+    alternative, _ = operator.adjust(other_matrix, other_frame, patient_ids=other_ids)
+    assert np.array_equal(alternative[0:1], block[0:1])
+
+    order = np.random.default_rng(4).permutation(12)
+    permuted, _ = operator.adjust(new_matrix[order], new_frame.iloc[order].reset_index(drop=True),
+                                  patient_ids=new_ids[order])
+    assert np.array_equal(permuted[np.argsort(order)], block)
+
+
+def test_a_categorical_only_design_is_bit_exact_block_versus_single():
+    """The deployed case, and the reason no published number rests on the tolerance.
+
+    All 14 persisted operators at ``runs_misc/tcga_operators/`` have purely
+    categorical designs (``cancer`` and ``tss``), so every design row is one-hot:
+    the products are exactly representable and the remaining terms are zeros, which
+    re-associate exactly. Measured over those 14 operators the deviation is
+    ``0.000e+00``; reproduced here without the box.
+    """
+    patient_ids, frame, matrix = _cohort()
+    operator = ConfoundAdjustmentOperator.fit(
+        matrix, frame[["cancer", "tss"]], ["cancer", "tss"], patient_ids=patient_ids,
+        site_column="tss", min_site_count=10, cohort_name="categorical_only")
+    new_ids, new_frame, new_matrix = _new_rows(matrix, with_purity=False)
+    deviation = block_invariance_deviation(operator, new_matrix, new_frame[["cancer", "tss"]],
+                                           patient_ids=new_ids)
+    assert deviation["design_bit_exact"] and deviation["composition_bit_exact"]
+    assert deviation["max_abs"] == 0.0, "a categorical-only design must be bit-exact"
+    assert deviation["n_differing"] == 0
+
+
+def test_the_block_size_tolerance_cannot_absorb_a_cohort_statistic():
+    """A tolerance is only defensible against the thing it must still catch.
+
+    Two real leaks, constructed on the same block the tolerance is measured on:
+    re-centring on the new cohort (what the transductive function does) and
+    standardising a numeric covariate by the new cohort's own mean and s.d. The
+    smaller of the two is ~1.3e11 times the tolerance, so nothing that would change
+    a published number can hide underneath it.
+    """
+    operator, patient_ids, frame, matrix = _fit()
+    new_ids, new_frame, new_matrix = _new_rows(matrix)
+    block, _ = operator.adjust(new_matrix, new_frame, patient_ids=new_ids)
+
+    recentred = float(np.max(np.abs(block - (block - block.mean(axis=0)))))
+
+    reference_mean, reference_std, _ = operator.design_spec.numeric_stats["purity"]
+    purity = new_frame["purity"].to_numpy(dtype=float)
+    on_reference_scale = (purity - reference_mean) / reference_std
+    on_new_cohort_scale = (purity - purity.mean()) / purity.std()
+    column = operator.design_spec.design_columns.index("purity")
+    ensemble_coefficient = np.mean([c[:, column] for c in operator.residualiser.coefficients],
+                                   axis=0)
+    restandardised = float(np.max(np.abs(np.outer(on_new_cohort_scale - on_reference_scale,
+                                                  ensemble_coefficient))))
+
+    smallest_leak = min(recentred, restandardised)
+    assert smallest_leak == pytest.approx(COHORT_STATISTIC_LEAK_SMALLEST_MEASURED, rel=1e-3)
+    assert smallest_leak > 1e10 * NEW_ROW_BLOCK_INVARIANCE_ATOL
+    assert NEW_ROW_BLOCK_INVARIANCE_ATOL > 1e3 * NEW_ROW_BLOCK_INVARIANCE_MEASURED_ATOL
 
 
 def test_transductive_residualiser_does_NOT_have_that_property():
