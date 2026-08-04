@@ -944,8 +944,10 @@ initialisation, steps 0→600 (40 epochs of this objective is 583 steps): m = 0 
 67.55/4.10/1.62/1.62/2.26/3.32/2.18/2.43/2.81; m = 0.9 gives 67.55/3.88/3.51/2.15/1.65/2.70/2.31/
 2.34/2.23; m = 0.99 gives 67.55/8.65/6.49/4.56/5.70/6.01/5.50/5.50/5.88; m = 0.999 gives
 67.55/9.35/7.03/6.99/7.60/7.33/7.84/7.61/7.42. Draw all four as curves; annotate that m = 0.9 tracks
-the no-momentum arm, so the threshold lies between 0.9 and 0.99, and that both working arms are flat
-from step 200 to 600.
+the no-momentum arm, so there is a threshold in m **at this learning rate** and it lies between 0.9
+and 0.99, and that both working arms are flat
+from step 200 to 600. **The "at this learning rate" is not decoration**: S9 shows the threshold moves
+with the learning rate and is not a property of m, so the annotation must carry `lr = 2e-4`.
 
 **Provenance.** `NOTEBOOK_ENTRIES/queue_size_implicates_the_key_set_20260803T2200Z.md`;
 `NOTEBOOK_ENTRIES/momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; logs

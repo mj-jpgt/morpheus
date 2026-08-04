@@ -25,14 +25,25 @@
 > m = 0.999 seed exceeds every m = 0 seed on both statistics**, so the separation is not an artefact of
 > the one seed the harness allowed.
 >
-> **But it does not clear P2 §4.1's bar, and the file must not be read as though it did.** The
+> **But it does not clear P2 §4.1's bar either, and the file must not be read as though it did.** The
 > worst-case separation is **10.45 / 3.18 = 3.29×** against §4.1's measured retraining floor of
-> **3.295×** (canonical R1, residualised exported block; 3.111× raw) — **inside it**. The earlier
+> **3.295×** (canonical R1, residualised exported block; 3.111× raw). The earlier
 > figure of 2.69× quoted in this header was the superseded n = 1 estimate and **must not be quoted as
 > the floor**. Different arm, duration and block make the comparison indicative rather than a
 > like-for-like disqualification, and all three mismatches point toward a *larger* floor in this regime
-> rather than a smaller one, so **by the paper's own criterion the momentum fix's rank difference is
-> not resolvable.**
+> rather than a smaller one. **The accurate verdict, and the word P2 §5.4 now uses throughout, is
+> `unjudgeable` rather than "not resolvable"**: these runs are read on the fixed held-out probe, which
+> has **no measured retraining floor** and cannot get one from the five exported repeats, so the
+> criterion has not been applied to the comparison in either direction. §5.4's conclusion is unaffected
+> — it rests on the binary outcome below.
+>
+> **And the mechanism is not momentum.** A predeclared learning-rate test (P2 §5.2a, `f68a7ac`) shows
+> this collapse is primarily a **learning-rate** phenomenon: at `lr = 1e-3` the representation sits at
+> 1.05–1.06 whatever the momentum, and at `lr = 4e-5` it reaches **12.30 with no momentum encoder at
+> all**. Momentum is **neither necessary nor sufficient**; it does rescue the objective at the rate
+> this project trains at, `2e-4`, and **lowering the learning rate would have solved the original
+> problem more simply, and we did not try it.** Every threshold in `m` in this file is scoped to
+> `lr = 2e-4`.
 >
 > **What the fix actually rests on is a binary outcome, not a ratio** — see **P2 §5.4**, which is now a
 > subsection of its own. `programme_free` completed 40 epochs uncollapsed on **0 of 3** seeds before the
@@ -106,9 +117,11 @@ encoder slightly — there is a threshold in m **at this learning rate**, and it
 m = 0.99. A predeclared learning-rate test has since shown that the threshold moves with the learning
 rate and is not a property of m at all: see draft §5.2a.
 
-**`m = 0.999` is used because it measured best in this sweep. No mechanism is claimed.** That is a
-weaker justification than a hyperparameter usually receives and it is stated deliberately: two
-mechanisms were proposed for this effect and both were falsified by measurement (below). A reader can
+**`m = 0.999` is used because it measured best in this sweep. No mechanism is claimed here.** That is a
+weaker justification than a hyperparameter usually receives and it is stated deliberately: **three**
+mechanisms were proposed for this effect and all three were falsified by measurement (below), and the
+fourth — the momentum threshold this table shows — was falsified in turn by the learning-rate test in
+P2 §5.2a. A reader can
 see exactly how much to trust the choice, which is more than a value defended by an unverified story
 would offer.
 
@@ -162,17 +175,34 @@ that are computed *within* that loss can see it either.
 **It is not confirmed, and one sharpening of it has been tested and refuted.** We proposed, and
 predeclared, that the required momentum should track queue turnover — that the EMA time constant
 `τ = 1/(1−m)` must exceed `T = capacity/batch`, making the criterion dimensionless in `τ/T`. Five
-predictions were committed before the runs. **Four were wrong, and the discriminating one inverted:**
-at `m = 0.95`, the arm with the *lowest* `τ/T` (0.52, capacity 8192) was the healthiest of its group
-at 3.67, where the criterion required it to be the worst; effective rank rose as `τ/T` fell.
+predictions were committed before the runs. **Four were wrong, and the discriminating one produced no
+effect at all:** the criterion required the arm with the *lowest* `τ/T` (0.52, capacity 8192, `m =
+0.95`) to be the worst of its group and fixed *"fails ≤ 3.5"* in advance; it read **3.67** and so did
+not fail. *An earlier version of this document called that an inversion, reading an ordering off 3.67
+against 3.53 — a 1.04× difference, smaller than any floor this project has measured on any statistic
+or any view. The accurate statement is that a predicted effect was **absent**; the same two numbers do
+carry the equality claim "nearly flat in capacity" below, which an ordering claim cannot (draft §4.1a,
+rows 51–52).*
 
 What the data supports is narrower: rank is **monotone in `m` and nearly flat in capacity**. At fixed
 `m = 0.95`, tripling the queue from 2,048 to 8,192 moves effective rank 3.53 → 3.67. At fixed capacity
 4,096, raising `m` from 0.95 to 0.999 moves it 2.91 → 7.82. A threshold sits between `τ = 20` (fails)
 and `τ = 100` (works) and appears at the same place for every capacity tested — an *absolute* time
-constant, not a ratio. We record that as an observation and explicitly do **not** advance it as a
-mechanism: it would be the fourth proposed explanation for this collapse, resting on the same data
-that refuted the third.
+constant, not a ratio **at the one learning rate this sweep was run at**. We recorded that as an
+observation and explicitly did **not** advance it as a mechanism.
+
+**And it has since been falsified, by the experiment the Limits section below named as the next
+testable shape.** A predeclared learning-rate test (draft §5.2a, `f68a7ac`) ran six arms at 400 steps
+from one initialisation. At `lr = 1e-3` the representation sits at **1.06 / 1.05 / 1.05** across
+`m = 0 / 0.9 / 0.999` — the momentum threshold buys nothing, a spread of **1.01×**; at `lr = 4e-5` it
+reaches **12.30** with `m = 0`, **27.88** at `m = 0.99` and **35.24** at `m = 0.999`. **Learning rate
+predicts the outcome perfectly and momentum predicts none of it at the high rate.** So the `τ`
+threshold above is a property of the learning rate it was measured at, not of `m`: **momentum is
+neither necessary nor sufficient** for this rescue. At the rate this project actually trains at,
+`2e-4`, momentum does rescue the objective and the seed-varied replication is unambiguous — but
+**lowering the learning rate would have solved the original problem more simply, and we did not try
+it.** Everything in this document about a threshold in `m` must be read with "at `lr = 2e-4`"
+attached.
 
 ## Why this may matter beyond one codebase
 
@@ -189,16 +219,24 @@ that is no reassurance at all.
 - One objective, one architecture, one cohort. No claim about generality is made.
 - Durability is established only to **step 600**, against a training duration of 583 steps. Nothing is
   known about behaviour at 10× that horizon.
-- The sweep is **one seed per momentum value**. The arms are separated by 2–3× and are flat over 400
+- The sweep is **one seed per momentum value**. The arms are separated by **2.208×–3.596×** past step
+  150 and are flat over 400
   steps, so the ordering is not in doubt, but no variability estimate is offered and none should be
-  read in.
+  read in. *A seed replication has since run — three seeds per momentum at 500 steps, every m = 0.999
+  seed above every m = 0 seed — and its worst-case separation is 3.29× against the nearest measured
+  floor of 3.295×, which is on a different block. The block these runs are read on has no measured
+  floor, so that comparison is **unjudgeable** by the paper's own criterion, not failing. Draft §5.4.*
 - The anchoring account is **not** confirmed against a control, and as stated it makes no prediction
   about how much decoupling is required — which is simultaneously why it survived the turnover
   experiment and why it is currently unfalsifiable. It should not be cited as established.
 - The turnover/`τ-over-T` sharpening was predeclared, tested and **refuted**; it is withdrawn.
-- The next testable shape, not yet run: vary the learning rate, which changes how far the encoder
-  moves per step without changing either `τ` or `T`. An absolute-`τ` threshold should move with it;
-  a per-step-drift account predicts it should not.
+- ~~The next testable shape, not yet run: vary the learning rate.~~ **RUN, predeclared, and it
+  falsified the `τ` threshold** (draft §5.2a). The design was right — the learning rate moves per-step
+  drift without touching `τ` or `T` — and neither of the two accounts it was built to separate
+  survived: the outcome is a **pure learning-rate effect**, which the original design could not see
+  because every high-rate arm it ran had sub-threshold momentum and every low-rate arm had
+  supra-threshold momentum. The two missing cells were predeclared and run. This is the **fourth**
+  account proposed for this collapse and the **first to survive a predeclared test**.
 - The capacity effect (§3) remains confounded: capacity changes both anchoring quality and negative
   count, and we have not separated them.
 - The staleness metric reported measures key-to-*query* lag, not key-to-*key* spread. With a 19-step
