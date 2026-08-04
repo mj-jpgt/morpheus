@@ -1275,7 +1275,7 @@ than inlined so this file stays navigable. Chronological within each thread.*
 | 01:55 | `t17b_known_covariate` | image-only ER **0.878** vs pre-registered [0.78, 0.92] |
 | 02:20 | `t2_induced_correlation_sweep` | induced correlation is **structural**: flat in n over 13×, in rank over 15×, 20× a matched structureless design |
 | 02:30 | `t12_t14_t16_t17_calibra_ledger` | controls behave, but **76–82% of the per-target channel is reproduced by random gene sets** |
-| 03:00 | `t13_adjusted_certificate_and_p6` | **adjustment fully discharges site** (0.363 → 0.012 at chance 0.0118); P6 fails as predeclared |
+| 03:00 | `t13_adjusted_certificate_and_p6` | ~~**adjustment fully discharges site**~~ → **first moment only** (0.363 → 0.012 at chance 0.0118); a nonlinear probe still reads 3.15× site. P6 fails as predeclared. See the CORRECTION block appended to the entry |
 | 03:55 | `dilution_foreign_tumour` | two of four predictions **falsified — I was too pessimistic**; 40% contamination costs 20% of channel |
 | 04:40 | `t11_t12_must_beat_baselines` | **ordinary PCA beats the interventional dictionary** in 3 of 4 cells and never loses |
 
