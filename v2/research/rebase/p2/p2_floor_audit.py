@@ -89,9 +89,17 @@ REPO = HERE.parents[3]          # v2/research/rebase/p2 -> repository root
 #: these logs is quoting R3 and must not be judged against an R1 floor without
 #: saying so. A header that is neither of these fails here rather than silently
 #: yielding whichever column happens to sit at that index.
+#: The last of these is the CAPACITY-SWEEP header, from the older
+#: `decorr_causal.py` harness behind §5.2 measurement 3. It carries the same four
+#: columns plus a trailing `decorr` column reporting the decorrelation LOSS TERM,
+#: which is not a rank and is never read here. It was previously refused, and
+#: naming it rather than guessing is what recovered §5.2 measurement 3's reading
+#: step: both of its arms print a row at **step 150**, which §6.2 recorded as
+#: never having been written down.
 PROBE_HEADERS = {
     ("R3-rank", "CANONICAL", "feat-std", "rna-rna", "contrastive"),
     ("eff-rank", "feat-std", "rna-rna", "contrastive"),
+    ("eff-rank", "feat-std", "rna-rna", "contrastive", "decorr"),
 }
 
 

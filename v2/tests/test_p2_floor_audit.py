@@ -223,6 +223,12 @@ def test_an_unknown_probe_header_is_refused():
 
     assert ("R3-rank", "CANONICAL", "feat-std", "rna-rna", "contrastive") in A.PROBE_HEADERS
     assert ("eff-rank", "feat-std", "rna-rna", "contrastive") in A.PROBE_HEADERS
+    # The capacity sweep's own harness, whose fifth column is the decorrelation
+    # LOSS TERM and not a rank. It was refused until the logs were vendored; the
+    # header is named here rather than guessed at, which is what recovered §5.2
+    # measurement 3's reading step.
+    assert ("eff-rank", "feat-std", "rna-rna", "contrastive", "decorr") in A.PROBE_HEADERS
+    assert ("eff-rank", "rna-rna") not in A.PROBE_HEADERS
     assert _json  # the import exists only to keep the failure mode explicit
 
 

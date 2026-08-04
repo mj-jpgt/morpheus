@@ -140,6 +140,21 @@ VENDORED = [
     "e0_run/d1_diag/mom_0_d0.04.log",
     "e0_run/d1_diag/mom_0.99_d0.04.log",
     "e0_run/d1_diag/mom_0.999_d0.04.log",
+    # §5.2 MEASUREMENT 3, the capacity sweep -- the two logs draft §6.2 says are
+    # "not vendored" and whose reading step it says "was never recorded". They
+    # are, and it is: both arms print a row at STEP 150, where capacity 64 reads
+    # 6.17 and capacity 4,096 reads 2.16, which are the two numbers §5.2 quotes.
+    # A different harness (`decorr_causal.py`) with a five-column header carrying
+    # a trailing decorrelation-LOSS column; `PROBE_HEADERS` names it rather than
+    # guessing at it. The capacity-4,096 arm's log is the `decorr_causal_*` one
+    # because that sweep held capacity at the value D1 runs and varied only
+    # decorrelation.
+    "e0_run/d1_diag/qsweep_d0.04_cap64.log",
+    "e0_run/d1_diag/qsweep_d0.0_cap64.log",
+    "e0_run/d1_diag/qsweep_d0.04_cap512.log",
+    "e0_run/d1_diag/qsweep_d0.0_cap512.log",
+    "e0_run/d1_diag/decorr_causal_0.04.log",
+    "e0_run/d1_diag/decorr_causal_0.0.log",
     # §5.2's TURNOVER FALSIFICATION, read at step 250. Audit rows 51, 52 and 53.
     "e0_run/d1_diag/turn_cap2048_m0.9.log",
     "e0_run/d1_diag/turn_cap2048_m0.95.log",
