@@ -41,6 +41,14 @@ adjudicate**. Two things must be said beside that, and both were fixed in advanc
   *p* ≤ 0.005 by three classifiers that are not functions of class means. That correction does not
   depend on which band the magnitude falls in.
 
+**It survives the strictest null anyone has proposed.** A sharper null published mid-run by another
+agent (`regenerated_adjustment_null`, `efee0f8`) regenerates the adjustment inside every permutation,
+so each draw carries an adjustment artefact of its own size. It shows the artefact is real — it lifts
+the reference from 1.0× to **1.65×** chance for site and **1.22×** for cancer — and that the finding
+outlives it: observed values sit at 2.1× and 3.2× that null's p95, *p* at the floor, leaving a netted
+**3.15× chance for site and 3.45× for cancer**. §7b, which also withdraws a defence I made and got
+wrong.
+
 The estimator-family argument therefore transfers from HEST to TCGA; the **magnitude** does not. HEST's
 adjusted k-NN read 0.729 against a 0.0769 chance (9.5×, 73% of spots). TCGA's reads 4.3–4.8× for site
 (5% of patients) and 3.6–4.9× for cancer (17–22% of patients).
@@ -311,10 +319,50 @@ discharged.
    reported as substantially inherited from surviving cancer for exactly this reason.
 10. **Residual folds versus probe folds.** `cross_fitted_residuals` uses `KFold(seed=42)`; the probe
     uses `_stratified_folds(seed=42)`. Different partitions, so a probe test row can be a residual train
-    row. This is a real non-independence and is recorded rather than waved away. It cannot manufacture
-    the effect — the residualisation is a *removal*, and the global permutation null is computed on the
-    same already-residualised features, so any structure the residualiser itself introduced is inside
-    the null as well as inside the observed.
+    row. **My first defence of this was wrong and §7b replaces it.**
+
+---
+
+### 7b. The objection to item 10, and the null that settles it
+
+While this run was in flight another agent (`efee0f8`) identified a real asymmetry in the null used
+above, and it lands directly on item 10:
+
+> `calibration.permutation_null` — the *channel's* null — re-residualises `y` on every permutation, so
+> a correlation the shared residualisation *induces* is regenerated inside the null.
+> `probe_state` permutes the **labels of an already-adjusted matrix**. A structure the adjustment tied
+> to the *true* rows is therefore broken in the null and intact in the observed, and is scored as
+> surviving confound rather than as chance.
+
+That mechanism is concrete: cross-fitted residualisation displaces each (class × residual-fold) group
+by that fold's estimation error, an offset shared by every patient in the group. My §7 item 10 claimed
+"the residualisation is a removal, so it cannot manufacture the effect". **That claim was too strong
+and I am withdrawing it rather than defending it.**
+
+`nonlinear_adjustment.regenerated_adjustment_null` is the null that closes the gap: it permutes the
+**rows of the block before the adjustment**, so every draw carries an adjustment artefact of its own
+size while labels, design, class structure and probe folds stay fixed, and it takes the max over the
+same k grid and both vote rules in the null as in the observed. Run on the exact §4.2 block
+(`runs/d2_final/artifacts/d2_h_seed42.npz`, `wsi_biology`, test, `adjusted_standardised` — the state
+whose certificate reads 0.0118), 200 permutations, seed 42, *p* floored at 1/201:
+
+| target | chance | observed | × chance | **regenerated-null median** | × chance | regenerated-null p95 | *p* | **excess over the null median, in × chance** |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| tissue source site (85) | 0.011765 | 0.0565 | 4.80 | **0.0194** | 1.65 | 0.0266 | **0.0050** | **3.15** |
+| cancer type (21) | 0.047619 | 0.2224 | 4.67 | **0.0581** | 1.22 | 0.0699 | **0.0050** | **3.45** |
+
+**The objection is real and the finding survives it.** The adjustment artefact is measurable — it lifts
+the reference from 1.0× chance (the label-permutation null, median 0.0113 site / 0.0470 cancer) to
+**1.65× and 1.22×** — so **part of the raw multiple-of-chance figure is an artefact of the adjustment,
+and any future run must quote the regenerated null, not the label-permutation null.** But the observed
+values sit at **2.1× and 3.2× the regenerated null's p95**, with *p* at the resolution floor in both
+targets. The honest headline figures, net of the adjustment artefact, are **3.15× chance for site and
+3.45× chance for cancer**, and they are the numbers I would defend.
+
+This is also the reason the §0 verdict does not move: the predeclared bands were stated on
+multiple-of-chance, where the netted figures are still comfortably inside band C, and the *existence*
+claim — that "the site signal is gone" and "Cancer is gone" are false for a non-mean reader — is
+established against the strictest null available, not the most convenient one.
 
 ---
 
@@ -473,4 +521,7 @@ other agents' additions.
 * Results JSON under
   `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/p1_evidence/nonlinear_probe/`:
   `d2final_wsi.json` (headline), `anchor_knn.json`, `anchor_svm.json`, `allpart_cancer.json`,
-  `breadth_knn.json`, `d2final_forest.json`. Logs in `logs/`.
+  `breadth_knn.json`, `d2final_forest.json`, `regenerated_null.json` (§7b). Logs in `logs/`.
+* §7b uses `v2/calibra/nonlinear_adjustment.regenerated_adjustment_null`, another agent's instrument
+  (`efee0f8`), imported rather than reimplemented; the driver is
+  `p1_evidence/nonlinear_probe/logs/regen.log`.
