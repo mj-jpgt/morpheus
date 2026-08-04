@@ -12,8 +12,13 @@ open hole.
 `runs_misc/h6_out/h6_*.json` (H6), `runs_misc/h6_out/mech_*.json` (mechanism),
 `runs_misc/track1_sign/track1_random_control_sign.json`, all under
 `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`.
-**Workspaces:** four, each `git -c core.autocrlf=false archive HEAD` verified per file by git blob
-SHA-1 — 659, 662, 663 and 663 files, **0 mismatches** each. Threads capped to 1 throughout. Every
+**Workspaces:** five, each `git -c core.autocrlf=false archive HEAD` verified per file by git blob
+SHA-1 — 659, 662, 663, 663 (box) and 665 (local, final) files, **0 mismatches** each. The local check
+must also use `git -c core.autocrlf=false hash-object`: one tracked file
+(`v2/research/rebase/p2/figures/data/ws_amp/out/P2_CENTRING_VERDICT.json`) is stored with CRLF, and a
+Windows `hash-object` under the default `core.autocrlf=true` strips them and reports a spurious
+mismatch. Byte-for-byte the archived file and the blob are identical (45,506 bytes each). Threads
+capped to 1 throughout. Every
 statistic imported from `v2/calibra/`; the floor rule is `calibration.floors_from_recovery`, the
 instrument's own.
 **Suite:** 540 passed, 0 failed (535 at the parent commit `7482a38`; the delta is exactly the 5 tests
