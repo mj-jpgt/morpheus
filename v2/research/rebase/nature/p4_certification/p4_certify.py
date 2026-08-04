@@ -81,13 +81,19 @@ def design_for(patient_ids: np.ndarray, cancers: np.ndarray, min_site_count: int
 # --------------------------------------------------------------------------------------
 
 def planted_axes(patient_ids: np.ndarray, cancers: np.ndarray, *, seed: int = 42,
-                 min_site_count: int = 10) -> np.ndarray:
+                 min_site_count: int = 10, snr: float = 1.0) -> np.ndarray:
     """Three axes of KNOWN character, appended to a state before it is certified.
 
-    These are data, not statistics: a site code, a cancer code and pure noise, each
-    at signal-to-noise 1.0 so none of them is degenerate. The certificate must
-    refuse the first and accept the other two; any other pattern means it does not
-    discriminate. Constructed from labels already on the artifact.
+    These are data, not statistics: a site code, a cancer code and pure noise. The
+    certificate must refuse the first and accept the other two; any other pattern
+    means it does not discriminate. Constructed from labels already on the artifact.
+
+    ``snr`` is the ratio of signal standard deviation to noise standard deviation.
+    The predeclaration fixed ``snr = 1.0``; the ladder run over several values is a
+    declared addition, because a single-axis nearest-class-mean rule at 85 classes
+    is a weak detector by construction and a binary verdict at one SNR would not say
+    *how strong* a site code must be before it is refused. ``snr = inf`` is the
+    noiseless site code -- the strongest single-axis leak that can exist.
     """
     rng = np.random.default_rng(seed)
     site, _ = pooled_tissue_source_site(patient_ids, min_site_count=min_site_count)
@@ -98,7 +104,8 @@ def planted_axes(patient_ids: np.ndarray, cancers: np.ndarray, *, seed: int = 42
         signal = rng.normal(size=int(index.max()) + 1)[index]
         signal = signal - signal.mean()
         scale = float(signal.std())
-        columns.append(signal + rng.normal(size=len(signal)) * (scale if scale > 1e-12 else 1.0))
+        noise = 0.0 if not np.isfinite(snr) else (scale if scale > 1e-12 else 1.0) / max(snr, 1e-12)
+        columns.append(signal + rng.normal(size=len(signal)) * noise)
     columns.append(rng.normal(size=len(site_index)))
     return np.column_stack(columns)
 
@@ -150,40 +157,53 @@ def cmd_abstention(args) -> None:
                 arm = "adjusted" if adjusted else "raw"
                 out["artifacts"].setdefault(key, {})[arm] = answerable(result)
                 print(f"[{key}/{arm}] {out['artifacts'][key][arm]}", flush=True)
-            if args.plant and key == f"{Path(args.artifacts[0]).stem}::{args.states[0]}":
-                planted = planted_axes(block["patient_ids"], block["cancers"], seed=args.seed,
-                                       min_site_count=args.min_site_count)
-                augmented = np.column_stack([block["features"], planted])
-                base = block["features"].shape[1]
-                for adjusted in (False, True):
-                    result = certify_axes(augmented, block["patient_ids"], block["cancers"],
-                                          min_site_count=args.min_site_count, n_splits=args.n_splits,
-                                          n_permutations=args.n_permutations, seed=args.seed,
-                                          n_boot=args.n_boot,
-                                          # every planted axis must get a bootstrap CI
-                                          n_boot_axes=args.n_boot_axes + planted.shape[1],
-                                          residualise=adjusted, n_jobs=args.n_jobs)
-                    breaching = {int(a["axis"]) for a in result["breaching_axes"]}
-                    accuracy = np.asarray(result["per_axis_balanced_accuracy"])
-                    null_p95 = np.asarray(result["per_axis_null_p95"])
-                    axis_p = np.asarray(result["per_axis_permutation_p"])
-                    arm = "adjusted" if adjusted else "raw"
-                    out["planted"][arm] = {
-                        "n_axes_total": int(result["n_axes"]),
-                        "chance_rate": float(result["chance_rate"]),
-                        "joint_certified": bool(result["joint_certified"]),
-                        "joint_lda_balanced_accuracy": float(result["joint_lda_balanced_accuracy"]),
-                        "n_breaching_axes": int(result["n_breaching_axes"]),
-                        "planted": {
-                            name: {"axis": base + i,
-                                   "balanced_accuracy": float(accuracy[base + i]),
-                                   "null_p95": float(null_p95[base + i]),
-                                   "permutation_p": float(axis_p[base + i]),
-                                   "exceeds_null_p95": bool(accuracy[base + i] > null_p95[base + i]),
-                                   "breaches": bool((base + i) in breaching)}
-                            for i, name in enumerate(PLANTED_NAMES)},
-                    }
-                    print(f"[planted/{arm}] {json.dumps(out['planted'][arm]['planted'])}", flush=True)
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.output).write_text(json.dumps(out, indent=2), encoding="utf-8")
+    print(f"[done] -> {args.output}", flush=True)
+
+
+def cmd_plant(args) -> None:
+    """Test A': does the certificate discriminate, or does it pass everything?"""
+    path = Path(args.artifact)
+    block = load_state(path, args.state, args.partition)
+    base = block["features"].shape[1]
+    out: dict = {"state": f"{path.stem}::{args.state}", "n_patients": int(len(block["patient_ids"])),
+                 "predeclared_snr": 1.0, "ladder": {}}
+    for snr in args.snr:
+        planted = planted_axes(block["patient_ids"], block["cancers"], seed=args.seed,
+                               min_site_count=args.min_site_count, snr=float(snr))
+        augmented = np.column_stack([block["features"], planted])
+        for adjusted in (False, True):
+            result = certify_axes(augmented, block["patient_ids"], block["cancers"],
+                                  min_site_count=args.min_site_count, n_splits=args.n_splits,
+                                  n_permutations=args.n_permutations, seed=args.seed,
+                                  n_boot=args.n_boot,
+                                  # every planted axis must get a bootstrap CI
+                                  n_boot_axes=args.n_boot_axes + planted.shape[1],
+                                  residualise=adjusted, n_jobs=args.n_jobs)
+            breaching = {int(a["axis"]) for a in result["breaching_axes"]}
+            accuracy = np.asarray(result["per_axis_balanced_accuracy"])
+            null_p95 = np.asarray(result["per_axis_null_p95"])
+            axis_p = np.asarray(result["per_axis_permutation_p"])
+            arm = "adjusted" if adjusted else "raw"
+            record = {
+                "n_axes_total": int(result["n_axes"]),
+                "chance_rate": float(result["chance_rate"]),
+                "joint_certified": bool(result["joint_certified"]),
+                "joint_lda_balanced_accuracy": float(result["joint_lda_balanced_accuracy"]),
+                "joint_null_p95": float(result["joint_null_p95"]),
+                "n_breaching_axes": int(result["n_breaching_axes"]),
+                "planted": {
+                    name: {"axis": base + i,
+                           "balanced_accuracy": float(accuracy[base + i]),
+                           "null_p95": float(null_p95[base + i]),
+                           "permutation_p": float(axis_p[base + i]),
+                           "exceeds_null_p95": bool(accuracy[base + i] > null_p95[base + i]),
+                           "breaches": bool((base + i) in breaching)}
+                    for i, name in enumerate(PLANTED_NAMES)},
+            }
+            out["ladder"].setdefault(str(snr), {})[arm] = record
+            print(f"[snr={snr}/{arm}] {json.dumps(record['planted'])}", flush=True)
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output).write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(f"[done] -> {args.output}", flush=True)
@@ -499,8 +519,14 @@ def main() -> None:
     a.add_argument("--artifacts", nargs="+", required=True)
     a.add_argument("--states", nargs="+", default=["wsi_biology", "rna_biology", "full_biology"])
     a.add_argument("--partition", default="test")
-    a.add_argument("--plant", action="store_true")
     a.set_defaults(func=cmd_abstention)
+
+    p = sub.add_parser("plant", parents=[common])
+    p.add_argument("--artifact", required=True)
+    p.add_argument("--state", default="wsi_biology")
+    p.add_argument("--partition", default="test")
+    p.add_argument("--snr", nargs="+", type=float, default=[0.5, 1.0, 2.0, float("inf")])
+    p.set_defaults(func=cmd_plant)
 
     b = sub.add_parser("endtoend", parents=[common])
     b.add_argument("--artifact", required=True)
