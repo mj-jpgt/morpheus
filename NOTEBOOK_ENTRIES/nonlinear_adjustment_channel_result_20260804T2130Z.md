@@ -111,7 +111,7 @@ permutations, p floor 0.0005. **Retention** is `nonlinear_adjustment.retention_o
 
 | arm | what it removes | S1 | own null median | excess | **retention** | S2 held-out | eff. rank | vs incumbent (per-axis r) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| none | column means only | 0.8155 | 0.7102 | 0.1053 | — | 0.8062 | 19.65 | 0.744 |
+| none | column means only | 0.8155 | 0.7102 | 0.1053 | 0.231 | 0.8062 | 19.65 | 0.744 |
 | **ridge (incumbent)** | additive one-hot, α=1 | **0.6052** | **0.1483** | **0.4569** | **1.000** | 0.5841 | 22.50 | 1.000 |
 | **saturated cell mean** | **every function of the labels** | 0.6051 | 0.1491 | 0.4560 | **0.998** | 0.5835 | 22.50 | 0.9992 |
 | kernel ridge α=1 γ=0.25 | RBF on the one-hot design | 0.6052 | 0.1473 | 0.4579 | **1.002** | 0.5837 | 22.50 | ≈1 |
@@ -123,7 +123,7 @@ permutations, p floor 0.0005. **Retention** is `nonlinear_adjustment.retention_o
 
 | arm | S1 | own null median | excess | retention | S2 held-out | eff. rank |
 |---|---:|---:|---:|---:|---:|---:|
-| none | 0.7700 | 0.6672 | 0.1028 | — | 0.7706 | 10.78 |
+| none | 0.7700 | 0.6672 | 0.1028 | 0.318 | 0.7706 | 10.78 |
 | **ridge (incumbent)** | **0.4703** | **0.1472** | **0.3231** | **1.000** | 0.4206 | 11.73 |
 
 *(full d2_i arm set in the JSON; see §11.)*
@@ -249,15 +249,19 @@ G groups with no structure is G/n, emitted beside every value):
 
 | arm | cell-mean energy | expected | ratio | (cell × fold)-mean energy | expected | ratio |
 |---|---:|---:|---:|---:|---:|---:|
-| none (raw) | 0.46552 | 0.03796 | 12.3× | 0.55045 | 0.18981 | 2.90× |
-| ridge | 0.00245 | 0.03796 | **0.065×** | 0.22788 | 0.18981 | **1.20×** |
-| saturated | 0.00129 | 0.03796 | 0.034× | 0.23298 | 0.18981 | 1.23× |
-| in-sample saturated | **0.00000** | 0.03796 | **0.000×** | 0.15891 | 0.18981 | 0.84× |
+| none (raw) | 0.46552 | 0.03796 | 12.26× | 0.55045 | 0.18294 | 3.01× |
+| **ridge** | 0.00245 | 0.03796 | **0.065×** | 0.22788 | 0.18294 | **1.246×** |
+| saturated | 0.00129 | 0.03796 | 0.034× | 0.23298 | 0.18294 | 1.274× |
+| kernel ridge α=1 γ=0.25 | 0.00500 | 0.03796 | 0.132× | 0.22511 | 0.18294 | 1.231× |
+| kernel ridge α=1 γ=0.5 | 0.00310 | 0.03796 | 0.082× | 0.22722 | 0.18294 | 1.242× |
+| **in-sample saturated** | **2.4e-30** | 0.03796 | **0.000×** | 0.15891 | 0.18294 | **0.869×** |
 
-The signature is exact: the adjustment drives the cell means to **6.5%** of what random grouping would
-give (the anti-correlation cross-fitting is known to induce), and simultaneously drives the
-cell × fold means to **120%** of theirs. In-sample removal zeroes the cell means exactly — the normal
-equations — and leaves cell × fold *below* baseline.
+The signature is exact. Every cross-fitted arm drives the cell means to **3–13%** of what random
+grouping alone would give — the anti-correlation cross-fitted residualisation is known to induce — and
+**simultaneously drives the (cell × fold) means to 123–127% of theirs.** The in-sample arm zeroes the
+cell means exactly (2.4e-30, i.e. float noise: the normal equations) and leaves cell × fold at **87%**
+of baseline, *below* it. The 506 non-empty (cell × fold) groups over 2,766 patients give the 0.18294
+expectation; the 105 cells give 0.03796.
 
 **The control.** Row-shuffle the block **before** the adjustment: same rows, same covariance, same
 effective rank, no confound association left. Anything the probe still reads was put there by the
