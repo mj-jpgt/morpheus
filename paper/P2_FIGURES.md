@@ -670,12 +670,16 @@ regime; §4.1's own argument is that a pair drawn from concordant repeats can li
 
 **Draft section.** §4.1a. **NEW 2026-08-04.**
 
-60 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
-**block**, the floor **its own statistic and block license**, whether it clears, and what the claim
-rests on if it does not. Of the 25 selections between candidate configurations, **13 fail, 11 are
-unjudgeable because no floor had ever been measured for the block they sit on, and 1 clears** — and
-the one that clears is **RankMe as published**, whose floor (1.811× raw) is nearly half of canonical
-R1's (3.111× raw) on the same five retrains. 29 of the 60 rows are unjudgeable; 5 are exempt with the
+62 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
+**block**, the floor **its own statistic, block and reading step license**, whether it clears, and
+what the claim rests on if it does not. Of the 25 selections between candidate configurations,
+**13 fail, 9 clear and 3 are unjudgeable**. **Exactly one of the nine is on the exported artifact
+block** — the block every between-arm comparison in §4 is measured on — and it is **RankMe as
+published**, whose floor (1.811× raw) is nearly half of canonical
+R1's (3.111× raw) on the same five retrains. The other eight are §5's, against the probe-block floor
+of **T10**. *The counting history is part of the table's value: 23 failures when one floor was applied
+to everything, then 13 / 11 / 1 once block-matching was enforced, then 13 / 9 / 3 once the probe block
+was measured — **the thirteen failures never moved**.* 19 of the 62 rows are unjudgeable; 5 are exempt with the
 reason stated. **Unjudgeable is not a pass and not a failure**, and the audit enforces the
 distinction: a row with no floor records `clears: null`.
 
@@ -685,7 +689,9 @@ block per view, measured from the five exported same-seed repeats by
 carries min, max, the floor, the other four repeats' own agreement, which repeat diverges and whether
 the bimodal shape §4.1 describes survives that change of statistic. It does not: the shape holds
 under R1, R2, R3 and residualised RankMe and under nothing else, though every statistic that moves at
-all puts the same repeat at the extreme.
+all puts the same repeat at the extreme. **And it does not survive a change of block at all** — none
+of the twenty probe-block floors in T10 is bimodal, so §4.1's bimodality is a property of the exported
+artifact and every caption drawing on it must say so.
 
 **This table is generated, not typed.** `v2/research/rebase/p2/floor_audit.json` is the list;
 `v2/research/rebase/p2/p2_floor_audit.py --markdown` renders exactly the table the draft prints, and

@@ -101,7 +101,7 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > **6. §4.1a is new: the paper audited exhaustively against its own criterion, and it costs us —
 > including a scope error in the first version of the audit itself.** §4.1's floor had been applied
 > to this paper's own numbers five times, each instance found separately and late. §4.1a enumerates
-> **all 60** rank comparisons the paper makes or relies on — Results, the worked example, the
+> **all 62** rank comparisons the paper makes or relies on — Results, the worked example, the
 > appendices, the figure plan, `QUEUE_ANCHORING.md` and `LIVENESS_GATE_DESIGN.md` — each judged
 > against the floor measured on **its own statistic and its own block**. The first version judged
 > them all against the **one** floor that existed, canonical R1 on the exported `wsi_biology` block,
@@ -3848,14 +3848,17 @@ Reproduced verbatim so that any future quotation can carry it.
   step-400 floors of 1.449× (R3) and 1.570× (R1) — the block and step these runs are actually read at.
   Neither verdict is what carries the observation: the monotonicity across three levels and the
   co-measured cosine are, and it is **one seed per level**.
-- **The floor audit (§4.1a).** 60 rank comparisons, each judged against the floor measured on its
-  own **statistic and** block; of the 25 selections between candidate configurations, **13 fail, 11
-  cannot be judged at all, and 1 clears — and the one that clears is RankMe as published, not ours**.
-  *Those counts predate the probe-block floor; they are now **13 / 9 / 3**, the thirteen failures are
-  unchanged, and all eight new passes are §5's on the fixed held-out probe. RankMe remains the only
-  selection clearing a floor on the **exported** block.*
-  29 of the 60 rows sit on a block for which **no floor has ever been measured**, including every
-  rank number in §5. **Unjudgeable is not a pass and not a failure**: the criterion has not been
+- **The floor audit (§4.1a).** 62 rank comparisons, each judged against the floor measured on its
+  own **statistic, block and reading step**; of the 25 selections between candidate configurations,
+  **13 fail, 9 clear and 3 cannot be judged at all**. **The one clearing a floor on the *exported
+  artifact* block — the block every between-arm comparison in §4 is measured on — is RankMe as
+  published, not ours**; the other eight are §5's, against the fixed held-out probe's own floor,
+  measured later. *The counting history: 23 failures when one floor was applied to everything; then
+  13 / 11 / 1 once block-matching was enforced; then 13 / 9 / 3 once the probe block was measured.
+  **The thirteen failures have never moved.***
+  19 of the 62 rows still sit on a block for which **no floor has been measured** — the in-run
+  training batch, the gate batch, a live checkpoint, and the probe at steps, momenta, capacities or
+  learning rates the repeats do not cover. **Unjudgeable is not a pass and not a failure**: the criterion has not been
   applied to those rows, and the audit records `clears: null` for them rather than a verdict.
   Machine-checkable at `v2/research/rebase/p2/floor_audit.json`, enforced by
   `v2/tests/test_p2_floor_audit.py`. Any quotation of a rank comparison from this paper should be
