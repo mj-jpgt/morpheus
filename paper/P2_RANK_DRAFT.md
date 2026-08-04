@@ -29,13 +29,29 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > **2. The claim that survived is different, narrower, and better powered.** It is stated in §1.3 and
 > carried by §4.1–§4.5. It does not depend on any sign count.
 >
-> **3. Pending slots — one closed, one open.** The D1 intervals are **no longer pending**: the
-> stratified paired bootstrap existed all along and was hidden by a stale absolute path in the audit
-> chain. §4.7.2 now reports **both** estimators, and the conservative one is less favourable to us —
-> decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap**, with seed 43's
-> interval touching zero at +0.0006. Still open: **no seed replication of §5.2's momentum sweep**,
-> whose absence is what makes §5 strain against §4.1 (§5.3). It is armed, and §5.3 states in advance
-> what each outcome licenses.
+> **3. Pending slots — all three closed as of 2026-08-04, and two of the three cost us something.**
+> (a) The D1 intervals were never missing: the stratified paired bootstrap existed all along and was
+> hidden by a stale absolute path in the audit chain. §4.7.2 reports **both** estimators and the
+> conservative one is less favourable — 3/3 on the patient bootstrap, **2/3 on the cancer-cluster
+> bootstrap**, seed 43's interval touching zero at +0.0006.
+> (b) **§4.1's retraining envelope is no longer n = 1.** Five identical same-seed retrains report a
+> **3.295×** rank floor against a **1.055×** channel spread, bimodally distributed. It moves our own
+> headline count from six of seven to seven of seven — *in our favour*, reported with the scepticism
+> that requires — and it makes **§4.7's necessity result unresolvable rather than refuted**, which is
+> the reading that was predeclared before the measurement existed.
+> (c) **§5.2's momentum sweep now has its seed replication** (`mseed_*`, three seeds per momentum);
+> every m = 0.999 seed exceeds every m = 0 seed, so §5.3's disjunction resolves in favour of
+> separation. **But the separation is 3.29× against §4.1's 3.30× floor**, so by §4.1's own criterion
+> that fix's *rank* difference is not resolvable either. §5.2 and §5.3 are **not yet rewritten around
+> this** and are flagged here rather than left to read as though the replication were still awaited;
+> the numbers are in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3.
+>
+> **5. §4.6's ground truth is a coordinate choice, and §4.6a is new.** The D2 arm contrast the
+> selection-rule table scores against exists on gene-set targets and on **none** of the five other
+> molecular target blocks on disk. Re-scored against each block in turn, every metric row's count
+> moves, the ordering between the two metrics the table is quoted for reverses, and our own statistic
+> can be handed a nominally significant 6/6 by the choice of block alone. `D2_RESULT.md` §6 has been
+> narrowed accordingly.
 >
 > **4. Every effective-rank number in this draft was recomputed under one canonical definition on
 > 2026-08-04** and every surviving instance reproduces exactly. Two instances are marked
@@ -58,7 +74,11 @@ seeds, paired bootstraps — and the hedge held: the higher-rank arm carried the
 molecular channel in all three seeds, in the same direction as its rank advantage, interval-backed
 3/3 under a patient bootstrap and **2/3 under the conservative cancer-cluster bootstrap** (both are
 quoted; the conservative one is the one to weight). That is a negative for this paper's
-generality and we state it here, at the prominence a confirmation would have received. It joins
+generality and we state it here, at the prominence a confirmation would have received — including
+after a subsequent measurement made it **unresolvable rather than refuted**: the rank differences that
+test reads (1.74×–3.25×) all sit inside the retraining floor of (i) below, so the experiment decides
+nothing about rank in **either** direction. That reading, and the refusal to treat it as a rescue, were
+fixed in a predeclaration written before the floor was measured. It joins
 published prior art we cannot claim novelty over: Aldeneh, Thilak, Higuchi, Theobald & Likhomanenko
 (ICASSP 2025, DOI 10.1109/ICASSP49660.2025.10889651) already report that *"rank does not reliably
 predict the best-performing layer for specific downstream tasks, as lower-ranked layers can
@@ -73,13 +93,21 @@ What survives is a different and better-powered claim, about **usefulness rather
 
 Four measurements carry it, on 12 frozen artifacts from 4 arms × 3 seeds of two matched-arm
 experiments in cross-modal morphology → bulk-transcriptome learning on 2,766 held-out TCGA patients.
-**(i)** Six of the seven between-arm rank differences this project has ever measured (**1.004× to
-2.19×**) fall inside the **2.69×** spread produced by retraining one configuration with the same seed —
-an envelope estimated from **one** retraining pair, which we state as a limitation of that measurement
-rather than a property of the metric, and which is why (ii) carries the argument. **(ii)** A variance decomposition over the 12 artifacts puts effective rank at **34.5% arm /
+**(i)** **The single cleanest observation is one configuration retrained five times at the same seed,
+with GPU non-determinism the only source of variation: effective rank spreads 3.295× while the
+molecular channel those same five runs carry spreads 1.055×.** The spread is **bimodal** rather than
+smooth — four repeats agree to within 2% and one lands at a third of them, with its rank down 3.3× and
+its channel down 5% — so the usable statement is that effective rank is **reproducible about 80% of the
+time and catastrophically not about 20% of the time**, on identical inputs. **All seven** between-arm
+rank differences this project has ever measured (**1.004× to 3.246×**) fall inside that floor, each
+judged against the floor measured on its own preprocessing block. The number is a floor twice over —
+it is measured on this project's *stable* arm, and same-seed repeats exclude seed variation entirely —
+and it is one measurement, of five repeats, on one arm, at one seed, which is why (ii) carries the
+argument. Its effect on our own headline count (six of seven to seven of seven) runs in our favour and
+is reported with the scepticism a result running the other way would receive. **(ii)** A variance decomposition over the 12 artifacts puts effective rank at **34.5% arm /
 65.5% training-seed nuisance**, with the arm term not significant (F(3,8) = 1.41); the molecular
 channel those same artifacts carry is **98.0% arm**, F = 128.2. **(iii)** At a matched training step,
-one arm spans **6.05×** across three seeds while its sibling spans **1.003×** — the floor is a
+one arm spans **6.05×** across five seeds while its sibling spans **1.18×** — the floor is a
 property of the *arm*, and is worst exactly where the arm is interesting. **(iv)** The instability is
 in **training, not estimation**: patient-resampling gives a measurement SD of ≈0.1 on a rank of 25,
 re-exporting a surviving checkpoint reproduces to five significant figures, and a controlled
@@ -103,7 +131,13 @@ of 0.140, so "low rank means little information" is false outside total collapse
 published alternatives on the same artifacts and **none is better**: LiDAR picks the
 information-poorer arm 0/3 on the in-scope contrast at every δ over eight orders of magnitude.
 Selection-rule counts on six pairs are reported and are explicitly underpowered — a *flawless* 6/6
-would give p = 0.031 — which is why the argument rests on the variance decomposition instead. And we
+would give p = 0.031 — and they are also **not stable under the choice of ground truth**: the arm
+contrast they are scored against exists on gene-set targets and on none of the five other target blocks
+on disk, and re-scoring against each block in turn moves every metric row's count, reverses the ordering
+between the two metrics the table is quoted for, and can hand our own statistic a nominally significant
+6/6 by nothing but the coordinate system the exam is written in. We report that we can manufacture our
+own significance this way because it is the strongest available reason not to read the counts at all;
+the argument rests on the variance decomposition instead. And we
 apply the paper's own standard to the paper: our smallest arm difference (0.0705) is about **half**
 the real-versus-random-control margin of 0.139, so the effect we measure is itself small relative to
 its instrument's floor. That is §4.1's argument arriving from the channel side, it points at us, and
@@ -114,14 +148,19 @@ we state it before it is put to us.
 Effective rank (Roy & Vetterli 2007) is proposed as a label-free criterion for representation quality
 and hyperparameter selection (RankMe, ICML 2023). We first report a failed prediction: a preregistered
 within-method test of RankMe's necessity hedge confirmed it in all three seeds — interval-backed 3/3
-under a patient bootstrap and 2/3 under the conservative cluster bootstrap. What survives is a claim about
+under a patient bootstrap and 2/3 under the conservative cluster bootstrap — though that test's own rank
+differences later proved to sit inside the floor below, leaving it unresolvable rather than refuted.
+What survives is a claim about
 usefulness, not truth: **effective rank's between-arm differences are smaller than its own within-arm
-reproducibility floor, inside the same-method regime RankMe reserves for itself.** Six of seven
-between-arm rank differences ever measured on this project (1.004×–2.19×) lie inside the 2.69×
-envelope of retraining one configuration at one seed. Over 12 artifacts (4 arms × 3 seeds), rank is
+reproducibility floor, inside the same-method regime RankMe reserves for itself.** Retraining one
+configuration five times at a fixed seed spreads effective rank **3.295×** while spreading the molecular
+channel those same runs carry **1.055×**; the spread is bimodal — four repeats within 2%, one at a third
+— so rank is reproducible ~80% of the time and catastrophically not ~20% of the time. All seven
+between-arm rank differences ever measured on this project (1.004×–3.246×) lie inside that floor. Over
+12 artifacts (4 arms × 3 seeds), rank is
 34.5% arm and 65.5% seed nuisance (arm term not significant, F(3,8) = 1.41) while the molecular
 channel is 98.0% arm (F = 128.2). At a matched step one arm spans 6.05× across seeds and its sibling
-1.003×, so the floor belongs to the arm. Measurement noise is negligible (SD ≈ 0.1 on rank 25): the
+1.18×, so the floor belongs to the arm. Measurement noise is negligible (SD ≈ 0.1 on rank 25): the
 instability is in training. The between-arm verdict also flips with the rank statistic, the
 preprocessing block and the measured view; the information verdict never does. Three published
 alternatives were computed on the same artifacts; none is better.
@@ -226,22 +265,26 @@ configurations regardless of what it would say if it could.
 The practitioner-facing form, which is the sentence we would want quoted:
 
 > *Before using a rank difference to select between configurations, retrain one configuration with the
-> same seed and measure the rank spread. If the between-configuration difference does not exceed it,
-> the comparison is uninformative.* On this stack that check would have disqualified six of the seven
-> rank comparisons this project ever made.
+> same seed several times and measure the rank spread. If the between-configuration difference does not
+> exceed it, the comparison is uninformative.* On this stack that check would have disqualified **all
+> seven** rank comparisons this project ever made. It says *several* repeats because the spread we
+> measured is bimodal: any pair drawn from our four concordant repeats spans at most 1.028×, so a
+> single retraining pair can return a floor that licenses everything.
 
 ### 1.4 Contributions
 
 In descending order of how well evidenced they are.
 
-1. **A measured reproducibility floor on effective rank, and the demonstration that essentially every
-   between-arm difference we have measured is inside it** (§4.1). Six of seven differences,
-   1.004×–2.19×, against a 2.69× same-seed retraining envelope. We have not found this reported.
+1. **A measured reproducibility floor on effective rank, and the demonstration that every between-arm
+   difference we have measured is inside it** (§4.1). Seven of seven differences, 1.004×–3.246×,
+   against a **3.295×** floor measured from five identical same-seed retrains — a floor that is
+   **bimodal**, four repeats within 2% and one at a third of them, on runs whose molecular channel
+   spreads only 1.055×. We have not found either the floor or the bimodality reported.
 2. **A variance decomposition separating the arm term from the seed term** (§4.2). Rank: 34.5% arm,
    65.5% seed, arm term not significant. Channel: 98.0% arm, F = 128.2. This is the contribution that
    does not depend on a sign count and it is what the paper rests on.
 3. **The floor is a property of the arm, not of the statistic** (§4.3). At one training step, 6.05×
-   across seeds for one arm against 1.003× for its sibling — so a reproducibility envelope measured on
+   across five seeds for one arm against 1.18× for its sibling — so a reproducibility envelope measured on
    a well-behaved configuration does not transfer to the one being diagnosed, which is the
    configuration a practitioner is looking at when they reach for rank.
 4. **A defeater check** (§4.4), which the exemplar literature will demand and which earlier drafts
@@ -918,44 +961,72 @@ rather than of the estimator.
 
 ## 4. Results
 
-### 4.1 Six of the seven between-arm rank differences ever measured are inside the statistic's own retraining envelope
+### 4.1 All seven between-arm rank differences ever measured are inside the statistic's own retraining floor — and the floor is bimodal
 
 This is the paper's headline. It is a statement about **usefulness**, and it is measured inside the
 same-method regime RankMe reserves for itself.
 
-**The envelope, and the estimate it rests on.** The envelope comes from **one** retraining pair: D2
-arm H, seed 42, identical arguments and identical seed, against the re-export of the surviving original
-checkpoint. **It is an n = 1 estimate and must be read as one.** We state that here rather than in the
-limitations, because this section's headline — six of seven differences inside 2.69× — inherits it, and
-because it is the same defect as §5's single-seed momentum sweep applied to the paper's *central*
-argument rather than to a supporting one. §4.2 exists so the conclusion does not depend on this number,
-and reaches it from 8 within-arm degrees of freedom instead.
+**The floor, and the measurement it now rests on.** Until 2026-08-04 this section rested on **one**
+retraining pair (D2 arm H, seed 42: re-export 8.6809 against retrain 23.3868, a 2.69× move) and said so
+in place of a limitation. That n = 1 defect was named in §6.2 as the paper's most valuable missing
+measurement, the repeat was predeclared in
+`NOTEBOOK_ENTRIES/PREDECLARED_retraining_envelope_20260804T0330Z.md` — including how each of four
+outcomes would be read — and it has now reported. **Five identical `programme_only` runs, same seed 42,
+same configuration, same data, same schedule. The only source of variation is GPU non-determinism.**
 
-| | held-out top-CCA | **canonical R1, residualised block** |
-|---|---:|---:|
-| recorded in the original run | 0.5861 | — |
-| re-export of the surviving checkpoint | **0.58612** | **8.6809** |
-| **retrained**, identical configuration and seed | **0.6214** | **23.3868** |
+| repeat | rank, raw block | **rank, residualised block** | **channel (top-CCA, 40 untrained targets)** |
+|---|---:|---:|---:|
+| 1 | 24.481 | 28.320 | 0.6182 |
+| **2** | **8.033** | **8.834** | **0.5859** |
+| 3 | 24.504 | 28.348 | 0.6123 |
+| 4 | 24.990 | 29.106 | 0.6110 |
+| 5 | 24.912 | 28.959 | 0.6098 |
+| **spread (max / min)** | **3.111×** | **3.295×** | **1.055×** |
 
-Re-export is deterministic to five significant figures, so the export and readout path is not the
-source of the variance. Retraining is not deterministic: the channel moves by 0.035 and the effective
-rank by **2.69×**. **2.69× is one observation of a spread, not an estimated distribution** — it carries
-no interval, and nothing here licenses treating it as a calibrated threshold. What it does license is
-the comparison below, which is qualitative in the way that matters: six of seven between-arm differences
-are *smaller* than a single observed retraining move, and three are smaller by a wide margin.
+*Provenance: `~/e0_run/d1_envelope/rep{1..5}.npz`, readout `~/e0_run/d1_envelope_readout.log`, produced
+by `v2/research/rebase/d1_envelope_readout.py` — canonical R1 and top-CCA both imported from
+`v2/calibra`, nothing computed inline. Block: exported `wsi_biology`, held-out test partition,
+cancer + pooled-TSS residualised, top-CCA at 16 components, the 40 targets neither D1 arm trained on —
+identical to `d2_compare`. Reported in
+`NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §1.*
+
+**The distribution is bimodal, not a smooth spread, and that is the more useful statement.** Four
+repeats agree to within 2% (28.32–29.11) and one lands at a third of them (8.83). This is the same
+signature as the liveness gate's 6-of-8 pass rate over eight identical runs (§5.1). A range invites the
+reader to imagine a distribution the data does not have; the shape says what actually happens.
+**Effective rank on this stack is reproducible about 80% of the time and catastrophically not about 20%
+of the time, on identical inputs.**
+
+**Repeat 2 is the cleanest single observation this project has produced.** Same seed, same
+configuration: **effective rank falls 3.3×; the channel falls 5%.** One quantity moves by a factor, the
+other barely moves at all, and there is no difference between the two runs to attribute either move to.
+That single row is this paper's argument without any arm contrast in it, and it is why it appears in the
+abstract.
+
+**The number is a FLOOR, twice over**, as predeclared before it existed. First, `programme_only` is this
+project's *stable* arm — its channel varies 1.018–1.026× across seeds where `programme_free` varies
+1.056×, and its step-200 tripwire rank spans 1.18× across five seeds against `programme_free`'s 6.05×
+(§4.3). Measuring
+the retraining spread on the stable arm understates it. Second, same-seed repeats exclude seed variation
+**entirely**; §4.2 measures that other axis separately and finds it larger still. So 3.295× is a lower
+bound on what a practitioner faces, and every quotation of it in this paper says "floor", not
+"envelope".
 
 **The comparisons a rank-based selection rule would act on.** Every between-arm rank comparison this
-project has ever measured, all canonical R1, each with the block named in §4.9 or below:
+project has ever measured, all canonical R1, each with the block named in §4.9 or below. **Each ratio is
+judged against the floor measured on its own block** — 3.295× residualised, 3.111× raw. Comparing a
+residualised ratio against the raw floor would put D1-B seed 43 outside it, which is precisely the
+raw/residualised confusion §4.5 is about:
 
-| comparison | arms | rank ratio | inside the 2.69× retraining envelope? |
-|---|---|---:|---|
-| D2 seed 44 (resid.) | H 9.1426 / I 9.1052 | **1.004×** | **yes** |
-| D2 seed 43 (resid.) | H 28.7715 / I 34.1168 | **1.186×** | **yes** |
-| Phase 1b, single seed (raw) | `full` 38.4834 / `programme_only` 32.0594 | **1.200×** | **yes** |
-| D2 seed 42 (resid.) | H 23.3868 / I 14.8675 | **1.573×** | **yes** |
-| D1-B seed 44 (resid.) | P 11.1148 / F 6.3937 | **1.738×** | **yes** |
-| D1-B seed 42 (resid.) | P 29.3813 / F 13.4184 | **2.190×** | **yes** |
-| D1-B seed 43 (resid.) | P 24.6730 / F 7.6003 | 3.246× | no — and only just |
+| comparison | arms | rank ratio | block | inside that block's retraining floor? |
+|---|---|---:|---|---|
+| D2 seed 44 | H 9.1426 / I 9.1052 | **1.004×** | resid. | **yes** |
+| D2 seed 43 | H 28.7715 / I 34.1168 | **1.186×** | resid. | **yes** |
+| Phase 1b, single seed | `full` 38.4834 / `programme_only` 32.0594 | **1.200×** | raw | **yes** (3.111×) |
+| D2 seed 42 | H 23.3868 / I 14.8675 | **1.573×** | resid. | **yes** |
+| D1-B seed 44 | P 11.1148 / F 6.3937 | **1.738×** | resid. | **yes** |
+| D1-B seed 42 | P 29.3813 / F 13.4184 | **2.190×** | resid. | **yes** |
+| D1-B seed 43 | P 24.6730 / F 7.6003 | **3.246×** | resid. | **yes — by 1.5%** |
 
 *Provenance: `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
 §5, §6; `v2/research/rebase/nature/D2_RESULT.md` §4; `PHASE1B_TARGETED_READOUT.md` §3, §5, §7. Artifacts
@@ -963,38 +1034,52 @@ project has ever measured, all canonical R1, each with the block named in §4.9 
 `~/e0_run/d1_v2/artifacts/`, and the Phase-1b artifacts at
 `/lambda/nfs/geeg/biorag3_persistent_20260711/runs/v21_release_20260720_retry3_resume_safe/artifacts/`.
 Every value recomputed under the canonical implementation on 2026-08-04 and reproducing the published
-figures exactly; outputs `~/ws_rank/RANK_RECOMPUTE.json`, `~/ws_rank/RANK_RECOMPUTE_P1B.json`.*
+figures exactly; outputs `~/ws_rank/RANK_RECOMPUTE.json`, `~/ws_rank/RANK_RECOMPUTE_P1B.json`. The
+raw-block D1-B ratios, quoted in the predeclaration and in §4.7, are 2.02× / 3.09× / 1.68×.*
 
-**Six of seven, spanning 1.004× to 2.19×, are smaller than the one observed retraining spread of the
-same statistic at a fixed seed.** Against those same D2 runs the paired channel
-difference is **−0.1325 / −0.1089 / −0.1226** — the same sign 3/3, spread 0.024 on a mean of −0.121,
-with both patient- and cancer-clustered bootstrap CIs excluding zero in all three seeds (§4.9). The
-channel readout is **not** exempt from §3.5 either — 0.5861 against 0.6214 is a 6% move at one seed —
-but the channel is quoted as a *paired within-run difference* and rank is not, and the paired difference
-is stable where both levels are not. **That asymmetry is a statement about how the two quantities are
-used, and it is the practical heart of this paper.**
+**The count moves from six of seven to seven of seven — in our favour, and it is reported with the
+scepticism a result going the other way would get.** The predeclaration fixed this in advance: an
+envelope wider than §4.1's own threshold *"changes our own headline count, in our favour"* and *"is to
+be reported with the same scepticism we would apply to a result going the other way, including that it
+rests on this one measurement"*. So: the seventh point clears by **1.5%** (3.246× against 3.295×), which
+is not a margin anyone should lean on; the floor is one measurement, of five repeats, on one arm, at one
+seed, on one stack; and it cannot separate rank-specific variance from stack non-determinism,
+architecture or schedule. **The correct quotation is "seven of seven fall inside a floor of 3.295×
+measured on five same-seed repeats", never a bare "seven of seven".**
+
+**Against the same measurement, the channel is resolvable.** On those five identical runs the channel
+spreads **1.055×** while rank spreads **3.295×**. Against the D2 runs the paired channel difference is
+**−0.1325 / −0.1089 / −0.1226** — the same sign 3/3, spread 0.024 on a mean of −0.121, with both
+patient- and cancer-clustered bootstrap CIs excluding zero in all three seeds (§4.9, and see §4.6a for
+what that contrast does and does not generalise over). The channel readout is **not** exempt from §3.5 —
+0.5861 against 0.6214 is a 6% move at one seed — but the channel is quoted as a *paired within-run
+difference* and rank is not, and the paired difference is stable where both levels are not. **That
+asymmetry is a statement about how the two quantities are used, and it is the practical heart of this
+paper.** It now rests on one measurement in which both quantities were computed on the *same five runs*,
+rather than on a comparison across tables.
 
 **The consequence for RankMe's own recommended use.** RankMe selects between runs by comparing their
 rank values and restricts that comparison to runs of a given method — exactly the setting above. A
-criterion whose value moves 2.69× when the same configuration is retrained cannot resolve a
+criterion whose value moves 3.3× when the same configuration is retrained cannot resolve a
 between-configuration difference smaller than that. In particular, the largest D2 difference (1.573×,
-seed 42) is comfortably inside the envelope, which is an independent reason why that seed's "correct"
+seed 42) is comfortably inside the floor, which is an independent reason why that seed's "correct"
 ordering carries no weight.
 
 **Stated as a rule a practitioner can apply:** *before using a rank difference to select between
-configurations, retrain one configuration with the same seed and measure the rank spread; if the
-between-configuration difference does not exceed it, the comparison is uninformative.* We have not seen
-this check proposed anywhere. It is cheap — one extra run — and on this stack it would have disqualified
-six of the seven rank comparisons this project made.
+configurations, retrain one configuration with the same seed several times and measure the rank spread;
+if the between-configuration difference does not exceed it, the comparison is uninformative.* We have
+not seen this check proposed anywhere, and on this stack it would have disqualified **every** rank
+comparison this project made. The bimodality is why the rule says *several* repeats and not one: a
+single pair draws two runs, and any pair drawn from our four concordant repeats spans at most **1.028×**
+— a measured floor of 1.03× would have licensed every comparison in the table above. One repeat is not
+a cheaper version of this check; it is a different check that can return the wrong answer.
 
-**What this rests on, stated plainly.** The envelope is **one retraining pair on one configuration** —
-n = 1, no interval. That is thin, and §4.2 exists because it is thin: the variance decomposition
-estimates the nuisance term from **8 within-arm degrees of freedom** across four arms rather than from a
-single pair, and reaches the same conclusion without depending on the 2.69× number at all. The two
-should be read together, and if only one survives review it should be §4.2. **A controlled repeat design
-— N retrainings of one configuration, rank and channel measured on each — is queued on the GPU and is
-named in §6.2 as the paper's most valuable missing measurement.** Until it reports, no sentence in this
-paper presents 2.69× as an established quantity.
+**What this rests on, stated plainly.** Five repeats, one arm, one configuration, one seed, one stack,
+no interval. That is much better than the n = 1 estimate it replaces and it is still thin, and §4.2
+exists because it is thin: the variance decomposition estimates the nuisance term from **8 within-arm
+degrees of freedom** across four arms rather than from repeats of one, and reaches the same conclusion
+without using this floor at all. The two should be read together, and if only one survives review it
+should be §4.2.
 
 ### 4.2 Where rank's variance lives: 34.5% arm, 65.5% training seed — and the channel is 98.0% arm
 
@@ -1063,26 +1148,34 @@ inside RankMe's scope by RankMe's own sentence.
 The reproducibility envelope is not a constant of the metric that could be measured once and reused. At
 the **same global training step**, on the **same configuration**, with only the seed differing:
 
-| arm, D1-B, global step 200 (epoch 11) | seed 42 | seed 43 | seed 44 | spread |
-|---|---:|---:|---:|---:|
-| `programme_free` | 7.545 | **45.646** | 12.194 | **6.05×** |
-| `programme_only` | 110.765 | 110.879 | 111.078 | **1.003×** |
+| arm, D1-B, global step 200 (epoch 11) | seed 42 | seed 43 | seed 44 | seed 45 | seed 46 | spread |
+|---|---:|---:|---:|---:|---:|---:|
+| `programme_free` | 7.545 | **45.646** | 12.194 | 18.881 | 22.518 | **6.05×** |
+| `programme_only` | 110.765 | 110.879 | 111.078 | 94.952 | 112.078 | **1.18×** |
 
-*Provenance: `~/e0_run/d1_v2/d1_f_seed{42,43,44}/train_metrics.jsonl` and
-`d1_p_seed{42,43,44}/train_metrics.jsonl`, key `train_rank_tripwire_observed`, epoch 11. **Statistic
+*Provenance: `~/e0_run/d1_v2/d1_{p,f}_seed{42,43,44}/train_metrics.jsonl` and
+`~/e0_run/d1_seeds4546/d1_{p,f}_seed{45,46}/train_metrics.jsonl`, key
+`train_rank_tripwire_observed`, epoch 11; distilled with per-file SHA-256 into
+`v2/research/rebase/p2/figures/data/extracted/F3_TRIPWIRE_STEP200_R3_n5.json`. **Statistic
 R3** — the tripwire statistic. These are in-training measurements whose states were never saved, so they
 are `[NOT RECOMPUTABLE]` under R1 and are not compared with any R1 number in this paper.
-`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §6.*
+`NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md` §6.
+**Seeds 45 and 46 landed after that entry was written**; on the original three seeds alone the
+`programme_only` spread is 1.003× and the `programme_free` spread is unchanged at 6.05×. Earlier
+versions of this table showed only the three, which understated the supervised arm's spread by a factor
+of 60 and is corrected here.*
 
-The supervised arm reproduces to **0.3%**; the contrastive arm spans **6.05×**. **Rank's
+The supervised arm reproduces to **18%** across five seeds and to **0.3%** across the original three;
+the contrastive arm spans **6.05×** either way. **Rank's
 reproducibility is therefore not a property of the statistic — it is a property of the arm being
 measured, and it is worst exactly where the arm is interesting.** A reproducibility envelope measured on
 a well-behaved configuration does not transfer to the one being diagnosed, and the one being diagnosed
 is the configuration a practitioner is looking at when they reach for rank.
 
 This also disposes of the most natural repair: "calibrate the envelope once, then use it". There is no
-one envelope. On this stack the same statistic, at the same step, is reproducible to three parts in a
-thousand on one arm and unusable on its sibling.
+one envelope. On this stack the same statistic, at the same step, is reproducible to eighteen percent on
+one arm and unusable on its sibling — and §4.1's floor, measured on the *better-behaved* of the two,
+still swallows every arm comparison this project has made.
 
 ### 4.4 Defeater check — is the metric fine and the estimator bad?
 
@@ -1116,8 +1209,8 @@ sampling standard deviations**, an unresolvable tie, against a ground-truth gap 
 bootstrap CI excludes zero. That "hit" is not a hit.
 
 **(2) The readout path is deterministic.** Re-exporting a surviving checkpoint reproduces its recorded
-channel to five significant figures (0.58612 against 0.5861) and gives a stable rank (8.6809); the 2.69×
-move in §4.1 appears only when the model is retrained (§3.5).
+channel to five significant figures (0.58612 against 0.5861) and gives a stable rank (8.6809); the
+3.295× spread of §4.1 appears only when the model is retrained (§3.5).
 
 **(3) At a fixed seed and a fixed short horizon, rank is tight.** Three repeats of a controlled 200-step
 probe with **identical inputs**, real streaming batches, live queue: m = 0.999 gives **7.15 / 6.92 /
@@ -1128,7 +1221,8 @@ to 6.92. *Provenance: `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900
 **These repeats hold the seed fixed and vary only stack non-determinism; the 6.05× row of §4.3 is at the
 same 200 steps on the same objective and varies the seed.** The two are not in conflict and the
 difference is the point: rank at step 200 is reproducible to 4.7% when the seed is held, spans 6.05×
-when it is not, and spans 1.003× on the sibling arm across the same three seeds. **The variance is
+when it is not, and spans 1.003× on the sibling arm across those same three seeds (1.18× once seeds 45
+and 46 are included, §4.3). **The variance is
 neither intrinsic to the measurement nor merely accumulated over training: it is seed sensitivity that
 is specific to the arm.**
 
@@ -1153,9 +1247,12 @@ adopt it.
 
 **One thing this section cannot establish.** We have two configurations and one stack. We do not know
 whether this variance is a property of effective rank, of this hardware's non-determinism, of this
-architecture, or of the 40-epoch schedule. A controlled repeat design — N retrainings of one
-configuration with rank and channel measured on each — has not been run and is named in §6.2 as the
-most valuable missing measurement after a labelled probe.
+architecture, or of the 40-epoch schedule. The controlled repeat design that would begin to separate
+them — N retrainings of one configuration with rank and channel measured on each — **has now been run
+at N = 5** and is §4.1's floor; it establishes that the variance is in retraining rather than in
+estimation, and it still cannot attribute retraining variance to the metric rather than to the stack,
+because there is only one stack. A labelled downstream probe remains the more valuable missing
+measurement (§6.2).
 
 ### 4.5 The verdict is under-determined: it flips with the statistic, the block and the measured view
 
@@ -1333,7 +1430,9 @@ scripts `~/e0_run/p2_competing_metrics.py`, `p2_selection_rule.py`; outputs `~/e
 over 1e-8…1e0; α-ReQ from the authors' released `fastssl` estimator. Fidelity and the departures from
 each source are stated in §2.5.*
 
-**Three things must be said about this table, in this order.**
+**Four things must be said about this table, in this order.** The fourth is §4.6a and is the largest:
+the ground truth this table scores against is one coordinate system out of six, and every count below
+moves when it changes. Nothing in this section may be read without it.
 
 **First, it is underpowered and must not carry rhetorical weight.** At n = 6, the exact two-sided
 binomial gives **p = 0.031 for a flawless 6/6**, 0.219 for 5/6 and 0.688 for 4/6. The design therefore
@@ -1359,10 +1458,109 @@ and `|α − 1|` is our operationalisation, not theirs. **Both halves of the Ran
 reported**, because "you evaluated a centred variant and the published metric does better" is true on
 D2 and false on D1.
 
-### 4.7 The necessity test, which went against us
+**Fourth, and largest: all of the above is scored against one target block.** See §4.6a. The 3/3-versus-
+2/3 comparison just made between RankMe and canonical effective rank **reverses** if the ground truth is
+taken on the perturbation dictionary's own codes or on a plain PCA basis, and canonical effective rank
+then reaches a nominally significant 6/6. Neither reading is quotable. The sentences above stand as a
+description of what happens on the gene-set block and on no wider domain than that.
+
+### 4.6a The ground truth §4.6 scores against is itself a coordinate choice, and every count in that table moves when it changes
+
+§4.6's marks are scored against **one** ground truth: the held-out channel onto the 40 **gene-set**
+targets neither arm trained on. On 2026-08-04 that ground truth stopped being a single number.
+`NOTEBOOK_ENTRIES/d2_coordinate_system_result_20260804T0800Z.md` re-scored both D2 arms on every other
+molecular target block that exists on this project's disk, and the **−0.12 arm contrast appears on
+exactly one of six** — the gene sets. On the dictionary's own 128 supervision codes all six 2,000-repeat
+intervals cover zero; every other block sits at or inside the published `random_control` negative
+control. Rotating the exam's basis moves the arm contrast by **+0.1227 / +0.1177 / +0.1200**, which is
+the entire published effect.
+
+**If the arm contrast is block-dependent, so is §4.6's ground truth, and so is every OK/MISS in it.** We
+had not chased that consequence and it is the counterfactual the table needs. Holding all twelve metrics
+fixed and swapping only the truth, once per block
+(`v2/research/rebase/p2/p2_selection_rule_blocks.py`, reading the same metrics JSON §4.6 reads and the
+per-block contrasts from `v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json`):
+
+| exam block used as ground truth | Δ s42 | Δ s43 | Δ s44 | arm ordering |
+|---|---:|---:|---:|:---:|
+| **gene sets, untrained 40 — the published truth** | −0.1325 | −0.1089 | −0.1226 | H H H |
+| PBS codes 128 (arm I's own supervision) | −0.0098 | **+0.0088** | −0.0026 | H **I** H |
+| PCA basis 128 | −0.0201 | **+0.0049** | −0.0284 | H **I** H |
+| gene-label-shuffled PBS 128 | −0.0359 | −0.0057 | −0.0175 | H H H |
+| `random_control` gene sets 90 (negative control) | −0.0099 | −0.0280 | −0.0268 | H H H |
+| size/spectrum-matched random dictionary 128 | −0.0597 | −0.0132 | −0.0454 | H H H |
+
+**Everything turns on seed 43, and seed 43 is the seed the coordinate system flips.** The D2 selection
+count under each truth, for the two rows §4.6 quotes against one another:
+
+| metric | gene sets 40 | PBS codes | PCA basis | shuffled PBS | rand control | rand dict |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| **canonical effective rank (resid.)**, D2 | 2/3 | **3/3** | **3/3** | 2/3 | 2/3 | 2/3 |
+| **RankMe (raw, as published)**, D2 | **3/3** | 2/3 | 2/3 | **3/3** | **3/3** | **3/3** |
+| — the same, as ALL / 6 (canonical R1) | 5/6 | **6/6**, *p* = 0.031 | **6/6**, *p* = 0.031 | 5/6 | 5/6 | 5/6 |
+| — the same, as ALL / 6 (RankMe) | 4/6 | 3/6 | 3/6 | 4/6 | 4/6 | 4/6 |
+
+*Provenance: `v2/research/rebase/p2/p2_selection_rule_blocks.py` over
+`~/ws_p2/out/P2_METRICS_D{1,2}.json` and
+`v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json`. The `geneset_untrained40` column
+reproduces §4.6's published table exactly, in all twelve rows, which is what licenses the other five.
+Tested in `v2/tests/test_p2_analysis_scripts.py`.*
+
+Three things follow, and the first two are against us.
+
+**First, every one of the twelve metric rows changes its D2 count.** Not one is stable across the six
+blocks. §4.6 already refused to let a 5/6 against a 4/6 carry weight on power grounds; this is a second,
+independent reason, and it is worse than the power problem because it is not fixed by more pairs.
+
+**Second, the ordering between the two rows the section names explicitly reverses.** On the published
+gene sets, RankMe-as-published beats canonical effective rank on D2, 3/3 against 2/3 — a fact §4.6
+reports because it cuts against us. On the dictionary's own codes and on a plain PCA basis the two
+**swap**, and canonical effective rank reaches **6/6 overall, exact two-sided p = 0.031** — "significant"
+by this very design's own stated bar, produced by nothing whatsoever except the choice of which
+coordinate system the exam is written in. **We report that we can manufacture our own significance by
+choosing a target block, because that is the strongest available demonstration that no count in §4.6 may
+be quoted without its block**, and it disqualifies the favourable reading as firmly as the unfavourable
+one.
+
+**Third, the D1 half cannot be re-scored at all, and is not treated as though it had been.** The
+coordinate-system work re-scored the two **D2** arms; the D1 arms were never scored against any block
+but the gene sets. So the D1 column is held fixed in every row above, and the ALL counts inherit that.
+**This is not evidence that the D1 half is block-stable — it is the absence of the measurement**, and it
+is named in §6.3 alongside the ground truth's other weaknesses.
+
+**What survives §4.6, and it is less than it was.** The direction — arm H is never behind on any block
+tested — is stable across all six. What is not stable is any *count*, any *ranking between metrics*, and
+any *p*. §4.6 is therefore reported as a descriptive record of one coordinate system, and the paper's
+argument continues to rest on §4.2's variance decomposition, which uses magnitudes rather than a
+verdict and does not consult a ground truth at all.
+
+### 4.7 The necessity test, which went against us — and which §4.1's floor has made unresolvable rather than refuted
 
 **This is the result that falsified this paper's previous framing, and it is reported before the
-instances that favour us.**
+instances that favour us. It stays at that prominence.**
+
+> **Read this before §4.7.2.** The measured retraining floor of §4.1 (3.295× residualised, 3.111× raw)
+> is **larger than all three of D1's rank ratios** — 2.190× / 3.246× / 1.738× residualised, 2.02× /
+> 3.09× / 1.68× raw. The rank difference this section reads is therefore **inside the noise floor of
+> the statistic that produced it**, and *D1 does not resolve whether effective rank tracks information,
+> in either direction.*
+>
+> **That is not a rescue and is not written as one.** The reading was fixed in
+> `PREDECLARED_retraining_envelope_20260804T0330Z.md` before the floor existed, in the band the floor
+> landed in: *"No D1 rank difference is resolvable. D1 is uninformative about rank; the channel remains
+> resolvable; the asymmetry is the finding. Explicitly **do not** claim the necessity result is
+> refuted."* Applying it without amendment:
+>
+> - **The necessity result is NOT refuted.** `programme_only` — the higher-rank arm — carries the larger
+>   channel in **3/3** seeds, with patient CIs excluding zero 3/3 and cancer-cluster CIs 2/3. Those
+>   intervals are unaffected by anything in §4.1. A comparison inside the noise floor is not evidence
+>   **for** rank's reliability; it is equally not evidence **against** it.
+> - **It is therefore reported at full strength below and flagged as *not resolvable by this
+>   comparison*, not deleted, not softened, and not moved out of the abstract.**
+> - **The asymmetry is the finding, and it holds only because both halves are reported.** On the same
+>   comparison, the channel difference clears its own instrument and the rank difference does not. A
+>   version of this section that quoted the rank half alone would convert a demonstration into a
+>   convenience.
 
 #### 4.7.1 What was predeclared
 
@@ -1496,11 +1694,29 @@ information content"* is not supported by our own best-matched three-seed experi
 of this draft asserting it has been withdrawn.
 
 It does not touch §4.1–§4.5, and the reason is worth stating precisely: **the rank ratios in the table
-above (1.74×, 2.19×, 3.25×) are not larger than the within-arm seed range (2.10–3.75×) of §4.2.** So
-even in the instance where rank gets the answer right, the size of the gap it is reading sits inside its
-own nuisance band, and two of the three are inside the retraining envelope of §4.1. **A metric can be
-right on average and still be unusable for a single comparison**; that is the whole content of this
-paper's surviving claim, and D1 is an example of it rather than a counterexample to it.
+above (1.74×, 2.19×, 3.25×) are not larger than the within-arm seed range (2.10–3.75×) of §4.2, and
+since 2026-08-04 all three are also inside the *measured* retraining floor of §4.1 (3.295×).** So even
+in the instance where rank gets the answer right, the size of the gap it is reading sits inside two
+independently measured noise floors — one estimated across seeds, one across identical repeats at a
+fixed seed. **A metric can be right on average and still be unusable for a single comparison**; that is
+the whole content of this paper's surviving claim, and D1 is an example of it rather than a
+counterexample to it.
+
+**The strongest form of the objection, stated against ourselves.** A referee may say: *"you have made
+your own inconvenient result disappear by measuring a noise floor wide enough to swallow it."* Three
+things answer that, and none of them is that the result went away.
+
+1. **The reading was predeclared before the floor was measured**, in a document that named this exact
+   outcome as *"suspiciously convenient for us"* and foreclosed the rescue in advance. The floor landed
+   in the `> 3.09×` band whose reading had already been written.
+2. **The floor was measured on the arm that makes it smallest.** `programme_only` is the stable arm
+   (§4.1, §4.3). A floor measured on `programme_free` would be larger, not smaller, so the objection
+   would have to argue we chose the *less* favourable arm on purpose.
+3. **The result is not deleted and its intervals are untouched.** `programme_free` still loses the
+   channel 3/3 with patient CIs excluding zero. What §4.1 removes is the licence to read the *rank*
+   half of this comparison, in either direction — which costs us the ability to point at D1 as evidence
+   that our own thesis fails there, and equally denies anyone the ability to point at it as evidence
+   that rank works.
 
 **And the same argument applies to us, which we state before it is put to us.** The sharpest available
 objection to this paper is that it holds rank to a strict standard — *your difference must exceed your
@@ -1510,15 +1726,17 @@ report (0.0705) is roughly half the real-versus-random-control margin of 0.139**
 seed 42, the seed that supplies the 0.0705). That is §4.1's envelope argument arriving from
 the channel side rather than the rank side, and it points at us. The effect we measure is *small
 relative to its own instrument's floor*, and a reader is entitled to hold that against our channel
-readings exactly as we hold the 2.69× envelope against rank.
+readings exactly as we hold the 3.295× floor against rank.
 
 Three things distinguish the two cases, and none of them makes our margin large:
 
 1. **The channel difference is a paired within-run difference and the rank difference is a level**
    (§3.5). The floor that matters for a paired difference is the spread of that difference, which is
    0.024 on a mean of −0.121 across the D2 seeds and same-signed 3/3; the floor that matters for a level
-   is 2.69×, which six of seven arm differences fail to clear (§4.1). That asymmetry is the practical
-   heart of the paper and it is not an accident of which quantity we like better.
+   is 3.295×, which **all seven** arm differences fail to clear (§4.1). That asymmetry is the practical
+   heart of the paper and it is not an accident of which quantity we like better; on the five identical
+   retrains that produced the floor, the two quantities were measured on the *same runs* and moved
+   3.295× against 1.055×.
 2. **The channel difference is interval-backed and the rank difference is not** — 3/3 at the patient
    level and 2/3 at the cancer level here, 3/3 on both in D2. No rank difference in this paper carries
    an interval at all, because no one computes one.
@@ -1672,7 +1890,7 @@ effective rank and its molecular channel is unchanged at the second decimal". It
 a genuine internal control — that head is a frozen MLP-CLIP teacher passed through, `max|diff| = 2.6e-04`
 between arms, with rank and channel identical to four significant figures, so the instrument does return
 "nothing changed" when nothing changed. But given §3.5 — the same seed retrained moves a channel estimate
-by 0.035 and a rank estimate by 2.69× — **a 0.002 channel difference and a 6.42-point rank difference are
+by 0.035 and a rank estimate by up to 3.3× (§4.1) — **a 0.002 channel difference and a 6.42-point rank difference are
 both inside this stack's run-to-run noise. Instance 2 shows that neither quantity is resolvable at one
 seed, not that one moved and the other did not.** Its own source adds that the arms were never verified
 matched (G0.4) and that *"no CI on any between-run difference; a paired bootstrap on the biology gap is
@@ -1979,10 +2197,25 @@ agrees — patient-to-patient mutual cosine 0.977–1.0000, retrieval at or belo
 difference, which is the practice §4.1 disqualifies.
 
 **Where it strains, stated rather than defended away.** In §5.2 the decision between `m = 0` and
-`m = 0.999` at step 600 rests on **2.81 against 7.42, a 2.64× ratio — which is inside the 2.69×
-retraining envelope of §4.1**, and the sweep is **one seed per momentum value**. Taken as an isolated
-two-point rank comparison, §4.1's own rule would disqualify it. Three things are why we nonetheless
-report the fix as real, and a reader is entitled to weigh them:
+`m = 0.999` at step 600 rests on **2.81 against 7.42, a 2.64× ratio — which is inside the 3.295×
+retraining floor of §4.1**, and the sweep is **one seed per momentum value**. Taken as an isolated
+two-point rank comparison, §4.1's own rule would disqualify it.
+
+**And the seed replication, which has since run, does not lift it clear.** Three seeds per momentum
+(`~/e0_run/d1_diag/mseed_*`, 500 steps) give canonical R1 of 11.26 / 10.45 / 10.55 at m = 0.999 against
+3.18 / 1.13 / 2.36 at m = 0, so **every m = 0.999 seed exceeds every m = 0 seed** and the single-seed
+defect named below is closed. But the worst-case separation is **10.45 / 3.18 = 3.29× against a 3.295×
+floor** — inside it, by §4.1's own criterion. On R3 it is 6.85 / 2.81 = 2.44×, also inside. The
+comparison is indicative rather than decisive in the other direction too: the floor was measured on
+`programme_only` at 40 epochs on an exported artifact, and these are `programme_free` at 500 steps on a
+held-out probe, so the quantities are not substitutable and a like-for-like floor for this regime has
+not been measured. *Provenance:
+`NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3.* **What does not depend
+on rank at all is the reason the fix was adopted**: the unfixed configuration collapses and the fixed one
+does not, visible in retrieval, in the contrastive loss, and in whether `programme_free` trains to 40
+epochs without the tripwire firing.
+
+Three things are why we nonetheless report the fix as real, and a reader is entitled to weigh them:
 
 1. **It is not a two-point comparison.** The effect is **monotone across four values of m** and **flat
    from step 200 to 600** in both working arms — nine time points × four arms, not one ratio. §4.1's rule
@@ -1994,7 +2227,8 @@ report the fix as real, and a reader is entitled to weigh them:
 3. **The controlled repeat measurement exists and is tight**: three repeats at step 200 with identical
    inputs give 7.15 / 6.92 / 7.25 for m = 0.999 against 1.80 / 1.46 / 1.98 for m = 0 — a **3.5×
    separation with an empty band**, which is the very check §4.1 asks a practitioner to run, and which
-   this comparison passes where six of seven arm comparisons in §4.1 fail it.
+   this comparison passes at that horizon — where all seven arm comparisons in §4.1 fail it. At the
+   500-step horizon with the seed varied, it does **not** pass: 3.29× against 3.295×.
 
 **But point 3 is also the sharpest thing that cuts against §5.2 as published**, and we say so: those
 repeats hold the **seed** fixed, and §4.3 shows the same arm at the same step spans **6.05×** across
@@ -2052,8 +2286,9 @@ should be withdrawn to a replication.
 
 | would-be measurement | why it is absent |
 |---|---|
-| **A controlled repeat design for §4.1** — N retrainings of one configuration, rank and channel measured on each | **Not run; queued on the GPU.** §4.1's envelope is an **n = 1** estimate — one retraining pair, no interval — and the headline "six of seven differences fall inside it" inherits that. **This is the paper's most valuable missing measurement**, and it is the same defect as §5.2's single-seed sweep applied to the central argument rather than to a supporting one. §4.2 exists because of it and reaches the same conclusion from 8 within-arm d.f. without using 2.69× at all; if only one of the two survives review it should be §4.2. |
-| **A seed replication of §5.2's momentum sweep** | **Armed, not yet reported.** `m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported alongside the participation ratio. §5.3 states the consequence of its absence and why the single-seed sweep was a **defect** — the harness had its seed hardcoded — rather than a design choice. |
+| ~~A controlled repeat design for §4.1~~ | **CLOSED, at N = 5.** Five identical `programme_only` retrains at seed 42 give a **3.295×** rank floor against a **1.055×** channel spread, bimodally distributed. It replaced an n = 1 estimate of 2.69×. What it still cannot do is attribute retraining variance to the metric rather than to this stack, because there is only one stack; and it is measured on the *stable* arm at a fixed seed, so it is a floor rather than an envelope. §4.2 remains the contribution that does not depend on it. |
+| ~~A seed replication of §5.2's momentum sweep~~ | **CLOSED, and it does not clear §4.1's bar.** Three seeds per momentum at 500 steps: every m = 0.999 seed exceeds every m = 0 seed (canonical R1 11.26 / 10.45 / 10.55 against 3.18 / 1.13 / 2.36), so the single-seed defect is closed and §5.3's disjunction resolves in favour of separation. But the worst-case ratio is **3.29× against §4.1's 3.295× floor**, so the fix's *rank* difference is not resolvable by this paper's own criterion. Different arm, duration and block, so indicative rather than a like-for-like disqualification. **§5.2 and §5.3 are not yet rewritten around this.** |
+| **A per-block ground truth for the D1 arms** | **Not run.** §4.6a re-scores the *D2* arms on six target blocks and finds the selection verdict unstable on all twelve metric rows. The D1 arms were never scored on any block but the gene sets, so §4.6a's D1 column is held fixed in every row and is **not** evidence that the D1 half is block-stable. |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
 | ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
 | An error bar on any dilution rank or channel value | Single seed, single donor draw; bootstrapping donor assignments is CPU-only and unrun. |
@@ -2153,13 +2388,15 @@ keep. That result is not a footnote to this paper; it removed the claim this pap
 claim that replaced it had to be one that survives rank being right on average.
 
 It is. **The metric's between-arm differences are smaller than its own within-arm reproducibility floor,
-inside the regime its authors reserve for it.** Six of the seven between-arm rank differences this project
-ever measured — 1.004× to 2.19× — are inside the 2.69× spread we observed when one configuration was
-retrained with the same seed, an envelope measured from a single pair and reported as such. Across twelve matched artifacts, 65.5% of the variance in effective rank is training-seed
+inside the regime its authors reserve for it.** All seven of the between-arm rank differences this project
+ever measured — 1.004× to 3.246× — are inside the **3.295×** spread measured over five identical retrains
+of one configuration at one seed: a floor whose distribution is **bimodal** (four repeats within 2%, one at
+a third of them), and on whose same five runs the molecular channel spreads only **1.055×**. Across twelve
+matched artifacts, 65.5% of the variance in effective rank is training-seed
 nuisance and the arm term is not significant; across the same twelve, 98.0% of the variance in the
 molecular channel is the arm, at F = 128.2. And the floor is not a constant that could be calibrated once
-and reused: at a fixed training step, one arm spans 6.05× across three seeds while its sibling spans
-1.003×. The instability is in training, not in estimation — the statistic itself is precise to about 0.1
+and reused: at a fixed training step, one arm spans 6.05× across seeds while its sibling spans
+1.18×. The instability is in training, not in estimation — the statistic itself is precise to about 0.1
 on a rank of 25 — which is what makes it fatal rather than fixable by measuring harder. So we propose the
 check that would have caught it: **retrain one configuration, measure the rank spread, and require the
 between-configuration difference to exceed it.**
@@ -2219,10 +2456,12 @@ to run the thing twice.
 | 3.2 | channel statistic, nulls, held-out re-estimation | `v2/calibra/spectral.py:78-108`, `v2/calibra/run_calibra.py`; metrics entry §4.4 | — |
 | 3.4 | D2 and D1 pair-manifest hashes and `objective_only_difference` | `D2_PAIR_MANIFEST.json`; `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` | `~/e0_run/d2_v3/`, `~/e0_run/d1_v2/` |
 | 3.5, 4.1 | seed non-reproducibility; re-export vs retrain | `D2_RESULT.md` §4 | `~/e0_run/d2_v3/recovered_artifacts/` |
-| 4.1 | the seven between-arm ratios and the 2.69× envelope (**n = 1**) | recomputation entry §6 | `~/ws_rank/RANK_RECOMPUTE.json` |
+| 4.1 | the seven between-arm ratios | recomputation entry §6 | `~/ws_rank/RANK_RECOMPUTE.json` |
+| 4.1 | the **3.295×** retraining floor, five same-seed repeats (**n = 5**) | `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §1; `v2/research/rebase/d1_envelope_readout.py` | `~/e0_run/d1_envelope/rep{1..5}.npz`, `~/e0_run/d1_envelope_readout.log` |
+| 4.6a | the arm contrast on six target blocks, and the selection verdict under each as truth | `NOTEBOOK_ENTRIES/d2_coordinate_system_result_20260804T0800Z.md` §1, §1a; `v2/research/rebase/p2/p2_selection_rule_blocks.py` | `v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json` |
 | **4.1–4.7** | **two independent recomputations agree.** (i) `~/ws_rank/` under the canonical `spectral.py`, 2026-08-04; (ii) `~/ws_p2/morpheus`, a fresh workspace verified byte-equal to HEAD *before* execution (402/402 files by git blob SHA-1) running the scripts vendored at `7b37dce`. Both reproduce §4.1, §4.2, §4.4(1), §4.5(b), §4.5(c), §4.6 and §4.7 to every published digit, and both independently identified the §4.5(a) statistic substitution **and the same corrected values** (3 of 6 → 2 of 6; D1 under canonical R2 is 3/3). | `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`; `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` | `~/ws_rank/`, `~/ws_p2/out/` |
 | 4.2 | variance decomposition and per-arm folds | metrics entry §4.1 | `~/e0_run/p2_necessity_and_variance.py` |
-| 4.3 | step-200 in-flight R3, 6.05× vs 1.003× | `~/e0_run/d1_v2/d1_{f,p}_seed{42,43,44}/train_metrics.jsonl`, `train_rank_tripwire_observed` | — |
+| 4.3 | step-200 in-flight R3, 6.05× vs 1.18× over five seeds | `~/e0_run/d1_v2/d1_{f,p}_seed{42,43,44}/` and `~/e0_run/d1_seeds4546/d1_{f,p}_seed{45,46}/train_metrics.jsonl`, `train_rank_tripwire_observed`; distilled to `v2/research/rebase/p2/figures/data/extracted/F3_TRIPWIRE_STEP200_R3_n5.json` | — |
 | 4.4 | subsampling SDs; probe repeats; tolerance and centring insensitivity | metrics entry §3; `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md`; recomputation entry §2, §4 | `~/e0_run/P2_METRICS_ALL_SUBSAMPLED.json`, `~/e0_run/d1_diag/probevar_*.log` |
 | 4.5 | statistic / block / view flips | metrics entry §4.2, §4.3; recomputation entry §4, §7 | `~/e0_run/P2_ROBUSTNESS.json` |
 | 4.7 | necessity test, predeclaration, escalation | `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`; metrics entry §5; `d1_readout_preregistration_20260803T1700Z.md` | `~/e0_run/d1_v2/`, `~/e0_run/d1_audit.log` |
@@ -2255,12 +2494,21 @@ to run the thing twice.
 
 Reproduced verbatim so that any future quotation can carry it.
 
-- **The 2.69× envelope (§4.1).** One retraining pair, one configuration, one stack. It cannot distinguish
-  rank-specific variance from stack non-determinism, architecture or schedule. The claim does not depend
-  on it alone; §4.2 reaches the same conclusion from 8 within-arm degrees of freedom.
+- **The 3.295× retraining floor (§4.1).** **Five** identical retrains, one arm (`programme_only`, the
+  *stable* one), one configuration, one seed, one stack, no interval. It cannot distinguish rank-specific
+  variance from stack non-determinism, architecture or schedule. It is a **floor**, not an envelope, and
+  its distribution is **bimodal** rather than a spread. Its effect on our own headline count (six of seven
+  to seven of seven) runs in our favour and the seventh point clears it by 1.5%. The claim does not depend
+  on it alone; §4.2 reaches the same conclusion from 8 within-arm degrees of freedom. The superseded n = 1
+  estimate was 2.69× and no sentence in this paper should quote it as the floor.
+- **Every count in §4.6.** Scored against **one** target block out of six. §4.6a re-scores against all six:
+  every metric row's D2 count moves, the ordering between canonical effective rank and RankMe reverses on
+  two blocks, and canonical effective rank reaches a nominally significant 6/6 on those two. **No
+  selection-rule count in this paper may be quoted without its target block.** The D1 half was never
+  re-scored, so its stability is unmeasured rather than established.
 - **The variance decomposition (§4.2).** Four arms × three seeds = 12 artifacts, two experiments, one
   stack. Log-scale decomposition for rank-type metrics, raw scale for the channel.
-- **The 6.05× / 1.003× pair (§4.3).** **Statistic R3**, in-training, states never saved, therefore
+- **The 6.05× / 1.18× pair (§4.3).** **Statistic R3**, in-training, states never saved, therefore
   `[NOT RECOMPUTABLE]` under R1 and never compared with an R1 number.
 - **D2 (§4.6, §4.9).** *"REPORTED, NOT INTERPRETED (blocker 5). WSI states are ~0.80 collinear at init, so
   a narrower rank may reflect resistance to an already-collapsed view rather than dictionary content."*
@@ -2303,8 +2551,10 @@ Reproduced verbatim so that any future quotation can carry it.
 - **§5's momentum sweep.** **One seed per momentum value** — because the harness had its seed
   **hardcoded**, a defect rather than a judgement — centred R3, durability established only to step 600
   against a 583-step training duration. Its m = 0 against m = 0.999 ratio (2.64×) is **inside** §4.1's
-  2.69× disqualifying envelope; §5.3 states why it is nonetheless reported and what the armed
-  seed-replicated sweep will license either way. The anchoring account is **not confirmed** and should
+  3.295× disqualifying floor; §5.3 states why it is nonetheless reported. **The seed replication has
+  since run** and separates the two momenta 3/3 on both statistics, closing the single-seed defect — but
+  at a worst-case 3.29× against that same 3.295× floor, so the *rank* difference remains unresolvable by
+  this paper's own criterion, and the fix's justification does not rest on it. The anchoring account is **not confirmed** and should
   not be cited as established; the turnover sharpening was predeclared, tested and **refuted**.
 - **All rank numbers.** RankMe's ε sits outside the division, so its statistic is not the exponential of a
   Shannon entropy and **no number in this paper is comparable to a published RankMe value**.

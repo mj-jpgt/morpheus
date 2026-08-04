@@ -154,13 +154,64 @@ between 2.2 and 5.6 min/epoch. GPU was never the constraint (~20 GB of 80 GB).
 
 ## 6. Verdict
 
-**PBS underperforms Hallmark supervision on the held-out molecular channel, by ~0.11–0.13 top-CCA,
-in 3/3 seeds, on 40 targets neither arm was trained on, with both patient and cancer-cluster CIs
-excluding zero in 3/3, against a negative control that is 4–13× smaller and mostly indistinguishable
-from zero.** P3's headline hypothesis is refuted by its own predeclared test. The refutation is not
-an artifact of scoring the Hallmark arm on its own supervision — that restriction makes PBS look
-*better*, not worse — and it is not explained by representation rank, which orders the wrong way in
-seed 43.
+> **NARROWED 2026-08-04.** The sentence this section carried until then —
+> *"PBS underperforms Hallmark supervision on the held-out molecular channel, by ~0.11–0.13 top-CCA"* —
+> generalised over a coordinate choice that carries the entire effect. It has been narrowed to its
+> measured scope. See `NOTEBOOK_ENTRIES/d2_coordinate_system_result_20260804T0800Z.md` and
+> `v2/research/rebase/nature/d2_coordinate_system/`, both predeclared
+> (`PREDECLARED_D2_coordinate_system_confound_20260804T0640Z.md`, committed before any number below
+> was computed). Everything in §1–§5 above reproduces exactly on a per-file-verified workspace; what
+> changed is the scope of the claim, not the numbers.
+
+**PBS underperforms Hallmark supervision on gene-set–valued targets, on the confound-residualised
+block, by ~0.11–0.13 top-CCA, in 3/3 seeds, on 40 targets neither arm was trained on, with both
+patient and cancer-cluster CIs excluding zero in 3/3, against a negative control that is 4–13× smaller
+and mostly indistinguishable from zero.** Both qualifications are load-bearing and neither may be
+dropped in quotation:
+
+- **The coordinate system.** Re-scoring both arms on the 128 PBS codes — arm I's own supervision, and
+  the only other molecular target space on disk that either arm was trained on — gives
+  Δ = **−0.0098 / +0.0088 / −0.0026** with **all six 2,000-repeat intervals covering zero**
+  (`p_improve` 0.30–0.74). Rotating the exam's basis moves the arm contrast by **+0.1227 / +0.1177 /
+  +0.1200** — the entire published effect. Across six target blocks the −0.12 appears on **exactly
+  one**: gene sets −0.1213, PBS codes −0.0012, PCA basis −0.0145, shuffled PBS −0.0197,
+  `random_control` −0.0216, random dictionary −0.0394. **Every non-gene-set block sits at or inside the
+  negative control.** "The held-out molecular channel" is not what was measured; the channel onto
+  gene-set–valued targets is.
+- **The block.** On the **raw** (unresidualised) block the gap is **3–5× smaller and seed 43 reverses
+  sign** (untrained 40: −0.0453 / **+0.0043** / −0.0224; all 90: −0.0441 / **+0.0092** / −0.0135).
+  Those are point estimates only — `d2_compare` residualises unconditionally, so no interval exists for
+  the raw block and none is claimed. **The 3/3 sign consistency and the ~0.12 magnitude are properties
+  of residualisation.** Removing cancer and tissue-source-site is the whole point of the design, but it
+  does not merely clean the estimate — it produces most of it.
+
+**What survives, and it still refutes P3.** *Hallmark supervision is never worse than PBS supervision
+on any target space tested — not on gene sets, not on random-control gene sets, not on a PCA basis, and
+not on PBS's own 128 supervision codes — and it is much better on gene-set targets. PBS supervision
+buys ~0.01–0.04 in its own neighbourhood, which is not enough to draw level plus a margin.* On an exam
+maximally generous to arm I, arm I can only draw. P3's headline hypothesis — that interventional
+coordinates are a **better** supervision target — remains refuted by its own predeclared test. **What
+does not survive is the magnitude: this is a claim of no disadvantage for Hallmark supervision, not of
+a 0.12 general advantage, and the verdict must not be quoted as one.**
+
+The refutation is not an artifact of scoring the Hallmark arm on its own supervision — that
+restriction makes PBS look *better*, not worse — and it is not explained by representation rank, which
+orders the wrong way in seed 43.
+
+**Two further findings travel with this verdict.** Overall survival, the one endpoint in neither arm's
+coordinate system, has arm H ahead in **3/3** seeds on the residualised block (Δ C-index −0.0136 /
+−0.0193 / −0.0171) but **no interval excludes zero**, so the direction reproduces on a neutral endpoint
+and the separation does not. And the project's only pre-registered clinical control, T1.7(b)'s
+ER/PR status, has **zero** coverage on this comparison's test partition — every labelled patient is
+BRCA, and BRCA is a development cancer in the maximal split. It cannot arbitrate D2 at all.
+
+**Consequence outside D2, recorded because nobody had chased it.** `paper/P2_RANK_DRAFT.md` §4.6 uses
+this comparison's Δ as **ground truth** for its selection-rule table. Because Δ is block-dependent, so
+is that ground truth: re-scored against each of the six blocks in turn, **every one of the twelve
+metric rows changes its D2 count**, the ordering between the two metrics that table is quoted for
+reverses on two blocks, and one metric reaches a nominally significant 6/6 by the choice of block
+alone. That is §4.6a of the P2 draft, computed by
+`v2/research/rebase/p2/p2_selection_rule_blocks.py`.
 
 ---
 

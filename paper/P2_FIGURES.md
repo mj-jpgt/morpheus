@@ -51,9 +51,11 @@ Not stylistic preferences. Each exists because the evidence would be misrepresen
    drawn from `~/ws_p2/out/P2_RANK_VARIANTS.json`, and no printing of that table older than
    `a11549a` may be used.**
 2. **Every panel showing a rank *level* must show a reproducibility envelope**, as a shaded band or
-   an annotated bracket: the 2.69× same-seed retraining envelope of §4.1, or the arm's own seed
-   spread from §4.2's table. A level comparison drawn without it is the practice this paper exists
-   to criticise.
+   an annotated bracket: the **3.295× measured same-seed retraining floor** of §4.1 (residualised
+   block; **3.111×** on the raw block — use the one matching the panel's own block), or the arm's own
+   seed spread from §4.2's table. A level comparison drawn without it is the practice this paper
+   exists to criticise. The superseded n = 1 estimate was 2.69× and may appear only where it is
+   labelled as superseded (F1(d)).
 3. **No number in this paper may be plotted against a published RankMe value.** RankMe normalises
    with `p_k = σ_k/‖σ‖₁ + ε` (ε outside the division, so the `p_k` do not sum to 1); Roy & Vetterli
    use `0 log 0 = 0`; ours uses a relative LAPACK cut. Draft §2.6, §3.1. The faithful RankMe
@@ -77,49 +79,79 @@ Not stylistic preferences. Each exists because the evidence would be misrepresen
 
 ## Main figures
 
-### F1 — The envelope, and the seven arm differences inside it
+### F1 — The measured retraining floor, and the seven arm differences inside it
 
 **Draft section.** §4.1. **This is the paper's headline figure.**
 
-**Claim.** Six of the seven between-arm rank differences this project has ever measured are smaller
-than the spread of the same statistic when one configuration is retrained with the same seed.
+**REWRITTEN 2026-08-04.** The controlled repeat that panel (d) used to be a hatched
+`[RETRAINING ENVELOPE PENDING]` placeholder for **has reported**, and the script was written to
+refuse the placeholder once it did. The envelope is no longer an n = 1 estimate of 2.69×; it is a
+measured **3.295×** floor over five identical same-seed retrains, and the figure is rebuilt around
+it. The panel letters below are the new ones.
+
+**Claim.** **All seven** of the between-arm rank differences this project has ever measured are
+smaller than the spread of the same statistic when one configuration is retrained, at the same seed,
+five times.
 
 **Panels.**
 
-- **(a) The envelope, established.** Three markers on a rank axis for one configuration (D2 arm H,
-  seed 42, identical arguments): recorded original (channel 0.5861, rank not recorded),
-  **re-export of the surviving checkpoint** (channel 0.58612, R1 rank **8.6809**), **retrained**
-  (channel 0.6214, R1 rank **23.3868**). Annotate "re-export deterministic to 5 s.f." and
-  "retraining: rank ×2.69, channel +0.035". This panel is what licenses the band in (b), and it
-  must also carry the channel move so no reader thinks the channel is exempt.
+- **(a) The envelope, measured.** Five identical `programme_only` retrains at seed 42 — GPU
+  non-determinism the only source of variation — as two stacked strips on a shared repeat axis:
+  **rank (R1, residualised, log)** 28.320 / **8.834** / 28.348 / 29.106 / 28.959, spread
+  **×3.295**; **channel (top-CCA, 40 untrained targets, linear)** 0.6182 / **0.5859** / 0.6123 /
+  0.6110 / 0.6098, spread **×1.055**. The five values are plotted individually and **never as a mean
+  or a band**: the distribution is bimodal, and a band would invite the reader to imagine a
+  distribution the data does not have. Repeat 2 is annotated. The strips are stacked rather than on a
+  twin axis, because the two are different quantities in different units and the comparison being made
+  is between their *spreads*.
 - **(b) The seven comparisons against it.** A single horizontal axis of *rank ratio*, log-scaled,
-  with the 2.69× envelope drawn as a shaded region from 1.0 to 2.69 and each comparison as a
-  labelled point: D2 s44 **1.004×**, D2 s43 **1.186×**, Phase 1b **1.200×**, D2 s42 **1.573×**,
-  D1-B s44 **1.738×**, D1-B s42 **2.190×**, D1-B s43 **3.246×**. Six sit inside the band; one sits
-  just outside. **The visual message is the six points inside the shading.**
+  with the floor drawn as a shaded region from 1.0 to **3.295** and each comparison as a labelled
+  point: D2 s44 **1.004×**, D2 s43 **1.186×**, Phase 1b **1.200×**, D2 s42 **1.573×**,
+  D1-B s44 **1.738×**, D1-B s42 **2.190×**, D1-B s43 **3.246×**. **Every ratio is judged against the
+  floor measured on its own block** — 3.295× residualised, drawn dashed; **3.111× raw**, drawn dotted,
+  and the Phase 1b triangle is judged against that one. Comparing a residualised ratio against the raw
+  floor would put D1-B s43 outside, which is the raw/residualised confusion §4.5 is about. **The
+  visual message is all seven points inside the shading.**
 - **(c) The asymmetry, beside it.** The same three D2 seeds on a channel axis: paired differences
   **−0.1325 / −0.1089 / −0.1226** with both patient CI₉₅ ([−0.1605,−0.0993] / [−0.1460,−0.0749] /
   [−0.1502,−0.0866]) and cancer CI₉₅ ([−0.1792,−0.0632] / [−0.1623,−0.0118] / [−0.1653,−0.0411]),
   and a zero line. Same sign 3/3, both CIs excluding zero 3/3. **The point of putting (b) and (c)
   side by side is that the channel is quoted as a paired within-run difference and rank is not, and
   there is no paired form of "this run has higher rank".**
+- **(d) What the floor replaced, and what it costs us.** The measured floor (**3.295×**) against the
+  superseded n = 1 estimate (8.681 → 23.387, **2.694×**), and beneath them D1's three necessity-test
+  rank ratios (**3.246× / 2.190× / 1.738×**) on the same axis. All three are inside the floor, so
+  **D1 is uninformative about rank in either direction** — and the panel states in text that the
+  necessity result is **not refuted** (the channel still separates 3/3 with patient CIs excluding
+  zero) and that the count moving 6/7 → 7/7 runs **in our favour** and is reported with the
+  scepticism that requires. Whether each D1 point is inside is **computed and stated, never
+  asserted**: if a future recomputation moved one outside, the figure must say so rather than fail,
+  because that is one of the four outcomes the envelope was predeclared to distinguish.
 
-**Data.** (a) `v2/research/rebase/nature/D2_RESULT.md` §4; artifacts `~/e0_run/d2_v3/recovered_artifacts/`.
+**Data.** (a) `v2/research/rebase/p2/figures/data/extracted/F1_RETRAINING_REPEAT.json`, parsed by
+`extract_from_box.py` out of `~/e0_run/d1_envelope_readout.log` (vendored verbatim at
+`v2/research/rebase/p2/figures/data/e0_run/d1_envelope_readout.log`), written by `v2/research/rebase/d1_envelope_readout.py`, which
+imports **every** statistic from `v2/calibra`. The extractor records the readout module's git blob
+SHA-1 and each `rep{1..5}.npz`'s SHA-256; the figure recomputes the three spreads from the per-repeat
+values and **asserts them against the spreads the log itself printed** before drawing anything.
 (b) rank ratios from `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
 §5–§6 and `~/ws_rank/RANK_RECOMPUTE.json`; independently reproduced for the ten D2/D1-B values in
 `~/ws_p2/out/P2_RANK_VARIANTS.json`; Phase 1b from
 `v2/research/rebase/nature/PHASE1B_TARGETED_READOUT.md` §3, §5, §7 and `~/ws_rank/RANK_RECOMPUTE_P1B.json`.
-(c) `v2/research/rebase/nature/D2_RESULT.md` §2 (lines 41–49) and §7; bootstrap outputs
+(c) `v2/research/rebase/nature/D2_RESULT.md` §2 and §7; bootstrap outputs
 `~/e0_run/d2_v3/bootstrap/`, `~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json`.
+(d) `v2/research/rebase/p2/figures/data/e0_run/d2_v3/RECOVERED_SEED42_READOUT.json`, `v2/research/rebase/p2/figures/data/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json`.
 
 **Status.** `PLOTTABLE`.
 
-**Caption must carry.** The envelope is **one retraining pair on one configuration, on one stack**;
-it cannot separate rank-specific variance from stack non-determinism, architecture or schedule
-(§6.2 names a controlled repeat design as the paper's most valuable missing measurement). Statistic
-**R1**, block **residualised** for every D2 and D1-B point and **raw** for the Phase 1b point — and
-the Phase 1b arms were never verified matched (§3.4). The claim does not rest on this figure alone:
-F2 reaches the same conclusion from 8 within-arm degrees of freedom without using the 2.69× number.
+**Caption must carry.** The floor is **five identical retrains of one configuration at one seed on one
+stack**, and it is a **floor twice over**: `programme_only` is this project's stable arm, and same-seed
+repeats exclude seed variation entirely. It cannot separate rank-specific variance from stack
+non-determinism, architecture or schedule. Statistic **R1**, block **residualised** for every D2 and
+D1-B point and **raw** for the Phase 1b point, which is judged against the raw-block floor of 3.111×
+and whose arms were never verified matched (§3.4). The seventh point clears by **1.5%**. The claim does
+not rest on this figure alone: F2 reaches the same conclusion from 8 within-arm degrees of freedom
+without using the floor at all.
 
 ---
 
@@ -553,18 +585,40 @@ between two rows of this table is evidence in either direction."* Additionally m
 in every row as unresolvable** (F4(a): 1.4 sampling sd), so effective rank's honest D2 record reads
 "1 clear hit, 1 clear miss, 1 pair it cannot resolve".
 
+**A SECOND BAND, added 2026-08-04, and it is larger than the first: the ground truth is a coordinate
+choice.** Draft §4.6a. Every mark in the table is scored against the held-out channel onto 40
+**gene-set** targets, and that arm contrast exists on the gene sets and on **none** of the five other
+molecular target blocks on disk
+(`NOTEBOOK_ENTRIES/d2_coordinate_system_result_20260804T0800Z.md` §1a). The band prints, for six
+blocks as columns: the **arm ordering across seeds 42/43/44** (`HHH` on gene sets, shuffled PBS,
+`random_control` and random dictionary; **`HIH`** on PBS codes and PCA basis — seed 43 is the seed the
+coordinate system flips), and the **D2 count** for the two rows §4.6 quotes against one another,
+with each cell's ALL/6 and exact binomial beneath it. The band's closing sentence is the finding:
+*the ordering between those two rows reverses on 2 of 6 blocks, and canonical effective rank reaches
+6/6 — p = 0.031, "significant" by this table's own bar — produced by nothing but the choice of which
+coordinate system the exam is written in. No count in this table may be quoted without its target
+block.* The band also states that the **D1 half cannot be re-scored** — those arms were never scored
+against any block but the gene sets — so only the D2 count moves, and that is an absent measurement
+rather than evidence of block-stability.
+
 **Provenance.** `~/ws_p2/out/P2_METRICS_D2.json`, `~/ws_p2/out/P2_METRICS_D1.json`, printed table in
-`~/ws_p2/out/p2_run.log`; scripts `v2/research/rebase/p2/p2_competing_metrics.py` and
-`v2/research/rebase/p2/p2_selection_rule.py`; originals `~/e0_run/P2_METRICS_D2.json`,
-`P2_METRICS_D1.json`, tabulated in
-`NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §3.
+`~/ws_p2/out/p2_run.log`; scripts `v2/research/rebase/p2/p2_competing_metrics.py`,
+`v2/research/rebase/p2/p2_selection_rule.py` and — for the band —
+`v2/research/rebase/p2/p2_selection_rule_blocks.py` over
+`v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json`; originals
+`~/e0_run/P2_METRICS_D2.json`, `P2_METRICS_D1.json`, tabulated in
+`NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md` §3. The band's counts are
+recomputed in the figure from the same per-artifact metrics the table's marks are recomputed from, and
+the exam panel's gene-set column is asserted against the metrics JSON's own untrained-40 contrast
+before anything is drawn.
 **Status.** `PLOTTABLE`.
 
 **Must carry.** LiDAR is **adapted** — q = 2 with the two modalities as views, licensed by the
 paper's own footnote 4 but outside the authors' tested q range — and its ordering is invariant across
 δ from 1e-8 to 1e0. α-ReQ follows the authors' released `fastssl` estimator, not the paper text, and
 `|α − 1|` is our operationalisation of their "Goldilocks zone", not theirs; all 12 artifacts sit at
-α between 2.6 and 4.8, far outside it.
+α between 2.6 and 4.8, far outside it. **And the ground-truth band**: no count in the table is
+quotable without naming its target block.
 
 ### T2 — What RankMe claims and what it restricts
 
@@ -713,18 +767,32 @@ from step 200 to 600.
 `NOTEBOOK_ENTRIES/momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; logs
 `~/e0_run/d1_diag/`.
 
-**Status.** `PLOTTABLE` as drawn — **but every panel must carry
-`[MOMENTUM SEED REPLICATION PENDING]`.** This sweep is **one seed per momentum value**, and §4.2
-measures the seed term as dominant for exactly this statistic on this stack. §5.3 states the
-consequence without softening it: the hyperparameter choice §5 reports rests on a rank difference
-that has not been tested against the nuisance term this paper's own headline measures.
-**A version of this figure that does not say so contradicts F2.** The single seed was a **defect,
-not a design choice** — the momentum harness had its seed hardcoded, so the sweep could not have
-varied seeds had we asked it to — and the panel must say which of the two it was. A seed-replicated
-sweep (`m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported beside the participation ratio) is
-**armed and not yet reported** (§5.3, §6.2); when it lands, the marker is replaced by a per-arm seed
-band drawn the way F2(b) draws one, and **the figure must be redrawn either way**, including if the
-replication shows the effect is inside the seed band.
+**Status.** `PLOTTABLE` as drawn — **and the seed replication has now landed, so the panel's marker
+must change rather than be dropped.** The original sweep is **one seed per momentum value**, and §4.2
+measures the seed term as dominant for exactly this statistic on this stack. The single seed was a
+**defect, not a design choice** — the momentum harness had its seed hardcoded, so the sweep could not
+have varied seeds had we asked it to — and the panel must say which of the two it was.
+
+**The replication (2026-08-04, `~/e0_run/d1_diag/mseed_*`, three seeds per momentum, 500 steps):**
+canonical R1 **11.26 / 10.45 / 10.55** at m = 0.999 against **3.18 / 1.13 / 2.36** at m = 0; R3
+7.40 / 6.85 / 7.15 against 2.81 / 1.05 / 2.06. **Every m = 0.999 seed exceeds every m = 0 seed on both
+statistics**, so §5.3's disjunction resolves in favour of separation and the single-seed defect is
+closed. Replace `[MOMENTUM SEED REPLICATION PENDING]` with a **per-arm seed band drawn the way F2(b)
+draws one**.
+
+**But the panel must now carry the awkward number instead.** The worst-case separation is
+**min(m = 0.999) / max(m = 0) = 10.45 / 3.18 = 3.29×, against F1's measured retraining floor of
+3.295×** — inside it. By §4.1's own criterion the momentum fix's *rank* difference is **not
+resolvable either**, and the panel says so rather than leaving it for a referee. On R3 it is
+6.85 / 2.81 = 2.44×, also inside. Three caveats make this indicative rather than a like-for-like
+disqualification, and none of them rescues it: the floor was measured on `programme_only` at 40 epochs
+on an exported artifact, and these runs are `programme_free` at 500 steps on a held-out probe —
+different arm, duration and block, and no like-for-like floor for this regime has been measured.
+**What does not depend on rank at all is the reason the fix was adopted** (the unfixed configuration
+collapses and the fixed one does not, visible in retrieval, in the contrastive loss, and in whether
+`programme_free` reaches 40 epochs without the tripwire firing), and the panel must not be drawn as
+though it did. *Numbers: `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md`
+§3. Draft §5.2 and §5.3 are **not yet rewritten** around this.*
 
 **Caption must carry.** MoCo's staleness account is ruled out three ways and the alternative is
 stated as unconfirmed: the queue turns over completely every 19 steps; key-to-encoder cosine at step
@@ -770,7 +838,7 @@ practice under criticism.
    falsified and removed. The surviving claim is about **resolvability against a within-arm
    reproducibility floor**, and E1 contains no within-arm term at all: its only intervals resample
    patients and cancer clusters, the variance component §4.1(iv) measures at SD ≈ 0.1 against a
-   retraining envelope of 2.69×. Worse, `aggregate_e1.py:38,48` makes `delta_effective_rank > 0` a
+   retraining floor of 3.295×. Worse, `aggregate_e1.py:38,48` makes `delta_effective_rank > 0` a
    necessary conjunct of its verdict, so a sign-unstable delta — the *supporting* observation for the
    surviving claim — is reported as "claim not supported". The panel keeps its point (we built the
    practice we criticise) and loses the counterfactual.
@@ -838,8 +906,9 @@ input.
 |---|---|---|
 | D1 paired bootstrap, 40 targets | **F6(b), F6(c)** | **RESOLVED.** `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` (00:08 UTC) and `D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json` (02:40 UTC); folded into draft §4.7.2 at commit `a11549a`. Draw **both** estimators; weight the cancer-cluster one. |
 | §4.5(a)'s statistic labels | **F5(a)** | **RESOLVED.** Corrected in the draft at `a11549a`; plot from `~/ws_p2/out/P2_RANK_VARIANTS.json`. |
-| **Momentum seed replication** | **S4** | **`[MOMENTUM SEED REPLICATION PENDING]`** — armed (`m ∈ {0, 0.999} × 3 seeds`), not yet reported. Every S4 panel carries the marker until it lands, and S4 is redrawn whichever way it comes out. |
-| **Controlled retraining repeat design** | **F1, F4** | **Not run**, and named in §6.2 as the paper's most valuable missing measurement. Do **not** draw F1's 2.69× band as if it were an estimated distribution; it is one pair on one configuration. |
+| **Momentum seed replication** | **S4** | **REPORTED 2026-08-04, and S4 is NOT yet redrawn around it.** Three seeds per momentum at 500 steps (`~/e0_run/d1_diag/mseed_*`): canonical R1 11.26 / 10.45 / 10.55 at m = 0.999 against 3.18 / 1.13 / 2.36 at m = 0, so every m = 0.999 seed exceeds every m = 0 seed on both statistics and the single-seed defect is closed. **But the worst-case separation is 3.29× against F1's 3.295× floor**, so S4 must carry that the fix's *rank* difference is not resolvable by §4.1's own criterion — different arm, duration and block, so indicative rather than a like-for-like disqualification. Numbers in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3. |
+| **Controlled retraining repeat design** | **F1(a), F1(b), F1(d), F4, F6(b)** | **RESOLVED at N = 5, 2026-08-04.** `~/e0_run/d1_envelope/rep{1..5}.npz`, readout `~/e0_run/d1_envelope_readout.log`, vendored and extracted to `v2/research/rebase/p2/figures/data/extracted/F1_RETRAINING_REPEAT.json`. Rank floor **3.295×** residualised / **3.111×** raw against a **1.055×** channel spread. Do **not** draw it as a fitted distribution or a confidence band: it is **bimodal** (four repeats within 2%, one at a third) and it is a **floor**, measured on the stable arm at a fixed seed. F1(a) plots the five values individually for that reason. |
+| **Per-block ground truth for the selection rule** | **T1** | **RESOLVED for the D2 half, 2026-08-04.** `v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json` re-scores both D2 arms on six target blocks; `v2/research/rebase/p2/p2_selection_rule_blocks.py` re-runs the rule with each as truth. Every metric row's D2 count moves; the ordering between canonical effective rank and RankMe reverses on two blocks. **Unresolved for the D1 half** — those arms were never scored on any block but the gene sets, so T1's band holds D1 fixed and says so. |
 | Per-step arrays for the collapse tracks | F8(b) | **RESOLVED, split.** The rank track has per-step values and is extracted (`v2/research/rebase/p2/collapse_tracks/diag_d.log`); the collapse-evidence quantities have endpoints only and keep the paired-marker treatment. Statistic corrected to **R3**. |
 | Synthetic `(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` inset | F5 | **RESOLVED.** `v2/research/rebase/p2/p2_hill_order_inset.py` + `v2/tests/test_p2_hill_order_inset.py`; R2/PR spans 1.000 to 5.923 over `a ∈ [0, 2]`. |
 | Phase 1b equivalence test | T7 | Not run; the row stays qualified, and "unchanged" means the point estimates differ by 0.002. |
