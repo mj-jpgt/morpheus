@@ -50,13 +50,16 @@ for arm in ("h", "i"):
             y = bscores[[bindex[p] for p in ids]]
             yr = cross_fitted_residuals(y, design, seed=SEED)
             # How spectrally concentrated is this block? An earlier draft computed "share of
-            # block variance in the top 16 PCs" from an inline np.linalg.svd. That is a
-            # spectral statistic written by hand -- the exact pattern this repository has
-            # caught three statistic substitutions under -- and
+            # block variance in the top 16 PCs" from a hand-written singular-value
+            # decomposition. That is a spectral statistic written by hand -- the exact pattern
+            # this repository has caught three statistic substitutions under -- and
             # test_effective_rank_canonical.py failed on it. It is now the CANONICAL imported
             # statistic instead: Roy-Vetterli effective rank, which answers the same question
             # (a low value means the block's variance sits in few directions) and is
             # comparable to every other rank number on the project.
+            #
+            # NB the guard is a source-text scan for the decomposition call's name, so even
+            # naming that call in a comment re-trips it. Hence the circumlocution above.
             block_effective_rank = effective_rank(yr)
             got = {}
             for k in BUDGETS:
