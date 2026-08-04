@@ -565,7 +565,7 @@ def cross_fitted_r2(matrix: np.ndarray, adjust) -> dict:
 
 def channel_under_adjustment(x: np.ndarray, y: np.ndarray, adjust, *, strata=None,
                              n_permutations: int = 2000, n_components: int = 16, seed: int = 42,
-                             n_jobs: int = 1, with_heldout: bool = True) -> dict:
+                             n_jobs: int = 1, with_heldout: bool = True, adjust_y=None) -> dict:
     """P1's channel statistic and its pairing null, under any adjustment.
 
     Generalises ``calibration.permutation_null`` in exactly one respect: the fixed
@@ -581,14 +581,30 @@ def channel_under_adjustment(x: np.ndarray, y: np.ndarray, adjust, *, strata=Non
     within-cancer *label* null uninterpretable on TCGA does not arise here: this
     permutes the patient **pairing** between two blocks, not a label inside a stratum.
     Both are computed by the CLI and the within-cancer one is quoted, as P1 4.4 does.
+
+    ``adjust_y`` defaults to ``adjust`` and exists for one case only: an **inductive**
+    adjustment (``inductive_adjustment.ConfoundAdjustmentOperator``) is a *fitted object*
+    whose ridge coefficients have one row per output column, so the operator that adjusts
+    a 256-column image block cannot be the operator that adjusts a 90-column target block.
+    Every transductive adjuster in this module is column-count agnostic and therefore
+    passes one callable, which is why the default is what it is; a test asserts that
+    leaving it ``None`` is byte-identical to passing ``adjust`` explicitly.  **Note what
+    this changes about the null:** a transductive ``adjust`` refits its nuisance model on
+    ``y[order]`` inside every permutation, so correlation *induced* by shared
+    residualisation is regenerated in the null (P1 4.6); an inductive one applies a fixed
+    map keyed to the scored rows' own design, so a permuted patient's un-removed confound
+    is not aligned with that design and is **not** regenerated.  Two arms differing in
+    that respect have nulls of different construction, and a retention computed across
+    them must say so.
     """
     x = np.asarray(x, dtype=np.float64)
     y = np.asarray(y, dtype=np.float64)
+    adjust_y = adjust if adjust_y is None else adjust_y
     rng = np.random.default_rng(seed)
     x_adjusted = adjust(x)
     strata = np.zeros(len(x), dtype=int) if strata is None else np.asarray(strata)
 
-    y_adjusted = adjust(y)
+    y_adjusted = adjust_y(y)
     observed = top_canonical_correlation(x_adjusted, y_adjusted, n_components=n_components)
     orders = []
     for _ in range(n_permutations):
@@ -599,7 +615,7 @@ def channel_under_adjustment(x: np.ndarray, y: np.ndarray, adjust, *, strata=Non
         orders.append((order,))
 
     def _one_permutation(order):
-        return top_canonical_correlation(x_adjusted, adjust(y[order]), n_components=n_components)
+        return top_canonical_correlation(x_adjusted, adjust_y(y[order]), n_components=n_components)
 
     record = {"observed_top_cca": float(observed), "n_permutations": int(n_permutations),
               "n_components": int(n_components)}
@@ -659,7 +675,7 @@ def corrected_multiple(record: dict) -> float:
 
 def labels_only_ceiling(design: np.ndarray, y: np.ndarray, *, n_components: int = 16,
                         seed: int = 42, adjust=None, strata=None, n_permutations: int = 0,
-                        n_jobs: int = 1) -> dict:
+                        n_jobs: int = 1, adjust_y=None) -> dict:
     """The channel obtainable from the confound labels alone, with no image features.
 
     The bound from the other side.  ``design`` stands in for the image representation --
@@ -681,7 +697,7 @@ def labels_only_ceiling(design: np.ndarray, y: np.ndarray, *, n_components: int 
     if adjust is not None:
         record["adjusted"] = channel_under_adjustment(
             design, y, adjust, strata=strata, n_permutations=n_permutations,
-            n_components=n_components, seed=seed, n_jobs=n_jobs)
+            n_components=n_components, seed=seed, n_jobs=n_jobs, adjust_y=adjust_y)
     return record
 
 
