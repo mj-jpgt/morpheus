@@ -170,3 +170,66 @@ def test_variance_decomposition_flags_an_unstable_dominant_component():
     wobbly = A.variance_decomposition([0.50, 0.56, 0.46, 0.53, 0.49],
                                       d1_centred, d1_uncentred)
     assert wobbly["spike_share_of_uncentred_variance"] > 1.0
+
+
+# ---------------------------------------------------------------------------
+# the vendored result, re-read so that a number quoted in the notebook entry
+# cannot drift from the file it came from
+# ---------------------------------------------------------------------------
+VENDORED = REPO / "v2" / "research" / "rebase" / "p2" / "figures" / "data" / "ws_amp" / "out"
+
+
+@pytest.fixture(scope="module")
+def verdict():
+    import json
+    return json.loads((VENDORED / "P2_CENTRING_VERDICT.json").read_text(encoding="utf-8"))
+
+
+def test_the_vendored_verdicts_are_the_ones_reported(verdict):
+    """The headline: the derivation survives its own premise and the data does not."""
+    real = {k: verdict["real"][k]["verdict"] for k in ("P1", "P2", "P3", "P3b", "P4", "P5")}
+    assert real == {"P1": "not falsified", "P2": "falsified", "P3": "not falsified",
+                    "P3b": "falsified", "P4": "falsified", "P5": "not falsified"}
+    synthetic = {c: {k: verdict["synthetic"][c][k]["verdict"] for k in ("S1", "S2", "S3", "S4")}
+                 for c in ("t_pinned", "stable_mean", "unstable_mean")}
+    assert synthetic["t_pinned"]["S1"] == "not falsified"
+    assert synthetic["t_pinned"]["S2"] == "not falsified"
+    assert synthetic["stable_mean"]["S1"] == "falsified"
+    assert synthetic["unstable_mean"]["S1"] == "falsified"
+    # S4 fails everywhere, including where the derivation is exact -- the predeclared
+    # ORDERING gloss was wrong for a -> inf, not the general formula
+    assert all(s["S4"] == "falsified" for s in synthetic.values())
+
+
+def test_the_derived_form_is_exact_where_its_premise_holds_and_the_naive_one_is_not(verdict):
+    pinned = verdict["synthetic"]["t_pinned"]
+    assert pinned["S1"]["median_relative_error"] < 0.002
+    assert pinned["S2"]["median_relative_error_naive"] > 0.45
+    unstable = verdict["synthetic"]["unstable_mean"]["detail"]
+    assert min(r["A_observed"] for r in unstable) < 0.2, (
+        "the unstable-mean condition must show centring IMPROVING reproducibility")
+
+
+def test_the_measured_shared_direction_is_not_the_one_the_observation_quoted(verdict):
+    """f on the exported wsi_biology block is ~0.992, not the 0.8133 of a different block."""
+    import json
+    real = json.loads((VENDORED / "P2_CENTRING_AMPLIFICATION_REAL.json").read_text(
+        encoding="utf-8"))
+    f = [real["repeats"][r]["views"]["wsi_biology"]["raw"]["f"]
+         for r in sorted(real["repeats"])]
+    assert min(f) > 0.99 and max(f) < 1.0
+    rna = [real["repeats"][r]["views"]["rna_biology"]["raw"]["f"]
+           for r in sorted(real["repeats"])]
+    assert 0.25 < min(rna) and max(rna) < 0.29
+    # residualisation removes the shared direction entirely, so the law predicts
+    # NOTHING about a comparison between two residualised views
+    resid = [real["repeats"][r]["views"][v]["residualised"]["f"]
+             for r in sorted(real["repeats"])
+             for v in ("wsi_biology", "rna_biology", "full_biology")]
+    assert max(resid) < 1e-20
+
+
+def test_more_than_half_the_view_effect_predates_centring(verdict):
+    p5 = verdict["real"]["P5"]
+    assert p5["fraction_of_the_view_effect_present_before_centring"] == pytest.approx(
+        0.5256, abs=5e-4)

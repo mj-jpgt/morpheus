@@ -242,6 +242,11 @@ SVD_ALLOWLIST = {
     "v2/calibra/claim_guards.py",                # the token appears only in prose
     "tests/test_claim_guards.py",                # ditto
     "v2/tests/test_effective_rank_canonical.py", # this file, which names the tokens
+    # Names the same tokens for the opposite reason: it asserts that
+    # `p2_centring_amplification.py` and `p2_centring_verdict.py` contain NONE of
+    # them, i.e. that the centring-amplification work reaches every spectrum
+    # through an import. The tokens appear only inside that assertion's own list.
+    "v2/tests/test_p2_centring_amplification.py",
 }
 
 RANK_SHAPED = ("svdvals", "linalg.svd")
