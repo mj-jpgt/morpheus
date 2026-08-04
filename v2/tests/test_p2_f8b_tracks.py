@@ -89,6 +89,36 @@ def test_collapse_evidence_has_endpoints_only_and_carries_the_16_of_16_pinning()
         assert pinned["note"] == "max 16"
 
 
+#: `v2/research/rebase/p2/figures/data/e0_run/` vendors the same two logs a second time, for the
+#: figure-drawing pipeline. Two copies of one piece of evidence is the drift hazard this project
+#: keeps re-learning, so if the second copy is present it must agree with the digest-enforced one.
+DUPLICATES = {
+    "collapse_diag.log": "figures/data/e0_run/collapse_diag.log",
+    "diag_d.log": "figures/data/e0_run/d1_diag/diag_d.log",
+}
+
+
+def test_the_second_vendored_copy_of_each_log_agrees_with_this_one() -> None:
+    """Compared on CONTENT, with line endings normalised.
+
+    The `figures/data/` copies carry no `text` attribute, so a checkout with `core.autocrlf=true`
+    rewrites their bytes and their sha256 changes while their content does not. Hashing them raw
+    would turn every Windows checkout red for a non-problem; comparing normalised content still
+    catches the failure that matters, which is the two copies genuinely diverging. That those copies
+    are unprotected is a real gap and is recorded in
+    `NOTEBOOK_ENTRIES/f8b_tracks_and_hill_order_inset_20260804T0630Z.md`, not fixed here -- the
+    directory belongs to concurrent work.
+    """
+    root = p2_f8b_tracks.LOG_DIR.parent
+    for name, relative in DUPLICATES.items():
+        other = root / relative
+        if not other.is_file():  # the figure pipeline is free not to vendor them
+            continue
+        mine = (p2_f8b_tracks.LOG_DIR / name).read_bytes().replace(b"\r\n", b"\n")
+        theirs = other.read_bytes().replace(b"\r\n", b"\n")
+        assert mine == theirs, f"{name} and {relative} have diverged"
+
+
 def test_the_negative_pairs_are_the_higher_ones_in_the_collapsed_arm() -> None:
     """0.9960 > 0.9959: the reading that makes the instance evidence rather than an anomaly."""
     arms = p2_f8b_tracks.build()["endpoint_pairs_only"]["arms"]

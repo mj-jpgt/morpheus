@@ -173,6 +173,25 @@ inset is about.
 
 ---
 
+## 3b. The same two logs are now vendored twice, and only one copy is protected
+
+Commit `84b1bf9` (concurrent figure work, landed while this was in flight) vendors
+`collapse_diag.log` and `d1_diag/diag_d.log` a second time under
+`v2/research/rebase/p2/figures/data/e0_run/`. Both copies are byte-identical to the box originals
+**at this commit** — checked, same sha256 as the `collapse_tracks/` copies.
+
+The gap: `git check-attr text` reports `unspecified` for the `figures/data/` copies, so a checkout
+with `core.autocrlf=true` (this project's Windows default) rewrites their bytes and their digests
+change. The `collapse_tracks/` copies are protected by their own `.gitattributes` (`* -text`) and
+are digest-enforced on every parse. **Two copies of one piece of evidence, one of them unprotected,
+is the drift hazard this project keeps re-learning**; the right end state is one copy.
+
+Not resolved here, because the directory belongs to concurrent work. What is in place instead:
+`test_p2_f8b_tracks.py::test_the_second_vendored_copy_of_each_log_agrees_with_this_one` compares the
+two copies on **line-ending-normalised content**, so a genuine divergence fails the suite while an EOL
+rewrite does not. Whoever owns `figures/data/` should either add `* -text` there or drop the
+duplicate and read from `collapse_tracks/`.
+
 ## 4. Reproduced on a byte-verified box workspace
 
 Per the workspace discipline in `WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md`, both scripts were
