@@ -216,6 +216,13 @@ SVD_ALLOWLIST = {
     # imported by nothing, and its function is named `legacy_r1_absolute_cut` precisely
     # so it can never be mistaken for the live definition.
     "v2/research/rebase/rank_recompute_all_instances.py",
+    # The four PUBLISHED ALTERNATIVE criteria of P2 §4.6 -- RankMe as published (uncentred,
+    # eps inside the normalisation), alpha-ReQ's eigenspectrum-decay fit, LiDAR's whitened
+    # between-class scatter, and two second-moment statistics (eigenvalue participation ratio
+    # and stable rank). None of them is effective rank, all of them must NOT be routed through
+    # `spectral.py`, and the whole point of the section is to score them against it. Effective
+    # rank itself is never reimplemented in this directory: `p2_rank_variants.py` imports it.
+    "v2/research/rebase/p2/p2_competing_metrics.py",
     "v2/calibra/claim_guards.py",                # the token appears only in prose
     "tests/test_claim_guards.py",                # ditto
     "v2/tests/test_effective_rank_canonical.py", # this file, which names the tokens
