@@ -173,6 +173,24 @@ inset is about.
 
 ---
 
+## 4. Reproduced on a byte-verified box workspace
+
+Per the workspace discipline in `WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md`, both scripts were
+re-run on `ubuntu@150.136.45.194` from a workspace built by `git archive` at commit `e5d6eee` and
+verified **before** execution:
+
+* `git -c core.autocrlf=false archive HEAD` (the override matters — with `autocrlf` honoured, the
+  archive is CRLF-converted and every text blob mismatches), one tarball, no per-file `scp`;
+* per-file `git hash-object` against `git ls-tree -r HEAD`: **452/452 verified, 0 mismatched**, and
+  452 files on disk, so the count matches as well as the digests;
+* `~/ws_e1apt/morpheus`, a new workspace; no other agent's tree touched. CPU only, thread-capped.
+
+Both scripts print **identical output** to the local run — the inset table to every digit including
+`R2/PR spans 1.000 to 5.923`, and the F8(b) parser including the sha256 check on both vendored logs,
+which passes through `git archive` because `collapse_tracks/.gitattributes` marks them `-text`.
+`v2/tests/test_p2_hill_order_inset.py`, `v2/tests/test_p2_f8b_tracks.py` and
+`v2/tests/test_effective_rank_canonical.py`: **24 passed** on the verified tree.
+
 ## Files / commits
 
 New: `v2/research/rebase/p2/p2_f8b_tracks.py`, `v2/research/rebase/p2/p2_hill_order_inset.py`,
