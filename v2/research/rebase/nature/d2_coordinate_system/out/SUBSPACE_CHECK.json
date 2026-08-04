@@ -1,0 +1,24 @@
+{
+  "k": 16,
+  "n_test": 2766,
+  "cond_of_random_map": 65.89717746995477,
+  "values": {
+    "original_128_columns": 0.5559870774245027,
+    "a_rank16_reconstruction": 0.5559870774245023,
+    "b_rank16_random_invertible_reparam": 0.5559870774245028,
+    "c_top16_PCs_rescaled": 0.5559870774245022,
+    "d_rank32_reconstruction_NOT_A_CONTROL": 0.5559870774245028,
+    "e_PCs_17_to_32_only_CONTROL": 0.33174597230817454,
+    "f_spectrum_reversed_CONTROL": 0.16039807160246525
+  },
+  "invariant_probes_passing": [
+    "a_rank16_reconstruction",
+    "b_rank16_random_invertible_reparam",
+    "c_top16_PCs_rescaled"
+  ],
+  "controls": {
+    "e_PCs_17_to_32_only_CONTROL": true,
+    "f_spectrum_reversed_CONTROL": true
+  },
+  "negative_control_differs": true
+}

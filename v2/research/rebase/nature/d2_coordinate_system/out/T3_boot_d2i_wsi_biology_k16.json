@@ -1,0 +1,65 @@
+{
+  "arm": "d2_i",
+  "state": "wsi_biology",
+  "k": 16,
+  "repeats": 400,
+  "n_test": 2766,
+  "n_design_columns": 108,
+  "n_sites_kept": 84,
+  "seed": 42,
+  "symmetry_check": {
+    "forward": 0.5216845349077298,
+    "reverse": 0.5216845349077298
+  },
+  "points": {
+    "PBS": 0.5216845349077298,
+    "PCA": 0.5400561549050248,
+    "RANDDICT": 0.44149683073537416
+  },
+  "contrasts": {
+    "PCA_minus_PBS": {
+      "patient": {
+        "n_valid": 400,
+        "mean_delta": 0.017624178965604354,
+        "ci95_low": 0.00480902474729433,
+        "ci95_high": 0.030784589633391802,
+        "p_improve": 0.9925,
+        "mode": "patient",
+        "repeats": 400,
+        "point_delta": 0.018371619997294975
+      },
+      "cancer": {
+        "n_valid": 400,
+        "mean_delta": 0.019439275367082166,
+        "ci95_low": -0.005819386460811043,
+        "ci95_high": 0.04104352522913197,
+        "p_improve": 0.9375,
+        "mode": "cancer",
+        "repeats": 400,
+        "point_delta": 0.018371619997294975
+      }
+    },
+    "PBS_minus_RANDDICT": {
+      "patient": {
+        "n_valid": 400,
+        "mean_delta": 0.06921035052726017,
+        "ci95_low": 0.03744498416529228,
+        "ci95_high": 0.10131596697207965,
+        "p_improve": 1.0,
+        "mode": "patient",
+        "repeats": 400,
+        "point_delta": 0.08018770417235566
+      },
+      "cancer": {
+        "n_valid": 400,
+        "mean_delta": 0.05133013645469424,
+        "ci95_low": 0.010215924029358414,
+        "ci95_high": 0.0902690393184446,
+        "p_improve": 0.995,
+        "mode": "cancer",
+        "repeats": 400,
+        "point_delta": 0.08018770417235566
+      }
+    }
+  }
+}
