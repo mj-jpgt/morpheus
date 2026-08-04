@@ -180,6 +180,36 @@ VENDORED = [
 VENDORED += [f"e0_run/d1_probefloor/probefloor_m{m}_rep{r}.log"
              for m in ("0.999", "0.0") for r in range(1, 6)]
 
+#: THE CENTRING MEASUREMENT. §6.2's last open row: the RNA-view mutual cosine
+#: recomputed on the CENTRED representation for §5.2a's three `lr = 1e-3` arms,
+#: which needed those runs' activations and so needed the runs re-done with
+#: `export_dir` attached. Three same-seed repeats of each arm rather than the one
+#: seed §5.2a has, so that "moves" and "flat" are verdicts against a measured
+#: spread. The reading rule was predeclared at
+#: `NOTEBOOK_ENTRIES/PREDECLARED_centred_cosine_20260804T1700Z.md` before any arm
+#: ran. The JSON carries the sha256 of every state it read and the state/log
+#: guard's per-row deltas.
+VENDORED += ["e0_run/d1_lrcentre/out/P2_CENTRED_COSINE.json",
+             "e0_run/d1_lrcentre/out/centred_cosine_run.log"]
+VENDORED += [f"e0_run/d1_lrcentre/lrc_m{m}_rep{r}.log"
+             for m in ("0", "0.9", "0.999") for r in range(1, 4)]
+
+#: THE THREE FLOORS THAT CLOSE §4.1a'S THREE UNJUDGEABLE ROWS. Each was named in
+#: §6.2 with what it would cost, and each is the same measurement at a setting no
+#: repeat had been run at: a **step-600** budget for §5.4 row 1, a third arm at
+#: **m = 0.99** for §5.4 limit 2, and **capacity 64** against capacity 4,096 for
+#: §5.2 measurement 3, read at the step its own logs turn out to record. Scored
+#: once per PAIR, because the two step-600 rows do not share a second arm.
+VENDORED += ["e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+             "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+             "e0_run/d1_probefloor600/out/probe_floors600_run.log",
+             "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+             "e0_run/d1_capfloor/out/cap_floors_run.log"]
+VENDORED += [f"e0_run/d1_probefloor600/pf600_m{m}_rep{r}.log"
+             for m in ("0.999", "0", "0.99") for r in range(1, 6)]
+VENDORED += [f"e0_run/d1_capfloor/cap_cap{c}_rep{r}.log"
+             for c in ("64", "4096") for r in range(1, 6)]
+
 # --------------------------------------------------------------------------
 # Extractors: run on the box, print JSON on stdout, written under data/extracted/
 # --------------------------------------------------------------------------
