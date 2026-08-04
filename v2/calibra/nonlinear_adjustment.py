@@ -79,7 +79,8 @@ __all__ = ["cell_codes", "cell_design", "saturated_cell_residuals", "kernel_ridg
            "KernelRidgeAdjuster", "forest_residuals", "cross_fitted_location_scale",
            "make_adjuster", "adjuster_agreement", "cross_fitted_r2",
            "channel_under_adjustment", "labels_only_ceiling", "ADJUSTER_MODELS",
-           "in_sample_residuals", "row_shuffled", "cross_fitting_offset_energy"]
+           "in_sample_residuals", "row_shuffled", "cross_fitting_offset_energy",
+           "regenerated_adjustment_null"]
 
 #: Every adjustment arm this module can build, by name.  ``ridge`` is the incumbent and
 #: is ``cross_fitted_residuals`` itself, not a copy.
@@ -380,6 +381,75 @@ def cross_fitting_offset_energy(residual: np.ndarray, codes: np.ndarray,
         "n_cells": n_cells,
         "n_folds": int(len(folds)),
     }
+
+
+def regenerated_adjustment_null(x: np.ndarray, class_index: np.ndarray, n_classes: int, adjust, *,
+                                k_grid=(1, 3, 5, 10, 15, 25, 50), n_splits: int = 5,
+                                seed: int = 42, n_permutations: int = 200, n_jobs: int = 1) -> dict:
+    """The confound probe against a null that **regenerates the adjustment inside itself**.
+
+    This is the null the k-NN confound probe needs and does not have, and the asymmetry is
+    the whole point:
+
+    * ``calibration.permutation_null`` -- the channel's null -- permutes the pairing and
+      then **re-residualises** ``y`` on every permutation (``calibration.py:158``).  Any
+      correlation the shared residualisation *induces* between two blocks is therefore
+      regenerated inside the null, which is why P1 4.6's induced-correlation floor does
+      not inflate the channel's ``permutation_p``.
+    * ``nonlinear_confound_probe.probe_state`` permutes the **labels** of an
+      already-adjusted feature matrix.  A structure that the adjustment tied to the *true*
+      cells is broken in the null and intact in the observed, so it is scored as surviving
+      confound rather than as chance.
+
+    Cross-fitted residualisation leaves exactly such a structure: each (cell x fold) group
+    is displaced by that fold's estimation error, an offset shared by every patient in the
+    group.  Here the null permutes the **rows of the block before the adjustment**, so
+    every draw carries an adjustment artefact of its own size and the observed value is
+    graded against it.  The labels, the design, the cell structure and the probe folds are
+    untouched; only the association between the block and the labels is destroyed.
+
+    The reading is the maximum over ``k_grid`` and over both vote rules, computed the same
+    way in the observed and in every permutation, so the null is a null *for the statistic
+    being quoted* rather than for one arbitrary member of the grid.
+    """
+    from .confound_certificate import _stratified_folds
+    from .nonlinear_confound_probe import knn_balanced_accuracy_oof, null_summary
+
+    x = np.asarray(x, dtype=np.float64)
+    class_index = np.asarray(class_index, dtype=np.int64)
+    folds = _stratified_folds(class_index, n_splits, seed)
+    grid = [(int(k), bool(prior)) for k in k_grid for prior in (False, True)]
+
+    def _reading(block: np.ndarray) -> float:
+        return max(knn_balanced_accuracy_oof(block, class_index, n_classes, k=k,
+                                             n_splits=n_splits, seed=seed, folds=folds,
+                                             prior_correction=prior)
+                   for k, prior in grid)
+
+    adjusted = adjust(x)
+    observed = float(_reading(adjusted))
+    per_probe = {f"knn_{'prior_' if prior else ''}k{k}":
+                 float(knn_balanced_accuracy_oof(adjusted, class_index, n_classes, k=k,
+                                                 n_splits=n_splits, seed=seed, folds=folds,
+                                                 prior_correction=prior))
+                 for k, prior in grid}
+
+    rng = np.random.default_rng(seed)
+    orders = [(rng.permutation(len(x)),) for _ in range(n_permutations)]
+
+    def _one(order):
+        return _reading(adjust(x[order]))
+
+    record = {"observed": observed, "multiple_of_chance": observed * float(n_classes),
+              "chance_rate": 1.0 / float(n_classes), "n_classes": int(n_classes),
+              "per_probe_observed": per_probe, "k_grid": [int(k) for k in k_grid]}
+    if n_permutations > 0:
+        null = np.asarray(_map(_one, orders, n_jobs), dtype=np.float64)
+        record["regenerated_null"] = null_summary(null, observed)
+        record["regenerated_null"]["null_median_multiple_of_chance"] = (
+            float(np.median(null)) * float(n_classes))
+        record["excess_multiple"] = (observed - float(np.median(null))) * float(n_classes)
+    return record
 
 
 # --- arm construction --------------------------------------------------------------------
@@ -685,6 +755,9 @@ def main() -> None:
     parser.add_argument("--probe-permutations", type=int, default=200)
     parser.add_argument("--probe-k-grid", default="1,3,5,10,15,25,50")
     parser.add_argument("--ceiling", action="store_true", help="step 2: the labels-only ceiling")
+    parser.add_argument("--regenerated-null", action="store_true",
+                        help="grade the confound probe against a null that REGENERATES the "
+                             "adjustment inside each permutation, as the channel's null does")
     parser.add_argument("--shuffle-control", action="store_true",
                         help="also probe the ROW-SHUFFLED block through the same adjuster: the "
                              "negative control for structure the adjustment itself introduces")
@@ -772,6 +845,25 @@ def main() -> None:
 
                 record["offset_energy"] = cross_fitting_offset_energy(
                     adjusted_x, block["codes"], n_splits=args.n_splits, seed=args.seed)
+
+                if args.regenerated_null:
+                    from .confound_certificate import _encode
+                    k_grid = tuple(int(v) for v in str(args.probe_k_grid).split(",") if v.strip())
+                    regenerated = {}
+                    for target, labels in (("site", block["tss"]), ("cancer", block["cancers"])):
+                        classes, class_index = _encode(np.asarray(labels).astype(str))
+                        regenerated[target] = regenerated_adjustment_null(
+                            block["x"], class_index, int(len(classes)), adjust, k_grid=k_grid,
+                            n_splits=args.n_splits, seed=args.seed,
+                            n_permutations=args.probe_permutations, n_jobs=args.n_jobs)
+                        r = regenerated[target]["regenerated_null"]
+                        print("      [regen %s::%s %s] obs=%.4f (%.2fx) null_med=%.4f (%.2fx) "
+                              "p95=%.4f p=%.4f" % (
+                                  key_prefix, name, target, regenerated[target]["observed"],
+                                  regenerated[target]["multiple_of_chance"], r["null_median"],
+                                  r["null_median_multiple_of_chance"], r["null_p95"],
+                                  r["permutation_p"]), flush=True)
+                    record["regenerated_adjustment_null"] = regenerated
 
                 if args.probe:
                     k_grid = tuple(int(v) for v in str(args.probe_k_grid).split(",") if v.strip())

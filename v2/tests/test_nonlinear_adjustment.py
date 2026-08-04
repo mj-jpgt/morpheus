@@ -26,7 +26,8 @@ from morpheus.v2.calibra.nonlinear_adjustment import (ADJUSTER_MODELS, KernelRid
                                                       cross_fitting_offset_energy, forest_residuals,
                                                       in_sample_residuals, kernel_ridge_residuals,
                                                       labels_only_ceiling, make_adjuster,
-                                                      row_shuffled, saturated_cell_residuals)
+                                                      regenerated_adjustment_null, row_shuffled,
+                                                      saturated_cell_residuals)
 from morpheus.v2.calibra.nonlinear_confound_probe import knn_balanced_accuracy_oof
 from morpheus.v2.calibra.residualise import confound_design, cross_fitted_residuals
 
@@ -225,6 +226,47 @@ def test_row_shuffle_preserves_geometry_and_destroys_the_association():
     shuffled = row_shuffled(x, seed=42)
     assert sorted(map(tuple, shuffled.tolist())) == sorted(map(tuple, x.tolist()))
     assert not np.array_equal(shuffled, x)
+
+
+def test_regenerated_null_calls_a_pure_artefact_chance_and_a_real_confound_signal():
+    """The two directions of the corrected null, on data whose truth is known.
+
+    Block A has no confound at all, so a null that regenerates the adjustment must not
+    call it significant however much the adjustment inflates the label-permutation
+    reading.  Block B carries a genuine class mean shift far larger than the adjustment
+    can remove, and must still be called significant -- otherwise the corrected null is
+    merely insensitive rather than correct.
+    """
+    rng = np.random.default_rng(13)
+    n, n_cells, p = 600, 12, 10
+    codes = rng.integers(0, n_cells, n)
+    design = cell_design(codes)
+    adjust = make_adjuster("ridge", design=design, n_splits=5, seed=42)
+
+    pure_noise = rng.normal(size=(n, p))
+    artefact = regenerated_adjustment_null(pure_noise, codes, n_cells, adjust, k_grid=(1, 5),
+                                           n_permutations=30, seed=42)
+    assert artefact["regenerated_null"]["permutation_p"] > 0.05
+
+    strong = pure_noise + np.eye(n_cells)[codes] @ rng.normal(size=(n_cells, p)) * 6.0
+    # a signal the adjustment cannot reach: give the probe a block adjusted by a design
+    # that knows nothing about the cells
+    blind = make_adjuster("ridge", design=np.ones((n, 1)), n_splits=5, seed=42)
+    real = regenerated_adjustment_null(strong, codes, n_cells, blind, k_grid=(1, 5),
+                                       n_permutations=30, seed=42)
+    assert real["regenerated_null"]["permutation_p"] <= 1.0 / 31.0 + 1e-9
+    assert real["multiple_of_chance"] > 3.0
+
+
+def test_regenerated_null_reports_every_probe_in_the_grid():
+    rng = np.random.default_rng(17)
+    codes = rng.integers(0, 6, 300)
+    x = rng.normal(size=(300, 5))
+    record = regenerated_adjustment_null(x, codes, 6, make_adjuster("none"), k_grid=(1, 5),
+                                         n_permutations=0, seed=42)
+    assert set(record["per_probe_observed"]) == {"knn_k1", "knn_prior_k1", "knn_k5", "knn_prior_k5"}
+    assert record["observed"] == max(record["per_probe_observed"].values())
+    assert "regenerated_null" not in record
 
 
 def test_a_pure_noise_block_can_still_be_probed_after_cross_fitted_adjustment():
