@@ -182,6 +182,40 @@ def test_probe_state_reports_both_nulls_the_linear_reference_and_every_k():
         result["probes"]["knn_k3"]["balanced_accuracy"] * n_classes)
 
 
+def test_the_adjusted_arm_is_byte_for_byte_the_state_the_certificate_certifies():
+    """The whole claim is that the probe reads the SAME adjusted state the certificate passes.
+
+    Reconstructing that state in the probe's CLI rather than importing it would let the two
+    drift apart silently, so the reconstruction is pinned here: adjust with
+    ``cross_fitted_residuals`` on ``confound_design(cancer + pooled TSS)`` and standardise
+    per axis, and the joint LDA must equal ``certify_axes(..., residualise=True)`` exactly.
+    """
+    import pandas as pd
+
+    from morpheus.v2.calibra.confound_certificate import certify_axes
+    from morpheus.v2.calibra.residualise import (confound_design, cross_fitted_residuals,
+                                                 pooled_tissue_source_site)
+
+    rng = np.random.default_rng(5)
+    sites = ["01", "02", "03", "04"]
+    cancers = np.repeat(["BRCA", "LUAD"], 60)
+    patient_ids = np.asarray([f"TCGA-{sites[(i // 15) % 4]}-{i:04d}" for i in range(120)])
+    features = rng.normal(size=(120, 6))
+    site, _ = pooled_tissue_source_site(patient_ids, min_site_count=10)
+    _, class_index = np.unique(site, return_inverse=True)
+    design = confound_design(pd.DataFrame({"cancer": cancers, "tss": site}), ["cancer", "tss"])
+    adjusted = cross_fitted_residuals(features, design, seed=42)
+    scaled = (adjusted - adjusted.mean(axis=0)) / np.maximum(adjusted.std(axis=0), 1e-12)
+    result = probe_state(scaled, class_index.astype(np.int64), len(np.unique(site)),
+                         k_grid=(), forest_trees=0, knn_permutations=0, model_permutations=0)
+    certificate = certify_axes(features, patient_ids, cancers, min_site_count=10,
+                               n_permutations=2, n_boot=2, n_boot_axes=1, seed=42,
+                               residualise=True)
+    assert (result["linear_reference"]["joint_lda_balanced_accuracy"]
+            == certificate["joint_lda_balanced_accuracy"])
+    assert (result["linear_reference"]["per_axis_max"] == certificate["observed_max"])
+
+
 def test_probe_state_omits_the_within_stratum_null_when_no_stratum_is_given():
     features, labels, n_classes = _mean_shift_fixture(per_class=25)
     result = probe_state(features, labels, n_classes, strata=None, k_grid=(5,), forest_trees=0,
