@@ -196,7 +196,7 @@ def main() -> int:
                    fontweight="bold", linespacing=1.5)
     ax_b1.plot(steps, ranks, color=C.BLUE, marker="o", markersize=5.0,
                markeredgecolor="white", markeredgewidth=0.8, zorder=3,
-               label="centred effective rank of the SAME objective (per-step)")
+               label="centred effective rank,\nSAME objective, PER-STEP")
     for x, v in zip(steps, ranks):
         if x in (0, 25, 50, 400):
             ax_b1.annotate(f"{v:.2f}", (x, v), xytext=(0, 7), textcoords="offset points",
@@ -207,7 +207,7 @@ def main() -> int:
     ax_b1.set_ylabel("rank\nTWO DIFFERENT STATISTICS, drawn together only because\n"
                      "the withdrawal is about mistaking one for the other", fontsize=6.2)
     P.grid(ax_b1)
-    ax_b1.legend(loc="center right", bbox_to_anchor=(1.0, 0.42), handlelength=1.8)
+    ax_b1.legend(loc="lower left", bbox_to_anchor=(0.10, 0.14), handlelength=1.8)
 
     # ----------------------------------------------------------------- (b2)
     ax_b2.set_title("      ... and the collapse evidence for the same arm", pad=10)
@@ -242,13 +242,9 @@ def main() -> int:
                      "open circle = before, filled = after; ENDPOINT PAIRS AS RECORDED,\n"
                      "nothing between them is interpolated", fontsize=6.4, labelpad=6)
     P.grid(ax_b2, axis="x")
-    ax_b2.text(0.985, 0.14,
-               f"Cross-modal positive and negative pairs become indistinguishable "
-               f"({ends['cross_pos'][1]:.4f} against\n{ends['cross_neg'][1]:.4f}) - the negatives "
-               "marginally HIGHER - and in-batch InfoNCE ends at "
-               f"{ends['infonce'][1]:.4f}\nagainst its own chance of {ends['chance_infonce']:.4f}.",
-               transform=ax_b2.transAxes, ha="right", va="bottom", fontsize=6.1,
-               color=C.INK, linespacing=1.6)
+    # The "positives and negatives are now indistinguishable" reading is left to
+    # the caption: the two endpoint values are already printed on their own rows,
+    # and a sentence here can only be placed on top of one of them.
 
     # ------------------------------------------------------------------ (c)
     ax_c.set_title("(c)  The boundary: where rank stops being informative", pad=10)
@@ -325,7 +321,9 @@ def main() -> int:
         "essentially any perturbation; (ii) its maximum is 16 because the batch is 16; (iii) it is a TRAIN batch of 16, not held out; "
         "(iv) the CENTRED EFFECTIVE RANK OF THE SAME OBJECTIVE FALLS TO 1.00 by step 50, so this instance is evidence FOR the collapse-diagnostic use, "
         "not against it; (v) this project previously listed it among its two strongest instances and THAT DESCRIPTION IS WITHDRAWN, here and in P1. "
-        "Panel (b)'s 16/16 track and all four collapse-evidence quantities are ENDPOINT PAIRS as recorded in ~/e0_run/collapse_diag.log, which probes "
+        "Cross-modal POSITIVE and NEGATIVE pairs end indistinguishable, 0.9959 against 0.9960 - the negatives marginally HIGHER - and in-batch InfoNCE ends "
+        "at 2.7734 against its own chance of 2.7726. Panel (b)'s 16/16 track and all four collapse-evidence quantities are ENDPOINT PAIRS as "
+        "recorded in ~/e0_run/collapse_diag.log, which probes "
         "before and after rather than on a schedule; no per-step array exists and none is interpolated. The source script for the original 16/16 "
         "measurement is a scratchpad file on the A100 and is not in this repository. The centred effective-rank track IS per-step and is drawn as one. "
         "Panel (a) reads \"we did not falsify the collapse-diagnostic use\", never \"we verified it\": we have not found a case of total collapse that "

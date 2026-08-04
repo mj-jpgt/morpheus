@@ -176,8 +176,13 @@ def main() -> int:
     ax_c.plot(d, s["cca_heldout"], color=C.VERMILLION, marker="s",
               linestyle=P.LINESTYLES[2], markersize=5.0, markeredgecolor="white",
               markeredgewidth=0.8, zorder=3, label="held-out top-CCA, absolute")
+    # The null band is 0.002 wide on an axis that runs to 1.3, so it is drawn as a
+    # band AND as a line through it - otherwise the reader sees nothing and the
+    # "every level clears its own null" claim has no mark on the panel.
     ax_c.fill_between([-0.03, 0.95], s["null_lo"], s["null_hi"], color=C.ENVELOPE,
-                      alpha=0.55, linewidth=0, zorder=0)
+                      alpha=0.9, linewidth=0, zorder=0)
+    ax_c.axhline((s["null_lo"] + s["null_hi"]) / 2, color=C.MUTED, linewidth=1.0,
+                 linestyle=(0, (1, 1.4)), zorder=1)
     ax_c.annotate(f"permutation null median, {s['null_lo']:.3f}-{s['null_hi']:.3f}\n"
                   "at EVERY level (within-cancer, this sweep's own null)",
                   (0.02, s["null_hi"]), xytext=(0, 6), textcoords="offset points",
