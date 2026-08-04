@@ -4,7 +4,7 @@
 `NOTEBOOK_ENTRIES/PREDECLARED_nonlinear_adjustment_channel_20260804T2015Z.md`, committed `010d9c4`,
 **before** the instrument existed and before any number below existed. **How obtained:**
 `v2/calibra/nonlinear_adjustment.py` (new, 25 tests) on the A100 box (150.136.45.194), workspaces
-`~/ws_nla{,2,3,4,5}` and `~/ws_nlabase`, each deployed by `git -c core.autocrlf=false archive HEAD` and
+`~/ws_nla{,2,3,4,5}`, `~/ws_nlafinal` and `~/ws_nlabase`, each deployed by `git -c core.autocrlf=false archive HEAD` and
 verified file-by-file against `git ls-tree -r HEAD` blob SHA-1 — **669–670 files, 0 mismatches,
 every time**. Thread caps `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`, process parallelism, CPU only; the box
 carried a co-tenant load of 20–50 on 30 cores throughout. Outputs
@@ -482,9 +482,10 @@ an adjusted block measures the estimator's chance rate but **not** the adjustmen
 
 ### 11. Suite status, files, outputs
 
-**Suite.** On the box in `~/venv`, `morpheus/v2/tests`: **467 passed, 1 failed, 27 errors** at this
-run's HEAD, against **443 passed, 1 failed, 27 errors** at the parent commit `ff9a6f9` on the same
-workspace machinery. The delta is exactly the **24** new tests (25 at the final commit). The 27 errors
+**Suite.** On the box in `~/venv`, `morpheus/v2/tests`: **468 passed, 1 failed, 27 errors** at this
+run's final commit (`~/ws_nlafinal`, 670 files, 0 blob mismatches), against **443 passed, 1 failed,
+27 errors** at the parent commit `ff9a6f9` on the same workspace machinery (`~/ws_nlabase`). The
+delta is exactly the **25** new tests. The 27 errors
 are `test_p2_figures.py`, which needs matplotlib, absent from that venv by policy. **The 1 failure is
 pre-existing and unrelated**: `test_inductive_adjustment.py::test_one_row_at_a_time_equals_the_whole_block`
 fails identically at `ff9a6f9` on this box — an `np.allclose(..., atol=0, rtol=0)` exact-equality
@@ -493,7 +494,8 @@ and flagged, not fixed, since it is not this run's file. Locally (numpy 2.4.3 / 
 passes at both commits, so it is an environment-sensitive exact-equality assertion.
 
 **Files.** `v2/calibra/nonlinear_adjustment.py`, `v2/tests/test_nonlinear_adjustment.py` — commits
-`52154ef`, `1ab5586`, `efee0f8`, `73caac7`, `b7c189c`, `b7f9e49` on `research/rebase-vision`. Predeclaration
+`52154ef`, `1ab5586`, `efee0f8`, `73caac7`, `b7c189c`, `b7f9e49` on `research/rebase-vision`.
+Predeclaration
 `010d9c4`. **No statistic is computed inline anywhere**: `top_canonical_correlation`,
 `heldout_top_cca`, `effective_rank`, `cross_fitted_residuals`, `confound_design`,
 `pooled_tissue_source_site`, `probe_state`, `knn_balanced_accuracy_oof`, `global_permutations`,
