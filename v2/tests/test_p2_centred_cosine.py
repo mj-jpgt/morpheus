@@ -174,3 +174,75 @@ def test_the_thresholds_are_the_predeclared_ones():
     got = _synthetic({"rep1": 0.01}, {"m0": 0.5})
     assert got["moves_threshold"] == 0.20 and got["flat_threshold"] == 0.10
     assert "PREDECLARED_centred_cosine_20260804T1700Z" in got["rule"]
+
+
+# --------------------------------------------------------------------------
+# The measurement itself, pinned against the file it was measured into
+# --------------------------------------------------------------------------
+@pytest.fixture(scope="module")
+def measured():
+    import json  # noqa: PLC0415
+
+    from morpheus.v2.research.rebase.p2 import p2_floor_audit as A  # noqa: PLC0415
+    path = A.DATA / "e0_run" / "d1_lrcentre" / "out" / "P2_CENTRED_COSINE.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def test_the_states_are_the_states_the_harness_printed_its_column_from(measured):
+    """The stopping condition, checked as a result rather than trusted as a step.
+
+    If the recomputed uncentred cosine were not the harness's own `rna-rna`
+    column, nothing in this measurement would mean what it says -- so the guard's
+    own numbers are asserted here and not only run on the box.
+    """
+    guard = measured["state_log_guard"]
+    assert guard["rows"] == 45
+    assert guard["max_abs_delta"] < 1e-4
+    for row in guard["checked"]:
+        assert abs(row["recomputed"] - row["printed"]) < 1e-4, row
+
+
+def test_the_dissociation_is_inside_the_cosines_own_retraining_spread(measured):
+    """§5.2a's premise, tested and not reproduced -- the entry's whole result.
+
+    The uncentred RNA-view cosine's spread ACROSS the three arms is smaller, in
+    every one of the three repeat draws, than its spread WITHIN one arm over
+    three identical same-seed retrains. By this paper's own criterion no arm
+    difference may be read off it, so neither account of §5.2a's dissociation is
+    testable and the predeclared rule returns its third branch.
+    """
+    v = measured["verdict"]["mutual_cosine_uncentred"]
+    assert max(v["across_arm_spread_per_repeat"].values()) < v["floor"]
+    assert v["clears_own_floor"] is False
+    assert v["floor_arm"] == "m0"
+    assert measured["verdict"]["reading"].startswith("neither")
+
+
+def test_the_rank_half_of_the_premise_does_reproduce(measured):
+    """Rank IS flat across the three arms -- and flat inside its own floor too.
+
+    Which is why the finding is "both instruments agree the three arms are
+    indistinguishable" rather than "rank was right" or "rank was wrong".
+    """
+    arms = ("m0", "m09", "m0999")
+    for view in ("wsi_biology", "rna_biology"):
+        for rep in ("rep1", "rep2", "rep3"):
+            values = [measured["reps"][a][rep]["200"]["views"][view]["R3"] for a in arms]
+            assert max(values) / min(values) < 1.30, (view, rep, values)
+
+
+def test_the_view_mismatch_is_measured_and_does_not_carry_the_result(measured):
+    """`geometry()` reads rank on the WSI view and the cosine on the RNA view.
+
+    The draft pairs the two as though they were one block. They are not, so the
+    RNA-view rank is scored too -- and it is as flat as the WSI-view rank, which
+    is what rules out the third account.
+    """
+    assert measured["config"]["cosine_view"] == "rna_biology"
+    assert "view mismatch" in measured["config"]["views_note"]
+    arms = ("m0", "m09", "m0999")
+    for rep in ("rep1", "rep2", "rep3"):
+        rna = [measured["reps"][a][rep]["200"]["views"]["rna_biology"]["R3"] for a in arms]
+        wsi = [measured["reps"][a][rep]["200"]["views"]["wsi_biology"]["R3"] for a in arms]
+        # neither view separates the arms by more than the other does by much
+        assert abs((max(rna) / min(rna)) - (max(wsi) / min(wsi))) < 0.30, (rep, rna, wsi)
