@@ -61,6 +61,12 @@ VENDORED = [
     # checkpoint that establishes readout determinism.
     "e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json",
     "e0_run/d2_v3/RECOVERED_SEED42_READOUT.json",
+    # The controlled retraining envelope: five identical `programme_only` runs at
+    # seed 42, read out by v2/research/rebase/d1_envelope_readout.py. This log is
+    # the SOURCE OF RECORD for F1(a)/(b)/(d) -- the extractor below parses it
+    # rather than recomputing anything, so the figure and the paper quote the
+    # same bytes.
+    "e0_run/d1_envelope_readout.log",
     # Collapse diagnostics. collapse_diag.log is the source of record for the
     # "16/16" instance and holds ENDPOINT PAIRS ONLY -- see F8(b).
     "e0_run/collapse_diag.log",
@@ -122,15 +128,61 @@ for name, path in RUNS.items():
 print(json.dumps(out, indent=1, sort_keys=True))
 """
 
-#: F1's controlled retraining repeat, and F8(b)'s per-step collapse arrays. Both
-#: may legitimately come back empty; the figure scripts turn an empty result into
-#: a loud PENDING / NOT-RETAINED panel rather than into a silent omission.
+#: F1's controlled retraining repeat. It may legitimately come back empty; the
+#: figure script turns an empty result into a loud PENDING panel rather than into
+#: a silent omission.
+#:
+#: NOTHING IS RECOMPUTED HERE. Every rank and channel value is parsed out of
+#: `~/e0_run/d1_envelope_readout.log`, which was written by
+#: `v2/research/rebase/d1_envelope_readout.py` importing `calibra.spectral` and
+#: `calibra.residualise` -- the only place in this project a rank or channel
+#: statistic may come from. The extractor records the readout module's own git
+#: blob SHA-1 so the figure can assert it against the repository copy: a
+#: workspace whose `spectral.py` had drifted from HEAD is exactly how the
+#: variance decomposition was nearly published under a different function
+#: (`NOTEBOOK_ENTRIES/WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md`).
 F1_REPEAT_EXTRACTOR = r"""
-import json, glob, os
+import json, glob, hashlib, os, re
 root = "/home/ubuntu/e0_run/d1_envelope"
-out = {"root": root, "expected": "rep{1..5}/, rep{1..5}.npz, readout log",
+log_path = "/home/ubuntu/e0_run/d1_envelope_readout.log"
+module = "/home/ubuntu/ws_d1/morpheus/v2/research/rebase/d1_envelope_readout.py"
+out = {"root": root,
+       "readout_log": log_path,
+       "readout_module": "v2/research/rebase/d1_envelope_readout.py",
+       "readout_module_on_box": module,
+       "expected": "rep{1..5}/, rep{1..5}.npz, readout log",
+       "statistic": "R1",
+       "block": "rank_raw on the exported wsi_biology block; rank_residualised and "
+                "channel on the cancer + pooled-TSS residualised block, top-CCA at "
+                "16 components, 40 targets neither arm trained on",
        "predeclaration": "NOTEBOOK_ENTRIES/PREDECLARED_retraining_envelope_20260804T0330Z.md",
-       "reps": {}, "complete": False}
+       "reps": {}, "printed_spread": {}, "complete": False}
+
+if os.path.exists(module):
+    blob = open(module, "rb").read()
+    out["readout_module_blob_sha1"] = hashlib.sha1(
+        b"blob " + str(len(blob)).encode() + b"\0" + blob).hexdigest()
+
+readout = {}
+if os.path.exists(log_path):
+    raw = open(log_path, "rb").read()
+    out["readout_log_sha256"] = hashlib.sha256(raw).hexdigest()
+    text = raw.decode()
+    for m in re.finditer(r"^\s*(rep\d+)\.npz\s+rank_raw=\s*([0-9.]+)\s+"
+                         r"rank_resid=\s*([0-9.]+)\s+channel=([0-9.]+)\s*$", text, re.M):
+        readout[m.group(1)] = {"rank_raw": float(m.group(2)),
+                               "rank_residualised": float(m.group(3)),
+                               "channel": float(m.group(4))}
+    for label, key in (("rank (raw)", "rank_raw"),
+                       ("rank (residualised)", "rank_residualised"),
+                       ("channel", "channel")):
+        m = re.search(r"^" + re.escape(label) + r"\s+min=([0-9.]+)\s+max=([0-9.]+)"
+                      r"\s+spread=([0-9.]+)x\s*$", text, re.M)
+        if m:
+            out["printed_spread"][key] = {"min": float(m.group(1)),
+                                          "max": float(m.group(2)),
+                                          "spread": float(m.group(3))}
+
 if os.path.isdir(root):
     for d in sorted(glob.glob(root + "/rep*")):
         if not os.path.isdir(d):
@@ -141,16 +193,24 @@ if os.path.isdir(root):
         if os.path.exists(jl):
             rows = [json.loads(l) for l in open(jl) if l.strip()]
         npz = os.path.join(root, name + ".npz")
-        out["reps"][name] = {
+        entry = {
             "epochs_logged": len(rows),
             "last_epoch": (rows[-1].get("epoch") if rows else None),
             "artifact_npz": npz if os.path.exists(npz) else None,
-            "rank": None,
-            "channel": None,
+            "rank_raw": None, "rank_residualised": None, "channel": None,
         }
-    # Complete iff every rep has an exported artifact AND a readout has been run.
+        if os.path.exists(npz):
+            h = hashlib.sha256()
+            with open(npz, "rb") as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(chunk)
+            entry["artifact_sha256"] = h.hexdigest()
+        entry.update(readout.get(name, {}))
+        out["reps"][name] = entry
+    # Complete iff every rep has an exported artifact AND the readout reported it.
     out["complete"] = bool(out["reps"]) and all(
-        r["artifact_npz"] and r["rank"] is not None for r in out["reps"].values())
+        r["artifact_npz"] and r["rank_residualised"] is not None and r["channel"] is not None
+        for r in out["reps"].values())
 print(json.dumps(out, indent=1, sort_keys=True))
 """
 

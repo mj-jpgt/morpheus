@@ -24,7 +24,8 @@ import pytest
 
 from morpheus.v2.calibra.spectral import RANK_VARIANTS, effective_rank
 from morpheus.v2.research.rebase.p2 import (p2_competing_metrics, p2_necessity_and_variance,
-                                            p2_rank_variants, p2_robustness, p2_selection_rule)
+                                            p2_rank_variants, p2_robustness, p2_selection_rule,
+                                            p2_selection_rule_blocks)
 
 #: Deliberately tiny. The real cohort is 2,766 test patients x 256 dimensions x 12 artifacts;
 #: everything asserted below is a property of the code path, not of the scale.
@@ -175,6 +176,83 @@ def test_selection_rule_scores_every_metric_against_the_ground_truth(metrics_jso
         assert name in out, name
     assert "SELECTION-RULE SCORE" in out
     assert "METRIC NOISE FLOOR vs BETWEEN-ARM GAP" in out   # the §4.4(1) block
+
+
+def _exam_panel(tmp_path, metrics_json, *, flip_seed=None):
+    """A synthetic `EXAM_PANEL.json` over the six blocks.
+
+    Every block reproduces the metrics JSON's own untrained-40 arm ordering, except that
+    `flip_seed` is reversed on the two blocks named there. That mirrors the real finding:
+    the coordinate-system re-scoring flips exactly one seed on exactly two blocks.
+    """
+    data = json.loads(metrics_json.read_text(encoding="utf-8"))
+    rows = []
+    for key, _short, _label in p2_selection_rule_blocks.BLOCKS:
+        for seed in (42, 43, 44):
+            h = data[f"H{seed}"]["points"]["untrained40"]["top_cca"]
+            i = data[f"I{seed}"]["points"]["untrained40"]["top_cca"]
+            delta = i - h
+            if flip_seed == seed and key in ("pbs_codes128_ARM_I_OWN", "pca_basis128"):
+                delta = -delta
+            rows.append({"exam": key, "seed": seed, "block": "residualised",
+                         "n_targets": 40, "point_hallmark": h, "point_pbs": i,
+                         "pbs_minus_hallmark": delta})
+    path = tmp_path / "EXAM_PANEL.json"
+    path.write_text(json.dumps(rows), encoding="utf-8")
+    return path
+
+
+def test_block_counterfactual_reproduces_the_published_column(metrics_json, tmp_path, capsys):
+    """With every block carrying the SAME ordering, the rule must give the published marks.
+
+    The counterfactual's only job is to swap the ground truth; it must not perturb the rule.
+    Scoring it against a panel that agrees with the untrained-40 truth everywhere therefore
+    has to reproduce `p2_selection_rule`'s own table exactly, or the two have drifted.
+    """
+    panel = _exam_panel(tmp_path, metrics_json)
+    p2_selection_rule_blocks.main([str(metrics_json), str(panel)])
+    out = capsys.readouterr().out
+    assert "1 distinct winner pattern(s)" in out
+    assert "seed(s) whose winner changes with the block: none" in out
+    for name, _, _ in p2_selection_rule_blocks.METRICS:
+        assert name in out, name
+    # Every row must read `stable? yes` when the truth does not move.
+    body = out.split("D2 count out of 3")[1].split("ALL count out of 6")[0]
+    assert "NO (" not in body, body
+
+
+def test_block_counterfactual_detects_an_unstable_verdict(metrics_json, tmp_path, capsys):
+    """One flipped seed on two blocks must surface as an unstable count, not be averaged away.
+
+    This is the failure mode the script exists to catch: `paper/P2_RANK_DRAFT.md` §4.6 takes
+    D2's arm contrast as ground truth, and
+    `NOTEBOOK_ENTRIES/d2_coordinate_system_result_20260804T0800Z.md` showed that contrast is
+    block-dependent.
+    """
+    panel = _exam_panel(tmp_path, metrics_json, flip_seed=43)
+    p2_selection_rule_blocks.main([str(metrics_json), str(panel)])
+    out = capsys.readouterr().out
+    assert "2 distinct winner pattern(s)" in out
+    assert "seed(s) whose winner changes with the block: 43" in out
+    body = out.split("D2 count out of 3")[1].split("ALL count out of 6")[0]
+    assert "NO (" in body, "a flipped ground truth must be reported as an unstable verdict"
+
+
+def test_block_counterfactual_holds_D1_fixed(metrics_json, tmp_path, capsys):
+    """The D1 half has no re-scoring available and must be declared, not silently carried."""
+    panel = _exam_panel(tmp_path, metrics_json, flip_seed=43)
+    p2_selection_rule_blocks.main([str(metrics_json), str(panel)])
+    out = capsys.readouterr().out
+    assert "The D1 columns CANNOT be" in out
+    # D1 marks are identical under every block, by construction of the script.
+    data = json.loads(metrics_json.read_text(encoding="utf-8"))
+    fixed = p2_selection_rule_blocks.d1_marks(data)
+    truth = p2_selection_rule_blocks.load_truth(str(panel))
+    per_block = {k: p2_selection_rule_blocks.marks_for(data, truth, k, fixed)
+                 for k, _s, _l in p2_selection_rule_blocks.BLOCKS}
+    for name, _, _ in p2_selection_rule_blocks.METRICS:
+        counts = {per_block[k][name]["d1"] for k, _s, _l in p2_selection_rule_blocks.BLOCKS}
+        assert len(counts) == 1, (name, counts)
 
 
 def test_two_sided_binomial_matches_the_values_quoted_in_the_draft():

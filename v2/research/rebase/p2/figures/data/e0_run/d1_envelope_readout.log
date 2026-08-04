@@ -1,0 +1,16 @@
+targets: 40 (heldout_pathway, immune_tme, tumour_state)
+
+    rep1.npz  rank_raw= 24.481  rank_resid= 28.320  channel=0.6182
+    rep2.npz  rank_raw=  8.033  rank_resid=  8.834  channel=0.5859
+    rep3.npz  rank_raw= 24.504  rank_resid= 28.348  channel=0.6123
+    rep4.npz  rank_raw= 24.990  rank_resid= 29.106  channel=0.6110
+    rep5.npz  rank_raw= 24.912  rank_resid= 28.959  channel=0.6098
+
+rank (raw)             min=8.0326  max=24.9895  spread=3.111x
+
+rank (residualised)    min=8.8340  max=29.1057  spread=3.295x
+
+channel                min=0.5859  max=0.6182  spread=1.055x
+
+This envelope is a FLOOR: programme_only is the stable arm, and same-seed
+repeats exclude seed variation entirely. Report it as a floor, not as THE envelope.

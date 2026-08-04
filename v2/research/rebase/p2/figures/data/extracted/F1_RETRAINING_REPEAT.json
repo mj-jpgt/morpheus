@@ -1,43 +1,77 @@
 {
- "complete": false,
+ "block": "rank_raw on the exported wsi_biology block; rank_residualised and channel on the cancer + pooled-TSS residualised block, top-CCA at 16 components, 40 targets neither arm trained on",
+ "complete": true,
  "expected": "rep{1..5}/, rep{1..5}.npz, readout log",
  "predeclaration": "NOTEBOOK_ENTRIES/PREDECLARED_retraining_envelope_20260804T0330Z.md",
- "reps": {
-  "rep1": {
-   "artifact_npz": null,
-   "channel": null,
-   "epochs_logged": 16,
-   "last_epoch": 15,
-   "rank": null
+ "printed_spread": {
+  "channel": {
+   "max": 0.6182,
+   "min": 0.5859,
+   "spread": 1.055
   },
-  "rep2": {
-   "artifact_npz": null,
-   "channel": null,
-   "epochs_logged": 16,
-   "last_epoch": 15,
-   "rank": null
+  "rank_raw": {
+   "max": 24.9895,
+   "min": 8.0326,
+   "spread": 3.111
   },
-  "rep3": {
-   "artifact_npz": null,
-   "channel": null,
-   "epochs_logged": 16,
-   "last_epoch": 15,
-   "rank": null
-  },
-  "rep4": {
-   "artifact_npz": null,
-   "channel": null,
-   "epochs_logged": 16,
-   "last_epoch": 15,
-   "rank": null
-  },
-  "rep5": {
-   "artifact_npz": null,
-   "channel": null,
-   "epochs_logged": 16,
-   "last_epoch": 15,
-   "rank": null
+  "rank_residualised": {
+   "max": 29.1057,
+   "min": 8.834,
+   "spread": 3.295
   }
  },
- "root": "/home/ubuntu/e0_run/d1_envelope"
+ "readout_log": "/home/ubuntu/e0_run/d1_envelope_readout.log",
+ "readout_log_sha256": "a7a94ec45a0286a262d4768247fac6c071dacdae1e460fb729f1b632b341a85f",
+ "readout_module": "v2/research/rebase/d1_envelope_readout.py",
+ "readout_module_blob_sha1": "4ba868ece8a7a1d84c39f758503413182a6b5216",
+ "readout_module_on_box": "/home/ubuntu/ws_d1/morpheus/v2/research/rebase/d1_envelope_readout.py",
+ "reps": {
+  "rep1": {
+   "artifact_npz": "/home/ubuntu/e0_run/d1_envelope/rep1.npz",
+   "artifact_sha256": "720ff0b610222ba233c5c8296f81228fd4306eb3367896be64cea5a6b4bb7623",
+   "channel": 0.6182,
+   "epochs_logged": 40,
+   "last_epoch": 39,
+   "rank_raw": 24.481,
+   "rank_residualised": 28.32
+  },
+  "rep2": {
+   "artifact_npz": "/home/ubuntu/e0_run/d1_envelope/rep2.npz",
+   "artifact_sha256": "8364342d9cc34f66f34f78887a10dea5e16d3a563b97a2ef1012532db86ae64e",
+   "channel": 0.5859,
+   "epochs_logged": 40,
+   "last_epoch": 39,
+   "rank_raw": 8.033,
+   "rank_residualised": 8.834
+  },
+  "rep3": {
+   "artifact_npz": "/home/ubuntu/e0_run/d1_envelope/rep3.npz",
+   "artifact_sha256": "d9179aa569ebbc99ce91594684e5781dd746fe72c580668f5f173ad148498c3f",
+   "channel": 0.6123,
+   "epochs_logged": 40,
+   "last_epoch": 39,
+   "rank_raw": 24.504,
+   "rank_residualised": 28.348
+  },
+  "rep4": {
+   "artifact_npz": "/home/ubuntu/e0_run/d1_envelope/rep4.npz",
+   "artifact_sha256": "3a6b4e24bc23b7695a917d5b366e986907390ae269cbeecf562bbfb965fe189b",
+   "channel": 0.611,
+   "epochs_logged": 40,
+   "last_epoch": 39,
+   "rank_raw": 24.99,
+   "rank_residualised": 29.106
+  },
+  "rep5": {
+   "artifact_npz": "/home/ubuntu/e0_run/d1_envelope/rep5.npz",
+   "artifact_sha256": "937779f90516400ecc019f160451f0cc8d53ae2a3c17aa943e32347460510a98",
+   "channel": 0.6098,
+   "epochs_logged": 40,
+   "last_epoch": 39,
+   "rank_raw": 24.912,
+   "rank_residualised": 28.959
+  }
+ },
+ "root": "/home/ubuntu/e0_run/d1_envelope",
+ "statistic": "R1"
 }
