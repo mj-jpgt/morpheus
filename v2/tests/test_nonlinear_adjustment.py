@@ -26,7 +26,9 @@ from morpheus.v2.calibra.nonlinear_adjustment import (ADJUSTER_MODELS, KernelRid
                                                       cross_fitting_offset_energy, forest_residuals,
                                                       in_sample_residuals, kernel_ridge_residuals,
                                                       labels_only_ceiling, make_adjuster,
-                                                      regenerated_adjustment_null, row_shuffled,
+                                                      corrected_multiple,
+                                                      regenerated_adjustment_null,
+                                                      retention_of_excess, row_shuffled,
                                                       saturated_cell_residuals)
 from morpheus.v2.calibra.nonlinear_confound_probe import knn_balanced_accuracy_oof
 from morpheus.v2.calibra.residualise import confound_design, cross_fitted_residuals
@@ -283,6 +285,17 @@ def test_a_pure_noise_block_can_still_be_probed_after_cross_fitted_adjustment():
     adjusted = saturated_cell_residuals(noise, codes, seed=42)
     reading = knn_balanced_accuracy_oof(adjusted, codes, n_cells, k=5, seed=42)
     assert np.isfinite(reading) and 0.0 <= reading <= 1.0
+
+
+def test_retention_and_corrected_multiple_are_ratios_over_the_right_denominators():
+    """Both derived quantities live here so a notebook entry never re-derives them."""
+    reference = {"excess_over_null_median": 0.4569}
+    assert retention_of_excess({"excess_over_null_median": 0.4560}, reference) == pytest.approx(
+        0.4560 / 0.4569)
+    assert np.isnan(retention_of_excess(reference, {"excess_over_null_median": 0.0}))
+    record = {"observed": 0.0511, "regenerated_null": {"null_median": 0.0187}}
+    assert corrected_multiple(record) == pytest.approx(0.0511 / 0.0187)
+    assert np.isnan(corrected_multiple({"observed": 0.05, "regenerated_null": {"null_median": 0.0}}))
 
 
 # --- reporting helpers --------------------------------------------------------------------

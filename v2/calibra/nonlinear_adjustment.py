@@ -79,6 +79,7 @@ __all__ = ["cell_codes", "cell_design", "saturated_cell_residuals", "kernel_ridg
            "KernelRidgeAdjuster", "forest_residuals", "cross_fitted_location_scale",
            "make_adjuster", "adjuster_agreement", "cross_fitted_r2",
            "channel_under_adjustment", "labels_only_ceiling", "ADJUSTER_MODELS",
+           "retention_of_excess", "corrected_multiple",
            "in_sample_residuals", "row_shuffled", "cross_fitting_offset_energy",
            "regenerated_adjustment_null"]
 
@@ -622,6 +623,38 @@ def channel_under_adjustment(x: np.ndarray, y: np.ndarray, adjust, *, strata=Non
         "unadjusted_top_cca": float(top_canonical_correlation(x, y, n_components=n_components)),
     })
     return record
+
+
+def retention_of_excess(arm: dict, reference: dict) -> float:
+    """``excess(arm) / excess(reference)`` -- how much of the channel an arm leaves standing.
+
+    The predeclared grading quantity, and it is a ratio of **excesses over each arm's own
+    null**, never of raw ``S1`` values.  A stronger adjustment can move the capacity floor
+    as well as the signal, so comparing a raw 0.60 against a null measured under a
+    different adjustment is exactly the error P1 4.4 warns about.  Kept here rather than
+    written out in a notebook entry so that every quoted retention comes from one
+    definition.
+    """
+    denominator = float(reference["excess_over_null_median"])
+    if abs(denominator) < 1e-12:
+        return float("nan")
+    return float(arm["excess_over_null_median"]) / denominator
+
+
+def corrected_multiple(record: dict) -> float:
+    """A probe reading as a multiple of the **measured** chance rate under its adjustment.
+
+    ``multiple_of_chance`` divides by the design rate ``1 / n_classes``.  That is the right
+    denominator for a raw block and the wrong one for an adjusted one, because a
+    cross-fitted adjustment leaves cell-tied structure that a k-NN reads and the
+    label-permutation null cannot see.  This divides by the median of
+    :func:`regenerated_adjustment_null` instead, which measures the rate rather than
+    assuming it.
+    """
+    median = float(record["regenerated_null"]["null_median"])
+    if median <= 0:
+        return float("nan")
+    return float(record["observed"]) / median
 
 
 def labels_only_ceiling(design: np.ndarray, y: np.ndarray, *, n_components: int = 16,
