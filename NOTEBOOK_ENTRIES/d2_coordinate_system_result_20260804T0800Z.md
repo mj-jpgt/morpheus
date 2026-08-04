@@ -87,6 +87,24 @@ finding, but it is a claim of **no disadvantage for Hallmark supervision**, not 
 advantage for it. P3's headline hypothesis — that interventional coordinates are a *better*
 supervision target — remains unsupported; the *magnitude* of its refutation does not.
 
+#### 1a. The two exams really are different spaces, so the shift is not a relabelling
+
+A +0.12 shift from swapping target blocks would be inexplicable if the blocks were near-identical.
+They are not. Canonical correlations between the 40 gene-set targets and the 128 PBS codes on the
+same 2,766 test patients (`cca_spectrum` at 16 components), and Roy–Vetterli effective rank of each
+block (`spectral.effective_rank`, CANONICAL = centred, order 1):
+
+| block | erank(gene sets 40) | erank(PBS 128) | top CCA | mean of 16 | >0.9 | >0.5 |
+|---|---:|---:|---:|---:|---:|---:|
+| raw | 26.45 | 67.22 | 0.9584 | 0.4792 | 1/16 | 8/16 |
+| residualised | 28.37 | 74.39 | 0.8846 | 0.3507 | 0/16 | 4/16 |
+
+On the residualised block — the one every D2 number is computed on — the two target spaces share
+three strong directions (0.885 / 0.850 / 0.817) and then diverge fast: the 4th canonical correlation
+is already 0.521 and the mean over 16 is 0.35. The exams overlap in part and differ in most, which
+is exactly the configuration in which "which basis is the exam written in" is a live confound rather
+than a pedantic one.
+
 #### 1b. The raw block, which has never been reported, is weaker still
 
 The task brief flagged that raw-vs-residualised flips arm orderings. It does. **Unresidualised**
@@ -247,10 +265,16 @@ favoured PCA turns out to favour the dictionary instead.
 
 ### Files / provenance
 
-Scripts: `~/ws_d2sym/{preview.py,task3_sweep.py,task3_heldout.py,task3_boot.py,task2_cell.py}`.
-Outputs: `~/ws_d2sym/out/{PREVIEW_points.json, ANCHOR_geneset40.json, T1_pbs_codes.json,
-T3_budget_sweep.json, T3_heldout_sweep.json, T3_boot_d2*_wsi_biology_k*.json, T2_os_s*_*.json}`,
-copied into `v2/research/rebase/nature/d2_coordinate_system/`.
+Scripts: `~/ws_d2sym/{preview.py,exam_geometry.py,task3_sweep.py,task3_heldout.py,task3_boot.py,task2_cell.py}`.
+Outputs: `~/ws_d2sym/out/{PREVIEW_points.json, EXAM_GEOMETRY.json, ANCHOR_geneset40.json,
+T1_pbs_codes.json, T3_budget_sweep.json, T3_heldout_sweep.json, T3_boot_d2*_wsi_biology_k*.json,
+T2_os_s*_*.json}`, copied into `v2/research/rebase/nature/d2_coordinate_system/`.
+
+`scikit-survival` 0.25.0 is not in `~/venv` and was installed into a **separate** `~/venv_surv`
+rather than into the shared environment, because other agents have jobs running against `~/venv` and
+a dependency upgrade underneath them would be exactly the kind of silent breakage this project keeps
+finding. `torch` and the rest resolve from `~/venv` via `PYTHONPATH`; numpy 2.2.6 / sklearn 1.7.2 /
+pandas 2.3.3 are identical in both, checked before use.
 
 **Suite.** `v2/tests` on the verified workspace: **278 passed, 1 failed in 46.37 s.** The one failure
 is `test_paper_paths_resolve.py::test_no_box_output_basename_is_actually_in_the_repository` and is
