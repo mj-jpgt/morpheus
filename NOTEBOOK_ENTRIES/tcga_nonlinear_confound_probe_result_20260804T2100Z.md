@@ -238,21 +238,25 @@ scale-invariant by construction — identical on `adjusted` and `adjusted_standa
 a standardisation artefact.
 
 **Random forest**, 300 trees, 50 permutations (the predeclared cost floor), global null, on the exact
-§4.2 block `runs/d2_final/artifacts/d2_h_seed42.npz` `wsi_biology`, site target, *p* floored at
-1/51 = 0.0196:
+§4.2 block `runs/d2_final/artifacts/d2_h_seed42.npz` `wsi_biology`, *p* floored at 1/51 = 0.0196:
 
-| arm | joint LDA | forest balanced accuracy | × chance | global null p95 | global *p* |
-|---|---:|---:|---:|---:|---:|
-| raw | 0.3494 | 0.0755 | **6.42** | 0.0133 | **0.0196** |
-| **adjusted, standardised** (§4.2's published 0.0118 state) | **0.0118** | **0.0335** | **2.85** | 0.0125 | **0.0196** |
+| target | arm | joint LDA | forest balanced accuracy | × chance | global null p95 | global *p* |
+|---|---|---:|---:|---:|---:|---:|
+| site | raw | 0.3494 | 0.0755 | **6.42** | 0.0133 | **0.0196** |
+| site | **adjusted, standardised** (§4.2's published 0.0118 state) | **0.0118** | **0.0335** | **2.85** | 0.0125 | **0.0196** |
+| cancer | raw | 0.6238 | 0.4537 | **9.53** | 0.0519 | **0.0196** |
+| cancer | **adjusted, standardised** | **0.0458** | **0.2696** | **5.66** | 0.0536 | **0.0196** |
 
-**The forest is the third family and it agrees.** On the state the certificate scores at 0.0118 — its
-own chance rate — a classifier built from axis-aligned thresholds, which is not a metric method and
-cannot be satisfied by mean-removal, reads **2.85× chance at 2.7× its own permutation null p95, with
-*p* at the floor**. The forest is the *weakest* of the three families on this cohort (it is also the
-weakest on the raw arm: 6.42× against the k-NN's 13.26× and the SVM's 16.63×), so its lower adjusted
-reading is a statement about forest power at n = 2,766 with 85 classes, not about the representation —
-predeclared item 1 cutting in the other direction.
+**The forest is the third family and it agrees — and on cancer it is the second family over the 5×
+line.** On the state the certificate scores at 0.0458 against a chance rate of 0.0476, a classifier
+built from axis-aligned thresholds — not a metric method, cannot be satisfied by mean-removal — names
+the cancer type **27.0% of the time, 5.66× chance, 5.0× its own permutation null p95**. On the site
+target it reads 2.85× at 2.7× its null p95. Both at the *p*-floor.
+
+The forest is the *weakest* family on site (2.85× against the k-NN's 4.80× and the SVM's 3.85×) and it
+is also the weakest on the site raw arm (6.42× against 13.26× and 16.63×), so that lower site number is
+about forest power at 85 classes with ~33 patients each, not about the representation — predeclared
+item 1 cutting in the other direction. At 21 classes it has the samples to work with and reads high.
 
 Measured cost per out-of-fold fit on the contended box: k-NN 0.1 s, SVM 11.5–15.5 s, forest 126.7 s
 (raw) / 245.9 s (adjusted). That cost is why the forest's declared 100 permutations were cut to the

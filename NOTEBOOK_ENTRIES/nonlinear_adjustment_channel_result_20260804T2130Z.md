@@ -15,7 +15,7 @@ carried a co-tenant load of 20–50 on 30 cores throughout. Outputs
 ### 0. The answer, in the order the brief asked for it
 
 **Does the channel survive nonlinear adjustment, and by how much? It survives entirely — retention of
-excess-over-null 0.987–1.007 under every arm — but by the letter of the predeclaration this is
+excess-over-null 0.987–1.007 on `d2_h` and 0.995–1.047 on `d2_i`, under every arm — but by the letter of the predeclaration this is
 Reading 4 (NO TEST), not Reading 1, and that distinction is kept.** No arm cleared the predeclared
 step-3 validity bar (k-NN ≤ 2.0× chance on both targets), and §6 shows *why no arm could*: the
 measured floor for **any** cross-fitted adjustment on this cohort is 1.45–1.75× design chance,
@@ -127,8 +127,17 @@ permutations, p floor 0.0005. **Retention** is `nonlinear_adjustment.retention_o
 |---|---:|---:|---:|---:|---:|---:|
 | none | 0.7700 | 0.6672 | 0.1028 | 0.318 | 0.7706 | 10.78 |
 | **ridge (incumbent)** | **0.4703** | **0.1472** | **0.3231** | **1.000** | 0.4206 | 11.73 |
+| **saturated cell mean** | 0.4696 | 0.1481 | 0.3216 | **0.995** | 0.4200 | 11.74 |
+| location–scale (2nd moment) | 0.4848 | 0.1465 | 0.3383 | **1.047** | 0.4580 | 26.66 |
+| in-sample saturated | 0.4694 | 0.1452 | 0.3242 | **1.004** | 0.4170 | 11.75 |
 
-*(full d2_i arm set in the JSON; see §11.)*
+**Retention is 0.987–1.007 on `d2_h` and 0.995–1.047 on `d2_i`.** On `d2_i` the second-moment arm
+*raises* the channel (0.4703 → 0.4848) — the opposite of over-removal, and reported as such. The
+`none` row's retention of 0.23 / 0.32 is not a defect either: the within-cancer **pairing** null for an
+unadjusted block sits at 0.667–0.710, because that permutation preserves cancer structure and cancer
+structure is present in both blocks, so the raw arm has little excess *over its own null* despite the
+larger raw S1. That is exactly why grading is on excess, and why P1 §4.4 insists chance is 0.147 and
+not 0.
 
 Every `permutation_p` in both tables is **0.0005 = 1/2001**, the floor: no permutation of two thousand
 reached the observed value under any adjustment.
@@ -357,7 +366,7 @@ a bigger cohort or a lower-dimensional block, not more compute.
 
 Predeclaration §6: if any arm reached Reading 2 or the lower half of Reading 3, its attenuation would
 be measured through the identical adjustment with `calibration.spike_recovery_curve` before a collapse
-could be reported as a confound finding. **No arm collapsed** — the lowest retention is 0.987 — so the
+could be reported as a confound finding. **No arm collapsed** — the lowest retention over both artifacts and all six adjusted arms is 0.987 — so the
 guard did not trigger and the spike curves were not run. Stated so that their absence is a
 consequence of the result rather than an omission.
 
