@@ -63,11 +63,38 @@ to the point — **no number in this paper is measured on it**, so a floor for i
 would be a floor for nothing. `ABSENT` below says so rather than leaving it
 ambiguous.
 
+THE CONFIGURATION IS AN ARGUMENT, BECAUSE A FLOOR EXISTS ONLY WHERE IT WAS RUN.
+The first run of this module left three audit rows unjudgeable and each named the
+gap that stopped it: a reading at **step 600** past the 500 the repeats were run
+to, an arm at **m = 0.99** that no repeat was run at, and an arm at **capacity 64**
+that no repeat was run at. Closing them is the same measurement at other settings,
+so `--steps`, `--arms`, `--arm-kind`, `--capacity` and `--momentum` are arguments
+and they travel into the output's `config`, from which `p2_floor_audit`'s block
+strings are built. Nothing is borrowed across any of them.
+
+`--arm-kind capacity` exists for the third: §5.2 measurement 3's two arms differ
+in QUEUE CAPACITY at fixed momentum rather than in momentum at fixed capacity, so
+the arms are named `cap64`/`cap4096` and their repeats live in `cap<n>_rep<r>`.
+
+AND A THREE-ARM RUN IS SCORED ONCE PER PAIR. §5.4's two step-600 rows are
+m = 0.999 against m = 0 and m = 0.999 against m = 0.99. `combine()` takes the max
+over the arms it is given, so scoring all three at once would judge the second row
+against the collapsed arm's spread, which is not one of its two sides. Each pair
+is therefore a separate invocation over the same repeat directories, and each
+writes its own output file.
+
 usage:
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
     NUMEXPR_NUM_THREADS=1 python3 p2_probe_floors.py \
         --root /home/ubuntu/e0_run/d1_probefloor \
         --output ~/e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json
+
+    ... --root ~/e0_run/d1_probefloor600 --arms 0.999,0 --steps 600 \
+        --read-step 600 --output .../P2_PROBE_FLOORS_S600_m0999_m0.json
+
+    ... --root ~/e0_run/d1_capfloor --arm-kind capacity --arms 64,4096 \
+        --momentum 0 --steps 200 --read-step 150 \
+        --output .../P2_PROBE_FLOORS_CAP.json
 """
 from __future__ import annotations
 
@@ -105,12 +132,21 @@ ABSENT = {
         "residualisation is applied at any point in `d1_momentum_probe.py`; every rank "
         "number draft §5 quotes is on the raw block. A residualised probe floor would be "
         "a floor for no number in this paper."),
-    "step 600 and beyond": (
-        "§5.2's headline momentum sweep reads at step 600 and this configuration runs to "
-        "500 — the budget §5.2's own seed replication uses and the one §6.2 predeclared. "
-        "The step-500 floor does not license a verdict at step 600 any more than one "
-        "block's floor licenses another's; a step-600 floor needs five more runs at a "
-        "600-step budget."),
+    "step 700 and beyond, and every budget between the ones measured": (
+        "This module is run once per step budget and a floor exists only at the budgets "
+        "actually run — 500 (`--steps 500`) and 600 (`--steps 600`). A floor at one budget "
+        "licenses no verdict at another any more than one block's floor licenses another's, "
+        "and the reading step is written into the block string so that block-matching "
+        "enforces it. Nothing in this paper reads past step 600."),
+    "momentum values other than 0, 0.99 and 0.999, and capacities other than 64 and 4,096": (
+        "The arms are an argument (`--arms`), and a floor exists only for the arms run. "
+        "§5.2's turnover sweep also visits m = 0.9 and m = 0.95 and capacities 512, 2,048 "
+        "and 8,192; no repeat has been run at any of them."),
+    "learning rates other than 2e-4": (
+        "Every repeat is at the project's training rate. §5.2a's own result is that the "
+        "LEARNING RATE is the variable that moves rank most, so a floor measured at one "
+        "rate is the last quantity that may be borrowed for another — which is why §5.2a's "
+        "four contrasts stay unjudgeable."),
     "the `full_biology` view of the probe": (
         "`geometry()` performs two forward passes, `view='wsi'` and `view='rna'`. There is "
         "no third view on this block to measure."),
@@ -118,14 +154,34 @@ ABSENT = {
 
 _STEP = re.compile(r"probe_step(\d+)\.npz$")
 
+#: How an arm is named and where its repeats live, per kind of sweep. The arm
+#: names an output KEY, and `p2_floor_audit.resolve` addresses this file with a
+#: DOT-SEPARATED path, so a key containing a `.` would be silently split in two
+#: and resolve to nothing. Momentum values are the one place in this project
+#: where that is a live hazard, and capacities are integers so they are safe.
+#:
+#: `momentum` is the original behaviour and is byte-identical to it: the same
+#: labels, the same directory names, so `P2_PROBE_FLOORS.json` regenerates
+#: unchanged. `capacity` exists because §5.2 measurement 3's two arms differ in
+#: QUEUE CAPACITY rather than in momentum, and a floor measured at one capacity
+#: may not be borrowed for another.
+ARM_KINDS = {
+    "momentum": {
+        "label": lambda arm: "m0" if float(arm) == 0 else "m" + str(arm).replace(".", ""),
+        "directory": lambda arm, rep: f"m{arm}_rep{rep}",
+        "varies": "momentum",
+    },
+    "capacity": {
+        "label": lambda arm: f"cap{int(float(arm))}",
+        "directory": lambda arm, rep: f"cap{arm}_rep{rep}",
+        "varies": "queue capacity",
+    },
+}
 
-def arm_label(arm: str) -> str:
-    """`0.999` -> `m0999`. The arm names an output KEY, and `p2_floor_audit.resolve`
-    addresses this file with a DOT-SEPARATED path, so a key containing a `.` would
-    be silently split in two and resolve to nothing. Momentum values are the one
-    place in this project where that is a live hazard.
-    """
-    return "m0" if float(arm) == 0 else "m" + str(arm).replace(".", "")
+
+def arm_label(arm: str, kind: str = "momentum") -> str:
+    """`0.999` -> `m0999`, `64` -> `cap64`. See `ARM_KINDS`."""
+    return ARM_KINDS[kind]["label"](arm)
 
 
 # --------------------------------------------------------------------------
@@ -200,22 +256,40 @@ def main(argv=None) -> dict:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", default="/home/ubuntu/e0_run/d1_probefloor")
     ap.add_argument("--arms", default="0.999,0.0")
+    ap.add_argument("--arm-kind", default="momentum", choices=sorted(ARM_KINDS),
+                    help="what the arms vary — `momentum` (the original) or `capacity`")
     ap.add_argument("--reps", type=int, default=5)
     ap.add_argument("--read-step", type=int, default=500,
                     help="the step whose floor is printed in the summary table")
+    # The three settings held fixed ACROSS the arms. They are arguments rather
+    # than constants because a floor exists only at the configuration it was run
+    # at, and the configuration has to travel with the numbers into the output —
+    # `p2_floor_audit`'s block strings are built from it.
+    ap.add_argument("--steps", type=int, default=500, help="the run's step budget")
+    ap.add_argument("--capacity", default="4096", help="queue capacity, when it is not the arm")
+    ap.add_argument("--momentum", default=None, help="momentum, when it is not the arm")
+    ap.add_argument("--lr", default="2e-4")
+    ap.add_argument("--decorrelation", default="0.04")
+    ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--output", required=True)
     args = ap.parse_args(argv)
 
+    kind = ARM_KINDS[args.arm_kind]
+    if args.arm_kind == "capacity" and args.momentum is None:
+        raise SystemExit("--arm-kind capacity needs --momentum: it is held fixed across the arms")
     root = Path(args.root)
     arms_raw: dict[str, dict[str, dict[int, dict]]] = {}
     arm_argv: dict[str, str] = {}
     steps_seen: set[int] | None = None
     for arm in args.arms.split(","):
-        label = arm_label(arm)
-        arm_argv[label] = f"d1_momentum_probe.py {arm} 0.04 500 4096 2e-4 42 <export_dir>"
+        label = arm_label(arm, args.arm_kind)
+        mom = arm if args.arm_kind == "momentum" else args.momentum
+        cap = arm if args.arm_kind == "capacity" else args.capacity
+        arm_argv[label] = (f"d1_momentum_probe.py {mom} {args.decorrelation} {args.steps} "
+                           f"{cap} {args.lr} {args.seed} <export_dir>")
         reps: dict[str, dict[int, dict]] = {}
         for r in range(1, args.reps + 1):
-            d = root / f"m{arm}_rep{r}"
+            d = root / kind["directory"](arm, r)
             files = sorted(glob.glob(str(d / "probe_step*.npz")))
             if not files:
                 raise SystemExit(f"no probe states under {d}")
@@ -227,7 +301,7 @@ def main(argv=None) -> dict:
             got = set(per_step)
             steps_seen = got if steps_seen is None else (steps_seen & got)
             wsi = per_step[max(per_step)]["views"]["wsi_biology"]
-            print(f"  m={arm:<5} rep{r}  step{max(per_step):<4} "
+            print(f"  {label:<7} rep{r}  step{max(per_step):<4} "
                   f"R1={wsi['R1']:8.3f}  R3={wsi['R3']:8.3f}  "
                   f"RankMe={wsi['RankMe']:7.3f}  hard={wsi['hard_rank']:6.0f}", flush=True)
         arms_raw[label] = reps
@@ -237,18 +311,23 @@ def main(argv=None) -> dict:
     floors = combine(arms, steps)
 
     out = {
-        "_": ("The retraining floor on the FIXED HELD-OUT PROBE — the block every rank "
-              "number in draft §5 is measured on, and the block `p2_envelope_floors.py` "
-              "named as unreachable from the exported repeats. Five identical same-seed "
-              "repeats of EACH of the two arms §5 compares. A FLOOR TWICE OVER (same-seed "
-              "repeats exclude seed variation entirely), n = 5 per arm, no interval, one "
-              "seed, one stack. Not a distribution."),
+        "_": (f"The retraining floor on the FIXED HELD-OUT PROBE — the block every rank "
+              f"number in draft §5 is measured on, and the block `p2_envelope_floors.py` "
+              f"named as unreachable from the exported repeats. {args.reps} identical "
+              f"same-seed repeats of EACH of the {len(arms)} arms compared, which here vary "
+              f"in {kind['varies']}. A FLOOR TWICE OVER (same-seed repeats exclude seed "
+              f"variation entirely), n = {args.reps} per arm, no interval, one seed, one "
+              f"stack. Not a distribution."),
         "config": {
             "harness": "v2/research/rebase/d1_momentum_probe.py",
             "argv": arm_argv,
             "objective_profile": "programme_free",
             "arms": list(arms), "repeats_per_arm": args.reps,
-            "seed": 42, "steps": 500, "capacity": 4096, "lr": 2e-4, "decorrelation": 0.04,
+            "arm_kind": args.arm_kind, "arms_vary": kind["varies"],
+            "seed": args.seed, "steps": args.steps,
+            "capacity": (None if args.arm_kind == "capacity" else int(args.capacity)),
+            "momentum": (None if args.arm_kind == "momentum" else float(args.momentum)),
+            "lr": float(args.lr), "decorrelation": float(args.decorrelation),
             "block": "fixed held-out probe, raw (256 held-out patients, as the model emits them)",
             "steps_measured": steps,
             "alpha_index_range": list(ALPHA_INDEX_RANGE), "lidar_delta": LIDAR_DELTA,
@@ -263,9 +342,12 @@ def main(argv=None) -> dict:
         "shape_rule": ("outlier = the run whose removal minimises the remaining four's fold; "
                        "concordant = that fold <= 1.05; bimodal = concordant and "
                        "full fold / rest fold >= 2.0 — imported from p2_envelope_floors.py"),
-        "floor_rule": ("floor = max over the two arms of that arm's own max/min across its "
-                       "five same-seed repeats, at the SAME step and the SAME statistic; "
-                       "`floor_arm` names which arm carried it and `arm_floor` keeps both."),
+        "floor_rule": (f"floor = max over the {len(arms)} arms of that arm's own max/min "
+                       f"across its {args.reps} same-seed repeats, at the SAME step and the "
+                       f"SAME statistic; `floor_arm` names which arm carried it and "
+                       f"`arm_floor` keeps both. A comparison is judged against the floor "
+                       f"built from ITS OWN two arms, so a three-arm run is scored once per "
+                       f"pair rather than once overall."),
         "absent": ABSENT,
         "reps": {arm: {rep: {str(s): rec for s, rec in per_step.items()}
                        for rep, per_step in reps.items()} for arm, reps in arms_raw.items()},
@@ -294,14 +376,14 @@ def main(argv=None) -> dict:
                 print(f"{view:>16} {stat:>18} {arm:>7} {lo:>10} {hi:>10} {fold:>8}  {tag}")
             combined = "n/a" if entry["floor"] is None else "%.3fx" % entry["floor"]
             print(f"{'':>16} {stat:>18} {'FLOOR':>7} {'':>10} {'':>10} "
-                  f"{combined:>8}  carried by m={entry['floor_arm']}")
+                  f"{combined:>8}  carried by {entry['floor_arm']}")
 
     print("\nper-repeat, per-step canonical R1 and R3 on `wsi_biology` — never a mean")
     for arm, reps in arms_raw.items():
         for rep, per_step in sorted(reps.items()):
             row = " ".join(f"{s}:{per_step[s]['views']['wsi_biology']['R1']:.2f}/"
                            f"{per_step[s]['views']['wsi_biology']['R3']:.2f}" for s in steps)
-            print(f"  m={arm:<6} {rep}  {row}")
+            print(f"  {arm:<8} {rep}  {row}")
     print("\nwrote", path)
     return out
 
