@@ -20,8 +20,9 @@ selection signal"* — is WITHDRAWN** (draft §4.1b); any figure or caption stil
 
 **And the fact the figure set must not bury** (draft §4.1b): on the raw exported block **RankMe as
 published has a retraining floor of 1.811× against our centred statistic's 3.111×** on the same five
-retrains, and RankMe is the only selection in the paper's own 60-row audit that clears a floor its own
-statistic and block license. **T9** carries both halves; **F1** must be captioned as measuring one
+retrains, and RankMe is the only selection in the paper's own audit that clears a floor on the
+**exported artifact block** — the block every between-arm comparison in §4 is measured on. (Eight
+further selections clear; every one is §5's, against the probe-block floor of T10.) **T9** carries both halves; **F1** must be captioned as measuring one
 view with one statistic, not as measuring the metric.
 
 One row per display item. For each: what it shows, the **exact data file** it draws from, the
@@ -672,7 +673,7 @@ regime; §4.1's own argument is that a pair drawn from concordant repeats can li
 60 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
 **block**, the floor **its own statistic and block license**, whether it clears, and what the claim
 rests on if it does not. Of the 25 selections between candidate configurations, **13 fail, 11 are
-unjudgeable because no floor has ever been measured for the block they sit on, and 1 clears** — and
+unjudgeable because no floor had ever been measured for the block they sit on, and 1 clears** — and
 the one that clears is **RankMe as published**, whose floor (1.811× raw) is nearly half of canonical
 R1's (3.111× raw) on the same five retrains. 29 of the 60 rows are unjudgeable; 5 are exempt with the
 reason stated. **Unjudgeable is not a pass and not a failure**, and the audit enforces the

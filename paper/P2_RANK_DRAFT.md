@@ -44,8 +44,10 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > mean-offset direction, which is large and stable; on the residualised block, where the mean is
 > already gone, the two floors coincide at 3.295×. **By our own criterion the metric we criticise is
 > more reproducible than the one we chose to measure with**, and our centring — justified on
-> principled grounds in §3.1 — is what made ours less usable. RankMe is the only selection in the
-> 60-row self-audit that clears a floor its own statistic and block license.
+> principled grounds in §3.1 — is what made ours less usable. **RankMe is the only selection in the
+> self-audit that clears a floor on the exported artifact block** — the block every between-arm
+> comparison in §4 is measured on. Eight further selections clear, and all eight are §5's, on the
+> fixed held-out probe, against the floor measured there later (item 10).
 >
 > **9. §5.2a is new, and the mechanism behind §5's queue fix is not the one §5 was written around.**
 > A predeclared learning-rate test (`f68a7ac`), six arms at 200 steps from one initialisation,
@@ -108,7 +110,10 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > from exports that already existed — and the counts are restated on that basis: **of the 25
 > selections between candidate configurations, 13 fail a floor their own statistic and block license,
 > 11 cannot be judged at all, and exactly 1 clears — RankMe as published, whose floor is 1.811×
-> against our own statistic's 3.111× on the same five runs.** The floor turns out to be a property of
+> against our own statistic's 3.111× on the same five runs.** *Those were the counts when only the
+> exported block had a floor. Since the probe block was measured (item 10) they are **13 fail, 9
+> clear, 3 unjudgeable**; the thirteen failures and the exported block's single pass are unchanged,
+> and all eight new passes are §5's.* The floor turns out to be a property of
 > the statistic (1.000× to 3.295× on one block) and of the **view** (3.295× on `wsi_biology`, 1.019×
 > on `rna_biology`): the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to
 > within 2%. **Four blocks had no floor; the largest of them — the fixed held-out probe, which every
@@ -205,8 +210,7 @@ as published has a reproducibility floor of 1.811× and the centred statistic we
 has 3.111×.** RankMe's uncentred normalisation retains the mean-offset direction — every exported row
 has L2 norm exactly 1.000, so that direction is large and stable — and on the residualised block,
 where the mean is already gone, the two floors coincide at 3.295×. **By our own criterion the metric
-we criticise is more reproducible than the one we criticise it with**, and it is the only selection in
-our 60-row self-audit that clears a floor its own statistic and block license. Our centring was
+we criticise is more reproducible than the one we criticise it with**, and it is the only selection in this paper that clears a floor on the **exported artifact block** — the block every between-arm comparison in §4 is measured on. Our centring was
 adopted on principled grounds (§3.1); it made our statistic less usable in the precise sense this
 paper measures usability.
 
@@ -420,8 +424,7 @@ not be presented as the general claim with a caveat attached; the conditionality
 **The narrowing does not soften the paper, and the clearest sign of that is in §4.1b.** Applied to our
 own artifacts, the same criterion finds that **RankMe as published is more reproducible than the
 centred statistic we chose to measure with** — a floor of 1.811× against 3.111× on the same five
-retrains — and that RankMe is the only selection in our entire 60-row self-audit that clears a floor
-its own statistic and block license.
+retrains — and that RankMe is the only selection in this paper that clears a floor on the **exported artifact block** — the block every between-arm comparison in §4 is measured on.
 
 Note what this claim is *not*. It is not "rank is uncorrelated with quality" — we did not measure that
 and §4.7 points the other way. It is not "rank is wrong" — the metric is a precise measurement of the
@@ -477,8 +480,7 @@ In descending order of how well evidenced they are.
    §4.1a). **RankMe as published has a retraining floor of 1.811× on the raw exported block against
    our centred statistic's 3.111× on the same five runs**, because the uncentred normalisation retains
    the mean-offset direction, which is the large and stable one. Our centring, justified on principled
-   grounds in §3.1, made our statistic less reproducible; RankMe is the only selection in the paper's
-   own 60-row audit that clears a floor its own statistic and block license.
+   grounds in §3.1, made our statistic less reproducible; RankMe is the only selection in this paper that clears a floor on the **exported artifact block** — the block every between-arm comparison in §4 is measured on.
 5. **A defeater check** (§4.4), which the exemplar literature will demand and which earlier drafts
    lacked: the instability is in training and not in estimation, established four independent ways.
 6. **The verdict is under-determined by choices nobody states** (§4.5): statistic (2/6 pairs), block
@@ -1585,19 +1587,28 @@ against. Both tables above are *generated* from that list; neither is maintained
 **What the audit found that the paper did not already say.** In descending order of how much it costs
 us.
 
-1. **Nothing in this paper clears a rank floor except the metric we are arguing against.** Of the 25
-   selections between candidate configurations, **13 fail a floor their own statistic and block
-   license, 11 cannot be judged at all, and exactly 1 clears** — row 30, **RankMe as published**,
-   whose floor (1.811× raw) is nearly half of ours (3.111× raw) on the same five runs. The two rows
-   the previous version of this table reported as clearing (§4.4(3)'s fixed-seed probe repeat at
-   3.495×, and §5.2's step-400 fold at 3.596×) are **both on the fixed held-out probe**, which has no
-   measured floor: they cleared a floor that does not license them, and they are now unjudgeable. The
-   count of failures fell from 23 to 13 — but not one of the ten that left the failing column moved
-   into the clearing one.
-2. **Every rank number in §5 is unjudgeable, and that is a sharper limitation than "it fails".**
-   Eleven of the 25 selections, and 29 of the 60 rows, sit on the fixed held-out probe, an in-run
-   training batch, the gate batch or a live checkpoint. The criterion cannot reach them in either
-   direction. §6.2 now names the one run that would change this.
+1. **Nothing in §4 clears a rank floor except the metric we are arguing against.** Of the 25
+   selections, **13 fail a floor their own statistic and block license, 9 clear it and 3 cannot be
+   judged at all** — and **exactly one of the nine is on the exported artifact block**, which is the
+   block every between-arm comparison in §4 is measured on. That one is row 30, **RankMe as
+   published**, whose floor (1.811× raw) is nearly half of ours (3.111× raw) on the same five runs.
+   **The other eight are all §5's**, on the fixed held-out probe, and they clear a floor that did not
+   exist when this subsection was first written (finding 2). *The counting history is itself worth
+   recording, because two of its three steps cost us: 23 failures under one floor for everything; then
+   13 failures, 11 unjudgeable and 1 pass once block-matching was enforced — with not one of the ten
+   that left the failing column moving into the clearing one; then 13 / 9 / 3 once the probe block was
+   measured. **The thirteen failures have never moved.***
+2. **Every rank number in §5 was unjudgeable, and closing that gap is what produced eight of the nine
+   passes.** Eleven of the 25 selections sat on a block with no measured floor. §6.2 named the run
+   that would change it — five same-seed repeats of the `programme_free` / 500-step configuration with
+   the probe attached — and it was run, doubled to ten so that **both** arms were retrained. Eight of
+   the eleven became judgeable and all eight cleared, including the momentum fix (§5.4). **Three
+   remain**, each naming its own gap rather than sharing one excuse: two want a floor at **step 600**
+   (one of them also at **m = 0.99**), and one wants a **reading step** §5.2 never recorded, at a
+   **capacity** no repeat covers. §5.2a's four `direction` rows also remain outside, because the probe
+   floor was measured at `lr = 2e-4` and those arms are at `1e-3` and `4e-5` — and §5.2a's own result
+   is that the learning rate moves rank more than anything else, so that floor is the last one that
+   may be borrowed.
 3. **§4.6's counts have a fourth defect, and it is the paper's own.** §4.6 refuses its counts on
    three grounds — n = 6, D2 s44's 1.4 sampling SDs, §4.6a's coordinate choice. To those add: **not
    one of the six pairs those twelve metric rows are scored on is resolvable** under canonical R1
@@ -1659,10 +1670,12 @@ off it. **An exemption stated is fine; an omission is not**, which is why the nu
 as obviously inapplicable.
 
 **What this costs and what it buys.** It costs the paper any remaining licence to read a rank
-ordering anywhere in it, and it costs more than the first version of this table admitted: **13 of the
-25 selections between candidate configurations are inside a floor their own statistic and block
-license, 11 cannot be judged at all, and the single one that clears is RankMe as published, not
-ours.** What it buys is three things. §1.3's rule is now applied to this paper exhaustively and
+ordering anywhere in **§4**, and it costs more than the first version of this table admitted: **13 of
+the 25 selections between candidate configurations are inside a floor their own statistic and block
+license, and the only one clearing a floor on the exported artifact block is RankMe as published, not
+ours.** Nine selections do clear, eight of them §5's against a probe-block floor measured for that
+purpose — **a criterion that never returned a pass would be a rhetorical device, and this one returns
+nine while still failing thirteen.** What it buys is three things. §1.3's rule is now applied to this paper exhaustively and
 mechanically rather than opportunistically; the next comparison added to the draft is checked by a
 test rather than by a reviewer; and the criterion itself is no longer being applied outside the scope
 of the one measurement that licenses it — which is the objection this paper makes to RankMe, made to
@@ -1713,8 +1726,9 @@ because that is where it belongs.**
 > **By our own criterion, the metric we criticise is more reproducible than the one we chose to
 > measure with.** On the raw exported block, over the same five same-seed retrains, **RankMe as
 > published has a floor of 1.811× and our centred canonical statistic has a floor of 3.111×.** RankMe
-> is the **only** selection in this paper's entire 60-row self-audit that clears a floor its own
-> statistic and block license (§4.1a, row 30).
+> is the **only** selection in this paper that clears a floor on the **exported artifact block** —
+> the block every between-arm comparison in §4 is measured on (§4.1a, row 30). Eight further
+> selections clear, and every one of them is §5's, on the fixed held-out probe.
 
 The mechanism is not mysterious and it is the one §4.6 already names for RankMe's D2 advantage.
 RankMe does not centre; every row of every exported view has L2 norm exactly 1.000, so the
@@ -3634,7 +3648,7 @@ floor of 1.811× and our centred canonical statistic has 3.111×.** RankMe does 
 row has L2 norm exactly 1.000, so the mean-offset direction it retains is both large and stable, and on
 the residualised block — where the mean is gone — the two floors coincide at 3.295×. **By this paper's own
 criterion the metric we criticise is more reproducible than the metric we criticise it with, and RankMe is
-the only selection in our own 60-row self-audit that clears a floor its own statistic and block license.**
+The only selection in this paper that clears a floor on the **exported artifact block** — the block every between-arm comparison in §4 is measured on.**
 Our centring was adopted for a principled reason stated in §3.1. It made our statistic less usable. We
 found that out by applying our own rule to ourselves, which is the whole argument for having the rule.
 
@@ -3837,6 +3851,9 @@ Reproduced verbatim so that any future quotation can carry it.
 - **The floor audit (§4.1a).** 60 rank comparisons, each judged against the floor measured on its
   own **statistic and** block; of the 25 selections between candidate configurations, **13 fail, 11
   cannot be judged at all, and 1 clears — and the one that clears is RankMe as published, not ours**.
+  *Those counts predate the probe-block floor; they are now **13 / 9 / 3**, the thirteen failures are
+  unchanged, and all eight new passes are §5's on the fixed held-out probe. RankMe remains the only
+  selection clearing a floor on the **exported** block.*
   29 of the 60 rows sit on a block for which **no floor has ever been measured**, including every
   rank number in §5. **Unjudgeable is not a pass and not a failure**: the criterion has not been
   applied to those rows, and the audit records `clears: null` for them rather than a verdict.
