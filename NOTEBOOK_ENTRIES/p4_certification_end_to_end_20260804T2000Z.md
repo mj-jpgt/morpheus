@@ -310,7 +310,9 @@ What this work contributes instead:
 
 Run on this workspace at the commit the tests were launched from:
 `pytest morpheus/v2/tests morpheus/tests --ignore=morpheus/v2/tests/test_p2_figures.py -q` →
-**448 passed, 0 failed in 70.57 s**. `test_p2_figures.py` (24 tests) still cannot run in `~/venv`
+**448 passed, 0 failed**; re-verified at the final commit on a *fresh* workspace built the same way
+(**643/643 files by git blob SHA-1**, 0 mismatched, 0 missing, 0 extra) → **476 passed, 0 failed in
+56.40 s**, the growth being other agents' tests landing between the two runs. `test_p2_figures.py` (24 tests) still cannot run in `~/venv`
 (`ModuleNotFoundError: No module named 'matplotlib'`); nothing was installed into that environment.
 
 ## One library defect found and fixed, with a test
