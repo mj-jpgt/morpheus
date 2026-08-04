@@ -18,7 +18,7 @@ import numpy as np
 __all__ = ["effective_rank", "RankVariant", "CANONICAL", "RANK_VARIANTS", "cca_spectrum",
            "top_canonical_correlation", "heldout_top_cca", "heldout_cca_projection",
            "heldout_top_cca_indexed", "paired_absolute_correlation",
-           "heldout_single_direction_correlation"]
+           "heldout_single_direction_correlation", "heldout_cca_directions"]
 
 
 class RankVariant(NamedTuple):
@@ -239,6 +239,62 @@ def _whiten_map(a: np.ndarray, n_components: int):
     return centre, (vt[:k].T / s[:k])
 
 
+def _heldout_cca_fit(x: np.ndarray, y: np.ndarray, train: np.ndarray, n_components: int):
+    """Shared fit for the held-out CCA family: whitening maps + the top singular pair.
+
+    Returns ``(cx, wx, cy, wy, a, bt)`` or ``None`` when either side whitens to
+    zero components. Split out so that :func:`heldout_cca_projection` and
+    :func:`heldout_cca_directions` cannot drift: the projection is
+    ``(x[test] - cx) @ wx @ a[:, 0]`` and the direction is ``wx @ a[:, 0]``, the
+    same two factors associated differently. The projection keeps its original
+    association order so that no published held-out number moves by a float ulp.
+    """
+    cx, wx = _whiten_map(x[train], n_components)
+    cy, wy = _whiten_map(y[train], n_components)
+    if wx.shape[1] == 0 or wy.shape[1] == 0:
+        return None
+    ux, uy = (x[train] - cx) @ wx, (y[train] - cy) @ wy
+    a, _, bt = np.linalg.svd(ux.T @ uy, full_matrices=False)
+    return cx, wx, cy, wy, a, bt
+
+
+def heldout_cca_directions(x: np.ndarray, y: np.ndarray, train: np.ndarray, *,
+                           n_components: int = 32) -> tuple[np.ndarray, np.ndarray]:
+    """The top canonical direction PAIR fit on ``train`` rows, in x/y column space.
+
+    Returns ``(u, v)`` with ``u`` of length ``x.shape[1]`` and ``v`` of length
+    ``y.shape[1]``, each L2-normalised, such that ``x @ u`` and ``y @ v`` are the
+    canonical scores up to an additive constant (correlation is shift-invariant,
+    so dropping the whitening centres changes nothing downstream).
+
+    Why this exists. The CALIBRA ``detection_floor`` is measured by planting a
+    spike along a direction pair and reading it back on that same pair, and until
+    now the pair was always **random** on at least the image side, while the
+    channel it grades (:func:`heldout_top_cca`) uses a pair that was **fitted**.
+    Handing this pair to ``calibration.spike_targets`` is what makes a
+    direction-matched floor measurable at all. The pair is fitted on ``train``
+    rows only, so it does not see the rows a held-out statistic is scored on.
+
+    Sign is arbitrary (an SVD singular pair is defined up to a joint sign flip);
+    the pair is jointly consistent, which is all a planted-correlation
+    construction needs.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    train = np.asarray(train, dtype=np.int64)
+    if len(train) < 10:
+        return np.zeros(0), np.zeros(0)
+    fit = _heldout_cca_fit(x, y, train, n_components)
+    if fit is None:
+        return np.zeros(0), np.zeros(0)
+    _, wx, _, wy, a, bt = fit
+    u, v = wx @ a[:, 0], wy @ bt[0]
+    norm_u, norm_v = np.linalg.norm(u), np.linalg.norm(v)
+    if norm_u < 1e-12 or norm_v < 1e-12:
+        return np.zeros(0), np.zeros(0)
+    return u / norm_u, v / norm_v
+
+
 def heldout_cca_projection(x: np.ndarray, y: np.ndarray, train: np.ndarray, test: np.ndarray, *,
                            n_components: int = 32) -> tuple[np.ndarray, np.ndarray]:
     """Project ``test`` rows onto the top canonical pair FIT ON ``train`` rows.
@@ -261,12 +317,10 @@ def heldout_cca_projection(x: np.ndarray, y: np.ndarray, train: np.ndarray, test
     if len(train) < 10 or len(test) < 10:
         return np.zeros(0), np.zeros(0)
 
-    cx, wx = _whiten_map(x[train], n_components)
-    cy, wy = _whiten_map(y[train], n_components)
-    if wx.shape[1] == 0 or wy.shape[1] == 0:
+    fit = _heldout_cca_fit(x, y, train, n_components)
+    if fit is None:
         return np.zeros(0), np.zeros(0)
-    ux, uy = (x[train] - cx) @ wx, (y[train] - cy) @ wy
-    a, _, bt = np.linalg.svd(ux.T @ uy, full_matrices=False)
+    cx, wx, cy, wy, a, bt = fit
 
     px = ((x[test] - cx) @ wx) @ a[:, 0]
     py = ((y[test] - cy) @ wy) @ bt[0]

@@ -277,13 +277,19 @@ def cmd_endtoend(args) -> None:
     curve = spike_recovery_curve(block["features"][:, axis][:, None],
                                  targets["scores"][:, target][:, None], design,
                                  n_draws=args.n_draws, seed=args.seed, n_jobs=args.n_jobs)
+    # SCHEMA 2 (2026-08-04): the amendment below is now the library's own rule, so the
+    # channel statistic is handed to the curve and ``observed_above_floor`` is a real
+    # verdict instead of the constant it was. ``magnitude`` is computed first for that
+    # reason; the criterion itself is unchanged.
+    magnitude = float(abs(grid[axis, target]))
+    curve.channel_statistic = magnitude
+    curve.channel_statistic_name = "abs(heldout_single_direction_correlation)"
     summary = curve.summary()
     floor = summary["detection_floor"]
     # AMENDED CRITERION, see the amendment appended to the predeclaration: the shipped
     # observed_above_floor flag compares a SIGNED correlation along a random direction
     # pair against the floor, and for a one-column x that sign is a coin flip. The
     # magnitude of the single-direction statistic is what the floor is expressed in.
-    magnitude = float(abs(grid[axis, target]))
     clears = bool(np.isfinite(floor) and magnitude > floor)
     conditions["2_clears_detection_floor"] = {
         "verdict": "PASS" if clears else "FAIL",
@@ -292,7 +298,12 @@ def cmd_endtoend(args) -> None:
         "detection_floor": floor,
         "transmission_floor": summary.get("transmission_floor"),
         "observed_matched_direction": summary.get("observed_matched_direction"),
+        # At schema 1 this was a constant and disagreed with the amended criterion; at
+        # schema 2 the library applies the amended criterion itself, so the two agree
+        # by construction and the key is kept only so old and new runs stay diffable.
         "shipped_flag_observed_above_floor": bool(summary["observed_above_floor"]),
+        "observed_above_floor_status": summary["observed_above_floor_status"],
+        "summary_schema_version": int(summary["summary_schema_version"]),
         "floor_is_nan": bool(not np.isfinite(floor)),
         "levels": summary["levels"], "recovered_median": summary["recovered_median"],
         "delta_median": summary["delta_median"],
@@ -445,9 +456,12 @@ def cmd_competitor(args) -> None:
                                                                 adjusted_targets[order, t],
                                                                 seed=args.seed)
                            for order in permutations], dtype=np.float64)
-        curve = spike_recovery_curve(block["features"][:, axis][:, None],
-                                     targets["scores"][:, t][:, None], design,
-                                     n_draws=args.n_draws, seed=args.seed, n_jobs=1).summary()
+        curve_result = spike_recovery_curve(block["features"][:, axis][:, None],
+                                            targets["scores"][:, t][:, None], design,
+                                            n_draws=args.n_draws, seed=args.seed, n_jobs=1)
+        curve_result.channel_statistic = float(abs(grid[axis, t]))
+        curve_result.channel_statistic_name = "abs(heldout_single_direction_correlation)"
+        curve = curve_result.summary()
         return {"target": str(targets["names"][t]), "target_group": str(targets["groups"][t]),
                 "axis": axis,
                 "correlation": float(grid[axis, t]),
@@ -457,6 +471,7 @@ def cmd_competitor(args) -> None:
                 "detection_floor": float(curve["detection_floor"]),
                 "observed_matched_direction": float(curve.get("observed_matched_direction", np.nan)),
                 "shipped_flag_observed_above_floor": bool(curve["observed_above_floor"]),
+                "summary_schema_version": int(curve["summary_schema_version"]),
                 # AMENDED: magnitude against the floor, per the appended amendment.
                 "clears_detection_floor": bool(np.isfinite(curve["detection_floor"])
                                                and abs(float(grid[axis, t])) > curve["detection_floor"]),

@@ -127,8 +127,9 @@ def test_fitted_direction_separates_signal_from_noise_targets():
 
 
 def test_random_direction_statistic_is_null_like_even_for_a_readable_target():
-    """The scale warning, as a test. A target a FITTED direction reads at ~0.9 is
-    still ~0 to a RANDOM direction, so the two statistics must never be compared."""
+    """The scale gap, as a test. A target a FITTED direction reads at ~0.9 is read
+    far lower by a RANDOM direction, so grading one against a floor measured in the
+    other is a comparison that has to be argued for, not assumed."""
     rng = np.random.default_rng(8)
     x = rng.normal(size=(500, 20))
     y = (x @ rng.normal(size=20))[:, None]
@@ -136,6 +137,26 @@ def test_random_direction_statistic_is_null_like_even_for_a_readable_target():
     random_u = random_direction_column_correlation(x, y, n_draws=20, seed=8)[0]
     assert fitted > 0.9, fitted
     assert abs(random_u) < 0.25, random_u
+
+
+def test_random_direction_statistic_is_a_magnitude_not_a_signed_median():
+    """The sign fix (schema 2), as a regression test.
+
+    ``random_direction_column_correlation`` is graded against a strictly positive
+    ``detection_floor``. With ``u`` drawn at random the sign of each draw is random,
+    so a SIGNED median collapses towards zero for every column whatever it carries
+    -- which made the negative control pass structurally rather than on merit. The
+    statistic must be non-negative, and on a column a random direction genuinely
+    does see, it must NOT sit at zero."""
+    rng = np.random.default_rng(4)
+    x = rng.normal(size=(400, 3))            # low dimension: a random u overlaps a lot
+    y = (x @ np.array([1.0, 0.0, 0.0]))[:, None]
+    values = random_direction_column_correlation(x, y, n_draws=40, seed=4)
+    assert np.all(values >= 0.0), values
+    assert values[0] > 0.3, values          # a signed median would sit near 0 here
+    noise = random_direction_column_correlation(x, rng.normal(size=(400, 5)),
+                                                n_draws=40, seed=4)
+    assert np.all(noise >= 0.0) and float(np.median(noise)) < 0.1, noise
 
 
 def test_grade_random_controls_fails_when_too_many_controls_clear_the_floor():

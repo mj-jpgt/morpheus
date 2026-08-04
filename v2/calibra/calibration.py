@@ -57,12 +57,27 @@ varies draw to draw. The floor is therefore read with a **paired** test -- does 
 draw beat its *own* level-0 value -- which is the point of reusing (u, v) across
 levels within a draw.
 
-Scale warning. The floor is in *single-direction* correlation units. The headline
-real-data number (adjusted / held-out top-CCA) is a *multivariate maximum* over 16
-components and is inflated by capacity. **The two are not on the same scale and must
-never be compared directly.** ``observed_matched_direction`` is provided as the
-same-units comparator; ``observed`` remains the multivariate figure the real
-analysis reports.
+Scale warning, CORRECTED 2026-08-04. The floor is in *single-direction* correlation
+units. The **in-sample** ``observed`` (``top_canonical_correlation``) is a multivariate
+maximum over ``n_components`` directions per side, is inflated by capacity -- its own
+within-strata permutation null reaches p95 = 0.171 on the 99-column design -- and must
+**never** be compared to the floor. That prohibition is real and unchanged.
+
+What *was* wrong is the sentence that used to follow it. ``observed_matched_direction``
+was offered as "the same-units comparator", and it is not a comparator at all: it is a
+correlation along a **random** direction pair, which on a multi-column representation
+carries essentially none of the channel and sits near zero however strong the channel
+is, with a random sign on top. The flag built on it was a constant, not a measurement
+(``NOTEBOOK_ENTRIES/observed_above_floor_is_broken_and_every_channel_clears_20260804T2115Z.md``).
+
+The comparator that *is* on the floor's scale is a **held-out, fitted-direction**
+statistic -- ``spectral.heldout_top_cca`` -- whose destroyed-pairing null is 0.06-0.09
+against floors of 0.20-0.50, i.e. the capacity objection that condemns the in-sample
+maximum is empirically false for the held-out one. The caller supplies it as
+``SpikeRecoveryResult.channel_statistic`` and :func:`channel_clears_floor` grades it by
+magnitude. See ``SUMMARY_SCHEMA_VERSION`` for what pre-fix artifacts carry, and
+``direction_pairs`` / :func:`floors_from_recovery` for measuring the floor on the
+channel's own fitted direction rather than a random one.
 """
 from __future__ import annotations
 
@@ -73,7 +88,26 @@ import numpy as np
 from .residualise import cross_fitted_residuals
 from .spectral import top_canonical_correlation
 
-__all__ = ["SpikeRecoveryResult", "spike_targets", "spike_recovery_curve", "permutation_null"]
+__all__ = ["SpikeRecoveryResult", "spike_targets", "spike_recovery_curve", "permutation_null",
+           "floors_from_recovery", "channel_clears_floor", "SUMMARY_SCHEMA_VERSION"]
+
+#: Schema version of :meth:`SpikeRecoveryResult.summary`'s dict, written into every
+#: emitted row set so an artifact can say which contract it holds.
+#:
+#: * **1** — ``observed_above_floor`` compared the SIGNED ``observed_matched_direction``
+#:   (a correlation along a RANDOM direction pair) against a positive
+#:   ``detection_floor``. Both halves of that comparison were wrong, and the flag was
+#:   in practice a **constant** rather than a measurement: for any multi-column
+#:   representation a random direction pair carries ~none of the channel, so the
+#:   left-hand side sits at ~0 whatever the channel does, and the sign made the
+#:   verdict a coin flip on top of that. Every artifact emitted at schema 1 carries an
+#:   ``observed_above_floor`` that must be ignored. Evidence:
+#:   ``NOTEBOOK_ENTRIES/observed_above_floor_is_broken_and_every_channel_clears_20260804T2115Z.md``.
+#: * **2** — the flag grades a caller-supplied **channel statistic** (a fitted-direction,
+#:   out-of-fold quantity such as :func:`spectral.heldout_top_cca`) by **magnitude**
+#:   against the floor, and is ``None`` with an explicit status when no channel
+#:   statistic was supplied. It never invents a comparator from a random direction.
+SUMMARY_SCHEMA_VERSION = 2
 
 try:                                          # optional; the serial path is identical
     from joblib import Parallel, delayed
@@ -164,21 +198,41 @@ def _correlation(a: np.ndarray, b: np.ndarray) -> float:
 
 def spike_targets(x: np.ndarray, y: np.ndarray, r_true: float, *, rng: np.random.Generator,
                   molecular_direction: np.ndarray | None = None,
+                  image_direction: np.ndarray | None = None,
                   return_directions: bool = False):
     """Return a copy of ``y`` whose ``v``-component correlates with ``Xu`` at exactly ``r_true``.
 
     With ``return_directions=True`` returns ``(y_spiked, u, v)``. The caller needs
     ``(u, v)`` to score the spike on its own axis -- see the TARGETED READOUT note
-    in the module docstring. The internal draw order (``u`` first, then ``v`` when
-    no ``molecular_direction`` is supplied) is part of the contract: tests
-    reconstruct the directions by re-seeding an identical generator.
+    in the module docstring. The internal draw order (``u`` first, then ``v``) is
+    part of the contract: tests reconstruct the directions by re-seeding an
+    identical generator. **A supplied direction consumes no draw**, which is how
+    ``molecular_direction`` has always behaved and is now also true of
+    ``image_direction``.
+
+    ``image_direction`` exists because until it did, no **direction-matched**
+    floor could be measured. The floor is a statement about a direction pair, and
+    with ``u`` drawn at random the floor was always measured on a pair that is
+    random on at least the image side -- while the channel it grades
+    (``spectral.heldout_top_cca``) uses a pair fitted on both sides. Pass
+    ``spectral.heldout_cca_directions``' output here to plant on the axis the
+    channel actually lives on. See
+    ``NOTEBOOK_ENTRIES/PREDECLARED_direction_matched_floor_20260804T2230Z.md``
+    for what that comparison does and does not settle: it matches the direction,
+    it does **not** turn the oracle readout into an estimated one.
     """
     if not 0.0 <= r_true < 1.0:
         raise ValueError("r_true must lie in [0, 1)")
     x = np.asarray(x, dtype=np.float64)
     y = np.asarray(y, dtype=np.float64)
-    u = rng.normal(size=x.shape[1])
-    u /= np.linalg.norm(u)
+    if image_direction is None:
+        u = rng.normal(size=x.shape[1])
+    else:
+        u = np.asarray(image_direction, dtype=np.float64).copy()
+    norm_u = np.linalg.norm(u)
+    if norm_u < 1e-12:
+        raise ValueError("image_direction must be non-zero")
+    u /= norm_u
     if molecular_direction is None:
         v = rng.normal(size=y.shape[1])
     else:
@@ -205,6 +259,40 @@ def spike_targets(x: np.ndarray, y: np.ndarray, r_true: float, *, rng: np.random
     return (spiked, u, v) if return_directions else spiked
 
 
+def channel_clears_floor(channel_statistic: float, detection_floor: float) -> tuple:
+    """Grade a channel statistic against a detection floor. Returns ``(verdict, status)``.
+
+    ``verdict`` is ``True``/``False`` when the comparison can be made and ``None``
+    when it cannot -- never a silent ``False``, because "we could not grade this"
+    and "the channel is below its floor" are opposite scientific statements and
+    the old flag conflated them for every artifact ever shipped.
+
+    **The comparison is on MAGNITUDE.** A detection floor is a threshold on the
+    size of an association; a channel is not less real for being negatively
+    oriented, and no channel readout in this repository can even see the sign
+    (``top_canonical_correlation``, ``heldout_top_cca`` and
+    ``paired_absolute_correlation`` all take ``abs``). The signed convention of
+    :func:`_correlation` is correct for the *paired* within-draw comparison it was
+    written for and wrong here; carrying it into this unpaired comparison made
+    three of four constructed sign-pairs return opposite verdicts for identical
+    evidence.
+
+    **``channel_statistic`` must come from the caller.** The floor grades *a
+    channel*, and this module has no way to measure one: its own
+    ``observed_matched_direction`` is a correlation along a **random** direction
+    pair, which for any multi-column representation carries ~none of the channel
+    and sits near zero whatever the channel does. Inventing the comparator here
+    is what made the shipped flag a constant.
+    """
+    floor = float(detection_floor)
+    channel = float(channel_statistic)
+    if not np.isfinite(channel):
+        return None, "ungraded_no_channel_statistic"
+    if not np.isfinite(floor):
+        return None, "ungraded_floor_did_not_resolve"
+    return bool(abs(channel) > floor), "graded"
+
+
 @dataclass
 class SpikeRecoveryResult:
     levels: np.ndarray
@@ -218,10 +306,18 @@ class SpikeRecoveryResult:
 
     delta: np.ndarray | None = None   # per-draw increment over that draw's level-0 baseline
 
+    #: The channel this run's floor is to grade, supplied by the caller because
+    #: this module cannot measure one (see :func:`channel_clears_floor`). It must
+    #: be a FITTED-direction, out-of-fold statistic on the floor's single-direction
+    #: scale -- ``spectral.heldout_top_cca`` is the one CALIBRA uses. Leave it NaN
+    #: and the flag reports ``None`` with a status rather than a fabricated verdict.
+    channel_statistic: float = float("nan")
+    channel_statistic_name: str = ""
+
     def summary(self) -> dict:
         median = np.nanmedian(self.recovered, axis=1)
         delta = self.delta if self.delta is not None else self.recovered - self.recovered[0][None, :]
-        matched = self.meta.get("observed_matched_direction", float("nan"))
+        verdict, status = channel_clears_floor(self.channel_statistic, self.detection_floor)
         return {
             "levels": self.levels.tolist(),
             "recovered_median": median.tolist(),
@@ -232,11 +328,16 @@ class SpikeRecoveryResult:
             "detection_floor": self.detection_floor,
             "attenuation_slope": self.attenuation_slope,
             "observed": self.observed,
-            # SCALE-SAFE: compares like with like. ``observed`` is a multivariate
-            # maximum; the floor is a single-direction correlation. Comparing those
-            # two was the original error, so the flag uses the matched statistic.
-            "observed_above_floor": bool(np.isfinite(matched) and np.isfinite(self.detection_floor)
-                                         and matched > self.detection_floor),
+            # SCHEMA 2. At schema 1 this key compared the SIGNED
+            # ``observed_matched_direction`` -- a random-direction correlation --
+            # against a positive floor, and was a constant rather than a
+            # measurement. It now grades the caller's channel statistic by
+            # magnitude, and is None when there is nothing to grade.
+            "summary_schema_version": SUMMARY_SCHEMA_VERSION,
+            "observed_above_floor": verdict,
+            "observed_above_floor_status": status,
+            "channel_statistic": float(self.channel_statistic),
+            "channel_statistic_name": self.channel_statistic_name,
             "floor_scale": "targeted_single_direction",
             "n_components": self.n_components,
             "recovery_fraction": self.recovery_fraction,
@@ -244,11 +345,51 @@ class SpikeRecoveryResult:
         }
 
 
+def floors_from_recovery(levels: np.ndarray, recovered: np.ndarray, *,
+                         recovery_fraction: float = 0.8) -> dict:
+    """The two floors, read off a (n_levels, n_draws) recovery matrix.
+
+    Lifted out of :func:`spike_recovery_curve` verbatim so that a caller scoring
+    the spike with a **different readout** -- e.g. the channel's own
+    ``spectral.heldout_top_cca``, which is what a like-for-like floor requires --
+    reads its floor with the *same rule* rather than re-implementing it. The two
+    floors are documented at length inside ``spike_recovery_curve``; the short
+    version is that ``transmission_floor`` is paired (does a draw beat *its own*
+    level 0) and answers the over-residualisation question, while
+    ``detection_floor`` is unpaired (does it beat the level-0 p90) and is the
+    conservative, quotable detection limit.
+    """
+    levels = np.asarray(levels, dtype=np.float64)
+    recovered = np.asarray(recovered, dtype=np.float64)
+    null_reference = (float(np.nanpercentile(recovered[0], 90))
+                      if np.isfinite(recovered[0]).any() else 0.0)
+    paired_hits = np.full(len(levels), np.nan)
+    unpaired_hits = np.full(len(levels), np.nan)
+    transmission_floor = float("nan")
+    detection_floor = float("nan")
+    for i, level in enumerate(levels):
+        paired_hits[i] = np.nanmean(recovered[i] > recovered[0])
+        unpaired_hits[i] = np.nanmean(recovered[i] > max(null_reference, 1e-9))
+        if level <= 0:
+            continue
+        if np.isfinite(paired_hits[i]) and paired_hits[i] >= recovery_fraction \
+                and not np.isfinite(transmission_floor):
+            transmission_floor = float(level)
+        if np.isfinite(unpaired_hits[i]) and unpaired_hits[i] >= recovery_fraction \
+                and not np.isfinite(detection_floor):
+            detection_floor = float(level)
+    return {"detection_floor": detection_floor, "transmission_floor": transmission_floor,
+            "null_reference_p90": null_reference,
+            "paired_hit_rate": paired_hits.tolist(),
+            "unpaired_hit_rate": unpaired_hits.tolist()}
+
+
 def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
                          levels=(0.0, 0.01, 0.02, 0.05, 0.10, 0.20, 0.40),
                          n_draws: int = 25, n_components: int = 32, seed: int = 42,
                          recovery_fraction: float = 0.8,
                          molecular_directions: np.ndarray | None = None,
+                         direction_pairs=None,
                          n_splits: int = 5, alpha: float = 1.0,
                          n_jobs: int = 1) -> SpikeRecoveryResult:
     """Push known-strength spikes through the full pipeline and measure recovery.
@@ -256,6 +397,17 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     ``design`` is the confound design matrix; residualisation is applied to the
     spiked data exactly as it is to the real data — that identity is the whole
     point, so do not "optimise" it away.
+
+    ``direction_pairs`` pins BOTH sides of the planted axis: an iterable of
+    ``(u, v)`` used one pair per draw, in order (cycled if shorter than
+    ``n_draws``). With it the floor becomes **direction-matched** -- measured on
+    the axis the channel actually occupies rather than on a random one, which is
+    the comparison the shipped floors could not make. Mutually exclusive with
+    ``molecular_directions``. Note what it does not fix: the readout still *knows*
+    ``(u, v)`` while the channel's readout must estimate them, so a
+    direction-matched oracle floor remains a lower bound on the floor that applies
+    to a fitted-direction statistic. Use ``floors_from_recovery`` with a fitted
+    readout for the like-for-like version.
 
     ``n_splits`` and ``alpha`` are the residualiser's own knobs, forwarded
     unchanged to :func:`cross_fitted_residuals`. They exist so that Track 2 can
@@ -277,16 +429,23 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     x_residual = cross_fitted_residuals(x, design, **resid)
     y_residual = cross_fitted_residuals(y, design, **resid)
 
+    if direction_pairs is not None and molecular_directions is not None:
+        raise ValueError("pass direction_pairs OR molecular_directions, not both")
+
     # Draw every (direction, seed) up front so the result is identical regardless of
     # how the draws are scheduled across workers.
     plan = []
-    for _ in range(n_draws):
-        direction = None
-        if molecular_directions is not None and len(molecular_directions):
+    for draw in range(n_draws):
+        direction, image = None, None
+        if direction_pairs is not None:
+            if not len(direction_pairs):
+                raise ValueError("direction_pairs must be non-empty")
+            image, direction = direction_pairs[draw % len(direction_pairs)]
+        elif molecular_directions is not None and len(molecular_directions):
             direction = molecular_directions[rng.integers(len(molecular_directions))]
-        plan.append((int(rng.integers(1 << 31)), direction))
+        plan.append((int(rng.integers(1 << 31)), direction, image))
 
-    def _one_draw(draw_seed: int, direction):
+    def _one_draw(draw_seed: int, direction, image):
         """PAIRED: the same (u, v) is reused across every level within a draw."""
         column = np.full(len(levels), np.nan)
         matched = float("nan")
@@ -294,6 +453,7 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
             spiked, u, v = spike_targets(x, y, float(level),
                                          rng=np.random.default_rng(draw_seed),
                                          molecular_direction=direction,
+                                         image_direction=image,
                                          return_directions=True)
             spiked_residual = cross_fitted_residuals(spiked, design, **resid)
             # TARGETED readout: score the planted axis, not a maximum over the whole
@@ -308,6 +468,11 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     results = _map(_one_draw, plan, n_jobs)
     recovered = np.column_stack([column for column, _ in results])
     observed_matched = float(np.nanmedian([m for _, m in results]))
+    # The MAGNITUDE version. The signed median above is a median over draws whose
+    # signs are random when (u, v) is random, so on a multi-column representation
+    # it estimates approximately nothing; it is retained only because published
+    # rows quote it. Neither is the channel -- see ``channel_clears_floor``.
+    observed_matched_abs = float(np.nanmedian([abs(m) for _, m in results]))
 
     # PAIRED floor. The spike is built orthogonal to s, yet level 0 does NOT read
     # zero on real data: residualising two orthogonal signals through a shared
@@ -339,20 +504,12 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
     #     the full draw-to-draw variability an actual single-shot analysis faces, so
     #     it is the conservative, quotable detection limit.
     #
-    null_reference = float(np.nanpercentile(recovered[0], 90)) if np.isfinite(recovered[0]).any() else 0.0
-    paired_hits = np.full(len(levels), np.nan)
-    unpaired_hits = np.full(len(levels), np.nan)
-    transmission_floor = float("nan")
-    detection_floor = float("nan")
-    for i, level in enumerate(levels):
-        paired_hits[i] = np.nanmean(recovered[i] > recovered[0])
-        unpaired_hits[i] = np.nanmean(recovered[i] > max(null_reference, 1e-9))
-        if level <= 0:
-            continue
-        if np.isfinite(paired_hits[i]) and paired_hits[i] >= recovery_fraction                 and not np.isfinite(transmission_floor):
-            transmission_floor = float(level)
-        if np.isfinite(unpaired_hits[i]) and unpaired_hits[i] >= recovery_fraction                 and not np.isfinite(detection_floor):
-            detection_floor = float(level)
+    floors = floors_from_recovery(levels, recovered, recovery_fraction=recovery_fraction)
+    null_reference = floors["null_reference_p90"]
+    paired_hits = np.asarray(floors["paired_hit_rate"])
+    unpaired_hits = np.asarray(floors["unpaired_hit_rate"])
+    transmission_floor = floors["transmission_floor"]
+    detection_floor = floors["detection_floor"]
 
     median_recovered = np.nanmedian(recovered, axis=1)
     finite = np.isfinite(levels) & np.isfinite(median_recovered)
@@ -401,6 +558,10 @@ def spike_recovery_curve(x: np.ndarray, y: np.ndarray, design: np.ndarray, *,
                                      "transmission_floor": transmission_floor,
                                      "confound_induced_baseline": baseline,
                                      "observed_matched_direction": observed_matched,
+                                     "observed_matched_direction_abs": observed_matched_abs,
+                                     "direction_source": ("fitted_pairs_supplied" if direction_pairs is not None
+                                                          else "structured_molecular_direction"
+                                                          if molecular_directions is not None else "random"),
                                      "observed_multivariate_top_cca": float(observed),
                                      "baseline_top_cca": float(top_canonical_correlation(
                                          x_residual, y_residual, n_components=n_components))})

@@ -162,9 +162,113 @@ def test_summary_reports_observed_against_floor():
                                   n_draws=4, n_components=6, seed=13)
     summary = result.summary()
     for key in ("detection_floor", "observed", "observed_above_floor", "attenuation_slope",
-                "recovered_median", "n_patients"):
+                "recovered_median", "n_patients", "summary_schema_version",
+                "observed_above_floor_status", "channel_statistic"):
         assert key in summary
-    assert isinstance(summary["observed_above_floor"], bool)
+    assert summary["summary_schema_version"] == 2
+    # SCHEMA 2 CONTRACT: with no channel statistic supplied there is nothing to
+    # grade, and the flag says so instead of inventing a verdict from a random
+    # direction. `None` is deliberate -- a silent False would be the schema-1 bug.
+    assert summary["observed_above_floor"] is None
+    assert summary["observed_above_floor_status"] == "ungraded_no_channel_statistic"
+    result.channel_statistic = 0.9
+    result.channel_statistic_name = "test"
+    graded = result.summary()
+    assert isinstance(graded["observed_above_floor"], bool)
+    assert graded["observed_above_floor_status"] == "graded"
+
+
+def test_the_flag_is_a_magnitude_and_cannot_be_flipped_by_the_sign_of_the_channel():
+    """B1 of PREDECLARED_observed_above_floor_20260804T1843Z, as a regression test.
+
+    A detection floor is a threshold on the SIZE of an association. At schema 1 the
+    flag compared a signed statistic against a positive floor, so two datasets
+    differing only in the sign of the planted association returned opposite
+    verdicts for identical evidence. Nothing about the fixed flag may depend on
+    the sign."""
+    from morpheus.v2.calibra.calibration import channel_clears_floor
+
+    for magnitude in (0.05, 0.2, 0.6):
+        positive = channel_clears_floor(magnitude, 0.1)
+        negative = channel_clears_floor(-magnitude, 0.1)
+        assert positive == negative, (magnitude, positive, negative)
+    assert channel_clears_floor(0.6, 0.1)[0] is True
+    assert channel_clears_floor(-0.6, 0.1)[0] is True
+    assert channel_clears_floor(0.05, 0.1)[0] is False
+    # Ungradable is None, never False: "we could not grade this" and "it is below
+    # the floor" are opposite statements.
+    assert channel_clears_floor(float("nan"), 0.1) == (None, "ungraded_no_channel_statistic")
+    assert channel_clears_floor(0.6, float("nan")) == (None, "ungraded_floor_did_not_resolve")
+
+
+def test_floors_from_recovery_reproduces_the_curve_s_own_floors():
+    """The floor rule is lifted out so a different readout can use the SAME rule.
+    If the extracted function ever drifts from the instrument, every
+    direction-matched / like-for-like floor becomes a re-implementation."""
+    from morpheus.v2.calibra.calibration import floors_from_recovery
+
+    x, y = _paired(n=260, shared=1.5, seed=21)
+    result = spike_recovery_curve(x, y, np.zeros((len(x), 0)), levels=(0.0, 0.05, 0.2, 0.4),
+                                  n_draws=8, n_components=6, seed=21)
+    floors = floors_from_recovery(result.levels, result.recovered,
+                                  recovery_fraction=result.recovery_fraction)
+    summary = result.summary()
+    for key in ("detection_floor", "transmission_floor", "null_reference_p90"):
+        assert np.allclose(floors[key], summary[key], equal_nan=True), key
+    assert np.allclose(floors["unpaired_hit_rate"], summary["unpaired_hit_rate"], equal_nan=True)
+    assert np.allclose(floors["paired_hit_rate"], summary["paired_hit_rate"], equal_nan=True)
+
+
+def test_spike_targets_accepts_a_supplied_image_direction():
+    """Without this the floor can only ever be measured on a direction pair that is
+    random on the image side, while the channel it grades is fitted on both."""
+    rng = np.random.default_rng(5)
+    x, y = _paired(n=600, seed=5)
+    u = np.zeros(x.shape[1]); u[3] = 1.0
+    v = np.zeros(y.shape[1]); v[2] = 1.0
+    for r_true in (0.0, 0.3, 0.6):
+        spiked, got_u, got_v = spike_targets(x, y, r_true, rng=np.random.default_rng(0),
+                                             image_direction=u, molecular_direction=v,
+                                             return_directions=True)
+        assert np.allclose(got_u, u) and np.allclose(got_v, v)
+        observed = abs(np.corrcoef(x @ u, spiked @ v)[0, 1])
+        assert abs(observed - r_true) < 0.05, (r_true, observed)
+    # A supplied direction consumes no draw, exactly as molecular_direction already did.
+    both = spike_targets(x, y, 0.2, rng=np.random.default_rng(0), image_direction=u,
+                         molecular_direction=v)
+    again = spike_targets(x, y, 0.2, rng=np.random.default_rng(77), image_direction=u,
+                          molecular_direction=v)
+    assert np.array_equal(both, again)
+    for bad in (np.zeros(x.shape[1]),):
+        try:
+            spike_targets(x, y, 0.2, rng=np.random.default_rng(0), image_direction=bad)
+        except ValueError:
+            continue
+        raise AssertionError("a zero image_direction must raise")
+
+
+def test_direction_pairs_pin_the_planted_axis_across_draws():
+    """A direction-matched floor is a floor measured on a SUPPLIED pair, one per draw."""
+    from morpheus.v2.calibra.spectral import heldout_cca_directions
+
+    x, y = _paired(n=400, shared=2.0, seed=31)
+    order = np.random.default_rng(0).permutation(len(x))
+    pairs = [heldout_cca_directions(x, y, order[:200], n_components=6),
+             heldout_cca_directions(x, y, order[200:], n_components=6)]
+    assert all(len(u) == x.shape[1] and len(v) == y.shape[1] for u, v in pairs)
+    result = spike_recovery_curve(x, y, np.zeros((len(x), 0)), levels=(0.0, 0.1, 0.4),
+                                  n_draws=4, n_components=6, seed=31, direction_pairs=pairs)
+    assert result.summary()["direction_source"] == "fitted_pairs_supplied"
+    # Pairs cycle, so draws 0 and 2 share a pair and must be bit-identical.
+    assert np.array_equal(result.recovered[:, 0], result.recovered[:, 2])
+    assert not np.array_equal(result.recovered[:, 0], result.recovered[:, 1])
+    try:
+        spike_recovery_curve(x, y, np.zeros((len(x), 0)), levels=(0.0, 0.1), n_draws=2,
+                             direction_pairs=pairs, molecular_directions=np.eye(y.shape[1])[:1])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("direction_pairs and molecular_directions must be exclusive")
 
 
 # --- held-out CCA: the fix for in-sample capacity inflation -----------------

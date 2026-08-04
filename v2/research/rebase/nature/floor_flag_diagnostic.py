@@ -13,6 +13,19 @@ Every statistic is imported from ``v2/calibra`` or ``v2/calibra/spectral``.
 Nothing is computed inline except the construction of the synthetic matrices.
 
 Predeclaration: NOTEBOOK_ENTRIES/PREDECLARED_observed_above_floor_20260804T1843Z.md
+
+HISTORICAL NOTE (2026-08-04). The run this script produced --
+``runs/floor_flag_audit/floor_flag_diagnostic.json`` -- was made against
+``calibration`` SUMMARY SCHEMA 1, where ``observed_above_floor`` was the broken
+flag under test. The defect it demonstrated has since been fixed: at schema 2 the
+library refuses to invent a comparator, so a call that supplies no
+``channel_statistic`` returns ``None`` with status
+``ungraded_no_channel_statistic`` rather than the schema-1 verdict. Re-running
+this script therefore CANNOT reproduce the schema-1 column, and the JSON in
+``runs/floor_flag_audit/`` is the record of what schema 1 did. The
+``shipped_observed_above_floor`` field below is kept, now reporting the
+schema-aware value alongside its status, so that a re-run is visibly a different
+measurement rather than a silently changed one.
 """
 from __future__ import annotations
 
@@ -113,6 +126,8 @@ def case(name: str, *, n: int, p: int, q: int, rho: float, negative: bool, seed:
         "shipped_observed_matched_direction": matched,
         "shipped_observed_matched_direction_abs": float(abs(matched)),
         "shipped_observed_above_floor": bool(summary["observed_above_floor"]),
+        "observed_above_floor_status": summary["observed_above_floor_status"],
+        "summary_schema_version": int(summary["summary_schema_version"]),
         "corrected_flag_truth_direction": bool(np.isfinite(floor) and truth > floor),
         "heldout_top_cca": heldout,
         "corrected_flag_heldout": bool(np.isfinite(floor) and np.isfinite(heldout) and heldout > floor),

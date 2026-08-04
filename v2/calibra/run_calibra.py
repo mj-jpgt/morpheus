@@ -26,7 +26,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .calibration import permutation_null, spike_recovery_curve
+from .calibration import SUMMARY_SCHEMA_VERSION, permutation_null, spike_recovery_curve
 from .residualise import confound_design, cross_fitted_residuals, pooled_tissue_source_site
 from .spectral import (cca_spectrum, effective_rank, heldout_single_direction_correlation,
                        heldout_top_cca)
@@ -128,6 +128,16 @@ def _channel_measurement(x: np.ndarray, y: np.ndarray, design: np.ndarray, strat
     """
     result = spike_recovery_curve(x, y, design, levels=levels, n_draws=n_draws,
                                   n_components=n_components, seed=seed, n_jobs=n_jobs)
+    # The floor grades A CHANNEL, and ``spike_recovery_curve`` cannot measure one --
+    # its own matched readout uses a RANDOM direction pair. The channel statistic is
+    # supplied here, before summary(), so that ``observed_above_floor`` is a
+    # measurement rather than the constant it was at schema 1. It must be the
+    # held-out (fitted-direction, out-of-fold) top-CCA, never the in-sample maximum.
+    heldout = heldout_top_cca(cross_fitted_residuals(x, design, seed=seed),
+                              cross_fitted_residuals(y, design, seed=seed),
+                              n_components=n_components, seed=seed)
+    result.channel_statistic = float(heldout)
+    result.channel_statistic_name = f"heldout_top_cca(k={n_components},seed={seed})"
     summary = result.summary()
     null = permutation_null(x, y, design, strata=strata, n_permutations=n_permutations,
                             n_components=n_components, seed=seed, n_jobs=n_jobs)
@@ -139,9 +149,7 @@ def _channel_measurement(x: np.ndarray, y: np.ndarray, design: np.ndarray, strat
     summary.update({
         "effective_rank": effective_rank(x),
         "unadjusted_top_cca": float(unadjusted[0]) if unadjusted.size else float("nan"),
-        "heldout_top_cca": heldout_top_cca(
-            cross_fitted_residuals(x, design, seed=seed),
-            cross_fitted_residuals(y, design, seed=seed), n_components=n_components, seed=seed),
+        "heldout_top_cca": float(heldout),
     })
     return summary, result
 
@@ -191,20 +199,36 @@ def score_target_block_per_column(x_residual: np.ndarray, y_residual: np.ndarray
 
 def random_direction_column_correlation(x_residual: np.ndarray, y_residual: np.ndarray, *,
                                         n_draws: int = 40, seed: int = 42) -> np.ndarray:
-    """Per-column ``observed_matched_direction``: RANDOM image direction, this target.
+    """Per-column random-direction correlation MAGNITUDE, this target.
 
-    This is the statistic the CALIBRA ``detection_floor`` is actually measured
-    in. The floor comes from ``corr(X_res u, Y_spiked_res v)`` with ``u`` drawn
-    at random from image space, so the only per-target quantity on the floor's
-    scale is the same correlation with ``v`` pinned to a single target column.
+    This is the statistic the CALIBRA ``detection_floor`` is measured in on the
+    image side: the floor comes from ``corr(X_res u, Y_spiked_res v)`` with ``u``
+    drawn at random from image space, so the per-target quantity on that scale is
+    the same correlation with ``v`` pinned to a single target column.
+
+    **SIGN FIX, 2026-08-04 (schema 2).** This function used to return
+    ``np.median(scores, axis=0)`` over SIGNED per-draw correlations, and was then
+    graded against a strictly positive ``detection_floor`` by
+    :func:`grade_random_controls`. With ``u`` drawn at random, the sign of each
+    draw's correlation is itself random, so the signed median collapses towards
+    zero for *every* column whatever that column carries -- and a control that
+    always reads ~0 always passes. The negative control was therefore partly
+    structural rather than earned. It is the same defect as the one found in
+    ``calibration.SpikeRecoveryResult.summary``: a signed convention that is
+    correct for the *paired* within-draw spike comparison, carried into an
+    *unpaired* comparison against a positive threshold where only a magnitude is
+    coherent. The median is now taken over ``|correlation|``, which moves the
+    controls **up** -- i.e. the fix makes our own negative control harder to pass,
+    and rows emitted before it are not comparable to rows emitted after.
 
     It is reported next to ``score_target_block_per_column`` precisely because
     the two disagree, and the disagreement is the point: a random direction
-    through a 256-column representation sees essentially nothing, while a
-    *fitted* (cross-validated) direction through the same representation sees a
-    great deal. Grading a fitted-direction readout against a random-direction
-    floor is not a like-for-like comparison, and any per-target claim that does
-    so is reading a floor that was never measured for it.
+    through a 256-column representation sees far less than a *fitted*
+    (cross-validated) direction through the same representation. On whether the
+    fitted statistic may be graded against the random-direction floor at all, see
+    ``spectral.heldout_single_direction_correlation``'s docstring, which says it
+    may, and ``NOTEBOOK_ENTRIES/direction_matched_floor_*`` for the measurement
+    that settles it.
     """
     x_residual = np.asarray(x_residual, dtype=np.float64)
     y_residual = np.asarray(y_residual, dtype=np.float64)
@@ -217,7 +241,7 @@ def random_direction_column_correlation(x_residual: np.ndarray, y_residual: np.n
         projected = x_residual @ u
         projected = (projected - projected.mean()) / max(projected.std(), 1e-12)
         scores[draw] = (projected[:, None] * y_std).mean(axis=0)
-    return np.median(scores, axis=0)
+    return np.median(np.abs(scores), axis=0)
 
 
 def grade_random_controls(control_values: np.ndarray, control_names: np.ndarray, *,
@@ -545,7 +569,14 @@ def main() -> None:
                 "transmission_floor": summary["transmission_floor"],
                 "attenuation_slope": summary["attenuation_slope"],
                 "null_reference_p90": summary["null_reference_p90"],
-                "observed_above_floor": float(summary["observed_above_floor"]),
+                # SCHEMA 2: a real verdict, or NaN when the comparison could not be
+                # made. NaN and 0.0 are opposite statements and schema 1 emitted 0.0
+                # for both -- in fact it emitted 0.0 unconditionally.
+                "observed_above_floor": (float(summary["observed_above_floor"])
+                                         if summary["observed_above_floor"] is not None
+                                         else float("nan")),
+                "summary_schema_version": float(summary["summary_schema_version"]),
+                "channel_statistic": float(summary["channel_statistic"]),
                 # Targeted-readout diagnostics. baseline_* is the REAL-DATA GATE:
                 # with a direction-matched readout the level-0 value must sit near
                 # the sampling null, not near 1. A baseline near 1 means the readout
@@ -554,6 +585,7 @@ def main() -> None:
                 "baseline_is_null_like": float(summary["baseline_is_null_like"]),
                 "baseline_null_scale": summary["baseline_null_scale"],
                 "observed_matched_direction": summary["observed_matched_direction"],
+                "observed_matched_direction_abs": summary["observed_matched_direction_abs"],
                 "permutation_null_median": summary["null_median"],
                 "permutation_null_p95": summary["null_p95"],
                 "excess_over_null_median": summary["excess_over_null_median"],
@@ -578,6 +610,26 @@ def main() -> None:
     frame.to_csv(output / "task_rows.csv", index=False)
     (output / "calibra_summary.json").write_text(json.dumps(summaries, indent=2))
     (output / "calibra_protocol.json").write_text(json.dumps({
+        # PROVENANCE OF THE OUTPUT SCHEMA. Bumped to 2 on 2026-08-04 with two
+        # changes that alter the MEANING of keys already present in shipped
+        # artifacts, so a reader must be able to tell the two apart:
+        #   * ``observed_above_floor`` was a constant at schema 1 (it graded a
+        #     signed random-direction correlation against a positive floor) and is
+        #     a real magnitude verdict on ``channel_statistic`` at schema 2;
+        #   * ``observed_matched_direction`` per-column rows were a signed median
+        #     over random directions at schema 1 and are a median |correlation| at
+        #     schema 2, which raises the random controls.
+        # Artifacts written before this bump are NOT rewritten. See
+        # ``calibration.SUMMARY_SCHEMA_VERSION``.
+        "summary_schema_version": SUMMARY_SCHEMA_VERSION,
+        "schema_2_changes": [
+            "observed_above_floor: was a constant (signed random-direction statistic vs a "
+            "positive floor); now abs(channel_statistic) > detection_floor, NaN when ungradable",
+            "channel_statistic: NEW; heldout_top_cca, the fitted-direction out-of-fold channel "
+            "the floor grades",
+            "random_direction_column_correlation: was a SIGNED median over random directions "
+            "(collapses to ~0 for every column); now a median |correlation|",
+        ],
         "levels": list(levels), "n_draws": args.n_draws, "n_components": args.n_components,
         "seed": args.seed, "partition": args.partition,
         "confounds": ["cancer", "tss", *( ["purity"] if purity_by_patient else [])], "purity": purity_manifest,
