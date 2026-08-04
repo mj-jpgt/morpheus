@@ -41,7 +41,7 @@ n = 2,530.
 | 5,200 | 13 | 100 | 0.1111 | **0.1057** | 0.1199 | 0.1084 | 0.951 |
 | 10,400 | 13 | 100 | 0.0785 | **0.0745** | 0.0865 | 0.0762 | 0.949 |
 | 20,800 | 13 | 50 | 0.0555 | **0.0538** | 0.0608 | 0.0535 | 0.969 |
-| **53,217** | 13 | 100 | 0.0347 | **0.0333** | 0.0364 | — | 0.960 |
+| **53,217** | 13 | 100 | 0.0347 | **0.0333** | 0.0364 | 0.0334 | 0.960 |
 
 At the matched anchor the spatial null is **0.1452**, inside TCGA's measured 0.140–0.147 band. The
 predeclared law **2·√(k/n_eff)** tracks the measurement to within **3.1–5.1% at every n over a 100-fold
@@ -294,11 +294,26 @@ n ≈ 2,766, k = 16, and every spatial paper in this literature runs at 10–100
   `genesets_cross/claim3_gene_sets.json`, `random_gene_sets_{test,all}.npz`.
 * Logs: `/lambda/nfs/geeg/biorag3_persistent_20260711/spatial/logs/claims_*.log`.
 
-### Suite status, reported rather than fixed
+### Suite status
 
-`morpheus/v2/tests` on the box: **377 passed, 1 failed, 27 errors** before any of my files were added.
-The 27 errors are `test_p2_figures.py` needing matplotlib, which is absent from `~/venv` by policy. The
-**failure is pre-existing and is not mine**: `test_leave_sites_out.py::test_indexed_cca_recovers_a_planted_signal`
-asserts `heldout_top_cca_indexed(...) > 0.8` and gets **0.7923** — a marginal numerical bar, not a
-logic error. I have not touched it, because loosening another author's threshold to make my run look
-green is exactly the move this project's rules exist to prevent. It needs an owner's decision.
+**At the commit this entry lands on (`be0ce4e`): `morpheus/v2/tests` is 408 passed, 0 failed, 27
+errors**, the 27 being `test_p2_figures.py` needing matplotlib, absent from `~/venv` by policy. My 18
+new tests are inside that 408.
+
+Two transient failures were observed on the way and are recorded because they were real when seen,
+both in other people's files and both since resolved by their owners:
+
+* `test_leave_sites_out.py::test_indexed_cca_recovers_a_planted_signal` — asserted
+  `heldout_top_cca_indexed(...) > 0.8`, measured **0.7923**, at the commit I started from. Passes now.
+* `test_effective_rank_canonical.py::test_no_second_definition_exists_in_the_tree` — flagged
+  `v2/tests/test_p2_centring_amplification.py` (added by another agent at `88e37ff`) as SVD-based rank
+  outside `calibra/spectral.py`. Fixed by that agent at `7c435dd`.
+
+Neither was touched by me. The guard test was also re-run with my two files removed from the tree, to
+confirm the offender list never contained them: 13 passed.
+
+**Note on the shared checkout.** This repository is being edited concurrently by other agents; the
+tracked file count moved 611 → 637 during this session and `git ls-tree -r HEAD` grew under commits
+that are not mine. Every workspace deploy was a fresh `git archive HEAD` verified file-by-file against
+that tree's blob SHA-1 (611 / 618 / 621 / 623 / 637 files, zero mismatches), so every number above was
+produced from a tree provably identical to a named commit.
