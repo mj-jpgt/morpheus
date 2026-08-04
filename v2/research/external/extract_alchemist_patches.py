@@ -120,7 +120,14 @@ def main() -> None:
     output = Path(args.output_dir)
     staging = output / "staging"
     staging.mkdir(parents=True, exist_ok=True)
-    slide_dir = output / "slides"
+    # Scratch must be PER SHARD. Shards deliberately share `staging/` -- that is the output --
+    # but they must not share the directory the .svs files land in, because `shutil.rmtree`
+    # at the end of this function would then delete slides the other shards are still reading.
+    # That is exactly what happened on the first full run: the earliest-finishing shard wiped
+    # the shared scratch and 20 slides died with "Unsupported or missing image file",
+    # "Cannot read raw tile" and one outright "No such file or directory" -- all AFTER their
+    # md5 had already verified, which is what made the cause obvious.
+    slide_dir = output / (f"slides_shard{args.shard}" if args.num_shards > 1 else "slides")
     slide_dir.mkdir(parents=True, exist_ok=True)
 
     catalog = pd.read_csv(args.catalog)
