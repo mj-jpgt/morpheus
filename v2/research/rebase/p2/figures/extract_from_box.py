@@ -122,7 +122,48 @@ VENDORED = [
     "e0_run/d1_diag/lr_L4_lo_m0.999.log",
     "e0_run/d1_diag/lr_L5_hi_m0.999.log",
     "e0_run/d1_diag/lr_L6_lo_m0.log",
+    # §5.2's HEADLINE MOMENTUM SWEEP -- the step-0-to-600 table, and the source of
+    # every value §5.4 row 1 and §5.2's per-step folds are read from. §6.4 flags
+    # only the `lr_L*` gap, so this table's provenance was exactly as weak as
+    # §5.2a's without being labelled so: audit rows 43, 46 and 47 resolved against
+    # the draft's own table. The runs were launched with a 1,500-step budget and
+    # the table reads them to 600.
+    "e0_run/d1_diag/long_m0.log",
+    "e0_run/d1_diag/long_m0.9.log",
+    "e0_run/d1_diag/long_m0.99.log",
+    "e0_run/d1_diag/long_m0.999.log",
+    # §5.2 MEASUREMENT 2, the staleness falsification: rank AND the key-to-encoder
+    # cosine on the same rows at step 100. These are a DIFFERENT run family from
+    # `long_*` above -- 300-step runs, and at step 100 they read 2.58 / 6.65 / 6.89
+    # where `long_*` reads 1.62 / 6.49 / 7.03 for the same nominal configuration.
+    # §5.2 quotes both families and does not say so; see `known_source_disagreements`.
+    "e0_run/d1_diag/mom_0_d0.04.log",
+    "e0_run/d1_diag/mom_0.99_d0.04.log",
+    "e0_run/d1_diag/mom_0.999_d0.04.log",
+    # §5.2's TURNOVER FALSIFICATION, read at step 250. Audit rows 51, 52 and 53.
+    "e0_run/d1_diag/turn_cap2048_m0.9.log",
+    "e0_run/d1_diag/turn_cap2048_m0.95.log",
+    "e0_run/d1_diag/turn_cap4096_m0.95.log",
+    "e0_run/d1_diag/turn_cap8192_m0.95.log",
+    "e0_run/d1_diag/turn_cap8192_m0.99.log",
+    # THE RETRAINING FLOOR ON THE FIXED HELD-OUT PROBE. Draft §6.2 predeclared
+    # this run in these words -- "five same-seed repeats of the `programme_free` /
+    # 500-step configuration with `d1_momentum_probe.py` attached, read at a fixed
+    # step" -- because every rank number in §5 is measured on that block and no
+    # floor had ever been measured for it, which made all of §5 `unjudgeable`
+    # rather than passing or failing. Ten runs: five identical same-seed repeats
+    # of EACH of the two arms §5 compares. Produced by `p2_probe_floors.py` on a
+    # workspace verified file-by-file against `git ls-tree`; the JSON carries the
+    # sha256 of every probe state it read, every per-repeat value, and its own
+    # `absent` list of what the floor still does not cover.
+    "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "e0_run/d1_probefloor/out/probe_floors_run.log",
 ]
+
+#: The ten probe-floor logs themselves, vendored beside the JSON so the two rank
+#: columns can be read from the run's own bytes and not only from the summary.
+VENDORED += [f"e0_run/d1_probefloor/probefloor_m{m}_rep{r}.log"
+             for m in ("0.999", "0.0") for r in range(1, 6)]
 
 # --------------------------------------------------------------------------
 # Extractors: run on the box, print JSON on stdout, written under data/extracted/

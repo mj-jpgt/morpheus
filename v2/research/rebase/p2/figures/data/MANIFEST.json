@@ -1,6 +1,6 @@
 {
  "box": "ubuntu@150.136.45.194",
- "fetched_utc": "2026-08-04T13:27:11Z",
+ "fetched_utc": "2026-08-04T13:59:52Z",
  "files": {
   "e0_run/collapse_diag.log": {
    "box_path": "~/e0_run/collapse_diag.log",
@@ -31,6 +31,30 @@
    "bytes": 879,
    "produced_by": null,
    "sha256": "d2b49035e174db9b62dca95d3bed163cd6fc5e0aa8da41ec6af12231babb40f7"
+  },
+  "e0_run/d1_diag/long_m0.9.log": {
+   "box_path": "~/e0_run/d1_diag/long_m0.9.log",
+   "bytes": 1177,
+   "produced_by": null,
+   "sha256": "850d2965888589f5a44ed71e108eb4bcb0ef580c4e8c7d7e0a4f93171932d3ac"
+  },
+  "e0_run/d1_diag/long_m0.99.log": {
+   "box_path": "~/e0_run/d1_diag/long_m0.99.log",
+   "bytes": 1178,
+   "produced_by": null,
+   "sha256": "efe480fa1df2353e167bf1ee2249d64724b887bf822c1c3add9239459e13df79"
+  },
+  "e0_run/d1_diag/long_m0.999.log": {
+   "box_path": "~/e0_run/d1_diag/long_m0.999.log",
+   "bytes": 1179,
+   "produced_by": null,
+   "sha256": "c24d7a595089fd43bba0d4039f810fad1b2330f33e1c8cc01e8f5d49953b3cb7"
+  },
+  "e0_run/d1_diag/long_m0.log": {
+   "box_path": "~/e0_run/d1_diag/long_m0.log",
+   "bytes": 1177,
+   "produced_by": null,
+   "sha256": "157aedc73b41c730d87bc8dcdb649750911c5013c4951e546e3ce886e5790d9f"
   },
   "e0_run/d1_diag/lr_L1_hi_m0.9.log": {
    "box_path": "~/e0_run/d1_diag/lr_L1_hi_m0.9.log",
@@ -67,6 +91,24 @@
    "bytes": 711,
    "produced_by": null,
    "sha256": "84019fc73cf92003d74806733be56a8ad712c5ef8ac95f841b7d8d40cffc6895"
+  },
+  "e0_run/d1_diag/mom_0.999_d0.04.log": {
+   "box_path": "~/e0_run/d1_diag/mom_0.999_d0.04.log",
+   "bytes": 338,
+   "produced_by": null,
+   "sha256": "748c043f4c8cc96c84b503b29480a12cc002a09cdf64c913a90eb0119485bce9"
+  },
+  "e0_run/d1_diag/mom_0.99_d0.04.log": {
+   "box_path": "~/e0_run/d1_diag/mom_0.99_d0.04.log",
+   "bytes": 337,
+   "produced_by": null,
+   "sha256": "653425faee20e89595e08232b01b03f4118338de3eddaceb05e7c43d14081722"
+  },
+  "e0_run/d1_diag/mom_0_d0.04.log": {
+   "box_path": "~/e0_run/d1_diag/mom_0_d0.04.log",
+   "bytes": 336,
+   "produced_by": null,
+   "sha256": "4a0e012321a53cb89658c05d176f2d7eb410e4eb3f7365aa66ced9e3f823b393"
   },
   "e0_run/d1_diag/mseed_m0.999_s42.log": {
    "box_path": "~/e0_run/d1_diag/mseed_m0.999_s42.log",
@@ -139,6 +181,36 @@
    "bytes": 625,
    "produced_by": null,
    "sha256": "2f54dac4b8fe82d296e7fd375945d1a0fa0a7389057bfd18a890890186efae95"
+  },
+  "e0_run/d1_diag/turn_cap2048_m0.9.log": {
+   "box_path": "~/e0_run/d1_diag/turn_cap2048_m0.9.log",
+   "bytes": 793,
+   "produced_by": null,
+   "sha256": "36929dabb6ea31effdcfeed7e2b866caeb2c15289d2da84fa6672caf5bdea902"
+  },
+  "e0_run/d1_diag/turn_cap2048_m0.95.log": {
+   "box_path": "~/e0_run/d1_diag/turn_cap2048_m0.95.log",
+   "bytes": 795,
+   "produced_by": null,
+   "sha256": "8afafccfbd9869bb46af1d7e44d2542492b09d125151b075b71c2e3def53089c"
+  },
+  "e0_run/d1_diag/turn_cap4096_m0.95.log": {
+   "box_path": "~/e0_run/d1_diag/turn_cap4096_m0.95.log",
+   "bytes": 796,
+   "produced_by": null,
+   "sha256": "a7086718926dde8c5a1d56e52994a7a7ab3203b84d1c7f9ec020d04c0a61ecdc"
+  },
+  "e0_run/d1_diag/turn_cap8192_m0.95.log": {
+   "box_path": "~/e0_run/d1_diag/turn_cap8192_m0.95.log",
+   "bytes": 856,
+   "produced_by": null,
+   "sha256": "db10a201eb1255c72ea9573bb579da2ecee1636e9690bec2e28052d6604f4740"
+  },
+  "e0_run/d1_diag/turn_cap8192_m0.99.log": {
+   "box_path": "~/e0_run/d1_diag/turn_cap8192_m0.99.log",
+   "bytes": 857,
+   "produced_by": null,
+   "sha256": "9cfb2993e188c5212a2385b5c1ba6f2c6b51033c692cfd6518c8bfbecf9bca6c"
   },
   "e0_run/d1_envelope_readout.log": {
    "box_path": "~/e0_run/d1_envelope_readout.log",

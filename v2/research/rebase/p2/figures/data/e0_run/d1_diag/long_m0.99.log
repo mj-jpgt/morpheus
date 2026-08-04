@@ -1,0 +1,27 @@
+momentum=0.99  decorrelation=0.04  capacity=4096  steps=1500  probe=256
+  step  eff-rank  feat-std  rna-rna  contrastive
+     0     67.55    0.0342   0.3650          nan
+    50      8.65    0.0079   0.8766       4.9877
+        STALENESS age:cos  0:0.620
+   100      6.49    0.0042   0.9077       6.4492
+        STALENESS age:cos  0:0.911
+   150      4.56    0.0070   0.9447       6.1641
+        STALENESS age:cos  0:0.935
+   200      5.70    0.0048   0.9666       7.4520
+        STALENESS age:cos  0:0.961
+   250      5.77    0.0059   0.9220       7.8757
+        STALENESS age:cos  0:0.956
+   300      6.01    0.0046   0.9702       7.7448
+        STALENESS age:cos  0:0.977
+   350      5.64    0.0061   0.9526       7.9378
+        STALENESS age:cos  0:0.983
+   400      5.50    0.0059   0.9617       8.0600
+        STALENESS age:cos  0:0.971
+   450      5.65    0.0061   0.9518       7.8125
+        STALENESS age:cos  0:0.974
+   500      5.50    0.0049   0.9564       7.9587
+        STALENESS age:cos  0:0.978
+   550      5.69    0.0062   0.9578       8.1402
+        STALENESS age:cos  0:0.983
+   600      5.88    0.0053   0.9612       7.8938
+        STALENESS age:cos  0:0.983
