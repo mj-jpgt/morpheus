@@ -515,12 +515,23 @@ def summary_sentence(audit: dict | None = None) -> str:
     # fixed held-out probe HAS a floor, and what stops the remaining rows is that
     # it was not measured at their reading step or on their arm.
     verb = "clears" if s["selection_clearing"] == 1 else "clear"
+    # The third clause has to survive its own count reaching ZERO, which it now
+    # has: every selection has a floor measured on its own statistic, block,
+    # reading step and arm. Phrasing that as "0 cannot be judged at all because no
+    # floor has been measured" reads as though a floor were still missing, so the
+    # zero case says what is true instead. It is still generated, so it cannot be
+    # edited into the draft by hand.
+    if s["selection_unjudgeable"]:
+        third = (f"and {s['selection_unjudgeable']} cannot be judged at all** because no floor has "
+                 f"been measured for the statistic, block, reading step and arm they sit on.")
+    else:
+        third = ("and none is unjudgeable** — every selection now has a floor measured on its own "
+                 "statistic, block, reading step and arm.")
     return (f"{s['total']} rank comparisons are enumerated; "
             f"{s['selection']} of them are selections between candidate configurations. "
             f"**{s['selection_failing']} of those {s['selection']} do not clear the floor their own "
-            f"statistic and block license, {s['selection_clearing']} {verb} it, and "
-            f"{s['selection_unjudgeable']} cannot be judged at all** because no floor has been "
-            f"measured for the statistic, block, reading step and arm they sit on. "
+            f"statistic and block license, {s['selection_clearing']} {verb} it, "
+            f"{third} "
             f"{s['exempt']} rows are exempt with the reason stated, "
             f"{s['no_floor_measured']} of the {s['total']} are unjudgeable for want of a floor, and "
             f"{s['block_mismatched']} carry an explicit statistic-, block- or kind-mismatch note.")

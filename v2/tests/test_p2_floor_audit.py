@@ -334,7 +334,13 @@ def test_the_three_way_count_partitions_the_selections(audit):
     s = A.summary(audit)
     assert (s["selection_failing"] + s["selection_clearing"]
             + s["selection_unjudgeable"]) == s["selection"]
-    assert s["selection_unjudgeable"] > 0, "the absent floors are the point of the audit"
+    # The split now returns ZERO in its third bin, and the machinery that keeps it
+    # honest is what matters rather than the count: a row with no floor may still
+    # only record `clears: null`, which the checker enforces and the negative
+    # tests below exercise. Sixteen NON-selection rows are still unjudgeable, so
+    # the audit has not stopped saying "we cannot tell".
+    assert s["selection_unjudgeable"] == 0
+    assert s["no_floor_measured"] > 0, "the absent floors are still the point of the audit"
 
 
 def test_the_two_rows_that_used_to_clear_now_clear_a_floor_on_their_own_block(audit):
@@ -375,25 +381,61 @@ def test_the_selections_that_clear_are_exactly_these(audit):
         "5.2-turnover-momentum",
         "5.4-row2-seedvaried",
         "5.4-row3-r3",
+        # The three that were unjudgeable until a floor was measured at their own
+        # step budget, their own third arm and their own capacity. All three
+        # clear; nothing about the direction was predeclared and every verdict is
+        # `ratio > floor` computed by the checker.
+        "5.4-row1-step600",
+        "5.4-m0999-over-m099",
+        "5.2-capacity-64",
     ]), clearing
 
 
-def test_the_section_5_rows_that_remain_unjudgeable_say_which_gap_stops_them(audit):
-    """The probe block has a floor now; three §5 selections are still outside it.
+def test_the_last_three_unjudgeable_selections_were_closed_by_their_own_floors(audit):
+    """Each was outside the step-500 floor for a reason the floor could not be stretched over.
 
-    Each is outside for a reason the floor cannot be stretched over: a reading
-    step past the 500 the repeats were run to, a momentum value no repeat was run
-    at, or a capacity no repeat was run at. The rule this file exists to enforce
-    is that a floor is never borrowed across a block, and a step and an arm are
-    part of this block's identity.
+    A reading step past the 500 the repeats were run to, a momentum value no
+    repeat was run at, and a capacity no repeat was run at. None was closed by
+    stretching the floor: each was closed by running the same measurement at the
+    setting the row sits on, and the block string carries that setting so
+    block-matching enforces it. `n` is 5 per arm in all three.
     """
-    unjudged = {r["id"] for r in audit["comparisons"]
-                if r["kind"] == "selection" and r["floor"] is None}
-    assert unjudged == {"5.4-row1-step600", "5.4-m0999-over-m099", "5.2-capacity-64"}
-    for rid in unjudged:
+    expected = {
+        "5.4-row1-step600": ("R3_probe_step600_m0999_vs_m0",
+                             "fixed held-out probe, step 600, arms m = 0.999 / m = 0"),
+        "5.4-m0999-over-m099": ("R3_probe_step600_m0999_vs_m099",
+                                "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99"),
+        "5.2-capacity-64": ("R3_probe_step150_cap64_vs_cap4096",
+                            "fixed held-out probe, step 150, "
+                            "arms capacity 64 / capacity 4,096"),
+    }
+    for rid, (floor_name, block) in expected.items():
         row = next(r for r in audit["comparisons"] if r["id"] == rid)
-        assert "STILL UNJUDGEABLE" in row["floor_note"], rid
-        assert row["clears"] is None, rid
+        assert row["floor"] == floor_name, rid
+        assert row["block"] == block, rid
+        assert row["clears"] is True, rid
+        assert audit["floors"][floor_name]["block"] == block, rid
+        assert audit["floors"][floor_name]["n"] == 5, rid
+    # No selection may be judged against a floor whose arms are not its own: the
+    # two step-600 rows share a step and a statistic and must NOT share a floor.
+    assert (audit["comparisons"] and
+            expected["5.4-row1-step600"][0] != expected["5.4-m0999-over-m099"][0])
+
+
+def test_the_value_this_project_runs_passes_narrowly_and_the_row_says_so(audit):
+    """m = 0.999 over m = 0.99 clears its own floor by 5.6%, and that is fragile.
+
+    The ten runs that measured the floor separate the two arms by only 1.138x
+    worst case under R3, which is INSIDE it -- the row passes on the particular
+    single-seed draw §5.2's table records. Under canonical R1 the same ten runs
+    separate them by 1.453x against a 1.155x floor. The row has to carry both or
+    the pass is being laundered, so the text is asserted rather than trusted.
+    """
+    row = next(r for r in audit["comparisons"] if r["id"] == "5.4-m0999-over-m099")
+    floor = audit["floors"][row["floor"]]
+    assert row["clears"] is True
+    assert row["ratio"] / floor["value"] < 1.10, "if this stops being narrow, rewrite the note"
+    assert "1.138" in row["rests_on"] and "1.453" in row["rests_on"]
 
 
 def test_the_probe_floor_is_carried_by_the_collapsed_arm_and_is_not_bimodal(audit):
@@ -409,10 +451,23 @@ def test_the_probe_floor_is_carried_by_the_collapsed_arm_and_is_not_bimodal(audi
     appears on the probe block under either statistic at any step.
     """
     probe = {n: f for n, f in audit["floors"].items() if "_probe_step" in n}
-    assert len(probe) == 10, sorted(probe)
+    assert len(probe) == 16, sorted(probe)
     for name, floor in probe.items():
-        assert floor["floor_arm"] == "m0", name
         assert floor["shape"]["bimodal"] is False, name
+    # (a) holds wherever a collapsed arm is one of the two: the m = 0 arm carries
+    # every floor it is part of, and the capacity-4,096 arm -- the collapsed side
+    # of §5.2 measurement 3 -- carries that one.
+    for name, floor in probe.items():
+        if "m0999_vs_m099" in name:
+            # BOTH arms are healthy here, so there is no collapsed arm to carry it
+            # and the floor is the smallest of the sixteen. That is the property
+            # stated the other way round and it is asserted rather than excused.
+            assert floor["floor_arm"] == "m0999", name
+            assert floor["value"] < 1.20, name
+        elif "cap64_vs_cap4096" in name:
+            assert floor["floor_arm"] == "cap4096", name
+        else:
+            assert floor["floor_arm"] == "m0", name
     assert audit["floors"]["R1_residualised_export"]["shape"]["bimodal"] is True
 
 

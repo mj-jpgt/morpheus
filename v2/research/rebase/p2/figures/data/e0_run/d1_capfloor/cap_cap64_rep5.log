@@ -1,0 +1,14 @@
+momentum=0.0  decorrelation=0.04  capacity=64  lr=0.0002  seed=42  steps=200  probe=256
+tau=0.0 steps   T=capacity/214=0.3 steps   tau/T=0.00
+  step   R3-rank  CANONICAL  feat-std  rna-rna  contrastive
+     0     67.55     101.38    0.0342   0.3650          nan
+    50      7.99      18.00    0.0064   0.8202       5.1581
+        STALENESS age:cos  0:1.000
+   100      6.67      10.65    0.0045   0.9112       5.2486
+        STALENESS age:cos  0:1.000
+   150      5.44       9.23    0.0051   0.9052       3.8711
+        STALENESS age:cos  0:0.996
+   200      5.55       8.67    0.0050   0.9216       5.2228
+        STALENESS age:cos  0:1.000
+
+DONE momentum=0.0 decorr=0.04 final_eff_rank=5.55 rna_rna=0.9216

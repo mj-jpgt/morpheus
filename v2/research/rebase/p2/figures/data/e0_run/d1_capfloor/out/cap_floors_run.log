@@ -1,0 +1,90 @@
+  cap64   rep1  step200  R1=   9.162  R3=   6.296  RankMe=  3.302  hard=   256
+  cap64   rep2  step200  R1=  10.072  R3=   6.007  RankMe=  2.721  hard=   256
+  cap64   rep3  step200  R1=   8.665  R3=   5.492  RankMe=  2.613  hard=   256
+  cap64   rep4  step200  R1=   8.136  R3=   4.910  RankMe=  2.456  hard=   256
+  cap64   rep5  step200  R1=   8.673  R3=   5.551  RankMe=  2.634  hard=   256
+  cap4096 rep1  step200  R1=   2.117  R3=   1.613  RankMe=  1.919  hard=   256
+  cap4096 rep2  step200  R1=   3.099  R3=   2.345  RankMe=  3.601  hard=   256
+  cap4096 rep3  step200  R1=   3.710  R3=   2.781  RankMe=  2.362  hard=   256
+  cap4096 rep4  step200  R1=   2.234  R3=   1.631  RankMe=  2.184  hard=   256
+  cap4096 rep5  step200  R1=   1.755  R3=   1.371  RankMe=  1.578  hard=   256
+
+floor on the fixed held-out probe at step 150 (max/min over five same-seed repeats, per arm)
+            view          statistic     arm        min        max     fold  shape
+     wsi_biology                 PR   cap64     2.1504     3.5643   1.658x  not bimodal (outlier=rep1, rest=1.306x, sep=1.27)
+     wsi_biology                 PR cap4096     1.1483     2.0181   1.758x  not bimodal (outlier=rep4, rest=1.662x, sep=1.06)
+                                 PR   FLOOR                         1.758x  carried by cap4096
+     wsi_biology         PR_rownorm   cap64     2.1504     3.5643   1.658x  not bimodal (outlier=rep1, rest=1.306x, sep=1.27)
+     wsi_biology         PR_rownorm cap4096     1.1483     2.0181   1.758x  not bimodal (outlier=rep4, rest=1.662x, sep=1.06)
+                         PR_rownorm   FLOOR                         1.758x  carried by cap4096
+     wsi_biology                 R1   cap64     8.8041     9.7869   1.112x  not bimodal (outlier=rep1, rest=1.061x, sep=1.05)
+     wsi_biology                 R1 cap4096     2.2861     3.7999   1.662x  not bimodal (outlier=rep5, rest=1.217x, sep=1.37)
+                                 R1   FLOOR                         1.662x  carried by cap4096
+     wsi_biology                 R2   cap64     5.0025     6.1234   1.224x  not bimodal (outlier=rep1, rest=1.126x, sep=1.09)
+     wsi_biology                 R2 cap4096     1.7042     2.9056   1.705x  not bimodal (outlier=rep5, rest=1.391x, sep=1.23)
+                                 R2   FLOOR                         1.705x  carried by cap4096
+     wsi_biology                 R3   cap64     5.0025     6.1234   1.224x  not bimodal (outlier=rep1, rest=1.126x, sep=1.09)
+     wsi_biology                 R3 cap4096     1.7042     2.9056   1.705x  not bimodal (outlier=rep5, rest=1.391x, sep=1.23)
+                                 R3   FLOOR                         1.705x  carried by cap4096
+     wsi_biology             RankMe   cap64     2.5445     2.9629   1.164x  not bimodal (outlier=rep5, rest=1.083x, sep=1.07)
+     wsi_biology             RankMe cap4096     2.7195     4.1606   1.530x  not bimodal (outlier=rep3, rest=1.500x, sep=1.02)
+                             RankMe   FLOOR                         1.530x  carried by cap4096
+     wsi_biology          alpha_req   cap64     2.2377     2.4507   1.095x  not bimodal (outlier=rep5, rest=1.065x, sep=1.03)
+     wsi_biology          alpha_req cap4096     2.5221     4.2635   1.690x  not bimodal (outlier=rep2, rest=1.352x, sep=1.25)
+                          alpha_req   FLOOR                         1.690x  carried by cap4096
+     wsi_biology  alpha_req_abs_dev   cap64     1.2377     1.4507   1.172x  not bimodal (outlier=rep5, rest=1.114x, sep=1.05)
+     wsi_biology  alpha_req_abs_dev cap4096     1.5221     3.2635   2.144x  not bimodal (outlier=rep2, rest=1.515x, sep=1.42)
+                  alpha_req_abs_dev   FLOOR                         2.144x  carried by cap4096
+     wsi_biology          hard_rank   cap64   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     wsi_biology          hard_rank cap4096   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+                          hard_rank   FLOOR                         1.000x  carried by cap64
+     wsi_biology        stable_rank   cap64     1.5362     2.4213   1.576x  not bimodal (outlier=rep1, rest=1.315x, sep=1.20)
+     wsi_biology        stable_rank cap4096     1.0744     1.6274   1.515x  not bimodal (outlier=rep4, rest=1.363x, sep=1.11)
+                        stable_rank   FLOOR                         1.576x  carried by cap64
+     rna_biology                 PR   cap64     2.4899     3.5175   1.413x  not bimodal (outlier=rep2, rest=1.096x, sep=1.29)
+     rna_biology                 PR cap4096     1.0500     1.4666   1.397x  not bimodal (outlier=rep5, rest=1.230x, sep=1.14)
+                                 PR   FLOOR                         1.413x  carried by cap64
+     rna_biology         PR_rownorm   cap64     2.4899     3.5175   1.413x  not bimodal (outlier=rep2, rest=1.096x, sep=1.29)
+     rna_biology         PR_rownorm cap4096     1.0500     1.4666   1.397x  not bimodal (outlier=rep5, rest=1.230x, sep=1.14)
+                         PR_rownorm   FLOOR                         1.413x  carried by cap64
+     rna_biology                 R1   cap64    14.0606    14.8823   1.058x  not bimodal (outlier=rep5, rest=1.032x, sep=1.03)
+     rna_biology                 R1 cap4096     2.2584     4.3586   1.930x  not bimodal (outlier=rep5, rest=1.271x, sep=1.52)
+                                 R1   FLOOR                         1.930x  carried by cap4096
+     rna_biology                 R2   cap64     6.6440     7.4672   1.124x  not bimodal (outlier=rep2, rest=1.077x, sep=1.04)
+     rna_biology                 R2 cap4096     1.4941     2.4341   1.629x  not bimodal (outlier=rep5, rest=1.108x, sep=1.47)
+                                 R2   FLOOR                         1.629x  carried by cap4096
+     rna_biology                 R3   cap64     6.6440     7.4672   1.124x  not bimodal (outlier=rep2, rest=1.077x, sep=1.04)
+     rna_biology                 R3 cap4096     1.4941     2.4341   1.629x  not bimodal (outlier=rep5, rest=1.108x, sep=1.47)
+                                 R3   FLOOR                         1.629x  carried by cap4096
+     rna_biology             RankMe   cap64     6.1838     6.9076   1.117x  not bimodal (outlier=rep2, rest=1.078x, sep=1.04)
+     rna_biology             RankMe cap4096     2.5781     3.6455   1.414x  not bimodal (outlier=rep3, rest=1.236x, sep=1.14)
+                             RankMe   FLOOR                         1.414x  carried by cap4096
+     rna_biology          alpha_req   cap64     2.3931     2.4189   1.011x  not bimodal (outlier=rep5, rest=1.007x, sep=1.00)
+     rna_biology          alpha_req cap4096     2.3021     2.6734   1.161x  not bimodal (outlier=rep4, rest=1.078x, sep=1.08)
+                          alpha_req   FLOOR                         1.161x  carried by cap4096
+     rna_biology  alpha_req_abs_dev   cap64     1.3931     1.4189   1.019x  not bimodal (outlier=rep5, rest=1.011x, sep=1.01)
+     rna_biology  alpha_req_abs_dev cap4096     1.3021     1.6734   1.285x  not bimodal (outlier=rep4, rest=1.137x, sep=1.13)
+                  alpha_req_abs_dev   FLOOR                         1.285x  carried by cap4096
+     rna_biology          hard_rank   cap64   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     rna_biology          hard_rank cap4096   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+                          hard_rank   FLOOR                         1.000x  carried by cap64
+     rna_biology        stable_rank   cap64     1.6883     2.3761   1.407x  not bimodal (outlier=rep2, rest=1.105x, sep=1.27)
+     rna_biology        stable_rank cap4096     1.0250     1.2424   1.212x  not bimodal (outlier=rep5, rest=1.135x, sep=1.07)
+                        stable_rank   FLOOR                         1.407x  carried by cap64
+  wsi_rna_paired              LiDAR   cap64     8.9632    10.6713   1.191x  not bimodal (outlier=rep4, rest=1.152x, sep=1.03)
+  wsi_rna_paired              LiDAR cap4096     3.1921     4.8366   1.515x  not bimodal (outlier=rep5, rest=1.352x, sep=1.12)
+                              LiDAR   FLOOR                         1.515x  carried by cap4096
+
+per-repeat, per-step canonical R1 and R3 on `wsi_biology` — never a mean
+  cap64    rep1  0:101.38/67.55 50:17.92/7.98 100:10.43/6.50 150:8.80/5.00 200:9.16/6.30
+  cap64    rep2  0:101.38/67.55 50:17.86/7.97 100:10.30/6.46 150:9.47/5.84 200:10.07/6.01
+  cap64    rep3  0:101.38/67.55 50:17.93/7.99 100:10.62/6.63 150:9.73/6.04 200:8.67/5.49
+  cap64    rep4  0:101.38/67.55 50:17.90/7.96 100:10.51/6.57 150:9.79/6.12 200:8.14/4.91
+  cap64    rep5  0:101.38/67.55 50:18.00/7.99 100:10.65/6.67 150:9.23/5.44 200:8.67/5.55
+  cap4096  rep1  0:101.38/67.55 50:6.27/4.05 100:3.58/2.40 150:3.12/2.09 200:2.12/1.61
+  cap4096  rep2  0:101.38/67.55 50:6.31/4.10 100:3.82/2.38 150:3.75/2.87 200:3.10/2.35
+  cap4096  rep3  0:101.38/67.55 50:6.26/4.08 100:2.93/1.96 150:3.65/2.72 200:3.71/2.78
+  cap4096  rep4  0:101.38/67.55 50:6.26/4.06 100:3.92/2.84 150:3.80/2.91 200:2.23/1.63
+  cap4096  rep5  0:101.38/67.55 50:6.28/4.08 100:3.33/2.47 150:2.29/1.70 200:1.75/1.37
+
+wrote /home/ubuntu/e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json

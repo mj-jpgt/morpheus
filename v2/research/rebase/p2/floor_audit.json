@@ -1242,6 +1242,216 @@
    },
    "floor_arm": "m0",
    "n": 5
+  },
+  "R1_probe_step600_m0999_vs_m0": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0",
+   "value": 1.7513,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.738429723244596,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+     "path": "floors.600.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.563674116662995,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+     "path": "floors.600.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep4",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.2864317908150926
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+    "path": "floors.600.wsi_biology.R1.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R1_probe_step600_m0999_vs_m099": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99",
+   "value": 1.1547,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 11.954523975867632,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+     "path": "floors.600.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 10.353053898700356,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+     "path": "floors.600.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": false,
+    "bimodal": false,
+    "rest_fold": 1.0599287785265923
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+    "path": "floors.600.wsi_biology.R1.arm_floor.m0999.shape"
+   },
+   "floor_arm": "m0999",
+   "n": 5
+  },
+  "R1_probe_step150_cap64_vs_cap4096": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 150, arms capacity 64 / capacity 4,096",
+   "value": 1.6622,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, five same-seed repeats per arm, n = 5, no interval, one seed, one stack. The two arms differ in QUEUE CAPACITY at fixed momentum 0, which is what §5.2 measurement 3 compares; a floor measured at one capacity may not be borrowed for another, which is why this one had to be run. Read at STEP 150, the step both of the sweep's own logs print the quoted values at. HARNESS NOTE: the floor is measured with `d1_momentum_probe.py` and the sweep was run with the older `decorr_causal.py`; the two agree where they overlap (the capacity-4,096 arm reads R3 2.16 in the sweep against a 1.610–2.990 same-seed span here) but they are not the same file.",
+   "a": {
+    "value": 3.7999011001740954,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+     "path": "floors.150.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 2.286118451144756,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+     "path": "floors.150.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep5",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.2167177273556173
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+    "path": "floors.150.wsi_biology.R1.arm_floor.cap4096.shape"
+   },
+   "floor_arm": "cap4096",
+   "n": 5
+  },
+  "R3_probe_step600_m0999_vs_m0": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0",
+   "value": 1.7491,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.2652398290989906,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+     "path": "floors.600.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.2950860964583746,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+     "path": "floors.600.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep4",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.19542391263661
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
+    "path": "floors.600.wsi_biology.R3.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R3_probe_step600_m0999_vs_m099": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99",
+   "value": 1.1947,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 8.053572410191407,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+     "path": "floors.600.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 6.741089600172154,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+     "path": "floors.600.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": false,
+    "bimodal": false,
+    "rest_fold": 1.0900036310254562
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
+    "path": "floors.600.wsi_biology.R3.arm_floor.m0999.shape"
+   },
+   "floor_arm": "m0999",
+   "n": 5
+  },
+  "R3_probe_step150_cap64_vs_cap4096": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 150, arms capacity 64 / capacity 4,096",
+   "value": 1.705,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, five same-seed repeats per arm, n = 5, no interval, one seed, one stack. The two arms differ in QUEUE CAPACITY at fixed momentum 0, which is what §5.2 measurement 3 compares; a floor measured at one capacity may not be borrowed for another, which is why this one had to be run. Read at STEP 150, the step both of the sweep's own logs print the quoted values at. HARNESS NOTE: the floor is measured with `d1_momentum_probe.py` and the sweep was run with the older `decorr_causal.py`; the two agree where they overlap (the capacity-4,096 arm reads R3 2.16 in the sweep against a 1.610–2.990 same-seed span here) but they are not the same file.",
+   "a": {
+    "value": 2.905586978178963,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+     "path": "floors.150.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.7041507325366694,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+     "path": "floors.150.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep5",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.3914249565682015
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_capfloor/out/P2_PROBE_FLOORS_CAP.json",
+    "path": "floors.150.wsi_biology.R3.arm_floor.cap4096.shape"
+   },
+   "floor_arm": "cap4096",
+   "n": 5
   }
  },
  "statistics_with_no_measured_floor": [],
@@ -2688,9 +2898,8 @@
    "comparison": "m = 0.999 against m = 0, **one seed**, step 600",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: it is read at **step 600**, past the 500-step budget the repeats were run over, and a floor at step 500 licenses no verdict at step 600 any more than one block's floor licenses another's. Closing it is five more runs at a 600-step budget.",
+   "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0",
+   "floor": "R3_probe_step600_m0999_vs_m0",
    "a": {
     "value": 7.42,
     "src": {
@@ -2709,8 +2918,8 @@
      "column": "eff-rank"
     }
    },
-   "rests_on": "nothing — §5.4 says so.",
-   "clears": null,
+   "rests_on": "the floor measured at its own step budget: five same-seed repeats of each of ITS OWN two arms at a 600-step budget give an R3 floor of 1.749×, carried by the m = 0 arm, and 2.641× clears it by 1.51×. One seed per arm in the comparison itself; the floor holds the seed fixed too, so it is a floor twice over. The same ten runs separate the arms by 2.98×–5.21× worst case at step 600 (R3 6.741 min at m = 0.999 against 2.265 max at m = 0), which is the same verdict from the other direction.",
+   "clears": true,
    "ratio": 2.6406,
    "value_digits": 3
   },
@@ -2784,9 +2993,8 @@
    "comparison": "**the value the project actually runs** — m = 0.999 over m = 0.99, step 600",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: **two** reasons — it is read at **step 600**, and one of its arms is **m = 0.99**, which is neither of the two arms repeats were run for.",
+   "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99",
+   "floor": "R3_probe_step600_m0999_vs_m099",
    "a": {
     "value": 7.42,
     "src": {
@@ -2805,8 +3013,8 @@
      "column": "eff-rank"
     }
    },
-   "rests_on": "nothing. The binary outcome supports **momentum against none**, not this value over its neighbour; `m = 0.999` is retained because it measured best in a sweep whose resolution the paper does not trust.",
-   "clears": null,
+   "rests_on": "**a pass by 5.6%, and the ten runs that measured the floor undercut it.** The floor built from its own two arms at step 600 is R3 1.195×, carried by the m = 0.999 arm, and the row's 1.262× clears it — computed by the checker, nothing predeclared. But the SAME ten runs separate the two arms by only **1.138×** worst case under R3 (m = 0.999 min 6.741 against m = 0.99 max 5.922), which is INSIDE that floor: the row passes on the particular single-seed draw §5.2's table records and would not pass on the worst draw of five. Under **canonical R1** the same ten runs separate them by **1.453×** worst case against a 1.155× floor, so the arms are cleanly ordered under R1 and marginally so under R3 — which is §4.5's statistic-conditionality applied to the one value this project actually runs. The binary training outcome still supports momentum against none, not this value over its neighbour.",
+   "clears": true,
    "ratio": 1.2619,
    "value_digits": 3
   },
@@ -2912,31 +3120,31 @@
    "comparison": "capacity 64 (6.17) against capacity 4,096 (2.16), fixed key encoder",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: one arm is at **capacity 64**, a configuration no repeat was run at, and §5.2 records **no reading step** for the sweep — the floor is measured per step and cannot be applied without one.",
+   "block": "fixed held-out probe, step 150, arms capacity 64 / capacity 4,096",
+   "floor": "R3_probe_step150_cap64_vs_cap4096",
    "a": {
     "value": 6.17,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2",
-     "literal": "6.17"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/qsweep_d0.04_cap64.log",
+     "step": 150,
+     "column": "eff-rank"
     }
    },
    "b": {
     "value": 2.16,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2",
-     "literal": "2.16"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/decorr_causal_0.04.log",
+     "step": 150,
+     "column": "eff-rank"
     }
    },
-   "rests_on": "one seed, and the section's own admission that capacity confounds anchoring quality with negative count. It is one of three measurements said to rule the staleness account out, and it is inside the floor.",
-   "clears": null,
+   "rests_on": "the floor measured at its own capacities and its own reading step: five same-seed repeats each at capacity 64 and capacity 4,096, m = 0, decorrelation 0.04, lr 2e-4, seed 42, read at step 150, give an R3 floor of 1.705× carried by the capacity-4,096 arm, and 2.857× clears it by 1.68×. Two caveats survive the pass and neither is repaired by it: one seed in the comparison, and **capacity confounds anchoring quality with negative count**, which is §5.2's own admission and is a design limit rather than a resolution limit. The measurement is one of three said to rule the staleness account out; clearing a floor makes the reading resolvable, not the confound absent.",
+   "clears": true,
    "ratio": 2.8565,
-   "value_digits": 3
+   "value_digits": 3,
+   "floor_note": "‡ HARNESS NOTE. The two quoted values are from the older `decorr_causal.py` capacity sweep; the floor is five same-seed repeats per arm of `d1_momentum_probe.py` at the same momentum, decorrelation, learning rate, seed and reading step. The two harnesses agree where they overlap and the step is now read out of the sweep's own logs rather than guessed at, but they are not the same file and the note travels with the row."
   },
   {
    "id": "5.2-turnover-inversion",
