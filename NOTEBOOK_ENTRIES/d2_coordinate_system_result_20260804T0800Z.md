@@ -169,6 +169,26 @@ principal subspace**. If that drove the win, "capacity-matched at 128" would be 
 would never enter — and the result would report where expression variance sits rather than anything
 about interventional content.
 
+**That structural claim is verified, not argued.** `top_canonical_correlation(x, y, k=16)` on the
+residualised 128-column PBS block, arm H seed 42 (`SUBSPACE_CHECK.json`):
+
+| transform of the 128-column block | top-CCA (k=16) | Δ vs original |
+|---|---:|---:|
+| original, all 128 columns | 0.555987077425 | — |
+| its own rank-16 PCA reconstruction | 0.555987077425 | −4.4e−16 |
+| that rank-16 block under a random invertible 16×16 map | 0.555987077425 | +1.1e−16 |
+| top-16 PCs only, each rescaled by a random factor | 0.555987077425 | −5.6e−16 |
+| **control:** PCs 17–32 substituted for PCs 1–16 | 0.331745972308 | **−0.224** |
+| **control:** spectrum reversed | 0.160398071602 | **−0.396** |
+
+Invariant to 1e−16 under all three transforms that preserve the top-16 principal subspace, and moved
+by −0.22 / −0.40 by the two that change it. (A rank-32 reconstruction was tried first as the control
+and is *also* invariant — it preserves the top-16 subspace, so it is not a control at all. Recorded
+because an inert control reads exactly like a passing one, which is this project's own standing
+lesson.) **So at k = 16, 112 of the 128 columns never enter the statistic**, and "capacity-matched at
+128" describes how the blocks were built, not what was compared. That is a real defect in how the
+T1.1 result is worded — but, as the sweep below shows, it is not what decided it.
+
 **Reproduction first.** The T1.1 main table's statistic is `heldout_top_cca` (its header says so);
 the block-level table in the same entry quotes `adjusted_top_cca`. Both reproduce exactly on
 `runs/d2_final/artifacts/d2_{h,i}_seed42.npz`, 108 design columns, 84 sites, n_test = 2,766:
