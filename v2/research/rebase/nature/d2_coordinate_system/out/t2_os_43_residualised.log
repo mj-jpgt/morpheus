@@ -1,0 +1,4 @@
+os s43 residualised  arm_h status=ok cindex=0.5663
+os s43 residualised  arm_i status=ok cindex=0.5470
+os s43 residualised  PAIRED arm_I minus arm_H patient  delta=-0.0193 CI[-0.0386,+0.0010] p_improve=0.0350
+os s43 residualised  PAIRED arm_I minus arm_H cancer   delta=-0.0193 CI[-0.0426,+0.0070] p_improve=0.0700

@@ -1,0 +1,66 @@
+{
+  "endpoint": "os",
+  "seed": 42,
+  "block": "raw",
+  "arms": {
+    "h": {
+      "status": "ok",
+      "selected_alpha": 0.0001,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5591617611745056,
+      "macro_cancer_harrell_cindex": 0.5600391751029593,
+      "patient_bootstrap_ci95_low": 0.5391103155125581,
+      "patient_bootstrap_ci95_high": 0.5800306882932562,
+      "patient_bootstrap_point": 0.5591617611745056,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5088868160734261,
+      "cancer_bootstrap_ci95_high": 0.6170784166149563,
+      "cancer_bootstrap_point": 0.5591617611745056,
+      "cancer_bootstrap_n_valid": 400
+    },
+    "i": {
+      "status": "ok",
+      "selected_alpha": 0.0001,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5592698876413439,
+      "macro_cancer_harrell_cindex": 0.5181037864686749,
+      "patient_bootstrap_ci95_low": 0.539579149581557,
+      "patient_bootstrap_ci95_high": 0.5809151291887459,
+      "patient_bootstrap_point": 0.5592698876413439,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5141323406008078,
+      "cancer_bootstrap_ci95_high": 0.6195320480792331,
+      "cancer_bootstrap_point": 0.5592698876413439,
+      "cancer_bootstrap_n_valid": 400
+    }
+  },
+  "n_paired": 2744,
+  "paired_i_minus_h": {
+    "patient": {
+      "mode": "patient",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": 0.00010812646683833194,
+      "mean_delta": 0.001213968390678489,
+      "ci95_low": -0.017567844158705218,
+      "ci95_high": 0.019995278456748637,
+      "p_improve": 0.5575
+    },
+    "cancer": {
+      "mode": "cancer",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": 0.00010812646683833194,
+      "mean_delta": 0.0009039400951395104,
+      "ci95_low": -0.0398629744292268,
+      "ci95_high": 0.04842953535299535,
+      "p_improve": 0.515
+    }
+  }
+}

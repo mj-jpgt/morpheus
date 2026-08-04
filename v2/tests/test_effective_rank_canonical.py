@@ -230,6 +230,15 @@ SVD_ALLOWLIST = {
     # `spectral.py`, and the whole point of the section is to score them against it. Effective
     # rank itself is never reimplemented in this directory: `p2_rank_variants.py` imports it.
     "v2/research/rebase/p2/p2_competing_metrics.py",
+    # Uses an SVD to CONSTRUCT rank-k projections of a target block -- rank-16
+    # reconstruction, a random invertible 16x16 reparametrisation of it, a PC rescaling, and
+    # two controls that swap the retained PCs -- in order to demonstrate that
+    # `top_canonical_correlation(x, y, k)` depends on y ONLY through y's top-k principal
+    # subspace. It computes no statistic from the singular values: the only number it reports
+    # is the imported `top_canonical_correlation`. Its sibling `task3_sweep.py` originally did
+    # compute a spectral statistic inline (top-16 variance share) and was NOT allowlisted --
+    # it was rewritten to call `spectral.effective_rank` instead.
+    "v2/research/rebase/nature/d2_coordinate_system/subspace_check.py",
     "v2/calibra/claim_guards.py",                # the token appears only in prose
     "tests/test_claim_guards.py",                # ditto
     "v2/tests/test_effective_rank_canonical.py", # this file, which names the tokens

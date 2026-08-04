@@ -1,0 +1,68 @@
+{
+  "endpoint": "os",
+  "seed": 42,
+  "block": "residualised",
+  "arms": {
+    "h": {
+      "status": "ok",
+      "selected_alpha": 0.00206913808111479,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5587438490634126,
+      "macro_cancer_harrell_cindex": 0.5807618942876798,
+      "patient_bootstrap_ci95_low": 0.537013449783288,
+      "patient_bootstrap_ci95_high": 0.5773812484696139,
+      "patient_bootstrap_point": 0.5587438490634126,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5295696925355781,
+      "cancer_bootstrap_ci95_high": 0.5850942696794392,
+      "cancer_bootstrap_point": 0.5587438490634126,
+      "cancer_bootstrap_n_valid": 400
+    },
+    "i": {
+      "status": "ok",
+      "selected_alpha": 0.0011288378916846883,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5451517551645313,
+      "macro_cancer_harrell_cindex": 0.5788652431555009,
+      "patient_bootstrap_ci95_low": 0.5250015422755685,
+      "patient_bootstrap_ci95_high": 0.5653128204777603,
+      "patient_bootstrap_point": 0.5451517551645313,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5121308556175747,
+      "cancer_bootstrap_ci95_high": 0.5848443618816603,
+      "cancer_bootstrap_point": 0.5451517551645313,
+      "cancer_bootstrap_n_valid": 400
+    }
+  },
+  "n_design_columns": 220,
+  "n_sites_kept": 185,
+  "n_paired": 2744,
+  "paired_i_minus_h": {
+    "patient": {
+      "mode": "patient",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": -0.013592093898881275,
+      "mean_delta": -0.013332912302970618,
+      "ci95_low": -0.03446176707833527,
+      "ci95_high": 0.009869077006125732,
+      "p_improve": 0.1425
+    },
+    "cancer": {
+      "mode": "cancer",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": -0.013592093898881275,
+      "mean_delta": -0.012576114280012117,
+      "ci95_low": -0.046434273674125615,
+      "ci95_high": 0.021114210124416385,
+      "p_improve": 0.245
+    }
+  }
+}

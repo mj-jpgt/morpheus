@@ -1,0 +1,68 @@
+{
+  "endpoint": "os",
+  "seed": 44,
+  "block": "residualised",
+  "arms": {
+    "h": {
+      "status": "ok",
+      "selected_alpha": 0.00018329807108324357,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5532240924341988,
+      "macro_cancer_harrell_cindex": 0.5707110392790747,
+      "patient_bootstrap_ci95_low": 0.5322558567894483,
+      "patient_bootstrap_ci95_high": 0.5724565957909904,
+      "patient_bootstrap_point": 0.5532240924341988,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5232502971206141,
+      "cancer_bootstrap_ci95_high": 0.5837565321926876,
+      "cancer_bootstrap_point": 0.5532240924341988,
+      "cancer_bootstrap_n_valid": 400
+    },
+    "i": {
+      "status": "ok",
+      "selected_alpha": 0.00018329807108324357,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5361122498663344,
+      "macro_cancer_harrell_cindex": 0.5496592423287718,
+      "patient_bootstrap_ci95_low": 0.5155783732877761,
+      "patient_bootstrap_ci95_high": 0.5571683332324813,
+      "patient_bootstrap_point": 0.5361122498663344,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5116389780997226,
+      "cancer_bootstrap_ci95_high": 0.5668985640091451,
+      "cancer_bootstrap_point": 0.5361122498663344,
+      "cancer_bootstrap_n_valid": 400
+    }
+  },
+  "n_design_columns": 220,
+  "n_sites_kept": 185,
+  "n_paired": 2744,
+  "paired_i_minus_h": {
+    "patient": {
+      "mode": "patient",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": -0.017111842567864355,
+      "mean_delta": -0.01605901630492697,
+      "ci95_low": -0.03615263589728153,
+      "ci95_high": 0.004565358228391142,
+      "p_improve": 0.0725
+    },
+    "cancer": {
+      "mode": "cancer",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": -0.017111842567864355,
+      "mean_delta": -0.01624319391275323,
+      "ci95_low": -0.03872958142132493,
+      "ci95_high": 0.007402537092623266,
+      "p_improve": 0.105
+    }
+  }
+}

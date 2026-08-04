@@ -1,0 +1,66 @@
+{
+  "endpoint": "os",
+  "seed": 44,
+  "block": "raw",
+  "arms": {
+    "h": {
+      "status": "ok",
+      "selected_alpha": 0.00018329807108324357,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.570521010365547,
+      "macro_cancer_harrell_cindex": 0.5432808868922386,
+      "patient_bootstrap_ci95_low": 0.5486411648686996,
+      "patient_bootstrap_ci95_high": 0.5890909775259832,
+      "patient_bootstrap_point": 0.570521010365547,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5304954904853154,
+      "cancer_bootstrap_ci95_high": 0.6211514794722767,
+      "cancer_bootstrap_point": 0.570521010365547,
+      "cancer_bootstrap_n_valid": 400
+    },
+    "i": {
+      "status": "ok",
+      "selected_alpha": 0.0011288378916846883,
+      "development_patients": 3655,
+      "development_events": 978,
+      "test_patients": 2744,
+      "test_events": 939,
+      "harrell_cindex": 0.5588460053572353,
+      "macro_cancer_harrell_cindex": 0.5445431115917203,
+      "patient_bootstrap_ci95_low": 0.5345226697805173,
+      "patient_bootstrap_ci95_high": 0.5783915842827724,
+      "patient_bootstrap_point": 0.5588460053572353,
+      "patient_bootstrap_n_valid": 400,
+      "cancer_bootstrap_ci95_low": 0.5057021569596181,
+      "cancer_bootstrap_ci95_high": 0.6150008747896353,
+      "cancer_bootstrap_point": 0.5588460053572353,
+      "cancer_bootstrap_n_valid": 400
+    }
+  },
+  "n_paired": 2744,
+  "paired_i_minus_h": {
+    "patient": {
+      "mode": "patient",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": -0.011675005008311756,
+      "mean_delta": -0.011334126911012377,
+      "ci95_low": -0.02723549337643239,
+      "ci95_high": 0.008679553345716774,
+      "p_improve": 0.11
+    },
+    "cancer": {
+      "mode": "cancer",
+      "repeats": 400,
+      "n_valid": 400,
+      "point_delta": -0.011675005008311756,
+      "mean_delta": -0.012014185772809414,
+      "ci95_low": -0.05411408906845941,
+      "ci95_high": 0.02867177101799178,
+      "p_improve": 0.29
+    }
+  }
+}

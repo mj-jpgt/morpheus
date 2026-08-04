@@ -208,10 +208,49 @@ cancer-cluster). Top-CCA is deliberately not used on a one-column target — it 
 in-sample directions and `spectral.heldout_single_direction_correlation`'s docstring already records
 that this manufactures a channel out of noise.
 
-*(Result table appended below when the six cells complete; declared deviation: 400 bootstrap
-repeats, not the 2,000 of the predeclaration, because `tasks.harrell_cindex` is an O(n²)
-pure-Python loop measured at 2.52 s per call at n = 2,765, which puts 2,000 repeats at ~5.6 h per
-cell.)*
+**Declared deviation from the predeclaration:** 400 bootstrap repeats, not 2,000.
+`tasks.harrell_cindex` is an O(n²) pure-Python double loop, measured at **2.52 s per call** at
+n = 2,765; the paired bootstrap needs `repeats × 2 modes × 2` calls, so 2,000 repeats is ~5.6 h per
+cell against ~67 min at 400. 400 is also the repeat count the published T1.1 baseline bootstrap
+used. Recorded here rather than quietly substituted.
+
+**The probe is live, not degenerate.** Coxnet fit on the 8 development cancers and scored on the 21
+held-out ones reaches Harrell C-index **0.551–0.571**, comfortably above 0.5. A null below would
+have been uninterpretable; it is not one.
+
+**Result — paired C-index, arm I minus arm H, 2,765 test patients, 400 repeats:**
+
+| block | seed | C-index H | C-index I | Δ (I−H) | patient CI₉₅ | p_improve | cancer CI₉₅ | p_improve |
+|---|---|---:|---:|---:|:---:|---:|:---:|---:|
+| **residualised** | 42 | 0.5587 | 0.5452 | −0.0136 | [−0.0345, **+0.0099**] | 0.1425 | [−0.0464, **+0.0211**] | 0.2450 |
+| **residualised** | 43 | 0.5663 | 0.5470 | −0.0193 | [−0.0386, **+0.0010**] | 0.0350 | [−0.0426, **+0.0070**] | 0.0700 |
+| **residualised** | 44 | 0.5532 | 0.5361 | −0.0171 | [−0.0362, **+0.0046**] | 0.0725 | [−0.0387, **+0.0074**] | 0.1050 |
+| raw | 42 | 0.5592 | 0.5593 | +0.0001 | [−0.0176, +0.0200] | 0.5575 | [−0.0399, +0.0484] | 0.5150 |
+| raw | 43 | 0.5512 | 0.5712 | **+0.0200** | **[+0.0014, +0.0377]** | 0.9875 | [−0.0372, +0.0934] | 0.7375 |
+| raw | 44 | 0.5705 | 0.5588 | −0.0117 | [−0.0272, +0.0087] | 0.1100 | [−0.0541, +0.0287] | 0.2900 |
+
+**Reading, against the predeclared rule. The predeclared "neither separates" branch is taken, and it
+is reported as uninformative rather than read either way.** On the residualised block — the D2
+design — **no interval excludes zero in any seed**, patient or cancer. Seed 43's patient interval
+comes closest and still covers zero at +0.0010.
+
+What can honestly be said beside that: the *direction* on the residualised block is consistent with
+D2 in **3/3 seeds** (arm H ahead by 0.0136 / 0.0193 / 0.0171 C-index, `p_improve` 0.14 / 0.035 /
+0.073). That is a real hint that the D2 direction is not purely a gene-set artifact. It is a hint
+only. The predeclared bar was a CI excluding zero and it was not cleared, and **no cross-seed
+combination was predeclared, so none is performed** — combining three `p_improve` values after
+seeing them is exactly the manoeuvre this project's predeclaration discipline exists to prevent.
+
+On the raw block the picture is mixed and one cell points the other way: seed 43's patient interval
+**excludes zero in arm I's favour** (+0.0200, [+0.0014, +0.0377]). The raw/residualised split flips
+the survival ordering on seed 43 just as it flips the top-CCA ordering there.
+
+**What Test 2 establishes, and what it does not.** It does not rescue the general claim and it does
+not refute it. Its firm contributions are two: the *direction* survives on a neutral endpoint at 3/3
+but below the predeclared bar, and — separately and more solidly — **the one pre-registered clinical
+control this project has cannot be run on the partition its headline results live on.** That second
+point is a finding about the evidence base, not about either arm, and it holds regardless of what
+the survival numbers had said.
 
 ---
 
@@ -291,10 +330,26 @@ matrices at 1e-10 inside the script):
 The patient CI excludes zero in **4/4**, at both budgets. The cancer CI excludes zero in 1/4 and has
 p_improve ≥ 0.91 in the rest.
 
-**The variance-concentration explanation fails, and fails backwards.** Share of each residualised
-block's variance carried by its own top-16 PCs — the quantity a 16-component readout selects on:
-**PBS 0.859, RANDDICT 0.726, PCA 0.651.** PCA is the *least* concentrated of the three blocks and
-still wins. It is not being handed an easy low-rank subspace; if anything the dictionary is.
+**The variance-concentration explanation fails, and fails backwards.** Roy–Vetterli effective rank
+(`spectral.effective_rank`, CANONICAL) of each **residualised** target block — low means the block's
+variance sits in few directions, which is what would make a truncated readout easy:
+
+| block | effective rank (residualised) |
+|---|---:|
+| PBS 128 | **74.39** |
+| random dictionary 128 | 96.75 |
+| PCA basis 128 | **97.92** |
+
+PCA has the **highest** effective rank of the three — the least concentrated spectrum — and still
+wins at every budget. It is not being handed an easy low-rank subspace; if anything the dictionary
+is, and the dictionary loses anyway.
+
+*(Method note, recorded rather than silently corrected: the first version of this script computed
+"share of block variance in the top 16 PCs" from an inline `np.linalg.svd` — 0.859 / 0.726 / 0.651
+for PBS / RANDDICT / PCA, the same ordering. That is a spectral statistic written by hand, and
+`v2/tests/test_effective_rank_canonical.py::test_no_second_definition_exists_in_the_tree` failed on
+it the moment the script was vendored. It has been replaced by the canonical imported statistic. The
+guard did exactly what it exists to do, on this work, and the number it objected to was mine.)*
 
 **Verdict on Task 3: the comparison is not circular and the T1.1 result stands.** Ordinary PCA of
 the expression matrix beats the interventional dictionary at every readout budget from 8 to 128,
@@ -316,11 +371,18 @@ that entry allowed. It remains a claim PCA also satisfies, and by more.
 ### In plain terms
 
 We asked whether the perturbation dictionary lost its headline contest because it is worse, or
-because the exam was written in its opponent's units. It is mostly the units. Re-marking the same
-two models on the dictionary's own 128 questions moves the score gap by about 0.12 — the whole gap.
-On the dictionary's own questions the two models tie. The dictionary still never *wins* anywhere, so
-this is not a reversal; but the published sentence claims a general advantage for the other method
-across "the molecular channel", and that generality is not there.
+because the exam was written in its opponent's units. Mostly the units. Re-marking the same two
+models on the dictionary's own 128 questions moves the score gap by about 0.12 — the whole gap — and
+on those questions the two models are statistically tied. The gap of 0.12 turns up on exactly one
+kind of exam out of the six we could set, and that is the kind the published result used. The
+dictionary still never *wins* anywhere, so this is not a reversal; but the published sentence claims
+a general advantage across "the molecular channel", and that generality is not there.
+
+We then looked for an exam in neither method's units. Only one exists: how long the patients lived.
+The pre-registered alternative — breast-cancer hormone-receptor status — turns out to have no
+coverage at all on the patients these results are computed on, which is worth knowing on its own.
+On survival, the Hallmark method is ahead in all three repeats, but by an amount too small for the
+error bars to separate, so we report it as undecided rather than as a win.
 
 Separately, we checked whether the other bad result for the dictionary — that ordinary PCA of the
 same data beats it — was rigged by how the scoring works. It was not. PCA wins at every setting we
@@ -330,16 +392,24 @@ favoured PCA turns out to favour the dictionary instead.
 ### Meaning for the claim
 
 * **D2_RESULT.md §6 must be narrowed.** "PBS underperforms Hallmark supervision on the held-out
-  molecular channel by ~0.11–0.13" is supported only for gene-set–valued targets on the residualised
-  block. On the dictionary's own codes the arms are within the negative control. Both the coordinate
-  system and the block must travel with the number.
+  molecular channel by ~0.11–0.13" is supported only for **gene-set–valued targets on the
+  residualised block**. On the dictionary's own codes all six 2,000-repeat intervals cover zero, and
+  the gap on every other 128-column block on disk sits at or inside the negative control. Both the
+  coordinate system and the block must travel with the number.
 * **The surviving form** is: *Hallmark supervision is never worse than PBS supervision on any target
-  space tested, and is much better on gene-set targets; PBS supervision buys nothing measurable even
-  on its own coordinates.* That still refutes P3's hypothesis. It does not support a 0.12 general
-  effect.
-* **T1.1 is unaffected and strengthened.** The PCA result is not a readout artifact.
+  space tested, and is much better on gene-set targets; PBS supervision buys ~0.01–0.04 even on its
+  own coordinates, which is not enough to draw level plus a margin.* That still refutes P3's
+  hypothesis — interventional coordinates are not a better supervision target — but it does not
+  support a 0.12 general effect, and the published verdict should not be quoted as one.
+* **Survival is directional support that does not reach the bar.** Arm H ahead 3/3 by 0.014–0.019
+  C-index on the residualised block, every interval covering zero. Quotable only as "the direction
+  reproduces on a neutral endpoint; the separation does not."
+* **T1.1 is unaffected and strengthened.** The PCA result is not a readout artifact, at any budget.
+  Its wording needs one repair: "capacity-matched at 128" is not what the k=16 statistic compares.
 * **The evidence base has a real hole**, independent of any arm: the only pre-registered clinical
-  control on this project has zero coverage on the partition every headline result is computed on.
+  control on this project has **zero** coverage on the partition every headline result is computed
+  on. Any future claim that leans on T1.7(b) as validation for a test-partition result is leaning on
+  nothing.
 
 ### Files / provenance
 

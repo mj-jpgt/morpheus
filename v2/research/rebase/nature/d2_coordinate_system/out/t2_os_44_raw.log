@@ -1,0 +1,4 @@
+os s44 raw           arm_h status=ok cindex=0.5705
+os s44 raw           arm_i status=ok cindex=0.5588
+os s44 raw           PAIRED arm_I minus arm_H patient  delta=-0.0117 CI[-0.0272,+0.0087] p_improve=0.1100
+os s44 raw           PAIRED arm_I minus arm_H cancer   delta=-0.0117 CI[-0.0541,+0.0287] p_improve=0.2900
