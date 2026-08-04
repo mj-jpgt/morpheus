@@ -958,6 +958,20 @@ objective, architecture, data, split or schedule. Rank-type metrics are decompos
 and the recovered Δ values (−0.1325 / −0.1089 / −0.1226) exactly. All 12 artifacts frozen; CPU only,
 thread-capped.*
 
+*Independent reproduction, and a near miss worth recording.* A workspace-drift audit
+(`NOTEBOOK_ENTRIES/WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md`) established that the workspace these
+scripts ran in carried a `spectral.py` **predating the rank canonicalisation entirely** — no
+`CANONICAL`, no `RANK_VARIANTS` — so every number in this section was computed by a different function
+object from the one now in the repository. Recomputed against a workspace verified current (0 files
+differing, 0 missing), **all five values above reproduce exactly**: 34.5%, F = 1.41, 29.1%, 98.0%,
+F = 128.20. They reproduce because the pre-consolidation implementation is numerically the same
+function as the new `CANONICAL` — the consolidation added named variants without moving the default —
+and `residualise.py` is byte-identical across every workspace, so the channel side was never exposed.
+**That is luck rather than design, and it is stated as such**: had the consolidation chosen a different
+default, every number here would have shifted silently and the reproduction check is the only thing
+that would have caught it. It is also the reason `v2/tests/test_effective_rank_canonical.py` now
+asserts object identity across call sites and fails the build if a second definition reappears.
+
 **Two-thirds of the variation in effective rank across these artifacts is training-seed nuisance. Two
 percent of the variation in the information channel is.** The arm effect on rank is not significant at
 all; the arm effect on the information those same artifacts carry is overwhelming. Note that this holds
@@ -1834,6 +1848,7 @@ should be withdrawn to a replication.
 | **E1**, the preregistered rank-versus-information experiment in this repository | Built (`v2/calibra/e1_rank_information.py`, `aggregate_e1.py`, equivalence margin 0.10, three-seed requirement) and **never run**. It is the experiment this paper should have been built on. |
 | Rank at **capacity scale**, where Deng et al. report a power law | Not measured. §2.3 argues their sweep is over capacity-like variables and ours is not; **we do not claim rank fails at capacity scale.** |
 | A case where the collapse diagnostic **fails** | We have not found one (§4.10). |
+| **The competing-metric and variance-decomposition scripts, vendored into the repository** | `~/e0_run/p2_competing_metrics.py`, `p2_selection_rule.py`, `p2_necessity_and_variance.py`, `p2_robustness.py` produce §4.2, §4.4, §4.5 and §4.6 and are **not yet in the repository**, unlike the rank-recomputation scripts (vendored at commit `8609081`). Their outputs are reproduced independently against a verified-current workspace (§4.2), but the "every number traces to a file in the repository" rule is not yet satisfied for them. **Vendoring them is a pre-submission requirement.** |
 | Rank computed with RankMe's exact ε convention as a *published-comparable* number | Not attempted; §2.1's discrepancy means no number here is comparable to a published RankMe value. (A faithful RankMe *was* computed on our artifacts for §4.2 and §4.6 — that is an internal comparison, not a cross-paper one.) |
 
 ### 6.3 "Your ground truth is the weak link"

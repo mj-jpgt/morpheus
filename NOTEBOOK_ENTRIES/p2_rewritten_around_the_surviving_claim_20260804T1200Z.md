@@ -143,3 +143,20 @@ Recorded because the report asked for it and because none of these is resolved b
 - `paper/P2_FIGURES.md` — stale banner, deconfliction marked executed
 - `paper/LIVENESS_GATE_DESIGN.md`, `paper/QUEUE_ANCHORING.md` — superseded headers + MoCo corrections
 - Suite: **317 passed**, thread-capped. No source file changed.
+
+### 7. Addendum — the workspace-drift audit, landed concurrently
+
+`WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md` (commit `0d6eed8`) arrived on the branch between this
+work's two pushes and bears directly on §4.2 of the draft. Two things folded in:
+
+1. **The §4.2 numbers were computed by a `spectral.py` predating the canonicalisation** — no
+   `CANONICAL`, no `RANK_VARIANTS`. Recomputed against a verified-current workspace, all five reproduce
+   exactly (34.5%, F 1.41, 29.1%, 98.0%, F 128.20). They reproduce because the consolidation added
+   variants without moving the default and `residualise.py` is byte-identical everywhere. **That is
+   luck, not design**, and §4.2 now says so, and names the object-identity test as the reason it cannot
+   recur.
+2. **`~/e0_run/p2_*.py` are not vendored into the repository**, unlike the rank-recomputation scripts.
+   §6.2 now carries a row making vendoring them a pre-submission requirement, because until then the
+   "every number traces to a file in the repository" rule is unsatisfied for §4.2, §4.4, §4.5 and §4.6.
+
+Nothing in the audit changes a number in the draft.
