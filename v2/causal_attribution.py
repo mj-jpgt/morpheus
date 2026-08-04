@@ -117,6 +117,80 @@ def _spearman(a: np.ndarray, b: np.ndarray) -> float:
     return float(spearmanr(a, b).statistic)
 
 
+def _spearman_with_interval(a: np.ndarray, b: np.ndarray, *, n_boot: int = 2000,
+                            seed: int = 0) -> dict:
+    """Spearman plus a bootstrap interval over the resampled *axes*.
+
+    The 128 axes are the sample here, not the patients: the question is whether
+    the across-axis association between legibility and attribution is bigger than
+    the noise in a set of 128 axes.
+    """
+    a, b = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
+    finite = np.isfinite(a) & np.isfinite(b)
+    a, b = a[finite], b[finite]
+    rng = np.random.default_rng(seed)
+    draws = [_spearman(a[d], b[d]) for d in (rng.integers(0, len(a), size=len(a)) for _ in range(n_boot))]
+    draws = np.asarray(draws, dtype=float)
+    return {"spearman": _spearman(a, b), "n": int(len(a)),
+            "ci95_low": float(np.nanpercentile(draws, 2.5)),
+            "ci95_high": float(np.nanpercentile(draws, 97.5))}
+
+
+def _partial_spearman(a: np.ndarray, b: np.ndarray, control: np.ndarray) -> float:
+    """Spearman between ``a`` and ``b`` with ``control`` linearly removed, in rank space.
+
+    The confound this exists for, named in the predeclaration as the first thing
+    to distrust: a high-variance PCA axis carries more signal, so it is *both*
+    easier to see from morphology *and* easier to reconstruct from anything. If
+    the legibility-attribution association is only the axis's own signal-to-noise
+    ratio talking, it disappears once the explained-variance rank is partialled out.
+    """
+    from scipy.stats import rankdata
+    finite = np.isfinite(a) & np.isfinite(b) & np.isfinite(control)
+    if finite.sum() < 4:
+        return float("nan")
+    ranks = [rankdata(np.asarray(v, dtype=float)[finite]) for v in (a, b, control)]
+    design = np.column_stack([np.ones(int(finite.sum())), ranks[2]])
+    residual = [v - design @ np.linalg.lstsq(design, v, rcond=None)[0] for v in ranks[:2]]
+    if residual[0].std() < 1e-12 or residual[1].std() < 1e-12:
+        return float("nan")
+    return float(np.corrcoef(residual[0], residual[1])[0, 1])
+
+
+def attributed_set_coherence(response: np.ndarray, cosine: np.ndarray, *, n_top: int = 10,
+                             n_random: int = 200, seed: int = 0) -> dict:
+    """Is an axis's top-attributed atom set more mutually coherent than a random set?
+
+    A per-axis attribution that names ten unrelated genes is a ranking artefact; one
+    that names ten members of the same machine is a claim about a mechanism. The
+    statistic is the mean absolute pairwise correlation among the top ``n_top``
+    atoms' response vectors, expressed as a percentile of the same quantity for
+    ``n_random`` size-matched random atom sets. It needs no external complex
+    annotation, which is the point — none is on disk.
+    """
+    response = np.asarray(response, dtype=np.float64)
+    centred = response - response.mean(axis=1, keepdims=True)
+    unit = centred / np.maximum(np.linalg.norm(centred, axis=1, keepdims=True), 1e-300)
+    rng = np.random.default_rng(seed)
+
+    def coherence(rows: np.ndarray) -> float:
+        block = unit[rows]
+        gram = np.abs(block @ block.T)
+        upper = gram[np.triu_indices(len(rows), k=1)]
+        return float(upper.mean()) if upper.size else float("nan")
+
+    null = np.asarray([coherence(rng.choice(len(unit), size=n_top, replace=False))
+                       for _ in range(n_random)])
+    observed, percentile = [], []
+    for k in range(cosine.shape[1]):
+        rows = np.argsort(-np.abs(cosine[:, k]))[:n_top]
+        value = coherence(rows)
+        observed.append(value)
+        percentile.append(float((null < value).mean()))
+    return {"coherence": np.asarray(observed), "percentile": np.asarray(percentile),
+            "null_median": float(np.median(null)), "n_top": int(n_top), "n_random": int(n_random)}
+
+
 def _perturbed_gene(atom_id: str) -> str:
     """``10005_ZBTB4_P1_ENSG00000174282`` -> ``ZBTB4``. The causal name itself."""
     parts = str(atom_id).split("_")
@@ -213,6 +287,8 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
                       "secondary": secondary["provenance"]}
 
     shuffle_spearman = np.asarray([_spearman(cosine[:, k], cosine_shuffled[:, k]) for k in range(width)])
+    coherence = attributed_set_coherence(response, cosine, n_top=n_top_atoms, seed=seed)
+    coherence_null = attributed_set_coherence(response, cosine_random, n_top=n_top_atoms, seed=seed)
     legibility = _axis_legibility(artifacts, reference, axis_scores, states,
                                   partition=partition, seed=seed) if artifacts else {}
 
@@ -229,6 +305,9 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
                   "top_atom_cosine_random_direction_null": float(np.abs(cosine_random[:, k]).max()),
                   "shuffle_rank_spearman": float(shuffle_spearman[k]),
                   "cross_line_rank_spearman": float(cross_line_spearman[k]),
+                  "attributed_set_coherence": float(coherence["coherence"][k]),
+                  "attributed_set_coherence_percentile": float(coherence["percentile"][k]),
+                  "attributed_set_coherence_random_direction_null": float(coherence_null["coherence"][k]),
                   "top_atoms": ";".join(str(atom_ids[i]) for i in order),
                   "top_perturbed_genes": ";".join(_perturbed_gene(atom_ids[i]) for i in order)}
         for artifact_name, per_state in legibility.items():
@@ -252,14 +331,33 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
         "cross_line_rank_spearman_median": float(np.nanmedian(cross_line_spearman)),
         "states": list(states), "partition": partition, "seed": int(seed),
     }
+    summary["attributed_set_coherence"] = {
+        "median": float(np.median(coherence["coherence"])),
+        "random_atom_set_null_median": coherence["null_median"],
+        "random_direction_axes_median": float(np.median(coherence_null["coherence"])),
+        "fraction_of_axes_above_95th_percentile_of_random_atom_sets": float(
+            (coherence["percentile"] > 0.95).mean()),
+        "n_top": coherence["n_top"], "n_random_sets": coherence["n_random"]}
+    variance = table["explained_variance_ratio"].to_numpy(dtype=float)
+    r2 = table["r2_cv"].to_numpy(dtype=float)
+    cosine_column = table["top_atom_cosine"].to_numpy(dtype=float)
+    summary["explained_variance_confound"] = {
+        "spearman_r2_vs_explained_variance": _spearman(r2, variance),
+        "spearman_top_cosine_vs_explained_variance": _spearman(cosine_column, variance)}
     for artifact_name, per_state in legibility.items():
         for state in per_state:
             column = f"legibility__{artifact_name}__{state}"
             finite = table[column].to_numpy(dtype=float)
-            summary[f"legibility_vs_r2_spearman__{artifact_name}__{state}"] = _spearman(
-                finite, table["r2_cv"].to_numpy(dtype=float))
-            summary[f"legibility_vs_top_cosine_spearman__{artifact_name}__{state}"] = _spearman(
-                finite, table["top_atom_cosine"].to_numpy(dtype=float))
+            summary[f"legibility_vs_r2_spearman__{artifact_name}__{state}"] = _spearman_with_interval(
+                finite, r2, seed=seed)
+            summary[f"legibility_vs_top_cosine_spearman__{artifact_name}__{state}"] = _spearman_with_interval(
+                finite, cosine_column, seed=seed)
+            # The predeclared distrust check: is the association only the axis's own
+            # signal-to-noise ratio, which raises legibility and reconstructability alike?
+            summary[f"legibility_vs_r2_partial_spearman__{artifact_name}__{state}"] = _partial_spearman(
+                finite, r2, variance)
+            summary[f"legibility_vs_explained_variance_spearman__{artifact_name}__{state}"] = _spearman(
+                finite, variance)
 
     directory = Path(output)
     directory.mkdir(parents=True, exist_ok=True)
