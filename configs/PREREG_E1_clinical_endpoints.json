@@ -1,0 +1,111 @@
+{
+  "preregistration_id": "E1_clinical_endpoints_20260804T1745Z",
+  "written_utc": "2026-08-04T17:45Z",
+  "written_before_any_endpoint_run": true,
+  "notebook_entry": "NOTEBOOK_ENTRIES/PREDECLARED_E1_clinical_endpoints_20260804T1745Z.md",
+  "partition": "test",
+  "primary_state": "wsi_biology",
+  "circular_states_not_evidence_about_morphology": ["rna_biology", "full_biology"],
+  "primary_statistic": "within_cancer_auroc",
+  "chance_level": "measured by within-cancer label permutation (null_p95), not assumed 0.5",
+  "split_structure": "leave-cancer-types-out; 11 cancers train/val, 21 cancers test",
+  "endpoints_unmeasurable_on_this_split": {
+    "er_status": "BRCA is train-only; 0 held-out patients",
+    "pr_status": "BRCA is train-only; 0 held-out patients",
+    "pam50_subtype": "BRCA train-only, and no subtype table on disk",
+    "idh_status": "LGG and GBM are both train-only",
+    "hpv_status": "0 labelled patients on the entire test partition in all three HPV columns",
+    "hrd": "no HRD score table on disk; deriving one is a new method, not a label lookup",
+    "coad_cms": "no consensus-subtype table on disk"
+  },
+  "confirmatory": {
+    "mut_TP53": {
+      "expected_low": 0.60,
+      "expected_high": 0.80,
+      "point": 0.70,
+      "n_test_labelled": 2686,
+      "n_positive": 893,
+      "cancers_scoreable": 14,
+      "sources": [
+        {
+          "citation": "Kather JN, Heij LR, Grabsch HI, et al. Pan-cancer image-based detection of clinically actionable genetic alterations. Nature Cancer 2020;1:789-799.",
+          "pmid": "33763651",
+          "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7610412/",
+          "quote": "the mean cross-validated area under the receiver operating curve (AUROC) for the top eight mutations ranged from 0.60 to 0.78 in lung adenocarcinoma; from 0.65 to 0.76 in colorectal cancer; from 0.62 to 0.78 in breast cancer and from 0.66 to 0.78 in gastric cancer"
+        },
+        {
+          "citation": "Noorbakhsh J, Farahmand S, Foroughi pour A, et al. Deep learning-based cross-classifications reveal conserved spatial behaviors within tumor histological images. Nature Communications 2020;11:6367.",
+          "pmid": "33311458",
+          "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7733499/",
+          "quote": "Self-cohort predictions (diagonal values) have AUC values ranging from 0.65-0.80 for per-slide"
+        }
+      ]
+    },
+    "mmr_deficient": {
+      "expected_low": 0.66,
+      "expected_high": 0.80,
+      "point": 0.74,
+      "n_test_labelled": 147,
+      "n_positive": 42,
+      "cancers_scoreable": 1,
+      "declared_underpowered_before_run": true,
+      "sources": [
+        {
+          "citation": "Echle A, Grabsch HI, Quirke P, et al. Clinical-Grade Detection of Microsatellite Instability in Colorectal Tumors by Deep Learning. Gastroenterology 2020;159(4):1406-1416.",
+          "pmid": "32562722",
+          "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7578071/",
+          "quote": "training the deep learning system on individual cohorts yielded an intra-cohort AUROC of 0.74 [0.66, 0.80] in the TCGA cohort (n=426)"
+        }
+      ]
+    }
+  },
+  "secondary": {
+    "mut_BRAF": {
+      "expected_low": 0.64,
+      "expected_high": 0.82,
+      "point": 0.77,
+      "sources": [
+        {
+          "pmid": "33763651",
+          "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7610412/",
+          "quote": "0.77 (0.64 - 0.82, p<10-5)",
+          "note": "external validation in colorectal cancer"
+        }
+      ]
+    },
+    "mut_KRAS": {
+      "expected_low": 0.60,
+      "expected_high": 0.78,
+      "point": 0.69,
+      "sources": [{"pmid": "33763651", "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7610412/", "note": "top-eight-mutation range; no gene-specific figure printed, weaker basis than TP53"}]
+    },
+    "mut_PIK3CA": {
+      "expected_low": 0.60,
+      "expected_high": 0.78,
+      "point": 0.69,
+      "sources": [{"pmid": "33763651", "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7610412/", "note": "top-eight-mutation range"}]
+    },
+    "mut_APC": {
+      "expected_low": 0.60,
+      "expected_high": 0.78,
+      "point": 0.69,
+      "sources": [{"pmid": "33763651", "url_fetched": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7610412/", "note": "top-eight-mutation range"}]
+    }
+  },
+  "exploratory_no_band": {
+    "grade_high": "no citable band retrieved; graded against measured chance only; morphology-to-morphology and near-circular by construction",
+    "stage_late": "no citable band retrieved; graded against measured chance only",
+    "other_genes": ["mut_ARID1A", "mut_KMT2D", "mut_PTEN", "mut_CTNNB1", "mut_NRAS", "mut_SMAD4", "mut_FBXW7", "mut_RB1", "mut_ATM", "mut_BRCA2", "mut_CDKN2A", "mut_NF1"]
+  },
+  "grading_rule": {
+    "pass_requires_ci_overlaps_band": true,
+    "ci_entirely_below_band": "FAIL under-recovery",
+    "ci_entirely_above_band": "FAIL leak or circularity, not a triumph",
+    "additionally_ci_lower_must_exceed_measured_null_p95": true,
+    "adjusted_is_the_number_that_counts": "cancer + pooled TSS, cross-fitted residuals",
+    "pass_raw_fail_adjusted": "reported as a cancer-type-identification artifact, i.e. a failure",
+    "per_cancer_reported_always": true,
+    "no_promotion_from_exploratory_to_confirmatory_after_the_fact": true
+  },
+  "success_criterion": "2-3 endpoints above band, surviving adjustment, interval excluding measured chance = application contribution. 1 = replication. 0 = a finding about how little morphology carries, reported at equal prominence."
+}
