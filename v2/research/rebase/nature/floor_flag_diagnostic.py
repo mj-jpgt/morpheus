@@ -23,12 +23,12 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
 
-from v2.calibra.calibration import spike_recovery_curve, spike_targets  # noqa: E402
-from v2.calibra.residualise import cross_fitted_residuals  # noqa: E402
-from v2.calibra.spectral import (heldout_single_direction_correlation, heldout_top_cca,  # noqa: E402
-                                 paired_absolute_correlation)
+from morpheus.v2.calibra.calibration import spike_recovery_curve, spike_targets  # noqa: E402
+from morpheus.v2.calibra.residualise import cross_fitted_residuals  # noqa: E402
+from morpheus.v2.calibra.spectral import (heldout_single_direction_correlation,  # noqa: E402
+                                          heldout_top_cca, paired_absolute_correlation)
 
 LEVELS = (0.0, 0.01, 0.02, 0.03, 0.05, 0.075, 0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60)
 
