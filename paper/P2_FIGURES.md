@@ -69,6 +69,9 @@ Not stylistic preferences. Each exists because the evidence would be misrepresen
    spread (draft §5.1).
 7. **Panels touching the historical instances must carry their withdrawals**: "16/16" is withdrawn
    as a rank instance and the decorrelation instance is `[NOT RECOMPUTABLE]`. See F8 and T7.
+8. **A permutation null drawn on a panel must be the null of that panel's own experiment.** At least
+   three are in play (0.140, 0.145–0.147, 0.151–0.158) and they differ in *n*, component count and
+   procedure; §4.7.3 mixed two of them and was corrected at commit `9fee55b`. See T5.
 
 ---
 
@@ -566,7 +569,18 @@ why it is not R2); `v2/tests/test_effective_rank_canonical.py`; Roy & Vetterli D
 Draft §3.2's table: measure, definition, chance level, code location — so no reader reads a channel
 number against an assumed null of zero. Must include the four distinct InfoNCE chance levels
 (ln 16 = 2.7726, ln 80 = 4.38, ln 2576 = 7.854, ln 4310 = 8.369) with the warning that they belong to
-different configurations, and the permutation nulls 0.140 (D2) and 0.145–0.147 (dilution).
+different configurations.
+
+**And it must carry the permutation nulls the same way, because this paper has already mixed two of
+them.** At least three appear on the project — **0.140** (200-draw row shuffle of the residualised
+target matrix, D2), **0.145–0.147** (within-cancer, dilution sweep), and 0.151–0.158 elsewhere — and
+they differ in *n*, component count and, for 0.140, in the permutation procedure itself. §4.7.3
+compared D2's random controls against 0.147 and was corrected to 0.140 at commit `9fee55b`. **No
+figure may draw a null line from a different experiment than the values it sits under**, and F8(c)'s
+0.140 and F7(c)'s 0.145–0.147 must never appear on one axis. Draft §3.2 also records an unresolved
+label conflict in our own notes — one entry calls 0.140 a within-cancer null, another a row shuffle;
+the value is agreed and the procedure label is not — and the table should carry that as stated rather
+than pick one.
 
 **Provenance.** `v2/calibra/spectral.py`, `v2/calibra/run_calibra.py`, `v2/losses.py`,
 `NOTEBOOK.md:1554`, `v2/research/rebase/nature/DILUTION_LOWER_BOUND.md` §2,
