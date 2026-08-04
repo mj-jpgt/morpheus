@@ -34,8 +34,8 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > block) and of the co-trained **view** (3.295× on `wsi_biology`, 1.019× on `rna_biology`, 1.020× on
 > `full_biology`), so the claim is that **rank's usability is view- and statistic-conditional**:
 > unusable on the WSI biology view under entropy-based statistics, usable on the RNA and full views —
-> 0 of 6 between-arm differences resolvable on the first, 12 of 12 on the other two, same artifacts,
-> same statistic, same runs. **This is not the old claim with a caveat attached; the conditionality is
+> under canonical R1, 0 of 6 between-arm differences are resolvable on the first view and 12 of 12 on
+> the other two, on the same artifacts, with the same statistic, from the same runs. **This is not the old claim with a caveat attached; the conditionality is
 > the result**, and §4 is organised around it.
 >
 > **8. The paper's most damaging single fact is now in the abstract, not in the limitations.**
@@ -163,8 +163,9 @@ is **conditional rather than general**:
 > and every between-arm difference clears it.** Retraining one configuration five times at a fixed
 > seed spreads rank **3.295×** on `wsi_biology`, **1.019×** on `rna_biology` and **1.020×** on
 > `full_biology`; the divergent repeat lost its WSI-view rank and kept its RNA-view rank to within
-> 1.9%, so the catastrophe is a property of that run's **WSI encoder**, not of the run. **0 of 6
-> between-arm differences are resolvable on the first view; 12 of 12 on the other two.**
+> 1.9%, so the catastrophe is a property of that run's **WSI encoder**, not of the run. Under canonical
+> R1, **0 of 6 between-arm differences are resolvable on the first view and 12 of 12 on the other two**
+> (under R2/R3 the wsi count is 1 of 6, and under the participation ratios 2 of 6).
 
 **And the single most damaging fact we report is against our own instrument, so we state it here
 rather than in the limitations.** On the raw exported block, over those same five retrains, **RankMe
@@ -263,7 +264,8 @@ repeats within 2%, one at a third — so rank is reproducible ~80% of the time a
 ~20% of the time there. All seven
 between-arm rank differences ever measured on this project (1.004×–3.246×) lie inside that floor. But on
 two other views of the same models, same statistic and same runs, the floor is **1.019×** and **1.020×**
-and every between-arm difference clears it: 0 of 6 resolvable on one view, 12 of 12 on the others.
+and every between-arm difference clears it: under canonical R1, 0 of 6 resolvable on one view and 12 of
+12 on the others.
 **And on our own artifacts RankMe as published is the more reproducible statistic — a floor of 1.811×
 against our centred statistic's 3.111× — so by our own criterion the metric we criticise beats the one
 we measure with.** Over
@@ -423,9 +425,10 @@ In descending order of how well evidenced they are.
    on the same five retrains: **3.2×** between views (3.295× on `wsi_biology` against 1.019× on
    `rna_biology`), **3.3×** between statistics on one block (1.000× hard rank to 3.295× canonical R1),
    and **5.1×** between arms at one step across five seeds (6.05× against 1.18×). The consequence is
-   that rank's usability is **view- and statistic-conditional**: 0 of 6 between-arm differences are
-   resolvable on `wsi_biology` and 12 of 12 on the other two views, on the same artifacts with the
-   same statistic. *An earlier draft claimed the floor is a property of the arm and **not** of the
+   that rank's usability is **view- and statistic-conditional**: under canonical R1, 0 of 6 between-arm
+   differences are resolvable on `wsi_biology` and 12 of 12 on the other two views, on the same
+   artifacts with the same statistic (the wsi count is 1 of 6 under R2/R3 and 2 of 6 under the
+   participation ratios, which is the statistic half of the same finding). *An earlier draft claimed the floor is a property of the arm and **not** of the
    statistic; that is measurably wrong and is withdrawn (§4.3).*
 4. **The paper's criterion, applied to the paper, finds against the paper's own instrument** (§4.1b,
    §4.1a). **RankMe as published has a retraining floor of 1.811× on the raw exported block against
@@ -1574,12 +1577,14 @@ this project had measured exactly **one** floor — canonical R1 on the exported
 
 > **Effective rank's usability as a selection signal is conditional on the *view* it is read from and
 > on the *statistic* it is read with, and neither condition is ever stated when the number is quoted.
-> On the `wsi_biology` view under the entropy-based statistics, the same-seed retraining floor is
-> 2.14×–3.295× and *none* of the six between-arm differences we measured is resolvable. On the
-> `rna_biology` and `full_biology` views, read with the same statistic on the same five runs and the
-> same artifacts, the floor is 1.019× and 1.020× and *all twelve* between-arm differences are. The
-> difference between "unusable" and "usable" is a choice of co-trained view that no paper we have
-> read reports making.**
+> On the `wsi_biology` view under canonical R1 the same-seed retraining floor is **3.295×** and
+> **0 of the 6** between-arm differences we measured is resolvable; under R2 and R3 the floor is
+> 2.224× and 2.290× and **1 of 6** is; under the two participation ratios, 1.419× and 1.466× and
+> **2 of 6**. On the `rna_biology` and `full_biology` views, read with canonical R1 on the same five
+> runs and the same artifacts, the floor is **1.019×** and **1.020×** and **all twelve** between-arm
+> differences are resolvable. The difference between "unusable" and "usable" is a choice of
+> co-trained view — and, to a smaller degree, of statistic — that no paper we have read reports
+> making.**
 
 Three measurements fix it, all on the five same-seed retrains of §4.1 and all in §4.1a's table.
 
@@ -3385,7 +3390,8 @@ ever measured — 1.004× to 3.246× — are inside the **3.295×** spread measu
 of one configuration at one seed: a floor whose distribution is **bimodal** (four repeats within 2%, one at
 a third of them), and on whose same five runs the molecular channel spreads only **1.055×**. **On two other
 co-trained views of the same five runs, with the same statistic, that floor is 1.019× and 1.020× and every
-between-arm difference clears it** — 0 of 6 resolvable on one view, 12 of 12 on the others, and the
+between-arm difference clears it** — under canonical R1, 0 of 6 resolvable on one view and 12 of 12 on
+the others, and the
 divergent repeat turns out to have lost its **WSI encoder** rather than its run. We report the narrower
 claim rather than the general one because it is what the measurements support and because it is the more
 useful of the two: it tells a practitioner what to check. Across twelve
