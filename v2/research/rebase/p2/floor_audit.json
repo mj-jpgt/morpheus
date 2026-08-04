@@ -2776,19 +2776,19 @@
    "a": {
     "value": 12.3,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "12.30"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L6_lo_m0.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "b": {
     "value": 1.06,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "1.06"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L3_hi_m0.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "rests_on": "**the predeclared sign, not the magnitude.** With momentum held at zero, dropping the learning rate 25× takes the representation from the collapse floor to 12.30 — the arm the momentum-threshold account predicted would **fail**. One seed per cell.",
@@ -2808,19 +2808,19 @@
    "a": {
     "value": 35.24,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "35.24"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L4_lo_m0.999.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "b": {
     "value": 1.05,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "1.05"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L5_hi_m0.999.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "rests_on": "**the predeclared sign, not the magnitude.** With momentum held at 0.999, dropping the learning rate 25× takes the representation from the collapse floor to 35.24 — and L5, at maximal momentum and the high rate, is the arm the momentum-threshold account predicted would **work**. L5 and L6 are the two cells that account cannot survive. One seed per cell.",
@@ -2840,19 +2840,19 @@
    "a": {
     "value": 1.06,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "1.06"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L3_hi_m0.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "b": {
     "value": 1.05,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "1.05"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L5_hi_m0.999.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "rests_on": "**an equality, which is the shape a 1.01× difference can carry.** Momentum from 0 to 0.999 moves rank by 1.01× at lr 1e-3, where the momentum-threshold account required a large effect. It is entered as a `direction` row for the same reason rows 51–52 are: an ordering may not be read off it, and an equality may.",
@@ -2872,19 +2872,19 @@
    "a": {
     "value": 35.24,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "35.24"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L4_lo_m0.999.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "b": {
     "value": 12.3,
     "src": {
-     "kind": "markdown",
-     "file": "paper/P2_RANK_DRAFT.md",
-     "heading": "5.2a",
-     "literal": "12.30"
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/lr_L6_lo_m0.log",
+     "step": 200,
+     "column": "R3-rank"
     }
    },
    "rests_on": "nothing on its own. Momentum does move rank at the low rate (2.87×) and does not at the high rate (1.01×), which is why §5.2a says the collapse is *primarily* a learning-rate phenomenon rather than exclusively one. One seed per cell, on a block with no floor, so the 2.87× carries no verdict.",

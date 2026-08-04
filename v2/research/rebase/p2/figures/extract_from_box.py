@@ -108,6 +108,20 @@ VENDORED = [
     "e0_run/d1_diag/mseed_m0_s42.log",
     "e0_run/d1_diag/mseed_m0_s43.log",
     "e0_run/d1_diag/mseed_m0_s44.log",
+    # The six-arm learning-rate test behind draft 5.2a -- the paper's one
+    # ESTABLISHED mechanism result, and until now the only §5 block whose audit
+    # rows resolved against the draft's own table rather than against bytes. The
+    # box filenames carry the arm's lr and momentum, which is why they are not
+    # `lr_L{1..6}.log`. Each log's own first line echoes the resolved argv, so
+    # vendoring them also recovers the two parameters the notebook entries never
+    # recorded (decorrelation 0.04, seed 42) AND the step budget, which is the
+    # column the audit reads.
+    "e0_run/d1_diag/lr_L1_hi_m0.9.log",
+    "e0_run/d1_diag/lr_L2_lo_m0.99.log",
+    "e0_run/d1_diag/lr_L3_hi_m0.log",
+    "e0_run/d1_diag/lr_L4_lo_m0.999.log",
+    "e0_run/d1_diag/lr_L5_hi_m0.999.log",
+    "e0_run/d1_diag/lr_L6_lo_m0.log",
 ]
 
 # --------------------------------------------------------------------------
