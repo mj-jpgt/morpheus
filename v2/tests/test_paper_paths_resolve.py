@@ -93,6 +93,14 @@ BOX_OUTPUT_BASENAMES = {
     "d2_readout.py": "on the box; not vendored - see P2 6.2",
     "collapse_diag.py": "scratchpad/ on the A100; not vendored",
     "last.pt": "training checkpoint under ~/e0_run/d1_v1/<arm>/",
+    # These two are excused from *existence* here and picked up by a stricter rule elsewhere:
+    # three distinct files are called d2_h_seed42.npz and they give three different published
+    # numbers, so resolving the name proves nothing. test_paper_artifact_digests.py requires a
+    # SHA-256 beside every citation of them.
+    "d2_h_seed42.npz": "runs/d2_final/artifacts/ on the box; identity is pinned by SHA-256 in "
+                       "test_paper_artifact_digests.py, not by this filename",
+    "d2_i_seed42.npz": "runs/d2_final/artifacts/ on the box; same - see "
+                       "test_paper_artifact_digests.py",
     "certificate_adjusted/": "output directory under p1_evidence/track1/ on the box",
     "certificate_raw/": "output directory under p1_evidence/track1/ on the box",
 }

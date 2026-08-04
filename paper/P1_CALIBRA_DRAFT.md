@@ -25,8 +25,8 @@ direction pair spanning the image and molecular blocks, pushes it through the *i
 including the residualisation, and reports what came back. On 2,530–6,427 TCGA patients with frozen
 H-Optimus-0 whole-slide features and bulk expression targets we report four things. (i) The
 adjustment works on the first moment and is verified rather than assumed, twice and on two different
-confounders: raw cancer-type balanced accuracy falls 0.463 → 0.035 against a chance rate of 0.048, and
-joint tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118, a 21–45× drop
+confounders: raw cancer-type balanced accuracy falls 0.463 → 0.035 against a chance rate of 0.048 (**artifact not identified** — §4.2), and
+joint tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118 (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 21–45× drop
 with zero breaching axes in six representation states — while a nonlinear probe still recovers both
 confounds from the adjusted state at 3.15× and 3.45× chance, so what is certified is the class means
 and not every function of the representation. That residual is bounded: a saturated cancer × site cell
@@ -63,7 +63,7 @@ small association cannot be distinguished from an insensitive analysis. We injec
 known strength onto a named direction pair spanning image and molecular blocks and push it through
 the identical pipeline, including a cross-fitted residualisation against cancer type and tissue source
 site. On 2,530–6,427 TCGA patients the adjustment removes what it claims to from the first moment
-(joint site accuracy 0.3633 → 0.0118 against chance 0.0118, zero breaching axes in six states) while a
+(joint site accuracy 0.3633 → 0.0118 against chance 0.0118, zero breaching axes in six states (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2)) while a
 nonlinear probe still recovers site at 3.15× and cancer at 3.45× chance from the adjusted state — a
 residual bounded by a saturated cancer × site cell design that moves the channel only 0.6052 → 0.6051.
 It costs the signal essentially nothing (attenuation 0.974–1.039), but cannot detect a
@@ -119,7 +119,7 @@ axis again (Carloni et al., arXiv:2507.22092, 2025) `[UNVERIFIED]`.
 
 We reproduce this on our own representations rather than citing it. A joint linear discriminant over
 all 256 axes of a raw representation state recovers the pooled tissue source site at balanced
-accuracy 0.2348–0.3633 against a chance rate of 0.0118, with *p* = 1/1001 in every one of six
+accuracy 0.2348–0.3633 against a chance rate of 0.0118 (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), with *p* = 1/1001 in every one of six
 state × artifact combinations (§4.2).
 
 The standard remedy is to remove the covariate — correct features post hoc (ComBat on deep features,
@@ -172,8 +172,8 @@ In descending order of how well evidenced they are.
 
 1. **A confound adjustment verified rather than asserted, on two different confounders, with the
    verification reported as a certificate — and with the certificate's own reach measured.**
-   Cancer-type balanced accuracy 0.463 → 0.035 (chance 0.048); joint tissue-source-site balanced
-   accuracy 0.3633 → 0.0118 (chance 0.0118), a 21–45× drop with zero breaching axes across six
+   Cancer-type balanced accuracy 0.463 → 0.035 (chance 0.048) (**artifact not identified** — §4.2); joint tissue-source-site balanced
+   accuracy 0.3633 → 0.0118 (chance 0.0118) (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 21–45× drop with zero breaching axes across six
    states. What that certifies is the **first moment**: a nonlinear probe still recovers site at
    3.15× and cancer at 3.45× chance from the adjusted state, *p* at the floor, three probe families
    agreeing. The residual is bounded — a saturated cancer × site cell design, the upper bound on any
@@ -651,7 +651,15 @@ falls from **0.463 raw to 0.035 adjusted**, against a chance rate of **0.048** (
 n = 2,530. The adjusted value is *below* chance, which is the expected behaviour of cross-fitted
 residualisation against the variable being removed.
 
-*Provenance: `v2/research/rebase/nature/PHASE1_RESULT.md`, "Validity checks passed".*
+> **PROVENANCE UNRESOLVED — ARTIFACT NOT IDENTIFIED.** These three numbers cannot be traced to an
+> artifact. `v2/research/rebase/nature/PHASE1_RESULT.md` states them in prose and names no artifact
+> path and no hash; no run output on persistent storage records a cancer-type balanced accuracy of
+> 0.463 or 0.035, and an exhaustive search of `p1_evidence/`, `p1_out/` and `e0_run/` on the box
+> returns only unrelated coincidental digit matches. The cohort is also different from the tissue-source-site
+> arm below — n = 2,530 against n = 2,766 — so it cannot be inherited from it. **They are quoted here
+> only because they are already published; they are not reproducible from anything we can point to, and
+> they must either be regenerated with a hash-pinned artifact or withdrawn before submission.** This
+> is stated rather than resolved by picking whichever artifact happens to match.
 
 **Tissue source site.** The identical certificate, run on raw and on cancer+TSS cross-fitted
 residuals of the same states, n = 2,766, 85 pooled TSS classes (chance = 1/85 = 0.0118), 108-column
@@ -666,12 +674,40 @@ design, ≥ 1,000 within-cancer label permutations:
 | d2_i | full_biology | 0.2689 | 0.0085 | 0.0758 | 0.0551 → 0.0102 | 61 → 0 |
 | d2_i | rna_biology | 0.2744 | 0.0079 | 0.0732 | 0.0495 → 0.0106 | 48 → 0 |
 
-*Provenance: `v2/research/rebase/nature/TRACK1_NEGATIVE_CONTROLS.md` §T1.3;
+**Artifacts, by content hash.** Every number in the table above was produced from these two files and
+from no others. A filename is not an identifier here: three distinct copies of `d2_h_seed42.npz` exist
+on persistent storage, and they give three different answers.
+
+| artifact | path (box, under `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`) | SHA-256 |
+|---|---|---|
+| d2_h | `runs/d2_final/artifacts/d2_h_seed42.npz` | `4a18b94f1017b85dd576f30ee8e3caf92d7897630a7054efb70166191cbe69e3` |
+| d2_i | `runs/d2_final/artifacts/d2_i_seed42.npz` | `028e8635465dd3c6d3dbead25a8c204ca1ae0cee4aabb20e5412847fb147b665` |
+
+Identification rests on three independent things, not on the filename. The run script
+`p1_evidence/run_track1.sh:6` hard-codes `runs/d2_final/artifacts` as its input; the run log
+`p1_evidence/logs/t1_cert_raw.log` prints exactly this table's raw column; and re-running the joint-LDA
+estimator over all three copies reproduces all six raw values to four decimals from this one and from
+neither other:
+
+| copy | SHA-256 (first 16) | d2_h wsi_biology raw joint LDA |
+|---|---|---:|
+| **`runs/d2_final/artifacts/`** (published) | `4a18b94f1017b85d` | **0.3633** ✓ |
+| `e0_run/d2_v3/recovered_artifacts/` | `053490d685bf0dc4` | 0.1782 |
+| `e0_run/d2_v3/d2_v3_s42/artifacts/` | `e81f4496f82c503a` | 0.3785 |
+
+The `d2_v3` set is the **August re-run** (2026-08-03) and `d2_final` (2026-08-01) predates it; the three
+copies were written from three different commits, two of them from a dirty tree. They are **different
+artifacts that share a filename**, not copies of one artifact, and the project's own finding that
+training on this stack is not seed-reproducible is why. Anything citing `~/e0_run/d2_v3/*/artifacts/`
+as the source of these numbers is citing the wrong file.
+
+*Other provenance: `v2/research/rebase/nature/TRACK1_NEGATIVE_CONTROLS.md` §T1.3;
 `NOTEBOOK_ENTRIES/t13_confound_certificate_20260803T0152Z.md`;
 `v2/research/rebase/nature/GATE_LOG.md` rows `T1.3_site_certificate_{raw,adjusted}::*`; run outputs
-`p1_evidence/track1/certificate_{raw,adjusted}/` on persistent NFS. Command:
-`confound_certificate --partition test --n-permutations 1000 --n-boot 200 --n-boot-axes 8`, with and
-without `--residualise`.*
+`p1_evidence/track1/certificate_{raw,adjusted}/` on persistent NFS. Command, as actually invoked by
+`p1_evidence/run_track1.sh` (there is no console script of this name):
+`python -m morpheus.v2.calibra.confound_certificate --artifacts <the two files above> --partition test
+--n-permutations 1000 --n-boot 200 --n-boot-axes 8`, with and without `--residualise`.*
 
 Two things must be said and neither is optional.
 
@@ -1477,8 +1513,8 @@ correlation of known strength onto a named direction pair and pushing it through
 pipeline.
 
 Applied to TCGA morphology and expression, the answers are: the adjustment removes what it claims to
-from the first moment (cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048; joint site
-accuracy 0.3633 → 0.0118 against chance 0.0118, with zero breaching axes in six states), and no
+from the first moment (cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048 (**artifact not identified** — §4.2); joint site
+accuracy 0.3633 → 0.0118 against chance 0.0118, with zero breaching axes in six states (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2)), and no
 further — a nonlinear probe recovers site at 3.15× and cancer at 3.45× chance from the adjusted state,
 against a null that regenerates the adjustment inside every permutation, so what the certificate
 certifies is the class means; it costs the signal essentially

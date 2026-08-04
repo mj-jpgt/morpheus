@@ -48,6 +48,20 @@ keep the text.
 different confounders; a per-axis certificate would have missed the leak; and a nonlinear probe still
 recovers a bounded residual that the mean-based certificate cannot see.
 
+**Artifacts, by content hash.** Panels (a), (b), (c) and (e) are all computed from these two files on
+the box, under `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`. The filename alone is
+**not** an identifier — three copies of `d2_h_seed42.npz` exist and give raw joint LDA 0.3633, 0.1782
+and 0.3785 respectively. Plot only from these hashes:
+
+| artifact | path | SHA-256 |
+|---|---|---|
+| d2_h | `runs/d2_final/artifacts/d2_h_seed42.npz` | `4a18b94f1017b85dd576f30ee8e3caf92d7897630a7054efb70166191cbe69e3` |
+| d2_i | `runs/d2_final/artifacts/d2_i_seed42.npz` | `028e8635465dd3c6d3dbead25a8c204ca1ae0cee4aabb20e5412847fb147b665` |
+
+Panel (d)'s cancer-type numbers (0.463 → 0.035) have **no identified artifact** — see P1 §4.2. Do not
+plot (d) as though it were provenanced; either regenerate it against a hashed artifact or drop the
+panel.
+
 **Panels.**
 - (a) Grouped bars, six state × artifact combinations: joint LDA balanced accuracy raw vs adjusted,
   with the chance line at 0.0118 and each bar's own joint null p95 marked. Raw 0.2348–0.3633; adjusted
@@ -57,7 +71,7 @@ recovers a bounded residual that the mean-based certificate cannot see.
   (0.0334, *below* its own null p95 of 0.0392), and the joint value (0.3633) as a separate marker far
   to the right. This panel is the figure that carries the certification-rule finding.
 - (c) Breaching-axis counts raw → adjusted (17→0, 60→0, 58→0, 43→0, 61→0, 48→0).
-- (d) Small companion bar: cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048 (different
+- (d) Small companion bar: cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048 (**artifact not identified**, see below; different
   cohort, n = 2,530 — label it as such, do not merge with (a)). **This panel is a first-moment
   statement and must be captioned as one** — it is *not* "cancer is gone"; see (e).
 - (e) **What the certificate does not cover, and how far it reaches.** Two paired bars for the same

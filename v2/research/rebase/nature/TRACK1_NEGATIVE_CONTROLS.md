@@ -32,6 +32,25 @@ exceed the 95th percentile of a ≥1,000-draw **within-cancer** label-permutatio
 bootstrap CI must include the chance rate. Chance = 1/85 = **0.0118**. Permutation resolution
 1/1001 = 0.000999.
 
+**Artifacts, by content hash** (box, under
+`/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`). The filename is not an identifier:
+three distinct files are called `d2_h_seed42.npz` and the same estimator returns 0.3633, 0.1782 and
+0.3785 from them. The table below is from these bytes and no others, per
+`p1_evidence/run_track1.sh:6`, the run log `p1_evidence/logs/t1_cert_raw.log`, and re-running the
+joint-LDA estimator over all three copies:
+
+| artifact | path | SHA-256 | raw joint LDA (wsi_biology) |
+|---|---|---|---:|
+| **d2_h (published)** | `runs/d2_final/artifacts/d2_h_seed42.npz` | `4a18b94f1017b85dd576f30ee8e3caf92d7897630a7054efb70166191cbe69e3` | **0.3633** |
+| **d2_i (published)** | `runs/d2_final/artifacts/d2_i_seed42.npz` | `028e8635465dd3c6d3dbead25a8c204ca1ae0cee4aabb20e5412847fb147b665` | **0.2348** |
+| not published | `e0_run/d2_v3/recovered_artifacts/d2_h_seed42.npz` | `053490d685bf0dc47f2094831048db2bb884fe99f7ada3b57508ca23b561b899` | 0.1782 |
+| not published | `e0_run/d2_v3/d2_v3_s42/artifacts/d2_h_seed42.npz` | `e81f4496f82c503a0dd1833e77cde2ea383cf79b0a6a7423a11c977c7f8f2625` | 0.3785 |
+
+The `d2_v3` set is the August re-run (2026-08-03); `d2_final` (2026-08-01) predates it. The three were
+written from three different commits, two from a dirty tree, and they are different artifacts sharing
+a filename — not copies. Citing `~/e0_run/d2_v3/*/artifacts/` for these numbers is citing the wrong
+file.
+
 | artifact | state | joint LDA **raw** | joint LDA **adjusted** | joint null p95 (adj) | per-axis max raw → adj | breaching axes raw → adj |
 |---|---|---:|---:|---:|---|---|
 | d2_h | **wsi_biology** | **0.3633** | 0.0118 | 0.0528 | 0.0532 → 0.0123 | 17 → 0 |

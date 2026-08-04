@@ -41,6 +41,16 @@ carries more molecular signal than the head explicitly supervised on molecular p
 functional counterpart of the earlier geometric finding (biology effective rank ~38 vs identity ~191).
 
 ## Validity checks passed
+
+> **PROVENANCE UNRESOLVED — the cancer-type numbers below have no identified artifact.** This file is
+> the origin of the `0.463 → 0.035` pair that P1 §4.2 and P1_FIGURES panel (d) quote, and it names no
+> artifact path and no hash. No run output under `p1_evidence/`, `p1_out/` or `e0_run/` on the box
+> records a cancer-type balanced accuracy of 0.463 or 0.035; an exhaustive search returns only
+> unrelated coincidental digit matches. The cohort here (n = 2,530) is also not the site certificate's
+> (n = 2,766), so the numbers cannot be inherited from it. They must be regenerated against a
+> hash-pinned artifact or withdrawn. Recorded rather than resolved by attributing them to whichever
+> artifact happens to reproduce them; pinned in `v2/tests/test_paper_artifact_digests.py`.
+
 - **Confound removal verified, not assumed — and bounded, not absolute:** cancer-type balanced
   accuracy from the residualised representation drops to **0.035** (chance 0.048) from **0.463**
   raw. That is a statement about the **first moment**: the adjustment removes cancer from the
