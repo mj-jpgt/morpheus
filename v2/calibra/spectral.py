@@ -16,7 +16,8 @@ from typing import NamedTuple
 import numpy as np
 
 __all__ = ["effective_rank", "RankVariant", "CANONICAL", "RANK_VARIANTS", "cca_spectrum",
-           "top_canonical_correlation", "heldout_top_cca",
+           "top_canonical_correlation", "heldout_top_cca", "heldout_cca_projection",
+           "heldout_top_cca_indexed", "paired_absolute_correlation",
            "heldout_single_direction_correlation"]
 
 
@@ -238,6 +239,62 @@ def _whiten_map(a: np.ndarray, n_components: int):
     return centre, (vt[:k].T / s[:k])
 
 
+def heldout_cca_projection(x: np.ndarray, y: np.ndarray, train: np.ndarray, test: np.ndarray, *,
+                           n_components: int = 32) -> tuple[np.ndarray, np.ndarray]:
+    """Project ``test`` rows onto the top canonical pair FIT ON ``train`` rows.
+
+    Returns ``(px, py)``, the two held-out score vectors whose correlation *is*
+    :func:`heldout_top_cca_indexed`. Exposing the projection rather than only the
+    scalar is what makes a permutation null and a bootstrap over the held-out rows
+    affordable: the whitening and the SVD are the expensive part and they depend
+    only on ``train``, so a null that permutes or resamples ``test`` reuses them
+    unchanged. That is not merely an optimisation — recomputing the fit per
+    permutation would refit the directions to each permuted sample and silently
+    test a different hypothesis.
+
+    Returns two empty arrays when either side whitens to zero components.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    train = np.asarray(train, dtype=np.int64)
+    test = np.asarray(test, dtype=np.int64)
+    if len(train) < 10 or len(test) < 10:
+        return np.zeros(0), np.zeros(0)
+
+    cx, wx = _whiten_map(x[train], n_components)
+    cy, wy = _whiten_map(y[train], n_components)
+    if wx.shape[1] == 0 or wy.shape[1] == 0:
+        return np.zeros(0), np.zeros(0)
+    ux, uy = (x[train] - cx) @ wx, (y[train] - cy) @ wy
+    a, _, bt = np.linalg.svd(ux.T @ uy, full_matrices=False)
+
+    px = ((x[test] - cx) @ wx) @ a[:, 0]
+    py = ((y[test] - cy) @ wy) @ bt[0]
+    return px, py
+
+
+def paired_absolute_correlation(px: np.ndarray, py: np.ndarray) -> float:
+    """``|corr(px, py)|``, NaN when either side is constant. The channel's readout."""
+    px = np.asarray(px, dtype=np.float64)
+    py = np.asarray(py, dtype=np.float64)
+    if px.size < 2 or py.size != px.size or px.std() < 1e-12 or py.std() < 1e-12:
+        return float("nan")
+    return float(abs(np.corrcoef(px, py)[0, 1]))
+
+
+def heldout_top_cca_indexed(x: np.ndarray, y: np.ndarray, train: np.ndarray, test: np.ndarray, *,
+                            n_components: int = 32) -> float:
+    """Top canonical correlation, directions fit on ``train`` rows, scored on ``test`` rows.
+
+    The row-index form of :func:`heldout_top_cca`. It exists because the split that
+    matters is not always random: a leave-sites-out design has to hand this function
+    the rows belonging to held-out tissue source sites, and a caller that re-rolled
+    the split itself would be a second implementation of the statistic.
+    """
+    return paired_absolute_correlation(*heldout_cca_projection(x, y, train, test,
+                                                               n_components=n_components))
+
+
 def heldout_top_cca(x: np.ndarray, y: np.ndarray, *, n_components: int = 32,
                     seed: int = 42, train_fraction: float = 0.5) -> float:
     """Top canonical correlation with directions FIT ON TRAIN, SCORED ON HELD-OUT rows.
@@ -246,29 +303,14 @@ def heldout_top_cca(x: np.ndarray, y: np.ndarray, *, n_components: int = 32,
     — quoting it is like reporting a score on questions you already saw. Here the
     canonical directions are estimated on one split and the correlation is measured
     on the other, giving an unbiased (and much smaller) absolute number.
+
+    The split is a uniformly random one. Everything else is
+    :func:`heldout_top_cca_indexed`, which is the single implementation.
     """
-    x = np.asarray(x, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
-    n = len(x)
-    rng = np.random.default_rng(seed)
-    order = rng.permutation(n)
+    n = len(np.asarray(x))
+    order = np.random.default_rng(seed).permutation(n)
     cut = int(n * train_fraction)
-    train, test = order[:cut], order[cut:]
-    if len(train) < 10 or len(test) < 10:
-        return float("nan")
-
-    cx, wx = _whiten_map(x[train], n_components)
-    cy, wy = _whiten_map(y[train], n_components)
-    if wx.shape[1] == 0 or wy.shape[1] == 0:
-        return float("nan")
-    ux, uy = (x[train] - cx) @ wx, (y[train] - cy) @ wy
-    a, _, bt = np.linalg.svd(ux.T @ uy, full_matrices=False)
-
-    px = ((x[test] - cx) @ wx) @ a[:, 0]
-    py = ((y[test] - cy) @ wy) @ bt[0]
-    if px.std() < 1e-12 or py.std() < 1e-12:
-        return float("nan")
-    return float(abs(np.corrcoef(px, py)[0, 1]))
+    return heldout_top_cca_indexed(x, y, order[:cut], order[cut:], n_components=n_components)
 
 
 def heldout_single_direction_correlation(x: np.ndarray, y: np.ndarray, *, n_splits: int = 5,
