@@ -11,16 +11,46 @@ import numpy as np
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import KFold
 
-__all__ = ["confound_design", "cross_fitted_residuals", "pooled_tissue_source_site"]
+__all__ = ["confound_design", "cross_fitted_residuals", "pooled_tissue_source_site",
+           "tissue_source_site", "apply_pooled_tissue_source_site"]
+
+
+def tissue_source_site(patient_ids: np.ndarray) -> np.ndarray:
+    """The raw TCGA TSS code (second barcode field), before any pooling.
+
+    Split out so that the transductive and inductive pooling rules cannot drift
+    apart in how they parse a barcode.
+    """
+    identifiers = np.asarray(patient_ids).astype(str)
+    return np.asarray([identifier.split("-")[1] if len(identifier.split("-")) > 1 else "NA"
+                       for identifier in identifiers])
 
 
 def pooled_tissue_source_site(patient_ids: np.ndarray, *, min_site_count: int = 10) -> tuple[np.ndarray, set[str]]:
     """Derive TCGA TSS and pool rare sites exactly once across CALIBRA analyses."""
-    identifiers = np.asarray(patient_ids).astype(str)
-    raw = np.asarray([identifier.split("-")[1] if len(identifier.split("-")) > 1 else "NA" for identifier in identifiers])
+    raw = tissue_source_site(patient_ids)
     unique, counts = np.unique(raw, return_counts=True)
     frequent = {site for site, count in zip(unique, counts) if count >= min_site_count}
-    return np.asarray([site if site in frequent else "OTHER" for site in raw]), frequent
+    return apply_pooled_tissue_source_site(patient_ids, frequent), frequent
+
+
+def apply_pooled_tissue_source_site(patient_ids: np.ndarray, frequent) -> np.ndarray:
+    """Apply an ALREADY-FITTED pooling rule to (possibly new) patients.
+
+    A site absent from ``frequent`` becomes ``OTHER``. That covers a site that
+    was rare in the reference cohort AND a site the reference cohort never saw
+    at all -- the two are the same case, because an unseen site is a site whose
+    reference count is zero, and zero is below every ``min_site_count``. So the
+    unseen-site policy is not a new rule invented for the inductive path: it is
+    :func:`pooled_tissue_source_site`'s own rule evaluated at a count of zero.
+
+    Applying it to the reference cohort's own patients reproduces
+    ``pooled_tissue_source_site(patient_ids, min_site_count=...)[0]`` exactly,
+    which is what makes the inductive design identical on the fitting cohort.
+    """
+    frequent = set(frequent)
+    return np.asarray([site if site in frequent else "OTHER"
+                       for site in tissue_source_site(patient_ids)])
 
 
 def confound_design(frame, columns) -> np.ndarray:
