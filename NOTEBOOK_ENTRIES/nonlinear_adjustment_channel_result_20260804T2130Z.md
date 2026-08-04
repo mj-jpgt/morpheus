@@ -36,7 +36,7 @@ answered anyway, from three directions that do not depend on step 3:
    **0.1237** (additive design) — against the real channel's own null median of **0.1483**. In excess
    over each block's own null, that is **6.0%** and **11.2%** of the channel's excess.
 3. **The residual, re-measured against a null that can see the adjustment (§6).** Still real, still at
-   the permutation floor, but **2.4–3.3× chance for site** and **3.5–3.7× for cancer**, not 4.3–4.9×.
+   the permutation floor, but **2.4–3.3× chance for site** and **3.1–3.7× for cancer**, not 4.3–4.9×.
 
 **Verdict against the predeclared bands: Reading 4 on the letter**, with the question answered by §4
 and §5 instead. Reading 4 was predeclared as *not* a favourable result and is not written as one.
@@ -72,7 +72,8 @@ within-cancer p95 **0.0399**; cancer **0.2126 = 4.46× at prior-corrected k5**, 
 **0.0582**. Those are the previous entry's `d2_h | adjusted` rows digit for digit.
 
 **Both statistics are reported throughout**, because the brief's "0.58–0.62 held-out against ~0.147"
-merges two of them and P2_RANK_DRAFT §… already warns that 0.140 and 0.147 must not be interchanged:
+merges two of them and `paper/P2_RANK_DRAFT.md:1049-1058` already warns that 0.140 and 0.147 come from
+different permutation procedures at different *n* and must not be interchanged:
 
 * **S1** = `spectral.top_canonical_correlation(adjust(x), adjust(y), n_components=16)` — the §4.4
   headline; an in-sample maximum over 16 whitened directions per side, computed on the held-out
@@ -114,8 +115,9 @@ permutations, p floor 0.0005. **Retention** is `nonlinear_adjustment.retention_o
 | none | column means only | 0.8155 | 0.7102 | 0.1053 | 0.231 | 0.8062 | 19.65 | 0.744 |
 | **ridge (incumbent)** | additive one-hot, α=1 | **0.6052** | **0.1483** | **0.4569** | **1.000** | 0.5841 | 22.50 | 1.000 |
 | **saturated cell mean** | **every function of the labels** | 0.6051 | 0.1491 | 0.4560 | **0.998** | 0.5835 | 22.50 | 0.9992 |
-| kernel ridge α=1 γ=0.25 | RBF on the one-hot design | 0.6052 | 0.1473 | 0.4579 | **1.002** | 0.5837 | 22.50 | ≈1 |
+| kernel ridge α=1 γ=0.25 | RBF on the one-hot design | 0.6052 | 0.1473 | 0.4579 | **1.002** | 0.5837 | 22.50 | 0.9993 |
 | kernel ridge α=1 γ=0.5 | RBF on the one-hot design | 0.6052 | 0.1477 | 0.4575 | **1.001** | 0.5837 | 22.50 | 0.9995 |
+| kernel ridge α=1 γ=1 | RBF on the one-hot design | 0.6053 | 0.1478 | 0.4575 | **1.001** | 0.5838 | 22.50 | 0.9993 |
 | location–scale (2nd moment) | per-cell mean **and** SD | 0.5978 | 0.1468 | 0.4510 | **0.987** | 0.5719 | 42.41 | 0.9889 |
 | in-sample saturated | cell means, exactly zero | 0.6054 | 0.1453 | 0.4601 | **1.007** | 0.5825 | 22.55 | 0.9943 |
 
@@ -153,7 +155,8 @@ for all but the 1.0% of rows in pooled `OTHER`.
 the column space of that design is *every* function of `(cancer, site)`. **It is an upper bound on
 what any kernel ridge, random forest or gradient-boosting estimate of `E[X | C]` can remove, and it
 changes the channel by 0.0001.** The kernel arm, run over the predeclared six-cell grid, agrees to
-four decimals and its residuals correlate with the incumbent's at a per-axis median of 0.9992–0.9995
+four decimals and its residuals correlate with the incumbent's at a per-axis median of 0.9993–0.9995
+(5th percentile 0.9985–0.9990, relative Frobenius difference 0.033–0.041)
 (predeclared distrust item 2: **these arms are relabelled incumbents, and are reported as such**).
 
 This was written down as a prediction in the predeclaration §2 before any of it was run, precisely so
@@ -293,32 +296,37 @@ assumed one. 200 permutations, p floor 0.0050.
 | arm | target | observed | × design chance | regenerated null median | × design chance | **corrected multiple** | p |
 |---|---|---:|---:|---:|---:|---:|---:|
 | ridge (incumbent) | site | 0.0511 | 4.34 | 0.0187 | 1.59 | **2.73** | 0.0050 |
-| ridge (incumbent) | cancer | 0.2126 | 4.46 | 0.0580 | 1.22 | **3.67** | 0.0050 |
+| ridge (incumbent) | cancer | 0.2126 | 4.46 | 0.0580 | 1.22 | **3.66** | 0.0050 |
 | saturated | site | 0.0497 | 4.23 | 0.0200 | 1.70 | **2.49** | 0.0050 |
 | saturated | cancer | 0.2065 | 4.34 | 0.0582 | 1.22 | **3.55** | 0.0050 |
 | kernel ridge α=1 γ=0.25 | site | 0.0546 | 4.64 | 0.0176 | 1.49 | **3.10** | 0.0050 |
 | kernel ridge α=1 γ=0.25 | cancer | 0.2067 | 4.34 | 0.0575 | 1.21 | **3.59** | 0.0050 |
-| kernel ridge α=1 γ=0.5 | site | 0.0518 | 4.40 | 0.0180 | 1.53 | **2.88** | 0.0050 |
+| kernel ridge α=1 γ=0.5 | site | 0.0518 | 4.40 | 0.0180 | 1.53 | **2.87** | 0.0050 |
 | kernel ridge α=1 γ=0.5 | cancer | 0.2096 | 4.40 | 0.0579 | 1.22 | **3.62** | 0.0050 |
 | location–scale | site | 0.0494 | 4.20 | 0.0205 | 1.75 | **2.41** | 0.0050 |
 | location–scale | cancer | 0.2102 | 4.41 | 0.0594 | 1.25 | **3.54** | 0.0050 |
 | in-sample saturated | site | 0.0603 | 5.13 | 0.0181 | 1.54 | **3.33** | 0.0050 |
 | in-sample saturated | cancer | 0.2125 | 4.46 | 0.0571 | 1.20 | **3.72** | 0.0050 |
 
-**`d2_i_seed42`, incumbent:** site observed 0.0507 (4.31× design chance) against a regenerated null
-median of 0.0170 (1.45×), **corrected 2.98×**, p = 0.0050.
+**`d2_i_seed42`.** Incumbent: site 0.0507 (4.31× design chance) against a regenerated null median of
+0.0170 (1.45×), **corrected 2.98×**; cancer 0.1738 (3.65×) against 0.0567 (1.19×), **corrected
+3.06×**. Saturated: site 0.0519 (4.41×) against 0.0180 (1.53×); cancer 0.1779 (3.74×) against 0.0572
+(1.20×). Every p = 0.0050.
 
 **What this changes and what it does not.**
 
 * **It does not overturn the previous entry's direction.** The residual is real. Every corrected
   multiple is ≥ 2.4 and every p is at the floor, against a null that contains the adjustment.
 * **It does change the magnitudes.** The publishable multiple for site on `d2_h` is **2.73×**, not
-  4.34×; for cancer **3.67×**, not 4.46×. Between **27% and 40%** of the reported multiple is the
-  adjustment reading itself back.
-* **It explains why nothing passes step 3.** The floor is 1.45–1.75× design chance for *any*
-  cross-fitted adjustment, so a bar of "≤ 2.0× chance" leaves a window of 0.25–0.55× that no
-  adjustment can reach. The predeclared bar was not attainable. That is a defect of the bar and it is
-  reported as one rather than converted into a pass.
+  4.34×; for cancer **3.66×**, not 4.46×. The probe's denominator assumed a chance rate of 1.00×
+  design chance; the measured rate under the adjustment is **1.19–1.75×** design chance across every
+  arm and both targets. That gap is the adjustment reading itself back.
+* **It explains why nothing passes step 3.** For **site** the measured floor is 1.45–1.75× design
+  chance under *any* cross-fitted adjustment, so a bar of "≤ 2.0× chance" left a window of only
+  0.25–0.55× for the adjustment to work in. For **cancer** the floor is lower (1.19–1.25×) and the
+  bar was in principle reachable; nothing reached it. The predeclared bar was, on the site half,
+  effectively unattainable. That is a defect of the bar and it is reported as one rather than
+  converted into a pass.
 
 ---
 
@@ -394,9 +402,9 @@ Per the rules for this run, `NOTEBOOK.md`, the paper drafts and `claim_guards.py
    1.58× (site) / 1.50× (cancer) at p = 0.0249 / 0.0149 after the same adjustment.
 2. **Same entry, every "× chance" for an *adjusted* arm** (§0, §3, §3b, §8 — the 4.3–4.9× site and
    3.4–4.9× cancer figures). The multiplier is against `1/n_classes`, which is the chance rate for a
-   *raw* block. Against the adjustment's own measured rate the same readings are **2.4–3.3× (site)**
-   and **3.5–3.7× (cancer)**. The *significance* is unchanged; the *magnitude* is overstated by
-   27–40%. The raw-arm multiples are unaffected.
+   *raw* block. Against the adjustment's own measured rate — **1.19–1.75×** design chance, not 1.00× —
+   the same readings are **2.4–3.3× (site)** and **3.1–3.7× (cancer)**. The *significance* is
+   unchanged; only the magnitude moves. The raw-arm multiples are unaffected.
 3. **Same entry §2, "Measured chance matches design chance, so the probe is not capacity-bound"** —
    correct as written (the global label-permutation null does sit at the design rate) but incomplete:
    that null measures the chance rate of the *estimator*, not of the *estimator applied to an adjusted
