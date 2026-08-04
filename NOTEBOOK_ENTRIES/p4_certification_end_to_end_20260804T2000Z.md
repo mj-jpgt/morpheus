@@ -299,10 +299,50 @@ What this work contributes instead:
   HEST-1k. But `claim_evidence.json` has no `external_cohorts` key, no spatial replication result
   exists, and both spatial entries state that no existing scientific claim has been re-run on spatial
   data. **No edit to `claim_evidence.json` is made by this work.**
-* The relevant transferable bar, for when their result lands: Claim 1a holds if the adjusted joint-LDA
-  slide accuracy is ≤ its own permutation null p95 **and** ≤ 1.5 × chance = **0.115**. If it clears,
-  the raw-FAIL / adjusted-PASS pattern found here at 85 site classes transfers to 13 slide classes —
-  which is evidence for condition 3 in a second modality, and **not** evidence for condition 4b.
+* **D1 — their result landed while this entry was being written**
+  (`spatial_claim_replication_result_20260804T1930Z.md`), and it answers the transfer question in both
+  directions at once.
+
+  **The pattern transfers.** n = 2,769 spots, 13 slide classes, chance 1/13 = 0.0769: raw **1,212 of
+  1,536** axes breaching with joint LDA **0.9707** against a null p95 of 0.5465 — NOT CERTIFIED;
+  adjusted **0** breaching with joint LDA **0.0025** against a null p95 of 0.0470 — CERTIFIED, a
+  factor of 384 down and far below chance. Their predeclared Claim 1a bar (≤ 1.5 × chance = 0.115)
+  clears with room. So the raw-FAIL / adjusted-PASS behaviour measured here at 85 site classes is not
+  a TCGA artefact: it reproduces in a second modality at a seventh of the design rank. **That is
+  evidence for condition 3 in a second modality, and it is not evidence for condition 4b.**
+
+  **And it makes the adjusted PASS mean much less than it appears to.** Their Claim 1c — a probe added
+  before the run because the certificate's classifier family is mean-based and the adjustment is a
+  mean — runs an out-of-fold **15-NN** vote for slide on the *adjusted* residual. It reads **0.7291
+  balanced accuracy, 9.5× chance**, against a **global**-permutation null of 0.0856 for the same
+  classifier on the same features. Cross-fitted ridge on a one-hot design removes the confound's
+  **mean vector** and nothing else.
+
+  **This lands directly on Test A′ above and sharpens it.** My planted-axis ladder shows the adjusted
+  certificate is near-inert against a *linear* site code at any realistic strength. Their kNN probe
+  shows that what survives the adjustment is not merely undetectable by the certificate — it is
+  recoverable by an ordinary non-linear classifier. Two independent routes to the same conclusion:
+  **the adjusted state's blanket PASS is a statement about the adjustment and the classifier family,
+  not evidence that any axis is confound-free.**
+
+  **The argument is about the classifier family, not about spatial data, and it applies verbatim to
+  the 85-class TCGA site certificate — which has never been asked this question.** Running the same
+  kNN probe on TCGA is hours of CPU and is now the highest-value open measurement on P4. Until it is
+  run, the sentence "the site signal is gone" in
+  `t13_adjusted_certificate_and_p6_20260803T0300Z.md` and `paper/P1_CALIBRA_DRAFT.md` §4.2 is not
+  supported; the supportable version is *the confound is removed from the first moment, and a
+  mean-based certificate therefore certifies*.
+
+* **A defect in the null convention that touches every number in Test A above.**
+  `within_stratum_permutations` permutes the confound label inside cancer type, so wherever the
+  confound is **nested** in the stratum the permutation is the identity and the null is handed the
+  true labels. Five of thirteen HEST test slides are the only slide of their oncotree label, which is
+  why their raw joint null median reads 0.533 against a chance rate of 0.0769. On TCGA, tissue source
+  site is partially nested in cancer, so a milder version of the same inflation is present in the
+  null p95 values quoted in Test A. **It makes the certificate more permissive, so it cannot rescue a
+  failure** — the raw joint accuracies of 0.235–0.363 exceed even an inflated null p95 of 0.12–0.19 —
+  but any *pass* read against a within-cancer null should be quoted with the global-permutation null
+  beside it, and the adjusted arm's passes here are not.
 
 ---
 

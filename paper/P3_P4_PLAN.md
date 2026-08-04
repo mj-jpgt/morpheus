@@ -46,6 +46,11 @@ both directions:
   paired morphology** exists anywhere on the project, and (ii) **the object that certifies is not the
   object you would expose** — the adjusted state passes the confound certificate, the raw state
   fails it, and the adjustment is a transductive cohort-level operation with no inductive form.
+* And a third, discovered on 2026-08-04 by the spatial replication and worse than either: **the
+  adjusted state's PASS is scoped to mean-based classifiers.** At spot level a 15-nearest-neighbour
+  vote recovers the confound from the *adjusted* residual at 9.5× chance. The equivalent probe has
+  never been run on TCGA. See §9.4 — it is the highest-value open measurement on P4 and it is hours
+  of CPU.
 * Therefore: **cut the `P3 → P4` and `D1 → P4` edges of the dependency diagram.** P4's exposable
   representation is arm H, which exists and is the better arm; certification is orthogonal to why
   the supervision works. Keeping those edges makes P4 look blocked by things that do not block it,
@@ -466,6 +471,40 @@ signal-to-noise ladder, with the reading fixed in advance.
 Taken together with §9.1: the certificate is a working instrument, it is being read on the wrong
 object, and §7.1 is what fixes that.
 
+**9.4 The spatial replication landed while this was being written, and it makes the adjusted PASS
+weaker still.** `NOTEBOOK_ENTRIES/spatial_claim_replication_result_20260804T1930Z.md`, on the HEST-1k
+spot artifact at n = 2,769 with 13 slide classes (chance 1/13 = 0.0769):
+
+* **The raw-FAIL / adjusted-PASS pattern transfers.** Raw: 1,212 of 1,536 axes breaching, joint LDA
+  **0.9707** against a null p95 of 0.5465 — NOT CERTIFIED. Adjusted: **0** axes breaching, joint LDA
+  **0.0025**, a factor of 384 down and far below chance — CERTIFIED. So condition 3's behaviour is
+  not a TCGA artefact; it reproduces in a second modality at a seventh of the design rank.
+* **And the adjusted PASS is scoped to mean-based classifiers, which nobody had tested.** An
+  out-of-fold **15-NN** vote on the *adjusted* residual still names which of thirteen slides a spot
+  came from **72.9% of the time — 9.5× chance** — against a global-permutation null of 0.086 for the
+  same classifier on the same features. Cross-fitted ridge on a one-hot design removes the confound's
+  **mean vector** and nothing else. The supportable sentence is therefore *"the confound is removed
+  from the first moment, and a mean-based certificate certifies; a classifier that reads anything else
+  still recovers it"* — **not** "the site signal is gone", which is what
+  `t13_adjusted_certificate_and_p6_20260803T0300Z.md` and `paper/P1_CALIBRA_DRAFT.md` §4.2 currently
+  say.
+* **That argument is about the classifier family, not about spatial data, and applies verbatim to
+  TCGA's 85-class site certificate — which has never been asked this question.** Until it is, P4's
+  condition 3 is not merely passing on the wrong object; the object it passes on may not be certified
+  at all under a wider classifier family.
+* **A third defect, in the null convention.** `within_stratum_permutations` permutes the confound
+  label inside cancer type, so wherever the confound is *nested* in the stratum the permutation is the
+  identity and the null is handed the true labels. Five of thirteen HEST test slides are the only
+  slide of their oncotree label, which is why the raw joint null median reads 0.533 against a chance
+  rate of 0.0769. On TCGA, tissue source site is partially nested in cancer, so the same inflation is
+  present in a milder form. It makes the certificate **more permissive**, so it does not rescue the
+  raw failure — but any *pass* read against a within-cancer null needs the global-permutation null
+  quoted beside it.
+
+**Consequence for the plan: §10.1 acquires a second requirement.** The inductive adjustment operator
+is necessary and is no longer sufficient. Certification must also be shown to hold against a
+classifier family wider than the one the adjustment was designed to defeat.
+
 ---
 
 ## 10. P4 — phase gate, sharpened
@@ -474,21 +513,29 @@ The old gate ("all five conditions plus ≥1 modality beyond bulk RNA") is kept 
 
 > **P4 may be written when all four hold.**
 >
-> 1. **All five conditions PASS on ≥1 axis on the state that is actually exposed.** Today the
->    exposed state fails condition 3. This requires the inductive adjustment operator of §7.1 — not
->    more analysis, a small piece of code plus its certificate re-run.
+> 1. **All five conditions PASS on ≥1 axis on the state that is actually exposed, against a
+>    classifier family wider than the one the adjustment defeats.** Today the exposed state fails
+>    condition 3. Two things are required, and the first alone is not enough: (a) the **inductive
+>    adjustment operator** of §7.1 — a small piece of code plus its certificate re-run, not more
+>    analysis; and (b) the **kNN slide/site probe run on TCGA**, because at spot level a 15-NN
+>    recovers the confound from the adjusted residual at 9.5× chance (§9.4) and the same probe has
+>    never been pointed at the 85-class TCGA site certificate. If TCGA behaves like HEST, the adjusted
+>    PASS on which every channel number in this project is read is a statement about linear-mean
+>    classifiers only, and P4's certificate schema needs a second, non-linear row exactly as it needed
+>    the joint one.
 > 2. **≥1 external cohort with paired morphology and molecular measurement**, through the same
 >    instrument, with the certificate re-issued there. The verified top pick is ALCHEMIST-ALCH
 >    (1,106 paired, open, SVS 40× ~0.25 µm/px, GDC API) and its acquisition has started; CPTAC's
 >    slides are at IDC in DICOM, not at GDC. This is a data acquisition and it is on the critical
 >    path.
-> 3. **≥1 modality beyond bulk RNA carries its own certificate.** The spatial replication predeclared
->    in `PREDECLARED_spatial_claim_replication_20260804T1800Z.md` runs `certify_axes` on the HEST-1k
->    spot artifact with slide standing in for site (13 test slides, chance 1/13 = 0.0769) and its
->    Claim 1a bar is: adjusted joint-LDA slide accuracy ≤ its own permutation null p95 **and**
->    ≤ 1.5 × chance = 0.115. If that clears, the raw-FAIL / adjusted-PASS pattern transfers across
->    modalities and P4 has its second modality for condition 3 — **but not for condition 4b**, which
->    needs the same axis read in a second cohort, not a different axis in a different modality.
+> 3. **≥1 modality beyond bulk RNA carries its own certificate. This is now MET for condition 3,**
+>    and it is the only one of the four that is. The spatial replication
+>    (`spatial_claim_replication_result_20260804T1930Z.md`) cleared its predeclared Claim 1a bar with
+>    room to spare: adjusted joint-LDA slide accuracy **0.0025**, against a bar of ≤ 1.5 × chance =
+>    0.115 and its own null p95 of 0.0470. So the raw-FAIL / adjusted-PASS pattern transfers across
+>    modalities — **subject to §9.4's kNN caveat, which applies to both modalities equally** — and
+>    **not** to condition 4b, which needs the same axis read in a second cohort, not a different axis
+>    in a different modality.
 > 4. **The abstention curve is measured**, i.e. answer quality as a function of refusal fraction,
 >    with the CellWhisperer-style no-abstention policy as the zero-refusal endpoint of the same
 >    curve. Without it the paper asserts that refusing is valuable and never shows it.
@@ -509,8 +556,12 @@ The old gate ("all five conditions plus ≥1 modality beyond bulk RNA") is kept 
    discharges `no_external_cohort` mechanically and it is a genuine second cohort, but replicating a
    pan-cancer axis in a single lineage tests acquisition-condition transfer, not disease breadth,
    and the certificate re-issued there must say so.
-2. **The exposable state fails the confound certificate, and the state that passes cannot be
-   exposed.** Fixed by the inductive adjustment operator of §7.1, which does not exist.
+2. **The exposable state fails the confound certificate; the state that passes cannot be exposed;
+   and the pass itself is scoped to mean-based classifiers.** The first two are fixed by the
+   inductive adjustment operator of §7.1, which does not exist. The third is not: a 15-NN vote
+   recovers the confound from the *adjusted* residual at 9.5× chance at spot level (§9.4), and the
+   same probe has never been run on TCGA. **Run it.** It is cheap, it is the single highest-value
+   open measurement on P4, and its outcome decides whether P4's certificate needs a second row.
 3. **Nothing is built.** Stage S6 of the build order. The atlas, the query layer, the uncertified-axis
    display: none of it exists, and the build order S1 → S6 must not be reordered.
 4. **The abstention curve has one point, not a curve.** §9 measures the refusal count at one
@@ -568,7 +619,7 @@ makes.
 | paper | phases, in order | note |
 |---|---|---|
 | **P3** | (1) 2,000-repeat paired bootstrap on the four exam blocks that carry point estimates only → (2) decide and record a claim kind for a supervision comparison → (3) optional `--no-residualise` bootstrap path in `d2_compare`, or explicit point-estimate labelling for the raw block → (4) write-up as a comp-bio benchmarking / analysis paper | **No GPU.** Steps 1 and 3 are hours of CPU on artifacts already on disk. The critical path is writing, not computing. |
-| **P4** | (1) inductive adjustment operator + re-issue the certificate on the exposed state → (2) acquire an external cohort with paired morphology → (3) re-run the five conditions there → (4) spatial certificate result folds in as the second modality → (5) abstention curve as the primary evaluation → (6) build S6 → (7) write-up | Step 1 is small and unblocks the only *measured* failure. Step 2 is the long pole and is a data acquisition. Steps 1 and 5 can start now; step 6 must not start before them, per the build order. |
+| **P4** | (1) **kNN site probe on TCGA** — decides what the adjusted PASS means → (2) inductive adjustment operator + re-issue the certificate on the exposed state → (3) acquire an external cohort with paired morphology (ALCHEMIST, under way) → (4) re-run the five conditions there → (5) *(done)* spatial certificate as the second modality → (6) abstention curve as the primary evaluation → (7) build S6 → (8) write-up | Step 1 is hours of CPU and is the highest-value open measurement on the paper; it comes first because a bad answer changes what steps 2 and 4 have to prove. Step 3 is the long pole and is a data acquisition. Steps 1, 2 and 6 can start now; step 7 must not start before them, per the build order. |
 
 ---
 
