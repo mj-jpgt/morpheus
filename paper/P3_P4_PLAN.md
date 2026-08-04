@@ -325,6 +325,15 @@ its untouched-patients half and is UNEVALUABLE in its external-cohort half. The 
 An UNEVALUABLE condition counts as not passed — you cannot certify on evidence that does not exist —
 and that distinction is preserved rather than collapsed into "fails".
 
+**Condition 4a was scored on the adjusted state, and on the raw state it does not hold either.** A
+concurrent agent's block-level leave-sites-out run on the same artifact and the same 90 targets
+(`NOTEBOOK_ENTRIES/leave_sites_out_result_20260804T1830Z.md`) reports the adjusted arm surviving 5/5
+folds at a ratio of **1.010** to a matched random split of identical size and per-cancer composition
+— holding out whole sites costs nothing measurable — while **the unadjusted arm collapses at 2 of 5
+folds against a predeclared bar of 3**. So the raw state fails condition 3 *and* condition 4a, and the
+adjusted state passes both. Every one of P4's open conditions reduces to the same structural fact,
+which is §7.1.
+
 **The shape of the condition-3 failure is the interesting part.** The most legible axis on the whole
 representation is individually innocent: its own site-prediction accuracy sits *below* its own
 permutation null on both the raw and the adjusted state. It is refused not for anything it does, but
@@ -400,10 +409,43 @@ number.
 
 ## 9. P4 — measured results
 
-The four system tests of the predeclaration were run on CPU on 2026-08-04. Their numbers are in
-`NOTEBOOK_ENTRIES/p4_certification_end_to_end_RESULTS.md` and are summarised into this plan when
-that entry lands; the plan's structure above does not depend on them, and where a verdict is quoted
-in §7 it is quoted from that entry.
+Full numbers, provenance and predeclaration in
+`NOTEBOOK_ENTRIES/p4_certification_end_to_end_20260804T2000Z.md`. The three that change the plan:
+
+**9.1 The abstention rule. On the state a user would be shown, the answerable fraction is 0.000 in
+6 of 6 artifact × state cells.** Not small — zero. Every raw state fails the joint LDA site test
+(joint balanced accuracy 0.235–0.363 against null p95 0.122–0.186 at a chance rate of 0.0118, every
+permutation p at the 1/1001 resolution floor). On the adjusted state it is 1.000 in 6 of 6. The
+per-axis-only reading — dropping the joint row — would be 0.762–0.934 on the raw state. **The joint
+row is the whole difference between "a working interface" and "no interface", on these artifacts.**
+
+**9.2 The competitor gap, which is P4's contribution expressed as a number for the first time.**
+On 90 non-control target queries against `d2_h_seed42::wsi_biology`:
+
+| | count |
+|---|---:|
+| answered by a CellWhisperer-style policy (no abstention) | **90** |
+| answered by our certified policy | **0** |
+| **gap** | **90** |
+| refused by the site certificate | 90 |
+| refused by the CALIBRA detection floor | **62** |
+| refused by the within-cancer permutation null | 1 |
+
+**The number that survives the one buildable fix is 62, not 90.** If the inductive adjustment
+operator of §7.1 existed and the site condition were met, a certified interface would answer
+**28 of 90** — and **19 of those 28 are targets the representation was supervised on**. Of the 24
+genuinely untrained `heldout_pathway` targets, **one** survives. For **23 of 90** targets the
+detection floor is unresolvable on the whole level grid: a planted spike of r = 0.40 is not recovered
+above the level-0 upper tail in 80% of draws. Those 23 are queries a competitor-style interface
+answers in fluent prose about an analysis that could not have detected the effect it describes.
+**That table is P4's Figure 1**, and it is the abstention-curve axis Leibig et al. established as the
+right primary evaluation.
+
+**9.3 Does the certificate discriminate?** See the entry's Test A′ — a site code, a cancer code and
+pure noise planted into the state over a signal-to-noise ladder, with the reading fixed in advance:
+the site code must be refused, the other two must not, and if the site code stops being refused after
+the adjustment then "the adjusted state certifies" is a statement about the adjustment rather than
+evidence that any axis is site-free.
 
 ---
 
@@ -417,8 +459,10 @@ The old gate ("all five conditions plus ≥1 modality beyond bulk RNA") is kept 
 >    exposed state fails condition 3. This requires the inductive adjustment operator of §7.1 — not
 >    more analysis, a small piece of code plus its certificate re-run.
 > 2. **≥1 external cohort with paired morphology and molecular measurement**, through the same
->    instrument, with the certificate re-issued there. CPTAC-3 has diagnostic slides at GDC; only its
->    RNA is on the box. This is a data acquisition and it is on the critical path.
+>    instrument, with the certificate re-issued there. The verified top pick is ALCHEMIST-ALCH
+>    (1,106 paired, open, SVS 40× ~0.25 µm/px, GDC API) and its acquisition has started; CPTAC's
+>    slides are at IDC in DICOM, not at GDC. This is a data acquisition and it is on the critical
+>    path.
 > 3. **≥1 modality beyond bulk RNA carries its own certificate.** The spatial replication predeclared
 >    in `PREDECLARED_spatial_claim_replication_20260804T1800Z.md` runs `certify_axes` on the HEST-1k
 >    spot artifact with slide standing in for site (13 test slides, chance 1/13 = 0.0769) and its
@@ -434,9 +478,18 @@ The old gate ("all five conditions plus ≥1 modality beyond bulk RNA") is kept 
 
 ## 11. P4 — blockers, in order of severity
 
-1. **No external cohort with paired morphology exists on the project.** This is condition 4b, it is
-   `claim_guards.no_external_cohort`, and it is a data acquisition, not an analysis. CPTAC-3
-   diagnostic slides are the obvious target and are not on the box.
+1. **No external cohort with paired morphology is on disk yet — but this blocker is moving.** This
+   is condition 4b and it is `claim_guards.no_external_cohort`. It is a data acquisition, not an
+   analysis, and a concurrent agent has already scouted and verified the options against live APIs
+   (`NOTEBOOK_ENTRIES/external_cohort_options_verified_20260804T1900Z.md`): **ALCHEMIST-ALCH**, 1,106
+   patients with both open-access SVS slides and STAR-counts expression, 100% FFPE tumour, 40×,
+   ~0.25 µm/px, same GDC API and same file format as the TCGA slides already in the pipeline;
+   CPTAC 1,580 paired but DICOM via IDC and with **no** CPTAC slides at GDC. Acquisition of
+   ALCHEMIST through the existing renderer is under way (commit `24e3466`).
+   **The scope caveat P4 must carry:** ALCHEMIST is resected stage IB–IIIA NSCLC, one disease. It
+   discharges `no_external_cohort` mechanically and it is a genuine second cohort, but replicating a
+   pan-cancer axis in a single lineage tests acquisition-condition transfer, not disease breadth,
+   and the certificate re-issued there must say so.
 2. **The exposable state fails the confound certificate, and the state that passes cannot be
    exposed.** Fixed by the inductive adjustment operator of §7.1, which does not exist.
 3. **Nothing is built.** Stage S6 of the build order. The atlas, the query layer, the uncertified-axis
