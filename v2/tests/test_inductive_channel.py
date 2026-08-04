@@ -119,6 +119,24 @@ def test_the_operator_carries_a_reference_digest_of_its_fitting_rows_only():
     assert operator.provenance["reference_digest"] == other.provenance["reference_digest"]
 
 
+def test_the_frozen_design_spec_encodes_every_row_in_the_fitting_rows_columns():
+    """The third labels encoding: the operator's OWN design, evaluated on the whole partition.
+
+    It has to be defined on the discovery rows (which the inductive operator is fitted on)
+    and on the exposure rows (which it scores), in the same columns, or a labels block built
+    from it is not one block. Row-wise encoding with frozen levels and frozen site pooling is
+    what makes that true, and it is asserted rather than assumed.
+    """
+    x, _, ids, cancers = _cohort()
+    fit_rows, score_rows = _folds(cancers)
+    _, operator = fit_inductive_adjuster(x, fit_rows, score_rows, cancers, ids, min_site_count=5)
+    whole, _ = operator._frame_and_design(pd.DataFrame({"cancer": cancers}), ids, "refuse")
+    on_fit, _ = operator._frame_and_design(pd.DataFrame({"cancer": cancers[fit_rows]}),
+                                           ids[fit_rows], "refuse")
+    assert whole.shape[1] == operator.provenance["n_design_columns"]
+    assert np.array_equal(whole[fit_rows], on_fit)
+
+
 # --- the new adjust_y argument ------------------------------------------------------------
 
 def test_adjust_y_defaults_to_adjust_byte_for_byte():

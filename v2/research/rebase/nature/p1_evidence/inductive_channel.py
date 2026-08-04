@@ -136,6 +136,10 @@ def main() -> None:
     parser.add_argument("--skip-full", action="store_true",
                         help="skip the n = 2,766 reproduction gate (for smoke runs only)")
     parser.add_argument("--no-global-null", action="store_true")
+    parser.add_argument("--labels-blocks", nargs="+",
+                        default=["additive_design", "saturated_cell_design"],
+                        choices=["additive_design", "saturated_cell_design",
+                                 "frozen_discovery_design"])
     args = parser.parse_args()
 
     with_global = not args.no_global_null
@@ -256,8 +260,23 @@ def main() -> None:
     # The "representation" is the confound labels themselves, encoded on the WHOLE partition so
     # the discovery and exposure rows land in identical columns and so the widths match the
     # published 108 / 105.
-    labels_blocks = {"additive_design": block["design"],
-                     "saturated_cell_design": cell_design(block["codes"])}
+    #
+    # Three encodings, because the published 6.0-11.2% figure was measured with the labels
+    # block and the adjustment design being the SAME 108 columns, and that coincidence does
+    # not survive the split: the exposure fold's own pooling keeps 57 columns and the
+    # discovery fold's keeps 55, so ~50 columns of a partition-wide labels block lie outside
+    # BOTH arms' adjustment spans and pass through untouched. ``frozen_discovery_design``
+    # restores the published coincidence -- it is the operator's OWN frozen design spec
+    # evaluated on every row of the partition, so it is defined on the discovery rows (which
+    # the inductive operator must be fitted on) and spans what both arms adjust against. The
+    # first two encodings are kept because the comparison this run exists to make is
+    # inductive vs the matched transductive control, and that comparison must not depend on
+    # which of the three encodings is chosen.
+    available = {"additive_design": lambda: block["design"],
+                 "saturated_cell_design": lambda: cell_design(block["codes"]),
+                 "frozen_discovery_design": lambda: operator_x._frame_and_design(
+                     pd.DataFrame({"cancer": cancers}), patient_ids, "refuse")[0]}
+    labels_blocks = {name: available[name]() for name in args.labels_blocks}
     ceiling_arms: list[tuple[str, str]] = []
     if not args.skip_full:
         ceiling_arms.append(("transductive_full", "full"))
