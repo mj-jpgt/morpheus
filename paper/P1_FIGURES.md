@@ -48,10 +48,12 @@ keep the text.
 different confounders; a per-axis certificate would have missed the leak; and a nonlinear probe still
 recovers a bounded residual that the mean-based certificate cannot see.
 
-**Artifacts, by content hash.** Panels (a), (b), (c) and (e) are all computed from these two files on
-the box, under `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`. The filename alone is
+**Artifacts, by content hash.** Panels (a), (b), (c) and (e) are computed from the first two files
+below; panel (d) is a different cohort and comes from the third. All are on the box, under
+`/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`. The filename alone is
 **not** an identifier — three copies of `d2_h_seed42.npz` exist and give raw joint LDA 0.3633, 0.1782
-and 0.3785 respectively. Plot only from these hashes:
+and 0.3785 respectively, and three copies of `diagnostic_full_seed42.npz` exist of which two are
+byte-identical and the third is a different file. Plot only from these hashes:
 
 | artifact | path | SHA-256 |
 |---|---|---|

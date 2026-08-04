@@ -658,7 +658,7 @@ per-axis standardisation, 5 class-stratified folds, seed 42. Adjustment: the ide
 `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`:
 `runs_misc/calibra_run/artifacts/diagnostic_full_seed42.npz`, SHA-256
 `72dcefcf05482288e4a353f7697678b9f82f7648078e223345eb3f6444b82c71`, scored against
-`frozen_rna_targets.npz`, SHA-256
+`runs_misc/calibra_run/artifacts/frozen_rna_targets.npz`, SHA-256
 `d526a7adc7456ac4f0e5e3ff71c0ef2bac96dc8488435ea714ba9840d8b51fb2`. A second file of the same name at
 `runs/v22_a10_11v21_20260725/artifacts/` on the box (SHA-256 `7674145216572fad…`) is **not** this one;
 a third at `runs/v21_release_20260720_retry3_resume_safe/artifacts/` is byte-identical to the first.
