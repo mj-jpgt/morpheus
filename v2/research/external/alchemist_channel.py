@@ -51,6 +51,31 @@ DILUTION_D = (0.00, 0.10, 0.20, 0.30, 0.40, 0.60, 0.80)
 DILUTION_RETAINED = (1.000, 0.999, 0.968, 0.905, 0.804, 0.607, 0.333)
 
 
+# A DECLARED mapping from ALCHEMIST ICD-O histology onto the TCGA lung code space.
+# Written down before the channel was measured, and reviewable as a list rather than a rule,
+# because a cancer-label choice is exactly the class of decision that can set the answer
+# without anyone noticing -- the coordinate-system work moved the whole D2 effect by
+# +0.118-0.120 on a basis change alone.
+#
+# Adenosquamous carcinoma is genuinely both lineages, so it goes to OTHER rather than being
+# forced to whichever of LUAD/LUSC would flatter the result.
+ALCHEMIST_TO_TCGA_LUNG = {
+    "Adenocarcinoma_NOS": "LUAD",
+    "Adenocarcinoma_in_situ_NOS": "LUAD",
+    "Acinar_adenocarcinoma": "LUAD",
+    "Mucinous_adenocarcinoma": "LUAD",
+    "Invasive_mucinous_adenocarcinoma": "LUAD",
+    "Mixed_invasive_mucinous_and_non-mucinous_adenocarcinoma": "LUAD",
+    "Lepidic_predominant_adenocarcinoma": "LUAD",
+    "Adenocarcinoma_with_mixed_subtypes": "LUAD",
+    "Squamous_cell_carcinoma_NOS": "LUSC",
+}
+
+
+def map_to_tcga_lung(histologies: np.ndarray) -> np.ndarray:
+    return np.asarray([ALCHEMIST_TO_TCGA_LUNG.get(str(h), "OTHER") for h in histologies])
+
+
 def pool_rare(labels: np.ndarray, minimum: int = POOL_MIN_COUNT) -> np.ndarray:
     """The `min_site_count` rule `pooled_tissue_source_site` uses, applied to any label."""
     counts = pd.Series(labels).value_counts()
@@ -296,6 +321,26 @@ def main() -> None:
         "alchemist_cancer_plus_scanner", alch_x, alch_y, alch_cancers,
         extra_columns={"scanner": alch_scanners}, **common)
 
+    # Label-granularity sensitivity. The primary ALCHEMIST arm adjusts on ALCHEMIST's own
+    # pooled ICD-O histology; this one collapses it onto the TCGA lung code space
+    # {LUAD, LUSC, OTHER} via the declared mapping above. If the channel moves between the
+    # two, the cancer-label choice is setting the answer and must be reported as such.
+    alch_mapped = map_to_tcga_lung(alch_cancers)
+    arms["alchemist_mapped_to_tcga_lung_codes"] = measure(
+        "alchemist_mapped_to_tcga_lung_codes", alch_x, alch_y, alch_mapped, **common)
+    report["label_mapping"] = {
+        "mapping": ALCHEMIST_TO_TCGA_LUNG,
+        "levels_after_mapping": {level: int((alch_mapped == level).sum())
+                                 for level in sorted(set(alch_mapped.tolist()))},
+        "primary_arm_uses": "ALCHEMIST's own pooled ICD-O histology, fitted within ALCHEMIST",
+        "why_not_the_persisted_tcga_operator":
+            "runs_misc/tcga_operators/*cancer_only* was fitted on the 2,530-row TCGA TEST "
+            "split, whose 22 design columns are its 21 cancers plus cancer_nan and contain "
+            "NEITHER LUAD NOR LUSC (the test split holds 0 of each). TCGA's own NSCLC "
+            "patients raise UnseenLevelError against it exactly as ALCHEMIST does, so it "
+            "cannot adjust either arm of a lung-versus-lung comparison.",
+    }
+
     # ---- 5. the predeclared bar ------------------------------------------------------
     reference = arms["tcga_nsclc_cancer_only"]
     candidate = arms["alchemist_cancer_only"]
@@ -321,7 +366,13 @@ def main() -> None:
         "predeclared_in": "NOTEBOOK_ENTRIES/PREDECLARED_alchemist_external_replication_20260804T1830Z.md",
     }
     (output / "alchemist_channel.json").write_text(json.dumps(report, indent=2, default=str))
+    mapped = arms["alchemist_mapped_to_tcga_lung_codes"]
+    report["verdict"]["R_under_mapped_labels"] = (
+        float(mapped["excess_over_null_median"] / denominator) if denominator > 0 else float("nan"))
     print(f"\n[VERDICT] R={ratio:.3f}  p={p:.4f}  ->  {verdict}", flush=True)
+    print(f"[label sensitivity] R under the declared LUAD/LUSC/OTHER mapping = "
+          f"{report['verdict']['R_under_mapped_labels']:.3f} "
+          f"(primary, ALCHEMIST's own histology: {ratio:.3f})", flush=True)
     print(f"[VERDICT] dilution predicted retained band for d in [{low},{high}] = "
           f"{predicted[0]:.3f}..{predicted[1]:.3f}", flush=True)
 
