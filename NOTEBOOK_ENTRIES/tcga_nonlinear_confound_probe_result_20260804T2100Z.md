@@ -25,17 +25,19 @@ SVM reads **0.2904, 6.10× chance**, *p* = 0.0099 at its own 1/101 floor.
 
 Both confounders survive, in both artifacts, on both artifact generations, and in **all three** probe
 families. On that same §4.2 state a **random forest** — axis-aligned thresholds, not a metric method —
-reads site at **0.0335, 2.85× chance**, against a global null p95 of 0.0125, *p* at its own 1/51 floor.
-The certificate cannot see any of it because it scores class means and the adjustment removes class
-means.
+reads site at **0.0335, 2.85× chance** and cancer at **0.2696, 5.66× chance**, both at 2.7–5.0× their
+own global null p95 and at the 1/51 floor. The certificate cannot see any of it because it scores class
+means and the adjustment removes class means.
 
 **Against the predeclared bands** (§3 of the predeclaration, stated in terms of the k-NN): every
 adjusted k-NN reading is between 2× and 5× chance, which is **reading C — report the magnitudes, do not
 adjudicate**. Two things must be said beside that, and both were fixed in advance:
 
-* The predeclaration's distrust item 4 says **disagreement between families resolves upward**. The SVM
-  reads cancer at **6.10×**, which is on the reading-B side of the line. The letter of the band is C;
-  the substance sits on the boundary.
+* The predeclaration's distrust item 4 says **disagreement between families resolves upward**. On the
+  cancer target **two of the three families are over the 5× line** — the SVM at **6.10×** and the
+  forest at **5.66×** — and the k-NN, the family the bands were written in terms of, is at 4.67×. The
+  letter of the band is C; the substance is on the reading-B side for every family except the one the
+  bands name.
 * Reading C is about **how much** survives. It is not about **whether** anything does. The sentences
   *"the site signal is gone"* and *"Cancer is gone"* are absolute, and they are refuted at
   *p* ≤ 0.005 by three classifiers that are not functions of class means. That correction does not
@@ -511,11 +513,21 @@ Two additions rather than corrections:
 
 ### 11. Suite status
 
-On the deployed workspace at this commit: **`morpheus/v2/tests` is 421 passed, 27 errors** in `~/venv`
-(the 27 being `test_p2_figures.py`, which needs matplotlib, absent from that venv by policy), and
-**28 passed** for `test_p2_figures.py` in `~/axis_venv` (matplotlib 3.10.9). The 14 new tests in
-`v2/tests/test_nonlinear_confound_probe.py` are inside the 421; the pre-existing baseline was 408 plus
-other agents' additions.
+On the deployed workspace `~/ws_probe3` at HEAD, `morpheus/v2/tests` runs **467 passed, 1 failed, 27
+errors** in `~/venv`; the 27 errors are `test_p2_figures.py` needing matplotlib, absent from that venv
+by policy, and that file is **28 passed** in `~/axis_venv` (matplotlib 3.10.9). My 14 tests in
+`v2/tests/test_nonlinear_confound_probe.py` pass (verified in isolation as well as in the suite).
+
+**The one failure is not mine and is flagged rather than touched:**
+`test_inductive_adjustment.py::test_one_row_at_a_time_equals_the_whole_block`, added at `e071d6c`
+today by another agent. It asserts `np.allclose(a, b, atol=0, rtol=0)` — bit-exact equality — on two
+arrays that print identically to eight decimal places, i.e. it is a last-bit floating-point difference
+between the batched and the one-row-at-a-time path. It was failing before my last commit and is
+untouched by anything in this run. Owner's call whether the right fix is a tolerance or a genuine
+associativity bug in the operator; I have not edited the file.
+
+The tree has grown under other agents throughout this session (645 → 669 tracked files), which is why
+the passing count differs from the 408 baseline quoted in earlier entries.
 
 ### 12. Files, commits, outputs
 
