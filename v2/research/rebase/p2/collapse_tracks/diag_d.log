@@ -1,0 +1,9 @@
+cosine margin required for in-batch InfoNCE <= 0.10 with 15 negatives: 0.3472
+
+--- D1 clean in-batch InfoNCE, lr 1e-3  lr=0.001 steps=2000 var_weight=0.0 clip=None
+        0 loss 3.0762 acc 0.188 pos 0.1235 worst-neg 0.2186 min-margin -0.2190 wsi-wsi 0.8008 eff-rank 12.88 std 0.0272
+       25 loss 2.4322 acc 0.125 pos 0.9344 worst-neg 0.9872 min-margin -0.1103 wsi-wsi 0.8702 eff-rank 1.21 std 0.0190
+       50 loss 2.3958 acc 0.188 pos 0.9993 worst-neg 0.9993 min-margin -0.0001 wsi-wsi 0.6119 eff-rank 1.00 std 0.0323
+      100 loss 2.3958 acc 0.125 pos 0.9995 worst-neg 0.9995 min-margin -0.0001 wsi-wsi 0.6103 eff-rank 1.00 std 0.0324
+      200 loss 2.3958 acc 0.062 pos 0.9996 worst-neg 0.9996 min-margin -0.0001 wsi-wsi 0.6165 eff-rank 1.00 std 0.0321
+      400 loss 2.3958 acc 0.125 pos 0.9999 worst-neg 0.9999 min-margin -0.0000 wsi-wsi 0.5904 eff-rank 1.00 std 0.0333

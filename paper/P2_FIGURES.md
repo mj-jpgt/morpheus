@@ -300,13 +300,40 @@ draft §4.5(a) now cites; §4.5's provenance note previously attributed the two 
 differing R3 rows to raw-versus-residualised block, which was wrong — both are residualised and the
 difference is the statistic — and that too was corrected at `a11549a`.
 
-**A panel this figure should carry and currently cannot.** The draft's own framing is that the
-correction to (a) *is* the paper's result: a fourth statistic living under a disambiguated name,
-inside the analysis code of the section that argues the name is unreliable. A small inset showing
-`(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` on one synthetic spectrum family would make the size of the
-substitution concrete rather than asserted. That is **`NEEDS EXTRACTION`** — cheap, CPU-only,
-deterministic new computation, which must be written into `v2/research/rebase/p2/` with a test rather
-than a scratchpad file, and run with the thread caps.
+**(e) Inset — the size of the substitution, on a synthetic spectrum family. `PLOTTABLE`.** The
+draft's own framing is that the correction to (a) *is* the paper's result: a fourth statistic living
+under a disambiguated name, inside the analysis code of the section that argues the name is
+unreliable. This inset makes the size of it concrete rather than asserted. Power-law spectra
+`σ_k = k^−a`, 64 components on 256 rows, `a` from 0 to 2 in steps of 0.1, each realised **exactly**
+(the matrix is built as an orthonormal basis of the mean-zero subspace scaled by the requested
+spectrum, so centring is a no-op and the centred singular values are the requested ones):
+
+| `a` | R1 | **R2** `(Σσ)²/Σσ²` | **PR** `(Σσ²)²/Σσ⁴` | R2/PR |
+|---:|---:|---:|---:|---:|
+| 0.0 | 64.000 | 64.000 | 64.000 | 1.000 |
+| 0.5 | 54.990 | 44.946 | 13.811 | **3.254** |
+| 0.9 | 34.517 | 17.922 | 3.026 | **5.923** (max) |
+| 1.0 | 29.118 | 13.811 | 2.453 | 5.630 |
+| 2.0 | 4.668 | 2.453 | 1.167 | 2.103 |
+
+Draw R2 and PR as two curves against `a`, with the R2/PR ratio on a secondary axis; mark `a = 0`,
+where the two agree exactly, so the reader sees that they coincide **only** on a flat spectrum.
+Annotate the hand-checkable anchor `σ ∝ (2,1,1)`: **R1 = 2√2 = 2.8284271247**, **R2 = 8/3**,
+**PR = 2** — three different numbers on one spectrum. Annotate also the closed-form fingerprint
+visible in the table: `PR` at decay `a` equals `R2` at decay `2a` exactly (PR(0.5) = 13.811 = R2(1.0)),
+because PR is the order-2 Hill number of the *squared* spectrum and squaring a power law doubles its
+exponent.
+
+**Data.** `v2/research/rebase/p2/p2_hill_order_inset.py`, deterministic (seed 20260804), CPU-only,
+thread-capped; test at `v2/tests/test_p2_hill_order_inset.py`. Neither statistic is implemented in
+that script: `R1`/`R2` come from `spectral.effective_rank` under the named `RANK_VARIANTS`, `PR` from
+`p2_competing_metrics.participation_ratio`, and the test asserts the script contains no
+decomposition of its own — which is the discipline whose absence produced the error the inset is
+about.
+
+**Caption must carry.** This is a synthetic illustration of the *arithmetic*, not evidence about our
+artifacts. The empirical size of the substitution is (a)'s table, where the count moved from 3 of 6
+to 2 of 6.
 
 **Caption must carry.** These panels do not show that rank is wrong; they show that **a rank verdict
 is not a well-defined object until the statistic, the block and the view are stated**. The
@@ -442,13 +469,13 @@ rank is worthless for the surviving use.
 
 - **(a) The collapse regime, where rank works.** Three rows, each a rank value with its co-measured
   collapse evidence printed beside it, **statistic labelled per row**: 12.88 → **1.00** at step 50
-  (diagnostic-script centred effective rank; pos/worst-neg cosine 0.9993/0.9993, min margin
+  (**R3** — see the note below; pos/worst-neg cosine 0.9993/0.9993, min margin
   −0.219 → −0.0001); 67.55 → ~2 at step 150 (**R3**; RNA-view mutual cosine 0.9813); 1.76 at epoch 21
   and 1.71 at epoch 39 on 282 held-out patients (**R3**; RNA–RNA mutual cosine 0.977 / 0.986, hard
   rank 9 / 11).
 - **(b) The withdrawal.** The "16/16" instance drawn honestly: a track pinned flat at **16/16** with
   the ceiling drawn as a dashed line labelled "**structural maximum = batch size 16**", stacked
-  directly above the centred effective rank of the same objective falling **12.88 → 1.00 by step
+  directly above the **R3** rank of the same objective falling **12.88 → 1.00 by step
   50**. Beside them, the collapse evidence for the same arm: within-modality off-diagonal cosine
   0.7089 → 0.9999, cross-modal positive 0.0538 → 0.9959 and negative 0.0816 → **0.9960** (the
   negatives marginally *higher*), retrieval acc@1 0.062 → **0.000** with its chance line at 0.062
@@ -471,12 +498,30 @@ rank is worthless for the surviving use.
 (c) `v2/research/rebase/nature/D2_RESULT.md` §2, §4; `~/e0_run/d2_v3/D2_PER_ARTIFACT_READOUT.json`.
 (d) as (a).
 
-**Status.** (a), (c), (d) `PLOTTABLE`. (b) **`NEEDS EXTRACTION`** — the collapse-evidence values are
-recorded as **endpoint pairs** ("0.7089 → 0.9999"), not per-step arrays. Either extract the per-step
-arrays from `~/e0_run/d1_diag/`, or **draw them as before/after paired markers labelled "endpoint
-values as recorded; per-step array not retained"**. Do not interpolate. The source script for the
-original 16/16 measurement is named in `NOTEBOOK.md` as a scratchpad file on the A100 and **is not in
-the repository**; if the per-step arrays cannot be recovered, that must be stated in the caption.
+**Status.** (a), (c), (d) `PLOTTABLE`. (b) **`PLOTTABLE`, and the extraction resolved it in two
+different directions — draw each half accordingly.**
+
+* **The rank track HAS per-step values.** Six recorded steps — 0, 25, 50, 100, 200, 400 — with rank,
+  loss, retrieval acc@1, positive cosine, worst-negative cosine, minimum margin and WSI-WSI cosine on
+  each. Draw it as a curve through the recorded steps. Source vendored at
+  `v2/research/rebase/p2/collapse_tracks/diag_d.log`, parsed by
+  `v2/research/rebase/p2/p2_f8b_tracks.py`, pinned by `v2/tests/test_p2_f8b_tracks.py`.
+* **The collapse-evidence quantities have ONLY endpoints.** The script that produced the 16/16
+  instance probes before and after training, not on a schedule, so no array exists to recover. The
+  original fallback stands for this half: **before/after paired markers labelled "endpoint values as
+  recorded; per-step array not retained"**. Do not interpolate. Source vendored at
+  `v2/research/rebase/p2/collapse_tracks/collapse_diag.log`; every value the panel quotes for arm A
+  is asserted against it by the test.
+
+**The statistic, corrected.** The `12.88 → 1.00` column is **R3** — `(Σσ)²/Σσ²` on the column-centred,
+**row-L2-normalised** matrix — not `spectral.CANONICAL`. It is computed by an inline formula at
+`v2/research/rebase/p2/collapse_tracks/diag_d.py:50-51`, which is vendored verbatim (and allowlisted
+in `v2/tests/test_effective_rank_canonical.py` for that reason) so the identification can be read off
+the source. Earlier text in this file, and in `paper/P1_CALIBRA_DRAFT.md` §4.11 and `paper/P1_FIGURES.md`,
+calls it "the centred effective rank", which in this repository's vocabulary reads as the canonical
+order-1 statistic. **The canonical value cannot be recovered** — the diagnostic kept no checkpoint, so
+it is `[NOT RECOMPUTED — needs a GPU re-run]`. At the collapsed endpoint the label barely matters (a
+rank-1 matrix scores 1.00 under every variant); at 12.88 it is unconstrained.
 
 **Caption must carry.** (i) The 16/16 column is a **hard numerical rank**, not R1/R2/R3, and a
 16 × 256 float matrix has full row rank under essentially any perturbation; (ii) its maximum is 16
@@ -717,7 +762,26 @@ Exists because it is the honest answer to "why didn't you run the obvious experi
 `information_density = direction_count_above_floor / effective_rank` is itself an example of the
 practice under criticism.
 
-**Provenance.** `v2/calibra/e1_rank_information.py`; `v2/calibra/aggregate_e1.py`; absence verified
+**Two corrections to this panel, from the 2026-08-04 aptness audit** (full account in
+`NOTEBOOK_ENTRIES/PREDECLARED_E1_aptness_and_verdict_20260804T0609Z.md`):
+
+1. **It is not the experiment this paper should have been built on, and the panel must stop saying so.**
+   E1's question is *"does decorrelation-created rank carry molecular information"* — the claim that was
+   falsified and removed. The surviving claim is about **resolvability against a within-arm
+   reproducibility floor**, and E1 contains no within-arm term at all: its only intervals resample
+   patients and cancer clusters, the variance component §4.1(iv) measures at SD ≈ 0.1 against a
+   retraining envelope of 2.69×. Worse, `aggregate_e1.py:38,48` makes `delta_effective_rank > 0` a
+   necessary conjunct of its verdict, so a sign-unstable delta — the *supporting* observation for the
+   surviving claim — is reported as "claim not supported". The panel keeps its point (we built the
+   practice we criticise) and loses the counterfactual.
+2. **"It is CPU work" is wrong.** E1's inputs do not exist. `v2/research/rebase/run_e1_training.py`
+   is the only driver that can produce them and it runs `morpheus.v2.runner` twice per seed at
+   `--decorrelation-weight` 0 and >0. Running E1 costs **six GPU trainings**. Every available
+   artifact pair carries `decorrelation_weight = 0.04` in *both* arms, so E1's own
+   `_validate_intervention` refuses all of them.
+
+**Provenance.** `v2/calibra/e1_rank_information.py`; `v2/calibra/aggregate_e1.py`;
+`v2/research/rebase/run_e1_training.py`; absence verified
 against `v2/research/rebase/nature/GATE_LOG.md` and `runs/`. **Status.** `PLOTTABLE`
 (text/schematic).
 
@@ -757,14 +821,14 @@ input.
 | Error bars on any dilution rank or channel value | Single seed, single donor draw; the source states there is no error bar on level-to-level differences. | §4.8, §6.2 |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run; "unchanged" means the point estimates differ by 0.002 and nothing more. | §4.9, §6.2 |
 | Instance 1 with per-seed values or a run artifact | The cited source file does not exist in the repository; only summary prose survives. See S7. | §4.9, §6.4 |
-| Per-step curves for F8(b)'s collapse tracks | Recorded as endpoint pairs, not arrays; the source script is a scratchpad file on the A100 and is not in the repository. | F8 `NEEDS EXTRACTION` note |
+| Per-step curves for F8(b)'s **collapse-evidence** quantities (cosines, retrieval) | **Confirmed unrecoverable.** `collapse_diag.log` records endpoint pairs only, because the script probes before and after training rather than on a schedule. F8(b)'s **rank** track, by contrast, *does* have per-step values and is now extracted. | F8 status |
 | A rank-versus-channel figure from D1-A | D1-A's `programme_free` arm never trained; its source entry forbids concluding anything about supervision from it. | §4.9 |
 | D1-A's 9.81 / 1.71 recomputed under R1 | Needs a GPU forward pass from surviving checkpoints (`~/e0_run/d1_v1/d1_{p_seed42,p_seed43,p_seed44,f_seed42}/last.pt`; the `f_seed43` and `f_seed44` directories exist but hold **no `last.pt`** — the gate refused those arms) and the GPU was in use. `[NOT RECOMPUTED]`. Draft §4.9 writes these paths as `d1_{p42,…}`, which do not resolve. | §4.9 |
 | Any instance on a second architecture, cohort or modality pair | Not measured. Every number is TCGA, one architecture family, morphology → bulk expression. `claim_guards.no_external_cohort` is undischarged. | §5.2, §6.2 |
 | A case where effective rank **missed** a total collapse | We have not found one; the figure would imply a symmetry the data do not support. | §4.10, §6.2 |
 | A pooled scatter of Δrank against Δinformation across instances | Different statistics, cohorts, measures and units. Meaningless, and would look authoritative. | §3.1, binding constraint 5 |
 | Any of our rank values against a published RankMe value | Three normalisation conventions that differ on near-collapsed spectra. | §2.6, §3.1 |
-| E1's three-seed equivalence result | Built and never run. See S6. | §3.1, §6.2 |
+| E1's three-seed equivalence result | Built and never run — **and it should not be run for this paper's surviving claim.** E1 tests whether decorrelation-created rank carries information; the surviving claim is about resolvability against a within-arm floor, which E1 measures nowhere. Its aggregator makes `delta_effective_rank > 0` a necessary conjunct of its verdict, so the supporting outcome of the current claim is scored as "claim not supported". It is also unrunnable: no artifact pair has the preregistered decorrelation 0 → >0 intervention. See S6 and `NOTEBOOK_ENTRIES/PREDECLARED_E1_aptness_and_verdict_20260804T0609Z.md`. | §3.1, §6.2 |
 
 ---
 
@@ -776,8 +840,8 @@ input.
 | §4.5(a)'s statistic labels | **F5(a)** | **RESOLVED.** Corrected in the draft at `a11549a`; plot from `~/ws_p2/out/P2_RANK_VARIANTS.json`. |
 | **Momentum seed replication** | **S4** | **`[MOMENTUM SEED REPLICATION PENDING]`** — armed (`m ∈ {0, 0.999} × 3 seeds`), not yet reported. Every S4 panel carries the marker until it lands, and S4 is redrawn whichever way it comes out. |
 | **Controlled retraining repeat design** | **F1, F4** | **Not run**, and named in §6.2 as the paper's most valuable missing measurement. Do **not** draw F1's 2.69× band as if it were an estimated distribution; it is one pair on one configuration. |
-| Per-step arrays for the collapse tracks | F8(b) | `NEEDS EXTRACTION` from `~/e0_run/d1_diag/`, else before/after paired markers. Do not interpolate. |
-| Synthetic `(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` inset | F5 | `NEEDS EXTRACTION` — new CPU-only computation, to be written into `v2/research/rebase/p2/` with a test. |
+| Per-step arrays for the collapse tracks | F8(b) | **RESOLVED, split.** The rank track has per-step values and is extracted (`v2/research/rebase/p2/collapse_tracks/diag_d.log`); the collapse-evidence quantities have endpoints only and keep the paired-marker treatment. Statistic corrected to **R3**. |
+| Synthetic `(Σσ)²/Σσ²` against `(Σσ²)²/Σσ⁴` inset | F5 | **RESOLVED.** `v2/research/rebase/p2/p2_hill_order_inset.py` + `v2/tests/test_p2_hill_order_inset.py`; R2/PR spans 1.000 to 5.923 over `a ∈ [0, 2]`. |
 | Phase 1b equivalence test | T7 | Not run; the row stays qualified, and "unchanged" means the point estimates differ by 0.002. |
 | Labelled linear probe on every artifact | — | Not run. No figure depends on it; §6.2 and §6.3 state the absence. |
 
@@ -830,8 +894,9 @@ The four edits, as originally stated:
    to this paper. The table and the F11 panel move here in full.
 2. **Correct P1 §4.11's description of instance 3.** It called it one of the two "strongest"
    instances and described it as "rank pinned while information collapses". That column is a hard
-   numerical rank at a structural ceiling of 16, and the centred effective rank of the same objective
-   falls 12.88 → 1.00. See F8(b).
+   numerical rank at a structural ceiling of 16, and the **R3** rank of the same objective
+   falls 12.88 → 1.00. See F8(b) — P1's own wording, "the centred effective rank", needs the same
+   correction, in `P1_CALIBRA_DRAFT.md` §4.11 and `P1_FIGURES.md`.
 3. **Correct P1 §2.6.** It grouped Jing et al. (ICLR 2022) among proposals of "geometric proxies for
    representation quality"; that paper contains no rank→performance claim. Its
    `[CITATION NEEDED: RankMe…]` is closed: Garrido, Balestriero, Najman & LeCun, ICML 2023,

@@ -1,0 +1,4 @@
+# Vendored evidence: byte-identical to the box originals, sha256-verified by
+# v2/research/rebase/p2/p2_f8b_tracks.py. Line endings must NOT be converted on
+# checkout or the digests stop matching and the provenance claim becomes false.
+* -text

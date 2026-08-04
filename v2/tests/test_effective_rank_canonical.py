@@ -216,6 +216,13 @@ SVD_ALLOWLIST = {
     # imported by nothing, and its function is named `legacy_r1_absolute_cut` precisely
     # so it can never be mistaken for the live definition.
     "v2/research/rebase/rank_recompute_all_instances.py",
+    # The A100 scratchpad script that produced P2 F8(b)'s `12.88 -> 1.00` track, vendored VERBATIM as
+    # evidence and imported by nothing. Its inline `erank` is `(sum s)^2 / sum s^2` on the centred,
+    # ROW-L2-NORMALISED matrix -- that is `RANK_VARIANTS["R3"]`, not the canonical statistic, and the
+    # whole point of keeping it byte-identical is that the substitution can be read off the source
+    # instead of taken on trust. It must NOT be rewritten to call `spectral.py`: that would destroy
+    # the evidence. `v2/tests/test_p2_f8b_tracks.py` asserts the identification.
+    "v2/research/rebase/p2/collapse_tracks/diag_d.py",
     # The four PUBLISHED ALTERNATIVE criteria of P2 §4.6 -- RankMe as published (uncentred,
     # eps inside the normalisation), alpha-ReQ's eigenspectrum-decay fit, LiDAR's whitened
     # between-class scatter, and two second-moment statistics (eigenvalue participation ratio
