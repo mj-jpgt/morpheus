@@ -54,7 +54,7 @@ both directions:
 * Therefore: **cut the `P3 → P4` and `D1 → P4` edges of the dependency diagram.** P4's exposable
   representation is arm H, which exists and is the better arm; certification is orthogonal to why
   the supervision works. Keeping those edges makes P4 look blocked by things that do not block it,
-  and hides the two that do.
+  and hides the three that do.
 
 **0.5 P4's contribution now has a number, and it is 90 of 90.** On 90 non-control target queries
 against `d2_h_seed42::wsi_biology`, a CellWhisperer-style policy answers all 90; ours answers **0**.
