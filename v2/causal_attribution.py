@@ -49,7 +49,18 @@ import pandas as pd
 from .baseline_target_common import development_expression_moments, load_reference_targets
 from .perturbation_basis_common import load_aligned_response
 
-__all__ = ["RIDGE_ALPHAS", "gene_fold_ridge_r2", "atom_cosines", "attribution_report"]
+__all__ = ["RIDGE_ALPHAS", "CERTIFICATE", "gene_fold_ridge_r2", "atom_cosines",
+           "certifiable_attribution", "attribution_report"]
+
+#: The four conditions an axis must meet before its causal name may be quoted.
+#: Conjunctive by design — an axis that reconstructs from the atom span but whose
+#: atom ranking survives a gene-label shuffle has a subspace, not a name.
+CERTIFICATE = {
+    "r2_cv_above_random_direction_null_max": "the axis is reconstructable from the atom span at all",
+    "shuffle_rank_spearman_at_most_0.20": "the name does not survive permuting which gene each loading refers to",
+    "cross_line_rank_spearman_at_least_0.30": "the same atoms are named from RPE1 as from K562",
+    "attributed_set_coherence_percentile_above_0.95": "the named atoms are a coherent set, not ten unrelated genes",
+}
 
 #: Predeclared ridge path for the gene-fold reconstruction. Fixed before the run.
 RIDGE_ALPHAS = (1e-1, 1.0, 1e1, 1e2, 1e3, 1e4)
@@ -224,6 +235,23 @@ def _axis_legibility(artifacts, reference, scores, states, *, partition: str, se
     return out
 
 
+def certifiable_attribution(table: pd.DataFrame, *, shuffle_ceiling: float = 0.20,
+                            cross_line_floor: float = 0.30,
+                            coherence_floor: float = 0.95) -> np.ndarray:
+    """Boolean mask of axes whose causal name meets all four :data:`CERTIFICATE` conditions.
+
+    The bars are conjunctive because each of the three nulls kills a different way
+    of being wrong, and an axis that fails any one of them is not partially named —
+    it is unnamed. Which axes fail, and on which condition, is as reportable as the
+    count that passes.
+    """
+    null_maximum = float(table["r2_cv_random_direction_null"].max())
+    return ((table["r2_cv"].to_numpy(float) > null_maximum)
+            & (table["shuffle_rank_spearman"].to_numpy(float) <= shuffle_ceiling)
+            & (table["cross_line_rank_spearman"].to_numpy(float) >= cross_line_floor)
+            & (table["attributed_set_coherence_percentile"].to_numpy(float) > coherence_floor))
+
+
 def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, output: str,
                        secondary_perturbation: str = "", pca_targets: str = "",
                        artifacts: tuple[str, ...] = (), states: tuple[str, ...] = ("wsi_biology",),
@@ -338,6 +366,16 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
         "fraction_of_axes_above_95th_percentile_of_random_atom_sets": float(
             (coherence["percentile"] > 0.95).mean()),
         "n_top": coherence["n_top"], "n_random_sets": coherence["n_random"]}
+    certified = certifiable_attribution(table)
+    table.insert(2, "causal_name_certified", certified)
+    null_maximum = float(table["r2_cv_random_direction_null"].max())
+    summary["causal_name_certificate"] = {
+        "conditions": CERTIFICATE, "n_axes": int(len(table)), "n_certified": int(certified.sum()),
+        "n_failing_reconstruction": int((table["r2_cv"].to_numpy(float) <= null_maximum).sum()),
+        "n_failing_shuffle": int((table["shuffle_rank_spearman"].to_numpy(float) > 0.20).sum()),
+        "n_failing_cross_line": int((table["cross_line_rank_spearman"].to_numpy(float) < 0.30).sum()),
+        "n_failing_coherence": int((table["attributed_set_coherence_percentile"].to_numpy(float) <= 0.95).sum()),
+        "certified_axes": table.loc[certified, "axis"].tolist()}
     variance = table["explained_variance_ratio"].to_numpy(dtype=float)
     r2 = table["r2_cv"].to_numpy(dtype=float)
     cosine_column = table["top_atom_cosine"].to_numpy(dtype=float)
@@ -358,6 +396,11 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
                 finite, r2, variance)
             summary[f"legibility_vs_explained_variance_spearman__{artifact_name}__{state}"] = _spearman(
                 finite, variance)
+            summary["causal_name_certificate"][f"median_legibility__{artifact_name}__{state}"] = {
+                "certified": float(np.nanmedian(finite[certified])) if certified.any() else float("nan"),
+                "uncertified": float(np.nanmedian(finite[~certified])) if (~certified).any() else float("nan"),
+                "certified_among_15_most_legible": int(
+                    certified[np.argsort(-np.abs(finite))[:15]].sum())}
 
     directory = Path(output)
     directory.mkdir(parents=True, exist_ok=True)

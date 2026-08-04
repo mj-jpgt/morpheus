@@ -175,3 +175,22 @@ def test_attributed_set_coherence_separates_a_planted_complex_from_a_random_set(
     result = attributed_set_coherence(response, aligned, n_top=10, n_random=200, seed=11)
     assert result["percentile"][0] > 0.95, result["percentile"][0]
     assert result["percentile"][1] < 0.95, result["percentile"][1]
+
+
+def test_causal_name_certificate_is_conjunctive_and_each_condition_can_veto():
+    """Four nulls, four ways to be wrong; failing any one leaves an axis unnamed."""
+    import pandas as pd
+
+    from morpheus.v2.causal_attribution import CERTIFICATE, certifiable_attribution
+
+    assert len(CERTIFICATE) == 4
+    passing = {"r2_cv": 0.4, "r2_cv_random_direction_null": 0.01, "shuffle_rank_spearman": 0.05,
+               "cross_line_rank_spearman": 0.45, "attributed_set_coherence_percentile": 1.0}
+    rows = [dict(passing)]
+    for veto, value in (("r2_cv", 0.005), ("shuffle_rank_spearman", 0.5),
+                        ("cross_line_rank_spearman", 0.1),
+                        ("attributed_set_coherence_percentile", 0.5)):
+        rows.append({**passing, veto: value})
+    mask = certifiable_attribution(pd.DataFrame(rows))
+    assert mask[0], "an axis meeting every condition was not certified"
+    assert not mask[1:].any(), f"a vetoed axis was certified: {mask}"
