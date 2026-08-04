@@ -1,10 +1,12 @@
 """The three statistics this repository calls `effective_rank`, scored as selection rules.
 
-Produces `paper/P2_RANK_DRAFT.md` §4.5(a) — the table showing that on 3 of the 6 matched pairs
-the three functions return different verdicts.
+Produces `paper/P2_RANK_DRAFT.md` §4.5(a) — the table showing that the functions this repository
+calls `effective_rank` return different verdicts on the same matched pairs. The draft says 3 of
+6; measured under the canonical statistics it is **2 of 6** (D2 s43 and D2 s44), for the reason
+in note 2 below.
 
-VENDORED 2026-08-05 from `~/e0_run/p2_rank_variants.py`. Two changes, both deliberate and both
-recorded in `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260805T0130Z.md`:
+VENDORED 2026-08-04 from `~/e0_run/p2_rank_variants.py`. Two changes, both deliberate and both
+recorded in `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md`:
 
 1. **The three rank statistics are no longer reimplemented inline.** The original defined its
    own `R1`, `R2`, `R3` and prefixed the file with `sys.path.insert(0, "/home/ubuntu/ws")` —
@@ -22,6 +24,12 @@ recorded in `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260805T0130Z.md`:
    canonical R1/R2/R3 columns and, beside them, `PR` and `PR_rownorm`, which are exactly what
    the pre-vendoring script computed for its "R2" and "R3" columns. Whether the published
    §4.5(a) verdicts move is then a measurement rather than an assumption.
+
+   **They move.** On the twelve frozen artifacts, `PR` and `PR_rownorm` reproduce the draft's
+   published "R2" and "R3" rows cell for cell, and the canonical R2 and R3 do not:
+   canonical R2 scores D1 3/3 where the draft reports 2/3, and canonical R3 swaps its two D2
+   verdicts. The canonical R2 and R3 *levels* in draft §4.5(b) are unaffected — they were
+   already computed with the canonical function and reproduce exactly.
 
 usage:
   OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \

@@ -1,6 +1,6 @@
 """The four P2 analysis scripts import and run, on a synthetic cohort small enough for CI.
 
-These scripts produce `paper/P2_RANK_DRAFT.md` §4.2, §4.4, §4.5 and §4.6. Until 2026-08-05 they
+These scripts produce `paper/P2_RANK_DRAFT.md` §4.2, §4.4, §4.5 and §4.6. Until 2026-08-04 they
 existed only at `~/e0_run/p2_*.py` on the GPU box, where nothing tested them and nothing could
 tell that the workspace they imported `spectral.py` from had drifted from HEAD
 (`NOTEBOOK_ENTRIES/WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md`). Vendoring them into the

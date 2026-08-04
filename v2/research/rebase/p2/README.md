@@ -1,4 +1,4 @@
-# P2 analysis scripts — vendored 2026-08-05
+# P2 analysis scripts — vendored 2026-08-04
 
 The five scripts in this directory produce `paper/P2_RANK_DRAFT.md` §4.2, §4.4, §4.5, §4.6 and
 §4.7. Until this commit they existed **only** at `~/e0_run/p2_*.py` on `ubuntu@150.136.45.194`.
@@ -42,7 +42,7 @@ default.
 
 ## Changes made at vendoring, and why
 
-Recorded in full in `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260805T0130Z.md`.
+Recorded in full in `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md`.
 
 1. `p2_selection_rule.py`, `p2_necessity_and_variance.py` — **unchanged** apart from a header.
 2. `p2_competing_metrics.py` — `main()` takes `argv` so it is testable; `participation_ratio_rownorm`
@@ -55,4 +55,11 @@ Recorded in full in `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260805T0130Z.
    R3: they were the order-2 Hill number of the *eigenvalue* distribution, `(Σσ²)²/Σσ⁴`, where
    `d1_audit.py`'s R2 — and therefore `RANK_VARIANTS["R2"]` — is `(Σσ)²/Σσ²`. Both statistics are
    now reported side by side (`R2`/`R3` against `PR`/`PR_rownorm`) so the difference is measured
-   rather than assumed.
+   rather than assumed. **It is not cosmetic**: `PR`/`PR_rownorm` reproduce the draft's published
+   §4.5(a) "R2" and "R3" rows cell for cell, and the canonical R2/R3 do not.
+
+## What reproduced, run from `~/ws_p2/morpheus` on the box
+
+Verified byte-equal to HEAD before running: 402/402 files, per-file git blob SHA-1. Output in
+`~/ws_p2/out/`. §4.2, §4.4(1), §4.5(b), §4.5(c), §4.6 and §4.7 reproduce to every published digit;
+§4.5(a)'s R2 and R3 rows do not. Full account in the notebook entry above.

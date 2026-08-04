@@ -1,6 +1,6 @@
 """Score every label-free metric AS A SELECTION RULE on the matched arm pairs.
 
-VENDORED 2026-08-05 from `~/e0_run/p2_selection_rule.py`, unchanged apart from this paragraph.
+VENDORED 2026-08-04 from `~/e0_run/p2_selection_rule.py`, unchanged apart from this paragraph.
 Produces `paper/P2_RANK_DRAFT.md` §4.6's table and §4.4(1)'s subsampling table. Reads only the
 JSON written by `p2_competing_metrics.py`, so it recomputes nothing and cannot drift from it.
 

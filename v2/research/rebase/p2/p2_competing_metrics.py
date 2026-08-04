@@ -1,6 +1,6 @@
 """P2: competing label-free representation-quality metrics, evaluated AS SELECTION RULES.
 
-VENDORED 2026-08-05 from `~/e0_run/p2_competing_metrics.py` on `ubuntu@150.136.45.194`, the
+VENDORED 2026-08-04 from `~/e0_run/p2_competing_metrics.py` on `ubuntu@150.136.45.194`, the
 script that produced `paper/P2_RANK_DRAFT.md` §4.2, §4.4 and §4.6. It is in the repository
 because §6.2 lists "the competing-metric and variance-decomposition scripts, vendored into the
 repository" as a pre-submission requirement: the paper's own standard is that every number
@@ -8,7 +8,7 @@ traces to a file in the repository, and until this commit these four scripts exi
 the box. The vendored copy is byte-for-byte the original except for this paragraph and for
 `participation_ratio_rownorm`, added below and used by no published number.
 
-Provenance of the reproduction: `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260805T0130Z.md`.
+Provenance of the reproduction: `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md`.
 
 Computes, on the frozen D2 and D1 representation artifacts:
   * canonical effective rank (Roy-Vetterli, this repository's single source of truth)

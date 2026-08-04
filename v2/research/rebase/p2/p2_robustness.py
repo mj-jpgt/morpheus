@@ -1,6 +1,6 @@
 """Two robustness checks a referee will demand of the ground truth and of the rank statistic.
 
-VENDORED 2026-08-05 from `~/e0_run/p2_robustness.py`; produces `paper/P2_RANK_DRAFT.md` §4.5(c).
+VENDORED 2026-08-04 from `~/e0_run/p2_robustness.py`; produces `paper/P2_RANK_DRAFT.md` §4.5(c).
 One change from the original: the output path was hardcoded to
 `/home/ubuntu/e0_run/P2_ROBUSTNESS.json` and is now the first positional argument, so the
 script can be run from a checkout on any machine. Nothing else was touched.

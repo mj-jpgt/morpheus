@@ -1,6 +1,6 @@
 """Two analyses that the selection-rule count (n=6, underpowered) cannot deliver.
 
-VENDORED 2026-08-05 from `~/e0_run/p2_necessity_and_variance.py`, unchanged apart from this
+VENDORED 2026-08-04 from `~/e0_run/p2_necessity_and_variance.py`, unchanged apart from this
 paragraph. Produces `paper/P2_RANK_DRAFT.md` §4.2 (the variance decomposition — the paper's
 most important display item) and §4.7 (the necessity test). Reads only the JSON written by
 `p2_competing_metrics.py`. The two pre-declared thresholds below were fixed before the pair
