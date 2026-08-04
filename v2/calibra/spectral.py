@@ -389,6 +389,27 @@ def heldout_single_direction_correlation(x: np.ndarray, y: np.ndarray, *, n_spli
     SIGNED, for the reason given in ``calibration._correlation``: an
     out-of-fold predictor that anti-correlates with its target is not evidence
     that the target is legible, and taking ``|r|`` would score it as if it were.
+
+    CORRECTION, 2026-08-05. The second paragraph above says this statistic is "on
+    the same scale" as the ``detection_floor``. **That is not supported by
+    measurement and should not be relied on.** The shipped floor is measured by
+    planting a spike along a direction pair that is random on at least the image
+    side; this statistic's direction is fitted. Those are different floors:
+    where a like-for-like floor can be measured at all -- spike planted on the
+    fitted pair, scored with the same fitted-direction readout -- it sits one to
+    two grid levels *above* the shipped random-direction floor, and with a random
+    pair the fitted readout resolves no floor at all in 11 of 13 states even at
+    ``r_true = 0.6``. The counter-claim in
+    ``run_calibra.random_direction_column_correlation`` is the one the data
+    supports. A direction-matched floor cannot currently be measured either,
+    because ``calibration.spike_targets`` orthogonalises in raw space and a fitted
+    pair's raw-space alignment is 2-9x a random pair's, which leaves a level-0
+    residue and makes the recovery curve non-monotone. Evidence and the named
+    repair: ``NOTEBOOK_ENTRIES/direction_matched_floor_20260805T0030Z.md``.
+
+    What survives: this is the right *per-target* statistic (a maximum over 256
+    in-sample directions is not), and it is honest about direction selection.
+    What does not: calling its scale the floor's.
     """
     from sklearn.linear_model import Ridge
     from sklearn.model_selection import KFold

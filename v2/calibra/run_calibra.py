@@ -224,11 +224,24 @@ def random_direction_column_correlation(x_residual: np.ndarray, y_residual: np.n
     It is reported next to ``score_target_block_per_column`` precisely because
     the two disagree, and the disagreement is the point: a random direction
     through a 256-column representation sees far less than a *fitted*
-    (cross-validated) direction through the same representation. On whether the
-    fitted statistic may be graded against the random-direction floor at all, see
-    ``spectral.heldout_single_direction_correlation``'s docstring, which says it
-    may, and ``NOTEBOOK_ENTRIES/direction_matched_floor_*`` for the measurement
-    that settles it.
+    (cross-validated) direction through the same representation.
+
+    ON THE LIKE-FOR-LIKE QUESTION, 2026-08-05 -- this docstring's warning is the
+    one the measurement supports, and it is sharpened here.
+    ``spectral.heldout_single_direction_correlation`` claims a fitted out-of-fold
+    direction *is* on the floor's scale; it is not. Planting a spike on a random
+    pair and reading it with the fitted-direction statistic the channel uses
+    resolves no floor at all in 11 of 13 states even at ``r_true = 0.6``, so a
+    random-direction floor is not merely a different number on that readout, it is
+    largely not measurable. Where a like-for-like floor does resolve it sits one to
+    two grid levels above the shipped floor and the channel still clears it at
+    1.08-2.06x. **So ``NOT_floor_units`` is correct caution, but the further
+    implication that no comparison is possible is too strong:** the comparison is
+    possible in principle and is blocked only by ``calibration.spike_targets``
+    orthogonalising in raw space, which a fitted pair's 2-9x larger raw-space
+    alignment turns into a level-0 residue and a non-monotone recovery curve.
+    Evidence, guards and the named repair:
+    ``NOTEBOOK_ENTRIES/direction_matched_floor_20260805T0030Z.md``.
     """
     x_residual = np.asarray(x_residual, dtype=np.float64)
     y_residual = np.asarray(y_residual, dtype=np.float64)
