@@ -64,5 +64,11 @@ def cross_fitted_residuals(matrix: np.ndarray, design: np.ndarray, *, n_splits: 
     for train_idx, test_idx in splitter.split(matrix):
         model = Ridge(alpha=alpha, fit_intercept=True)
         model.fit(design[train_idx], matrix[train_idx])
-        residual[test_idx] = matrix[test_idx] - model.predict(design[test_idx])
+        # sklearn ravels a SINGLE-column target: Ridge.predict returns (n,) for a
+        # (n, 1) matrix and (n, k) for k >= 2. Without this reshape the one-column
+        # case broadcasts to (n, n) and raises -- which is why per-AXIS residualisation
+        # (one column at a time, the unit P4 certification works in) was unreachable.
+        # A strict no-op for every k >= 2 call site, so no existing number moves.
+        prediction = np.asarray(model.predict(design[test_idx]))
+        residual[test_idx] = matrix[test_idx] - prediction.reshape(matrix[test_idx].shape)
     return residual - residual.mean(axis=0, keepdims=True)

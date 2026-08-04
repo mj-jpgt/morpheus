@@ -81,6 +81,36 @@ def test_cross_fitted_residuals_remove_the_confound():
     assert after < before - 0.2, (before, after)
 
 
+def test_cross_fitted_residuals_handle_a_single_column():
+    """One column must residualise, and must agree with the same column inside a block.
+
+    sklearn ravels a single-column Ridge target, so ``model.predict`` returns ``(n,)``
+    where the matrix slice is ``(n, 1)``; the subtraction then broadcast to ``(n, n)``
+    and raised. Per-AXIS residualisation is one column at a time, and it is the unit
+    the P4 certification rule works in, so the one-column path is not a corner case --
+    it is the case. The second assertion pins that the fix changes nothing for k >= 2:
+    column 0 of a two-column call must equal the one-column call exactly.
+    """
+    rng = np.random.default_rng(11)
+    site = rng.integers(0, 4, size=200)
+    onehot = np.eye(4)[site]
+    first = rng.normal(size=200) + 3.0 * onehot @ rng.normal(size=4)
+    second = rng.normal(size=200) + 3.0 * onehot @ rng.normal(size=4)
+    design = confound_design(pd.DataFrame({"site": site.astype(str)}), ["site"])
+
+    single = cross_fitted_residuals(first[:, None], design)
+    assert single.shape == (200, 1)
+    assert np.isfinite(single).all()
+
+    block = cross_fitted_residuals(np.column_stack([first, second]), design)
+    np.testing.assert_allclose(single[:, 0], block[:, 0], rtol=0, atol=1e-12)
+
+    # And it actually removes the confound rather than merely running.
+    before = top_canonical_correlation(onehot, first[:, None], n_components=1)
+    after = top_canonical_correlation(onehot, single, n_components=1)
+    assert after < before - 0.2, (before, after)
+
+
 def test_confound_design_handles_missing_numerics():
     frame = pd.DataFrame({"purity": [0.5, np.nan, 0.8, 0.2], "site": ["A", "B", "A", "B"]})
     design = confound_design(frame, ["purity", "site"])
