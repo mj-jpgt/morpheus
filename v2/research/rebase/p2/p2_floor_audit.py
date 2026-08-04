@@ -213,6 +213,12 @@ def resolve(src: dict) -> float:
     raise KeyError(f"unknown source kind {kind!r}")
 
 
+def resolve_shape(src: dict) -> dict:
+    """A floor's bimodality descriptor, read back out of the file it was measured into."""
+    blob = json.loads((DATA / src["file"]).read_text(encoding="utf-8"))
+    return _dotted(blob, src["path"])
+
+
 def resolve_ratio(entry: dict) -> float:
     """The ratio an entry's own sources support, recomputed from them.
 
@@ -247,12 +253,51 @@ def check(audit: dict | None = None) -> list[str]:
             if abs(got - floor["value"]) > 0.0015:
                 problems.append(
                     f"floor {name}: recorded {floor['value']} but its source gives {got:.4f}")
+        # A SECOND, independent source for the same floor where one exists. The
+        # two floors the paper's whole criterion rests on are parsed from
+        # `d1_envelope_readout.py`'s printed log; the cross-check recomputes the
+        # same statistic on the same five artifacts from a workspace verified
+        # file-by-file against `git ls-tree`. If the two ever part, neither may
+        # be used -- which is the rule, not a preference for one of them.
+        if "cross_check" in floor:
+            other = resolve_ratio(floor["cross_check"])
+            if abs(other - floor["value"]) > 0.0015:
+                problems.append(
+                    f"floor {name}: recorded {floor['value']} but its independent cross-check "
+                    f"({floor['cross_check']['what']}) gives {other:.4f} -- STOP, and report both")
+        # The shape is a claim about the paper's thesis, so it is checked like a
+        # value: whether the divergent run is an outlier under THIS statistic, and
+        # whether the four-run agreement survives, are read back out of the file
+        # they were measured into.
+        if "shape" in floor and "shape_src" in floor:
+            source = resolve_shape(floor["shape_src"])
+            for key in ("outlier", "outlier_is_low", "bimodal"):
+                if floor["shape"][key] != source[key]:
+                    problems.append(
+                        f"floor {name}: shape.{key} recorded {floor['shape'][key]!r} but its "
+                        f"source gives {source[key]!r}")
+            if abs(floor["shape"]["rest_fold"] - source["rest_fold"]) > 0.0002:
+                problems.append(
+                    f"floor {name}: shape.rest_fold recorded {floor['shape']['rest_fold']} but "
+                    f"its source gives {source['rest_fold']:.4f}")
 
     for entry in audit["comparisons"]:
         eid = entry["id"]
         if eid in seen:
             problems.append(f"{eid}: duplicate id")
         seen.add(eid)
+
+        # (0) UNJUDGEABLE IS NOT A VERDICT. A comparison whose statistic-and-block
+        # has no measured floor may record neither a pass nor a failure, and the
+        # coupling is enforced rather than left to convention: for as long as
+        # `clears: false` was allowed to sit beside `floor: null`, thirteen rows
+        # with no ruler at all were being counted alongside rows that had failed
+        # a measured one.
+        if (entry.get("floor") is None) != (entry.get("clears") is None):
+            problems.append(
+                f"{eid}: floor={entry.get('floor')!r} but clears={entry.get('clears')!r} — a row "
+                f"with no floor must record `clears: null`, and a row with a floor must record a "
+                f"boolean")
 
         # (1) the two values still agree with their sources, and (2) the ratio
         # agrees with the two values.
@@ -302,6 +347,13 @@ def check(audit: dict | None = None) -> list[str]:
             problems.append(f"{eid}: no `rests_on` -- what carries the claim is not stated")
         if entry["kind"] == "selection" and not entry["clears"] and not entry.get("rests_on"):
             problems.append(f"{eid}: an unresolvable selection with nothing stated behind it")
+
+    # The floors must each name a statistic and a block, or block-matching cannot
+    # be checked at all, and each must carry the caveat that travels with it.
+    for name, floor in floors.items():
+        for field in ("statistic", "block", "caveat"):
+            if not floor.get(field):
+                problems.append(f"floor {name}: no {field}")
     return problems
 
 
@@ -345,7 +397,10 @@ def render_markdown(audit: dict | None = None) -> str:
         if entry["kind"] in ("regime", "excluded"):
             verdict = "**exempt**"
         elif floor_name is None:
-            verdict = "**no floor**"
+            # Not a pass and not a failure: no floor has ever been measured for
+            # this row's statistic on this row's block, so the criterion cannot
+            # be applied to it in either direction.
+            verdict = "**unjudgeable**"
         elif entry["clears"]:
             verdict = "yes"
         else:
@@ -357,13 +412,76 @@ def render_markdown(audit: dict | None = None) -> str:
     return "\n".join(lines)
 
 
+#: Display order for the floor table: the block 4.1's floor is measured on
+#: first, then the paired block LiDAR needs, then the two views nothing had ever
+#: been measured on. Within a group, largest floor first, so the 3.3x spread
+#: BETWEEN statistics on one block is the first thing the column shows.
+_FLOOR_GROUPS = [
+    ("the exported `wsi_biology` block — the one §4.1 measures, every statistic T1 scores",
+     lambda name: not name.startswith("LiDAR") and not name.endswith(("_rna_view", "_full_view"))),
+    ("the `wsi_biology` + `rna_biology` positive pair — LiDAR's block",
+     lambda name: name.startswith("LiDAR")),
+    ("the `rna_biology` view, canonical R1 — same five runs, same statistic, other view",
+     lambda name: name.endswith("_rna_view")),
+    ("the `full_biology` view, canonical R1 — same five runs, same statistic, other view",
+     lambda name: name.endswith("_full_view")),
+]
+
+
+def render_floors_markdown(audit: dict | None = None) -> str:
+    """The measured-floor table draft 4.1a prints, generated from the audit list.
+
+    Min and max are re-resolved from `P2_ENVELOPE_FLOORS.json` rather than
+    restated, so the table cannot drift from the file the floors were measured
+    into. The last three columns are the SHAPE, not the magnitude: whether the
+    four-run agreement and the factor-scale gap that make 4.1's floor bimodal
+    survive a change of statistic is a claim about this paper's thesis, not a
+    detail of presentation.
+    """
+    audit = audit or load()
+    floors = audit["floors"]
+    lines = ["| statistic | block | min | max | **floor** | other four agree to |"
+             " divergent run | bimodal? |",
+             "|---|---|---:|---:|---:|---:|---|:---:|"]
+    placed: set[str] = set()
+    for label, predicate in _FLOOR_GROUPS:
+        group = [(n, f) for n, f in floors.items()
+                 if n not in placed and predicate(n) and "value" in f]
+        group.sort(key=lambda item: (-item[1]["value"], item[0]))
+        if not group:
+            continue
+        lines.append(f"| **{label}** | | | | | | | |")
+        for name, floor in group:
+            placed.add(name)
+            lo, hi = resolve(floor["b"]["src"]), resolve(floor["a"]["src"])
+            shape = floor.get("shape", {})
+            block = floor["block"].split(" (")[0].replace(", `", " — `")
+            lines.append(
+                f"| {floor['statistic'].replace('|', chr(92) + '|')} | {block} | "
+                f"{lo:.4f} | {hi:.4f} | **{floor['value']:.3f}×** | "
+                f"{shape['rest_fold']:.3f}× | {shape['outlier']} "
+                f"({'low' if shape['outlier_is_low'] else 'high'}) | "
+                f"{'**yes**' if shape['bimodal'] else 'no'} |")
+    return "\n".join(lines)
+
+
 def summary(audit: dict | None = None) -> dict:
+    """The three-way count. `failing` + `clearing` + `unjudgeable` = `selection`.
+
+    The three-way split is the point. A row whose block has no measured floor is
+    NOT a failure, and counting it as one flatters the paper: it says the
+    criterion was applied and the comparison lost, when in fact the criterion
+    could not be applied at all.
+    """
     audit = audit or load()
     rows = audit["comparisons"]
+    sel = [r for r in rows if r["kind"] == "selection"]
     return {
         "total": len(rows),
-        "selection": sum(r["kind"] == "selection" for r in rows),
-        "selection_failing": sum(r["kind"] == "selection" and not r["clears"] for r in rows),
+        "selection": len(sel),
+        "selection_failing": sum(r["clears"] is False for r in sel),
+        "selection_clearing": sum(r["clears"] is True for r in sel),
+        "selection_unjudgeable": sum(r.get("floor") is None for r in sel),
         "exempt": sum(r["kind"] in ("regime", "excluded") for r in rows),
         "no_floor_measured": sum(r.get("floor") is None for r in rows),
         "block_mismatched": sum(bool(r.get("floor_note")) for r in rows),
@@ -378,24 +496,29 @@ def summary_sentence(audit: dict | None = None) -> str:
     """
     s = summary(audit)
     return (f"{s['total']} rank comparisons are enumerated; "
-            f"{s['selection']} of them are selections between candidate configurations, and "
-            f"{s['selection_failing']} of those {s['selection']} do not clear the floor their "
-            f"own block licenses. "
-            f"{s['exempt']} are exempt with the reason stated, "
-            f"{s['no_floor_measured']} are on a statistic or a block for which **no floor has "
-            f"ever been measured**, and "
-            f"{s['block_mismatched']} carry an explicit block- or statistic-mismatch note.")
+            f"{s['selection']} of them are selections between candidate configurations. "
+            f"**{s['selection_failing']} of those {s['selection']} do not clear the floor their own "
+            f"statistic and block license, {s['selection_clearing']} clears it, and "
+            f"{s['selection_unjudgeable']} cannot be judged at all** because no floor has ever been "
+            f"measured for the block they sit on. "
+            f"{s['exempt']} rows are exempt with the reason stated, "
+            f"{s['no_floor_measured']} of the {s['total']} are unjudgeable for want of a floor, and "
+            f"{s['block_mismatched']} carry an explicit statistic-, block- or kind-mismatch note.")
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--markdown", action="store_true", help="print the draft 4.1a table")
+    ap.add_argument("--floors", action="store_true", help="print the draft 4.1a floor table")
     ap.add_argument("--sentence", action="store_true", help="print the draft 4.1a counting sentence")
     ap.add_argument("--check", action="store_true", help="re-resolve every value (default)")
     args = ap.parse_args(argv)
     if args.markdown:
         print(render_markdown())
+        return 0
+    if args.floors:
+        print(render_floors_markdown())
         return 0
     if args.sentence:
         print(summary_sentence())

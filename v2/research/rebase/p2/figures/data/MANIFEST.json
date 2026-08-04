@@ -1,6 +1,6 @@
 {
  "box": "ubuntu@150.136.45.194",
- "fetched_utc": "2026-08-04T11:02:52Z",
+ "fetched_utc": "2026-08-04T12:05:34Z",
  "files": {
   "e0_run/collapse_diag.log": {
    "box_path": "~/e0_run/collapse_diag.log",
@@ -151,6 +151,18 @@
    "bytes": 3462,
    "produced_by": "extract_from_box.py",
    "sha256": "7c17e904b548f82a9adec429a0fb4b4d5eae7f71914b2ba6e536413e306d5c19"
+  },
+  "ws_floor/out/P2_ENVELOPE_FLOORS.json": {
+   "box_path": "~/ws_floor/out/P2_ENVELOPE_FLOORS.json",
+   "bytes": 50435,
+   "produced_by": null,
+   "sha256": "385086f6156e2fb734388baf21a4108564aec1a443c0fe36de0cf89c7c975d7c"
+  },
+  "ws_floor/out/floors_run.log": {
+   "box_path": "~/ws_floor/out/floors_run.log",
+   "bytes": 8772,
+   "produced_by": null,
+   "sha256": "ed91e9f5b1afaef69abf0d1b902fd11b2911d56b2fe2c5d5df5fca2cb2096275"
   },
   "ws_p2/out/P2_METRICS_D1.json": {
    "box_path": "~/ws_p2/out/P2_METRICS_D1.json",

@@ -1,5 +1,5 @@
 {
- "_": "The floor audit behind paper/P2_RANK_DRAFT.md 4.1a. Every rank comparison the paper makes or relies on, each judged against the floor measured on ITS OWN block. Owned and checked by v2/research/rebase/p2/p2_floor_audit.py; the draft's table is rendered from this file and asserted against it by v2/tests/test_p2_floor_audit.py. Nothing here is computed: every value is read back out of the source named in its `src` block.",
+ "_": "The floor audit behind paper/P2_RANK_DRAFT.md 4.1a. Every rank comparison the paper makes or relies on, each judged against the floor measured on ITS OWN statistic, block and view. Owned and checked by v2/research/rebase/p2/p2_floor_audit.py; the draft's table is rendered from this file and asserted against it by v2/tests/test_p2_floor_audit.py. Nothing here is computed: every value is read back out of the source named in its `src` block. A comparison whose statistic-and-block has no measured floor is UNJUDGEABLE — `floor: null` and `clears: null` — which is neither a pass nor a failure, and is enforced rather than conventional.",
  "floors": {
   "R1_residualised_export": {
    "value": 3.295,
@@ -21,7 +21,36 @@
      "path": "printed_spread.rank_residualised.min"
     }
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm, and same-seed repeats exclude seed variation entirely — and BIMODAL, not a spread"
+   "caveat": "a FLOOR twice over — measured on the stable arm, and same-seed repeats exclude seed variation entirely — and BIMODAL, not a spread. n = 5, one arm, one seed, one stack, no interval; not an estimated distribution",
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0277,
+    "separation": 3.206,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.R1.shape"
+   },
+   "cross_check": {
+    "what": "the same five repeats recomputed from the artifacts by `p2_envelope_floors.py` on a byte-verified workspace, independent of the readout log the recorded value is parsed from",
+    "a": {
+     "src": {
+      "kind": "json",
+      "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+      "path": "floors.wsi_biology.residualised.R1.max"
+     }
+    },
+    "b": {
+     "src": {
+      "kind": "json",
+      "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+      "path": "floors.wsi_biology.residualised.R1.min"
+     }
+    }
+   }
   },
   "R1_raw_export": {
    "value": 3.111,
@@ -43,7 +72,36 @@
      "path": "printed_spread.rank_raw.min"
     }
    },
-   "caveat": "as above"
+   "caveat": "as above. n = 5, one arm, one seed, one stack, no interval; not an estimated distribution",
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0208,
+    "separation": 3.048,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.R1.shape"
+   },
+   "cross_check": {
+    "what": "the same five repeats recomputed from the artifacts by `p2_envelope_floors.py` on a byte-verified workspace, independent of the readout log the recorded value is parsed from",
+    "a": {
+     "src": {
+      "kind": "json",
+      "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+      "path": "floors.wsi_biology.raw.R1.max"
+     }
+    },
+    "b": {
+     "src": {
+      "kind": "json",
+      "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+      "path": "floors.wsi_biology.raw.R1.min"
+     }
+    }
+   }
   },
   "within_arm_seed_band": {
    "low": 2.1,
@@ -52,27 +110,796 @@
    "block": "residualised",
    "what": "§4.2's within-arm fold across three seeds, over the four arms: 3.15× / 3.75× / 2.64× / 2.10×. It governs any comparison that varies the SEED",
    "caveat": "four arms, three seeds each, eight within-arm degrees of freedom"
+  },
+  "R2_residualised_export": {
+   "value": 2.224,
+   "statistic": "R2",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.R2.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.R2.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0249,
+    "separation": 2.17,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.R2.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R2_raw_export": {
+   "value": 2.14,
+   "statistic": "R2",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.R2.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.R2.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0138,
+    "separation": 2.111,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.R2.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R3_residualised_export": {
+   "value": 2.29,
+   "statistic": "R3",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.R3.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.R3.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0284,
+    "separation": 2.227,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.R3.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R3_raw_export": {
+   "value": 2.14,
+   "statistic": "R3",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.R3.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.R3.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0138,
+    "separation": 2.111,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.R3.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "PR_residualised_export": {
+   "value": 1.419,
+   "statistic": "PR",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.PR.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.PR.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0511,
+    "separation": 1.35,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.PR.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "PR_raw_export": {
+   "value": 1.446,
+   "statistic": "PR",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.PR.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.PR.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.047,
+    "separation": 1.381,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.PR.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "PR_rownorm_residualised_export": {
+   "value": 1.466,
+   "statistic": "PR_rownorm",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.PR_rownorm.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.PR_rownorm.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0244,
+    "separation": 1.431,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.PR_rownorm.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "PR_rownorm_raw_export": {
+   "value": 1.446,
+   "statistic": "PR_rownorm",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.PR_rownorm.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.PR_rownorm.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.047,
+    "separation": 1.381,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.PR_rownorm.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "stable_rank_residualised_export": {
+   "value": 1.224,
+   "statistic": "stable rank",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.stable_rank.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.stable_rank.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.054,
+    "separation": 1.161,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.stable_rank.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "stable_rank_raw_export": {
+   "value": 1.246,
+   "statistic": "stable rank",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.stable_rank.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.stable_rank.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0349,
+    "separation": 1.204,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.stable_rank.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "alpha_req_absdev_residualised_export": {
+   "value": 2.299,
+   "statistic": "α-ReQ |α−1|",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.alpha_req_abs_dev.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.alpha_req_abs_dev.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": false,
+    "rest_fold": 1.121,
+    "separation": 2.05,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.alpha_req_abs_dev.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "alpha_req_absdev_raw_export": {
+   "value": 2.14,
+   "statistic": "α-ReQ |α−1|",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.alpha_req_abs_dev.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.alpha_req_abs_dev.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": false,
+    "rest_fold": 1.1368,
+    "separation": 1.883,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.alpha_req_abs_dev.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "hard_rank_residualised_export": {
+   "value": 1.0,
+   "statistic": "hard numerical matrix rank",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.hard_rank.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.hard_rank.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep1",
+    "outlier_is_low": false,
+    "rest_fold": 1.0,
+    "separation": 1.0,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.hard_rank.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "hard_rank_raw_export": {
+   "value": 1.0,
+   "statistic": "hard numerical matrix rank",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.hard_rank.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.hard_rank.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep1",
+    "outlier_is_low": false,
+    "rest_fold": 1.0,
+    "separation": 1.0,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.hard_rank.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "RankMe_published_raw_export": {
+   "value": 1.811,
+   "statistic": "RankMe (raw, uncentred, ε = 1e-7)",
+   "block": "raw",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. THIS IS THE PUBLISHED STATISTIC — uncentred, ε inside the normalisation — and it is markedly more reproducible across retrains than our centred R1 on the same five runs (1.811× against 3.111×)",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.RankMe.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.raw.RankMe.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0196,
+    "separation": 1.776,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.raw.RankMe.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "RankMe_residualised_export": {
+   "value": 3.295,
+   "statistic": "RankMe (residualised)",
+   "block": "residualised",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. On the residualised block the column mean is ~0, so RankMe and canonical R1 coincide to 4 significant figures (3.295× against 3.295×); the two statistics differ only where the mean offset survives, i.e. on the raw block",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.RankMe.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_biology.residualised.RankMe.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0277,
+    "separation": 3.206,
+    "bimodal": true
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_biology.residualised.RankMe.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "LiDAR_residualised_export": {
+   "value": 1.06,
+   "statistic": "LiDAR",
+   "block": "residualised (wsi + rna as the positive pair)",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. LiDAR is computed over the `wsi_biology`/`rna_biology` pair at q = 2, δ = 1e-4, exactly as T1 scores it",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_rna_paired.residualised.LiDAR.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_rna_paired.residualised.LiDAR.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0243,
+    "separation": 1.034,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_rna_paired.residualised.LiDAR.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "LiDAR_raw_export": {
+   "value": 1.034,
+   "statistic": "LiDAR",
+   "block": "raw (wsi + rna as the positive pair)",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. LiDAR is computed over the `wsi_biology`/`rna_biology` pair at q = 2, δ = 1e-4, exactly as T1 scores it",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_rna_paired.raw.LiDAR.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.wsi_rna_paired.raw.LiDAR.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0256,
+    "separation": 1.009,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.wsi_rna_paired.raw.LiDAR.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R1_residualised_rna_view": {
+   "value": 1.019,
+   "statistic": "R1",
+   "block": "residualised, `rna_biology` view",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `rna_biology` view of the same exports; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.rna_biology.residualised.R1.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.rna_biology.residualised.R1.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.016,
+    "separation": 1.003,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.rna_biology.residualised.R1.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R1_raw_rna_view": {
+   "value": 1.023,
+   "statistic": "R1",
+   "block": "raw, `rna_biology` view",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `rna_biology` view of the same exports; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.rna_biology.raw.R1.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.rna_biology.raw.R1.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0172,
+    "separation": 1.005,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.rna_biology.raw.R1.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R1_residualised_full_view": {
+   "value": 1.02,
+   "statistic": "R1",
+   "block": "residualised, `full_biology` view",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `full_biology` view of the same exports; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.full_biology.residualised.R1.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.full_biology.residualised.R1.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": false,
+    "rest_fold": 1.0149,
+    "separation": 1.005,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.full_biology.residualised.R1.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "R1_raw_full_view": {
+   "value": 1.014,
+   "statistic": "R1",
+   "block": "raw, `full_biology` view",
+   "n": 5,
+   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `full_biology` view of the same exports; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.full_biology.raw.R1.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.full_biology.raw.R1.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": false,
+    "rest_fold": 1.009,
+    "separation": 1.005,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.full_biology.raw.R1.shape"
+   },
+   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+  },
+  "channel_residualised_export": {
+   "value": 1.055,
+   "statistic": "top-CCA (16 components, 40 untrained targets)",
+   "block": "residualised",
+   "n": 5,
+   "what": "the channel on the SAME five runs — the comparator §4.1's asymmetry claim is made against; `p2_envelope_floors.py`",
+   "a": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.channel.residualised.top_cca_16.max"
+    }
+   },
+   "b": {
+    "src": {
+     "kind": "json",
+     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "path": "floors.channel.residualised.top_cca_16.min"
+    }
+   },
+   "shape": {
+    "outlier": "rep2",
+    "outlier_is_low": true,
+    "rest_fold": 1.0139,
+    "separation": 1.041,
+    "bimodal": false
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "path": "floors.channel.residualised.top_cca_16.shape"
+   },
+   "caveat": "not a rank statistic. It is here so that the asymmetry §4.1 rests on (rank 3.295×, channel 1.055×, same five runs) is machine-checked against the same file as the ranks."
   }
  },
- "statistics_with_no_measured_floor": [
-  "R2",
-  "R3",
-  "PR",
-  "PR_rownorm",
-  "RankMe as published",
-  "participation ratio",
-  "stable rank",
-  "α-ReQ |α−1|",
-  "LiDAR",
-  "hard numerical matrix rank"
- ],
+ "statistics_with_no_measured_floor": [],
  "blocks_with_no_measured_floor": [
-  "fixed held-out probe (256 patients)",
-  "training batch, in-run",
   "16-patient gate batch",
-  "282 held-out patients (live checkpoint)",
-  "`rna_biology` view",
-  "`full_biology` view"
+  "282 held-out patients, live checkpoint",
+  "fixed held-out probe",
+  "training batch, in-run"
  ],
  "known_source_disagreements": [
   {
@@ -531,7 +1358,7 @@
    "statistic": "R3",
    "block": "training batch, in-run",
    "floor": null,
-   "floor_note": "R3 on in-run training batches; the states were never saved, so these are [NOT RECOMPUTABLE] under R1 and no floor exists on this block",
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** R3 on in-run training batches; the states were never saved, so these are [NOT RECOMPUTABLE] and a floor needs the five repeats re-run with the tripwire logged at a fixed step (GPU). The exported-block R3 floor is 2.290× residualised / 2.140× raw and does NOT license a comparison on the training batch.",
    "a": {
     "value": 45.64579,
     "src": {
@@ -549,7 +1376,7 @@
     }
    },
    "rests_on": "five seeds, one step, no interval; the claim is that the spread is large.",
-   "clears": false,
+   "clears": null,
    "ratio": 6.0499,
    "value_digits": 3
   },
@@ -561,7 +1388,7 @@
    "statistic": "R3",
    "block": "training batch, in-run",
    "floor": null,
-   "floor_note": "as above",
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** R3 on in-run training batches; the states were never saved, so these are [NOT RECOMPUTABLE] and a floor needs the five repeats re-run with the tripwire logged at a fixed step (GPU). The exported-block R3 floor is 2.290× residualised / 2.140× raw and does NOT license a comparison on the training batch.",
    "a": {
     "value": 112.07783,
     "src": {
@@ -579,7 +1406,7 @@
     }
    },
    "rests_on": "five seeds, one step, no interval; the claim is that the spread is small.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.1804,
    "value_digits": 3
   },
@@ -591,7 +1418,7 @@
    "statistic": "R3",
    "block": "training batch, in-run",
    "floor": null,
-   "floor_note": "the compared quantity is a SPREAD, not a level. §4.1's floor is a floor on levels, and **no floor has ever been measured for a spread on this project** — so §4.3's headline is the one claim in the paper the criterion cannot even be applied to",
+   "floor_note": "the compared quantity is a SPREAD, not a level. This project has measured floors on rank **levels** — now for ten statistics, three views and two blocks — and **never on a spread**, and the block is the in-run training batch, which has no floor either. Unjudgeable twice over.",
    "a": {
     "value": 6.049884,
     "src": {
@@ -621,7 +1448,7 @@
     }
    },
    "rests_on": "five seeds per arm and no interval on either spread. The claim survives because the two arms' step-200 *levels* are an order of magnitude apart and the supervised arm's five seeds agree to 18%, not because the ratio of the two spreads clears anything.",
-   "clears": false,
+   "clears": null,
    "ratio": 5.1254,
    "value_digits": 3
   },
@@ -632,9 +1459,9 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "clears": true,
-   "floor_note": "statistic AND block both mismatched — R3 on a fixed held-out probe against an R1 residualised-export floor; no floor has been measured on the probe",
+   "floor": null,
+   "clears": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it. **This row is one of the two the paper quoted as CLEARING the floor** (3.495×, 'by 6%'); it cleared an R1 exported-block floor while being an R3 probe-block measurement. It clears nothing that has been measured.",
    "a": {
     "value": 6.92,
     "src": {
@@ -658,14 +1485,13 @@
    "value_digits": 3
   },
   {
-   "id": "4.5a-thirty",
+   "id": "4.5a-r1",
    "section": "§4.5(a)",
-   "comparison": "**30 arm comparisons** — 5 statistics (R1, R2, R3, PR, PR_rownorm) × 6 pairs",
+   "comparison": "the six arm pairs under **R1** — canonical Roy & Vetterli order 1",
    "kind": "direction",
-   "statistic": "R1/R2/R3/PR",
+   "statistic": "R1",
    "block": "residualised",
    "floor": "R1_residualised_export",
-   "floor_note": "only R1 has a measured floor. R2, R3, PR and PR_rownorm have none, so 24 of these 30 comparisons cannot be judged against the criterion at all",
    "pair_max": {
     "file": "ws_p2/out/P2_RANK_VARIANTS.json",
     "paths": [
@@ -692,7 +1518,26 @@
      [
       "artifacts.P44.R1",
       "artifacts.F44.R1"
-     ],
+     ]
+    ]
+   },
+   "ratio": 3.2463,
+   "clears": false,
+   "values_label": "1.004× – 3.246× over 6",
+   "value_digits": 3,
+   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Against R1's own floor of 3.295×, **0 of the 6** pairs are resolvable. **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.**"
+  },
+  {
+   "id": "4.5a-r2",
+   "section": "§4.5(a)",
+   "comparison": "the six arm pairs under **R2** — the order-2 Hill number of the singular values (`d1_audit.py`)",
+   "kind": "direction",
+   "statistic": "R2",
+   "block": "residualised",
+   "floor": "R2_residualised_export",
+   "pair_max": {
+    "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+    "paths": [
      [
       "artifacts.H42.R2",
       "artifacts.I42.R2"
@@ -716,7 +1561,26 @@
      [
       "artifacts.P44.R2",
       "artifacts.F44.R2"
-     ],
+     ]
+    ]
+   },
+   "ratio": 2.3812,
+   "clears": true,
+   "values_label": "1.014× – 2.381× over 6",
+   "value_digits": 3,
+   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Against R2's own floor of 2.224×, **1 of the 6** pairs are resolvable (P43/F43). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.**"
+  },
+  {
+   "id": "4.5a-r3",
+   "section": "§4.5(a)",
+   "comparison": "the six arm pairs under **R3** — R2 on L2-normalised rows (the geometry probes and the in-run tripwire)",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "residualised",
+   "floor": "R3_residualised_export",
+   "pair_max": {
+    "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+    "paths": [
      [
       "artifacts.H42.R3",
       "artifacts.I42.R3"
@@ -740,7 +1604,26 @@
      [
       "artifacts.P44.R3",
       "artifacts.F44.R3"
-     ],
+     ]
+    ]
+   },
+   "ratio": 2.4759,
+   "clears": true,
+   "values_label": "1.042× – 2.476× over 6",
+   "value_digits": 3,
+   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Against R3's own floor of 2.290×, **1 of the 6** pairs are resolvable (P43/F43). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.**"
+  },
+  {
+   "id": "4.5a-pr",
+   "section": "§4.5(a)",
+   "comparison": "the six arm pairs under **PR** — the eigenvalue participation ratio",
+   "kind": "direction",
+   "statistic": "PR",
+   "block": "residualised",
+   "floor": "PR_residualised_export",
+   "pair_max": {
+    "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+    "paths": [
      [
       "artifacts.H42.PR",
       "artifacts.I42.PR"
@@ -764,7 +1647,26 @@
      [
       "artifacts.P44.PR",
       "artifacts.F44.PR"
-     ],
+     ]
+    ]
+   },
+   "ratio": 1.5057,
+   "clears": true,
+   "values_label": "1.012× – 1.506× over 6",
+   "value_digits": 3,
+   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Against PR's own floor of 1.419×, **2 of the 6** pairs are resolvable (P43/F43, P44/F44). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.**"
+  },
+  {
+   "id": "4.5a-pr_rownorm",
+   "section": "§4.5(a)",
+   "comparison": "the six arm pairs under **PR_rownorm** — the eigenvalue participation ratio on normalised rows",
+   "kind": "direction",
+   "statistic": "PR_rownorm",
+   "block": "residualised",
+   "floor": "PR_rownorm_residualised_export",
+   "pair_max": {
+    "file": "ws_p2/out/P2_RANK_VARIANTS.json",
+    "paths": [
      [
       "artifacts.H42.PR_rownorm",
       "artifacts.I42.PR_rownorm"
@@ -791,11 +1693,11 @@
      ]
     ]
    },
-   "ratio": 3.2463,
-   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Every one of the 30 folds is inside the one floor that exists, which supports rather than undermines the claim: a verdict read off an unresolvable difference is exactly what §4.5 says a rank verdict is.",
-   "clears": false,
-   "values_label": "1.004× – 3.246× over 30",
-   "value_digits": 3
+   "ratio": 1.6522,
+   "clears": true,
+   "values_label": "1.020× – 1.652× over 6",
+   "value_digits": 3,
+   "rests_on": "the **instability of the ordering** across statistics, not any magnitude. Against PR_rownorm's own floor of 1.466×, **2 of the 6** pairs are resolvable (P44/F44, P43/F43). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.**"
   },
   {
    "id": "4.5b-block-flip",
@@ -804,8 +1706,8 @@
    "kind": "direction",
    "statistic": "R3",
    "block": "raw and residualised",
-   "floor": "R1_residualised_export",
-   "floor_note": "R3 has no floor of its own; the R1 rows of this table are rows 1–3 above",
+   "floor": "R3_raw_export",
+   "floor_note": "R3 now HAS a floor of its own on the exported block — **2.140× raw and 2.290× residualised** — and this row spans both blocks, so it is judged against the smaller (easier to clear) of the two; the verdict is the same under either. It was previously judged against the R1 floor.",
    "pair_max": {
     "file": "ws_rank/RANK_RECOMPUTE.json",
     "paths": [
@@ -834,14 +1736,13 @@
    "value_digits": 3
   },
   {
-   "id": "4.5c-views",
+   "id": "4.5c-wsi",
    "section": "§4.5(c)",
-   "comparison": "**18 comparisons** — 6 pairs × 3 co-trained views (`wsi`, `rna`, `full`)",
+   "comparison": "the six arm pairs on the co-trained **`wsi_biology`** view",
    "kind": "direction",
    "statistic": "R1",
-   "block": "residualised, per view",
-   "floor": null,
-   "floor_note": "the floor is measured on `wsi_biology` only. `rna_biology` and `full_biology` have **no measured floor**, and the largest fold among them — D1 s44 `full_biology`, 5.250× — is larger than the wsi floor, so the 11/18 and 2/9 counts include orderings nobody can say are resolvable and orderings nobody has measured a floor for",
+   "block": "residualised",
+   "floor": "R1_residualised_export",
    "pair_max": {
     "file": "ws_p2/out/P2_ROBUSTNESS.json",
     "paths": [
@@ -850,68 +1751,106 @@
       "I42.wsi_biology.eff_rank"
      ],
      [
-      "H42.rna_biology.eff_rank",
-      "I42.rna_biology.eff_rank"
-     ],
-     [
-      "H42.full_biology.eff_rank",
-      "I42.full_biology.eff_rank"
-     ],
-     [
       "H43.wsi_biology.eff_rank",
       "I43.wsi_biology.eff_rank"
-     ],
-     [
-      "H43.rna_biology.eff_rank",
-      "I43.rna_biology.eff_rank"
-     ],
-     [
-      "H43.full_biology.eff_rank",
-      "I43.full_biology.eff_rank"
      ],
      [
       "H44.wsi_biology.eff_rank",
       "I44.wsi_biology.eff_rank"
      ],
      [
-      "H44.rna_biology.eff_rank",
-      "I44.rna_biology.eff_rank"
-     ],
-     [
-      "H44.full_biology.eff_rank",
-      "I44.full_biology.eff_rank"
-     ],
-     [
       "P42.wsi_biology.eff_rank",
       "F42.wsi_biology.eff_rank"
-     ],
-     [
-      "P42.rna_biology.eff_rank",
-      "F42.rna_biology.eff_rank"
-     ],
-     [
-      "P42.full_biology.eff_rank",
-      "F42.full_biology.eff_rank"
      ],
      [
       "P43.wsi_biology.eff_rank",
       "F43.wsi_biology.eff_rank"
      ],
      [
+      "P44.wsi_biology.eff_rank",
+      "F44.wsi_biology.eff_rank"
+     ]
+    ]
+   },
+   "ratio": 3.2463,
+   "clears": false,
+   "values_label": "1.004× – 3.246× over 6",
+   "value_digits": 3,
+   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **3.295×**, **0 of the 6** pairs are resolvable. This is the view §4.1's floor is measured on and the only one of the three on which no pair is resolvable. `rna_biology` is also partly circular, so the 2/9 count is already not quoted as a rate."
+  },
+  {
+   "id": "4.5c-rna",
+   "section": "§4.5(c)",
+   "comparison": "the six arm pairs on the co-trained **`rna_biology`** view",
+   "kind": "direction",
+   "statistic": "R1",
+   "block": "residualised, `rna_biology` view",
+   "floor": "R1_residualised_rna_view",
+   "pair_max": {
+    "file": "ws_p2/out/P2_ROBUSTNESS.json",
+    "paths": [
+     [
+      "H42.rna_biology.eff_rank",
+      "I42.rna_biology.eff_rank"
+     ],
+     [
+      "H43.rna_biology.eff_rank",
+      "I43.rna_biology.eff_rank"
+     ],
+     [
+      "H44.rna_biology.eff_rank",
+      "I44.rna_biology.eff_rank"
+     ],
+     [
+      "P42.rna_biology.eff_rank",
+      "F42.rna_biology.eff_rank"
+     ],
+     [
       "P43.rna_biology.eff_rank",
       "F43.rna_biology.eff_rank"
      ],
      [
-      "P43.full_biology.eff_rank",
-      "F43.full_biology.eff_rank"
-     ],
-     [
-      "P44.wsi_biology.eff_rank",
-      "F44.wsi_biology.eff_rank"
-     ],
-     [
       "P44.rna_biology.eff_rank",
       "F44.rna_biology.eff_rank"
+     ]
+    ]
+   },
+   "ratio": 3.0137,
+   "clears": true,
+   "values_label": "1.116× – 3.014× over 6",
+   "value_digits": 3,
+   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **1.019×**, **6 of the 6** pairs are resolvable. **The floor is a property of the VIEW.** The same five retrains that spread 3.295× on `wsi_biology` spread 1.019× on `rna_biology` and 1.020× on `full_biology`: the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to within 2%. Every between-arm difference on this view is therefore resolvable, and none on `wsi_biology` is — on the same artifacts, the same statistic and the same runs."
+  },
+  {
+   "id": "4.5c-full",
+   "section": "§4.5(c)",
+   "comparison": "the six arm pairs on the co-trained **`full_biology`** view",
+   "kind": "direction",
+   "statistic": "R1",
+   "block": "residualised, `full_biology` view",
+   "floor": "R1_residualised_full_view",
+   "pair_max": {
+    "file": "ws_p2/out/P2_ROBUSTNESS.json",
+    "paths": [
+     [
+      "H42.full_biology.eff_rank",
+      "I42.full_biology.eff_rank"
+     ],
+     [
+      "H43.full_biology.eff_rank",
+      "I43.full_biology.eff_rank"
+     ],
+     [
+      "H44.full_biology.eff_rank",
+      "I44.full_biology.eff_rank"
+     ],
+     [
+      "P42.full_biology.eff_rank",
+      "F42.full_biology.eff_rank"
+     ],
+     [
+      "P43.full_biology.eff_rank",
+      "F43.full_biology.eff_rank"
      ],
      [
       "P44.full_biology.eff_rank",
@@ -920,10 +1859,10 @@
     ]
    },
    "ratio": 5.2498,
-   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. The 2/9 count is already not quoted as a rate (`rna_biology` is partly circular).",
-   "clears": false,
-   "values_label": "1.004× – 5.250× over 18",
-   "value_digits": 3
+   "clears": true,
+   "values_label": "1.042× – 5.250× over 6",
+   "value_digits": 3,
+   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **1.020×**, **6 of the 6** pairs are resolvable. **The floor is a property of the VIEW.** The same five retrains that spread 3.295× on `wsi_biology` spread 1.019× on `rna_biology` and 1.020× on `full_biology`: the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to within 2%. Every between-arm difference on this view is therefore resolvable, and none on `wsi_biology` is — on the same artifacts, the same statistic and the same runs."
   },
   {
    "id": "4.6-six-pairs",
@@ -975,8 +1914,7 @@
    "kind": "selection",
    "statistic": "RankMe (raw, uncentred, ε = 1e-7)",
    "block": "raw",
-   "floor": null,
-   "floor_note": "**no retraining floor has been measured for any statistic other than canonical R1.** RankMe, participation ratio, stable rank, α-ReQ and LiDAR — eight of T1's twelve rows — cannot be judged against the criterion at all",
+   "floor": "RankMe_published_raw_export",
    "pair_max": {
     "file": "ws_p2/out/P2_METRICS_D2.json",
     "paths": [
@@ -995,8 +1933,8 @@
     ]
    },
    "ratio": 3.3817,
-   "rests_on": "nothing that this paper can check. §4.2 does measure RankMe's arm/seed split (29.1% arm, F = 1.09, n.s.) — which is the honest substitute for a floor it does not have.",
-   "clears": false,
+   "rests_on": "**the one selection in this paper that clears a floor its own statistic and block licenses — and it is not ours.** RankMe as published has a retraining floor of **1.811×** on the raw exported block, against canonical R1's 3.111× on the same five runs, because its uncentred normalisation is dominated by the mean-offset direction, which is the stable part. Only **1 of the 3** D2 pairs clears it (s43, 3.382×; s42 is 1.677× and s44 is 1.248×), so the 3/3 count still rests on two unresolvable orderings — but the criterion no longer refuses the row, and the paper must say that the published metric is the more reproducible one on our own artifacts.",
+   "clears": true,
    "values_label": "1.248× – 3.382× over 3",
    "value_digits": 3
   },
@@ -1179,7 +2117,7 @@
    },
    "value_digits": 1,
    "rests_on": "nothing. It is excluded from every count on **provenance**, not on the floor — and it happens also to be inside the floor, which is a second reason and not the operative one.",
-   "clears": false,
+   "clears": null,
    "ratio": 2.0701
   },
   {
@@ -1190,7 +2128,7 @@
    "statistic": "hard numerical matrix rank",
    "block": "16-patient train batch",
    "floor": null,
-   "floor_note": "not an effective rank at all; withdrawn as a rank instance",
+   "floor_note": "not an effective rank at all; withdrawn as a rank instance. The 16-patient gate batch has no measured floor and one is not recoverable from the exports. Recorded for completeness: the hard numerical rank now HAS a floor on the exported block and it is **1.000×** — the statistic does not move at all across five retrains, which is a floor that would license every comparison ever made and is exactly the trap §4.1 warns about.",
    "a": {
     "value": 16.0,
     "src": {
@@ -1213,7 +2151,7 @@
    },
    "value_digits": 0,
    "rests_on": "the co-measured collapse evidence — patient cosine 0.9999, retrieval 0.000 *below* its 0.062 chance level — and the fact that the R3 rank of the same objective falls 12.88 → 1.00. The rank column carries nothing.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.0
   },
   {
@@ -1224,7 +2162,7 @@
    "statistic": "R3",
    "block": "282 held-out patients, live checkpoint",
    "floor": null,
-   "floor_note": "`[NOT RECOMPUTED]` under R1 — it needs a GPU forward pass — and no floor has been measured on this block",
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** `[NOT RECOMPUTED]` under R1 — it needs a GPU forward pass — and the 282-patient live checkpoint has never had a floor measured on it.",
    "a": {
     "value": 9.81,
     "src": {
@@ -1244,7 +2182,7 @@
     }
    },
    "rests_on": "a collapse verdict with co-measured evidence: RNA-view mutual cosine 0.986, hard rank 11, and no exported readout at all. Its own source entry forbids concluding anything about supervision from it.",
-   "clears": false,
+   "clears": null,
    "ratio": 5.7368,
    "value_digits": 3
   },
@@ -1256,7 +2194,7 @@
    "statistic": "R3",
    "block": "diagnostic script, train batch",
    "floor": null,
-   "floor_note": "R3 on a train batch; no floor on this block, and the reading is AT the collapse floor",
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** R3 on a diagnostic script's train batch; the exported-block R3 floor (2.290×) does not license it, and the reading is AT the collapse floor.",
    "a": {
     "value": 12.88,
     "src": {
@@ -1276,7 +2214,7 @@
     }
    },
    "rests_on": "positive and worst-negative cosine both 0.9993 and a minimum margin of −0.0001, co-measured. §4.10 is where the paper says rank works.",
-   "clears": false,
+   "clears": null,
    "ratio": 12.88,
    "value_digits": 3
   },
@@ -1308,7 +2246,7 @@
     }
    },
    "rests_on": "held-out channels of 0.5983 and 0.4757 against a **measured** permutation null of 0.140 — a co-measured quantity, not a ratio. A representation at 3.6% of nominal rank was carrying a large, permutation-significant channel.",
-   "clears": false,
+   "clears": null,
    "ratio": 28.0008,
    "value_digits": 3
   },
@@ -1341,7 +2279,7 @@
     }
    },
    "rests_on": "two things, neither of them a rank difference. (i) The gate's own **binary** pass criterion — contrastive 0.012–0.057 against a ≤ 0.10 bar with retrieval 16/16 on three seeds. (ii) The cohort-scale arm being independently **collapsed**: RNA-view mutual cosine 0.977 / 0.986, hard rank 9 / 11, against the supervised sibling at 7.38 / 7.35. The claim — *a gate that certifies memorisation of 16 does not certify learning at 3,118* — is a statement about what the gate's regime removes, not a selection between two configurations.",
-   "clears": false,
+   "clears": null,
    "ratio": 3.2278,
    "value_digits": 3
   },
@@ -1353,7 +2291,7 @@
    "statistic": "R3",
    "block": "fixed 256-patient held-out probe",
    "floor": null,
-   "floor_note": "R3 on the probe; no floor on this block",
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 4.08,
     "src": {
@@ -1373,7 +2311,7 @@
     }
    },
    "rests_on": "an absolute-level claim, not a between-arm one: **all five** arms fall from a verified common initialisation of 67.55 to 1.59–3.43, i.e. ≥ 19.7×, including both regularisers at zero. The between-arm folds carry nothing and are not quoted.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.5573,
    "value_digits": 3
   },
@@ -1384,8 +2322,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched; §5.4 states all three mismatches (arm, duration, block) and that each points toward a LARGER floor here",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 7.42,
     "src": {
@@ -1405,7 +2343,7 @@
     }
    },
    "rests_on": "nothing — §5.4 says so.",
-   "clears": false,
+   "clears": null,
    "ratio": 2.6406,
    "value_digits": 3
   },
@@ -1416,8 +2354,8 @@
    "kind": "selection",
    "statistic": "R1",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "block mismatched — the fixed held-out probe has no floor of its own",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 10.45,
     "src": {
@@ -1437,7 +2375,7 @@
     }
    },
    "rests_on": "a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**.",
-   "clears": false,
+   "clears": null,
    "ratio": 3.2862,
    "value_digits": 3
   },
@@ -1448,8 +2386,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 6.85,
     "src": {
@@ -1469,7 +2407,7 @@
     }
    },
    "rests_on": "as row above.",
-   "clears": false,
+   "clears": null,
    "ratio": 2.4377,
    "value_digits": 3
   },
@@ -1480,8 +2418,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 7.42,
     "src": {
@@ -1501,7 +2439,7 @@
     }
    },
    "rests_on": "nothing. The binary outcome supports **momentum against none**, not this value over its neighbour; `m = 0.999` is retained because it measured best in a sweep whose resolution the paper does not trust.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.2619,
    "value_digits": 3
   },
@@ -1512,9 +2450,9 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "clears": true,
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "clears": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it. **This row is the other of the two the paper quoted as clearing the floor.** Both were on this block.",
    "a": {
     "value": 7.84,
     "src": {
@@ -1544,8 +2482,8 @@
    "kind": "direction",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 6.89,
     "src": {
@@ -1565,7 +2503,7 @@
     }
    },
    "rests_on": "**not the ordering.** What falsifies MoCo's staleness account here is that key-to-encoder agreement varies 2.06× (0.908 against 0.441) while rank is *indistinguishable* — an equality claim, which a 1.04× difference supports. The sentence “the best-agreeing arm does not have the best rank” reads an ordering off that 1.04× and should be restated as the equality it is.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.0361,
    "value_digits": 3
   },
@@ -1576,8 +2514,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 6.89,
     "src": {
@@ -1597,7 +2535,7 @@
     }
    },
    "rests_on": "the same binary outcome as §5.4; one seed.",
-   "clears": false,
+   "clears": null,
    "ratio": 2.6705,
    "value_digits": 3
   },
@@ -1608,8 +2546,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 6.17,
     "src": {
@@ -1629,7 +2567,7 @@
     }
    },
    "rests_on": "one seed, and the section's own admission that capacity confounds anchoring quality with negative count. It is one of three measurements said to rule the staleness account out, and it is inside the floor.",
-   "clears": false,
+   "clears": null,
    "ratio": 2.8565,
    "value_digits": 3
   },
@@ -1640,8 +2578,8 @@
    "kind": "direction",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 3.67,
     "src": {
@@ -1661,7 +2599,7 @@
     }
    },
    "rests_on": "**the predeclared reading, not the ordering.** The criterion required P4 to be the worst of its group and fixed “fails ≤ 3.5” in advance; P4 read 3.67 and so did not fail. That is a predicted effect being ABSENT. The draft's “the discriminating one inverted” reads an ordering off a 1.04× difference and overstates what the data support.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.0397,
    "value_digits": 3
   },
@@ -1672,8 +2610,8 @@
    "kind": "direction",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 3.67,
     "src": {
@@ -1693,7 +2631,7 @@
     }
    },
    "rests_on": "an **equality** claim, and the same 1.04× that cannot carry the ordering above does carry this. The two rows are the same two numbers used two ways, and are listed together deliberately.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.0397,
    "value_digits": 3
   },
@@ -1704,8 +2642,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 7.82,
     "src": {
@@ -1725,7 +2663,7 @@
     }
    },
    "rests_on": "one seed per cell; the surviving statement is monotonicity in m across five values.",
-   "clears": false,
+   "clears": null,
    "ratio": 2.6873,
    "value_digits": 3
   },
@@ -1736,8 +2674,8 @@
    "kind": "selection",
    "statistic": "R3",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "statistic and block both mismatched",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 8.01,
     "src": {
@@ -1757,7 +2695,7 @@
     }
    },
    "rests_on": "**monotonicity across three levels and a co-measured contradicting quantity**: the RNA-view mutual cosine rises 0.4774 → 0.7657 → 0.8696 on the *same runs* as rank rises. One seed per level. The magnitude carries nothing; the direction and the cosine do. Figure F9.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.8542,
    "value_digits": 3
   },
@@ -1768,8 +2706,8 @@
    "kind": "selection",
    "statistic": "R1",
    "block": "fixed held-out probe",
-   "floor": "R1_residualised_export",
-   "floor_note": "block mismatched — the probe has no floor of its own",
+   "floor": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
    "a": {
     "value": 12.2,
     "src": {
@@ -1789,7 +2727,7 @@
     }
    },
    "rests_on": "as above. Recorded because the 1.85× the notebook entry quotes is the **R3** column; statistic-matched to the floor it is 1.940×, and both are inside.",
-   "clears": false,
+   "clears": null,
    "ratio": 1.9396,
    "value_digits": 3
   },
@@ -1801,7 +2739,7 @@
    "statistic": "R1",
    "block": "fixed held-out probe",
    "floor": null,
-   "floor_note": "**n = 2 is a pair, not a floor.** §4.1 states the trap in terms: any pair drawn from four concordant repeats spans at most 1.028×, and a measured floor of 1.03× would license every comparison in the paper. This pair may not be quoted as a floor for the momentum/probe regime",
+   "floor_note": "**n = 2 is a pair, not a floor.** §4.1 states the trap in terms: any pair drawn from four concordant repeats spans at most 1.028×, and a measured floor of 1.03× would license every comparison in the paper. This pair may not be quoted as a floor for the momentum/probe regime The block is the fixed held-out probe, which still has no floor of its own.",
    "a": {
     "value": 12.2,
     "src": {
@@ -1821,9 +2759,21 @@
     }
    },
    "rests_on": "nothing may be read off it as a floor. It is recorded because §5.4 and §6.2 both say **no like-for-like measurement exists in this regime**, and one does: the two runs share momentum, decorrelation, capacity, learning rate, seed and step-0 state (67.55 / 101.38 / 0.0342 / 0.3650), and `d1_momentum_probe.py` has no schedule that depends on the step budget. Over the eight shared logged steps the widest canonical fold is 1.128× (step 150).",
-   "clears": false,
+   "clears": null,
    "ratio": 1.0664,
    "value_digits": 3
   }
+ ],
+ "statistics_with_no_measured_floor_note": "NONE REMAIN on the exported block. Every statistic T1 scores — R1, R2, R3, PR, PR_rownorm, RankMe (raw and residualised), stable rank, α-ReQ |α−1|, LiDAR and the hard numerical rank — now has a floor of its own on the exported `wsi_biology` block, raw and residualised, measured on the same five same-seed repeats §4.1's R1 floor comes from. The floors differ by 3.3× between statistics (1.000× for the hard rank, 3.295× for R1), which is why judging one statistic against another's floor was never admissible.",
+ "blocks_with_no_measured_floor_note": "NOT RECOVERABLE from the five repeats, and this is a result rather than a caveat: the repeats were EXPORTED, not probed. `~/e0_run/d1_envelope/` holds `rep{n}.npz` and per-run `train_metrics.jsonl` and neither carries a probe forward pass, a training batch's activations, or a gate batch. A floor on any of these four blocks requires re-running the five repeats with the probe or the tripwire attached, on a GPU. EVERY RANK NUMBER IN DRAFT §5 IS ON THE FIRST OF THEM, and is therefore unjudgeable against this paper's central criterion until that run exists. The per-block cost is stated in `absent_blocks` of figures/data/ws_floor/out/P2_ENVELOPE_FLOORS.json, which a test asserts this list against.",
+ "absent_blocks_src": {
+  "kind": "json",
+  "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+  "path": "absent_blocks"
+ },
+ "views_with_measured_floor": [
+  "wsi_biology",
+  "rna_biology",
+  "full_biology"
  ]
 }

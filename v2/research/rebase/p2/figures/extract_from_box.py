@@ -51,6 +51,16 @@ VENDORED = [
     # Canonicalised rank recomputation of every surviving instance.
     "ws_rank/RANK_RECOMPUTE.json",
     "ws_rank/RANK_RECOMPUTE_P1B.json",
+    # The retraining floor measured for EVERY statistic, view and block the five
+    # exported same-seed repeats allow -- draft 4.1's floor is canonical R1 on the
+    # exported `wsi_biology` block and nothing else, and 4.1a was applying it to
+    # eight other statistics and four other blocks. Produced by
+    # `v2/research/rebase/p2/p2_envelope_floors.py` on a workspace verified
+    # file-by-file against `git ls-tree`; the JSON carries the sha256 of each
+    # `rep{n}.npz` it read and its own `absent_blocks` list, which is what makes
+    # "no floor exists for this block" a recorded result rather than a silence.
+    "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "ws_floor/out/floors_run.log",
     # D1 paired bootstraps. The UNSUFFIXED D1_PAIRED_BOOTSTRAP.json is
     # deliberately absent: it scores all 90 non-control targets, 50 of which are
     # programme_only's own supervision (P2_FIGURES.md F6 caption).
@@ -268,7 +278,10 @@ def run_extractors() -> None:
 def write_manifest() -> None:
     entries = {}
     for path in sorted(DATA.rglob("*")):
-        if not path.is_file() or path.name == "MANIFEST.json":
+        # `.gitattributes` is a repository file, not vendored evidence: this
+        # directory is marked `* -text` so the digests below stay meaningful, and
+        # the marker itself must not be listed as something the box produced.
+        if not path.is_file() or path.name in ("MANIFEST.json", ".gitattributes"):
             continue
         rel = path.relative_to(DATA).as_posix()
         blob = path.read_bytes()
@@ -278,12 +291,15 @@ def write_manifest() -> None:
             "box_path": "~/" + rel if rel in VENDORED else None,
             "produced_by": None if rel in VENDORED else "extract_from_box.py",
         }
-    (DATA / "MANIFEST.json").write_text(json.dumps({
+    # Bytes, with an explicit LF, not `write_text`: this directory is marked
+    # `* -text`, so a run on Windows would otherwise rewrite every line of the
+    # manifest as CRLF and present it as a change to every vendored digest.
+    (DATA / "MANIFEST.json").write_bytes((json.dumps({
         "fetched_utc": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "box": BOX,
         "note": "Written by extract_from_box.py. Figures read from here and nowhere else.",
         "files": entries,
-    }, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    }, indent=1, sort_keys=True) + "\n").encode("utf-8"))
 
 
 def main() -> int:

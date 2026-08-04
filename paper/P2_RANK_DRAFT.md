@@ -64,14 +64,23 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > §3.1 and
 > `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`.
 >
-> **6. §4.1a is new: the paper audited exhaustively against its own criterion, and it costs us.**
-> §4.1's floor had been applied to this paper's own numbers five times, each instance found
-> separately and late. §4.1a enumerates **all fifty** rank comparisons the paper makes or relies on —
-> Results, the worked example, the appendices, the figure plan, `QUEUE_ANCHORING.md` and
-> `LIVENESS_GATE_DESIGN.md` — each judged against the floor measured on **its own block**. **23 of
-> the 25 selections between candidate configurations are inside a floor**, and **13 rows sit on a
-> statistic or a block for which no floor has ever been measured**, including eight of T1's twelve
-> metric rows. It found a sixth instance the draft had not stated (§4.7.4's second violation, P44
+> **6. §4.1a is new: the paper audited exhaustively against its own criterion, and it costs us —
+> including a scope error in the first version of the audit itself.** §4.1's floor had been applied
+> to this paper's own numbers five times, each instance found separately and late. §4.1a enumerates
+> **all 56** rank comparisons the paper makes or relies on — Results, the worked example, the
+> appendices, the figure plan, `QUEUE_ANCHORING.md` and `LIVENESS_GATE_DESIGN.md` — each judged
+> against the floor measured on **its own statistic and its own block**. The first version judged
+> them all against the **one** floor that existed, canonical R1 on the exported `wsi_biology` block,
+> and printed "fails" for twenty-four rows the criterion could not reach. **Every floor recoverable
+> from the five same-seed repeats has now been measured** — ten statistics, three views, two blocks,
+> from exports that already existed — and the counts are restated on that basis: **of the 25
+> selections between candidate configurations, 13 fail a floor their own statistic and block license,
+> 11 cannot be judged at all, and exactly 1 clears — RankMe as published, whose floor is 1.811×
+> against our own statistic's 3.111× on the same five runs.** The floor turns out to be a property of
+> the statistic (1.000× to 3.295× on one block) and of the **view** (3.295× on `wsi_biology`, 1.019×
+> on `rna_biology`): the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to
+> within 2%. Four blocks still have no floor and none can be recovered without a GPU — **every rank
+> number in §5 is on one of them**. It found a sixth instance the draft had not stated (§4.7.4's second violation, P44
 > against I43, 3.07×), two §5.2 claims that read an ordering off a 1.04× difference and must be
 > restated as the equalities they are, and one like-for-like same-seed pair in §5.4's own regime that
 > §5.4 says does not exist — n = 2, concordant, and explicitly **not** quotable as a floor. It also
@@ -1124,20 +1133,157 @@ instance 2 (≈3.2×, flagged in a notebook entry and left unrewritten until now
 a time is how a referee finds the sixth. **This subsection enumerates all of them at once**, and it
 is a cheap thing for us to write and an expensive thing for a referee to construct independently.
 
+**And this subsection was itself published with a scope error, which is repaired here — badly enough
+that it is the first thing the subsection should say.** The first version of the audit judged fifty
+comparisons against **one** floor, canonical R1 on the exported `wsi_biology` block, because that was
+the only floor this project had ever measured. Thirteen rows sat on a statistic or a block with no
+floor at all and were nonetheless printed with a verdict of "**no**"; a further eleven sat on the
+fixed held-out probe and were judged against a floor measured on the exported artifact. **A
+comparison with no measured floor has not failed the criterion. The criterion has not been applied to
+it**, and printing those two outcomes in the same column flattered us: it made an unmeasured ruler
+look like a failed test. The repair has two halves. First, **every floor recoverable from the five
+repeats has now been measured** — a re-derivation from exports that already existed, not a new
+training run. Second, a row whose statistic-and-block has no floor now records `clears: null`, prints
+**unjudgeable**, and is counted separately; the coupling between "no floor" and "no verdict" is
+enforced by `p2_floor_audit.check()` rather than left to convention.
+
+#### The floors, measured — every statistic T1 scores, every view §4.5(c) reads
+
+§4.1's five identical `programme_only` retrains (seed 42, GPU non-determinism the only source of
+variation) export all three co-trained views, so a floor for every other statistic and every other
+view was already sitting on disk. Measured by `v2/research/rebase/p2/p2_envelope_floors.py`,
+CPU only, thread-capped, on a box workspace built with `git -c core.autocrlf=false archive` and
+verified **543/543 files by git blob SHA-1** before it was run:
+
+| statistic | block | min | max | **floor** | other four agree to | divergent run | bimodal? |
+|---|---|---:|---:|---:|---:|---|:---:|
+| **the exported `wsi_biology` block — the one §4.1 measures, every statistic T1 scores** | | | | | | | |
+| R1 | residualised | 8.8340 | 29.1057 | **3.295×** | 1.028× | rep2 (low) | **yes** |
+| RankMe (residualised) | residualised | 8.8359 | 29.1105 | **3.295×** | 1.028× | rep2 (low) | **yes** |
+| R1 | raw | 8.0326 | 24.9895 | **3.111×** | 1.021× | rep2 (low) | **yes** |
+| α-ReQ \|α−1\| | residualised | 1.1419 | 2.6247 | **2.299×** | 1.121× | rep2 (high) | no |
+| R3 | residualised | 6.3663 | 14.5795 | **2.290×** | 1.028× | rep2 (low) | **yes** |
+| R2 | residualised | 5.5972 | 12.4506 | **2.224×** | 1.025× | rep2 (low) | **yes** |
+| R2 | raw | 5.1004 | 10.9157 | **2.140×** | 1.014× | rep2 (low) | **yes** |
+| R3 | raw | 5.1004 | 10.9157 | **2.140×** | 1.014× | rep2 (low) | **yes** |
+| α-ReQ \|α−1\| | raw | 1.2291 | 2.6304 | **2.140×** | 1.137× | rep2 (high) | no |
+| RankMe (raw, uncentred, ε = 1e-7) | raw | 1.9883 | 3.6011 | **1.811×** | 1.020× | rep2 (low) | no |
+| PR_rownorm | residualised | 3.7152 | 5.4474 | **1.466×** | 1.024× | rep2 (low) | no |
+| PR | raw | 2.5913 | 3.7480 | **1.446×** | 1.047× | rep2 (low) | no |
+| PR_rownorm | raw | 2.5913 | 3.7480 | **1.446×** | 1.047× | rep2 (low) | no |
+| PR | residualised | 3.1643 | 4.4913 | **1.419×** | 1.051× | rep2 (low) | no |
+| stable rank | raw | 1.7729 | 2.2082 | **1.246×** | 1.035× | rep2 (low) | no |
+| stable rank | residualised | 2.1977 | 2.6898 | **1.224×** | 1.054× | rep2 (low) | no |
+| top-CCA (16 components, 40 untrained targets) | residualised | 0.5859 | 0.6182 | **1.055×** | 1.014× | rep2 (low) | no |
+| hard numerical matrix rank | raw | 256.0000 | 256.0000 | **1.000×** | 1.000× | rep1 (high) | no |
+| hard numerical matrix rank | residualised | 256.0000 | 256.0000 | **1.000×** | 1.000× | rep1 (high) | no |
+| **the `wsi_biology` + `rna_biology` positive pair — LiDAR's block** | | | | | | | |
+| LiDAR | residualised | 38.7877 | 41.1002 | **1.060×** | 1.024× | rep2 (low) | no |
+| LiDAR | raw | 39.6212 | 40.9816 | **1.034×** | 1.026× | rep2 (low) | no |
+| **the `rna_biology` view, canonical R1 — same five runs, same statistic, other view** | | | | | | | |
+| R1 | raw — `rna_biology` view | 23.9832 | 24.5300 | **1.023×** | 1.017× | rep2 (low) | no |
+| R1 | residualised — `rna_biology` view | 27.2245 | 27.7497 | **1.019×** | 1.016× | rep2 (low) | no |
+| **the `full_biology` view, canonical R1 — same five runs, same statistic, other view** | | | | | | | |
+| R1 | residualised — `full_biology` view | 29.8042 | 30.3991 | **1.020×** | 1.015× | rep2 (high) | no |
+| R1 | raw — `full_biology` view | 26.3285 | 26.6921 | **1.014×** | 1.009× | rep2 (high) | no |
+
+*Provenance: `~/e0_run/d1_envelope/rep{1..5}.npz` (each file's SHA-256 recorded in the output),
+targets `~/e0_run/data/frozen_rna_targets.npz`, cancer + pooled-TSS cross-fitted residualisation at seed 42,
+α-ReQ at the authors' estimator over eigenvalue ranks 11–50 and LiDAR at q = 2, δ = 1e-4 — the
+settings T1 is scored with. R1/R2/R3 and the channel are imported from `v2/calibra/spectral.py`, the
+four published alternatives from `p2_competing_metrics.py`, the hard rank is
+`numpy.linalg.matrix_rank`; **nothing is computed inline**. Output vendored at
+`v2/research/rebase/p2/figures/data/ws_floor/out/P2_ENVELOPE_FLOORS.json`, and every value in the
+table above is re-read out of it by `v2/tests/test_p2_floor_audit.py`. The two floors §4.1 already
+published are now carried with a **second, independent source**: 3.295× and 3.111× are parsed from
+`d1_envelope_readout.py`'s printed log, and this recomputation from the artifacts agrees with them to
+four decimal places on both extremes.*
+
+**"Other four agree to" and "divergent run" are the SHAPE, and they are reported per statistic
+because whether the shape survives a change of statistic is on this paper's thesis.** The rule is
+fixed in the module, not chosen per row: the divergent run is the one whose removal minimises the
+remaining four's fold; a floor is called bimodal when those four agree to within 5% *and* the full
+fold is at least twice theirs. Under that rule §4.1's own floor reads exactly as §4.1 describes it —
+repeat 2, four others within 2.8%, separation 3.21×.
+
+**Five things this table says. The first two cost us.**
+
+1. **The floor is a property of the statistic, and it varies by as much as the effect the paper is
+   about.** On one block — exported `wsi_biology`, residualised, the same five runs — it runs from
+   **1.000×** (hard numerical rank, which does not move at all) through 1.224× (stable rank), 1.419×
+   (participation ratio) and 2.224×/2.290× (R2/R3) to **3.295×** (R1). §4.3's heading says the floor
+   is a property of the arm *and not of the statistic*; on this measurement it is a property of both,
+   and §4.3 is corrected. Concretely: judging an R3 comparison against R1's floor, which the first
+   version of this table did on fourteen rows, is **1.4× too strict**.
+2. **RankMe as published is markedly more reproducible on our own artifacts than our centred
+   statistic is.** On the raw block its floor is **1.811×** against canonical R1's **3.111×**, on the
+   same five runs. The mechanism is the one §4.6 already names for RankMe's D2 advantage: the
+   uncentred normalisation retains the mean-offset direction, and every row of every exported view
+   has L2 norm exactly 1.000, so that direction is both large and stable. On the *residualised* block
+   the mean is gone and the two statistics coincide — floors of 3.295× and 3.295×. **This is a result
+   against our own instrument**, and it is why the RankMe row is the one selection in the whole audit
+   that clears a floor its own statistic and block license.
+3. **The floor is also a property of the VIEW, and the divergent run is divergent in only one of
+   them.** The same five runs spread **3.295×** on `wsi_biology`, **1.019×** on `rna_biology` and
+   **1.020×** on `full_biology`. Repeat 2 — whose WSI-view rank is a third of its siblings' — sits
+   within 1.6% of them on the RNA view and is the *high* member on the full view. The catastrophic
+   one-in-five is not a property of the run; it is a property of that run's **WSI encoder**. Every
+   one of §4.5(c)'s twelve `rna_biology`/`full_biology` arm comparisons is resolvable against its own
+   view's floor, and none of the six on `wsi_biology` is — same artifacts, same statistic, same runs.
+4. **The bimodal shape is statistic-dependent; the divergence is not hidden from any statistic.**
+   Every statistic that moves at all identifies repeat 2 as the outlier, and in the degradation
+   direction (lower rank, higher α-ReQ α). What changes is the magnitude, and therefore the shape:
+   the four-concordant-plus-a-factor signature §4.1 calls bimodal survives under R1, R2, R3 and
+   residualised RankMe and under nothing else. The same run is 1.22× away under stable rank, 1.06×
+   under LiDAR and 1.00× under the hard rank. **The divergence is a redistribution of spectral mass
+   in the tail — which the entropy-based ranks are sensitive to by construction and the
+   dominant-subspace statistics are not.** That is a narrower and better-supported reading of §4.1's
+   asymmetry than "rank is unreliable", and it is the reading the paper should carry.
+5. **A floor of 1.000× licenses everything, and one statistic has one.** The hard numerical rank is
+   pinned at 256 in every repeat, every view and both blocks. §4.1 warns that a floor drawn from a
+   single pair of concordant repeats would have been 1.028× and would have licensed every comparison
+   in this paper; a statistic whose measured floor is exactly 1 is the same failure with five repeats
+   instead of two. Nothing in the audit is judged against it.
+
+**Four blocks still have no floor, and the absence is now a stated result rather than a silence.**
+The five repeats were **exported, not probed**: `~/e0_run/d1_envelope/` holds `rep{n}.npz` and a
+per-run `~/e0_run/d1_envelope/rep{n}/train_metrics.jsonl`, and neither carries a probe forward pass, a training batch's
+activations, or a gate batch. So no floor exists, and none can be recovered without a GPU, for **the
+fixed held-out probe**, **the in-run training batch**, **the 16-patient gate batch**, or **the
+282-patient live checkpoint**. What each would cost is recorded per block in
+`P2_ENVELOPE_FLOORS.json`'s `absent_blocks`, which a test asserts the audit's own list against.
+**Every rank number in §5 is on the first of those four blocks**, as are §4.9a's decorrelation
+ablation and §4.4(3)'s probe repeat. What §5 would need in order to become judgeable at all is one
+specific run: five same-seed repeats of the `programme_free` / 500-step configuration with
+`d1_momentum_probe.py` attached, read at a fixed step. Until that exists, §5's rank comparisons are
+neither confirmed nor refuted by this paper's criterion — they are outside its reach, and §5.4 and
+§6.2 should say so in those words.
+
+**The caveat that travels with every row of that table.** Each floor is **n = 5**, one arm, one seed,
+one stack, no interval — and it is a **floor twice over**, exactly as §4.1 says of the two it
+extends: `programme_only` is this project's *stable* arm, and same-seed repeats exclude seed
+variation entirely, which §4.2 measures as the larger term. A table of twenty-six numbers is not a
+table of estimated distributions and must not be read as one; the right sentence is "a floor of
+2.290× measured on five same-seed repeats", never "R3 varies 2.29×".
+
+#### The audit, re-run against the floors that now exist
+
 Every rank comparison this paper makes or relies on is below — Results, the worked example, the
 appendices, the figure plan, `QUEUE_ANCHORING.md` and `LIVENESS_GATE_DESIGN.md`. For each: the two
 values, the fold, the statistic, the **block**, which floor applies, whether it clears, and — where
 it does not — what the claim rests on instead. Where a comparison legitimately falls outside the
 criterion the exemption is **stated**, never taken silently.
 
-**Read the block column first.** A residualised ratio judged against the raw floor gives the wrong
-answer, and this has already happened once on this project: D1-B seed 43 is **3.246×** on the
-residualised block and **3.091×** on the raw one, and its residualised figure against the *raw*
-floor of 3.111× reads as **outside** the floor when on its own block it is inside (rows 6 and 9).
-A ‡ marks a row whose statistic or block does not match the floor it is judged against; the note
-travels with the row in `v2/research/rebase/p2/floor_audit.json`.
+**Read the statistic and block columns first.** A ratio may be judged only against a floor measured
+on its own statistic *and* its own block, and both halves of that rule have already produced a wrong
+verdict on this project. On the block: D1-B seed 43 is **3.246×** residualised and **3.091×** raw, and
+its residualised figure against the *raw* floor of 3.111× reads as **outside** when on its own block
+it is inside (rows 6 and 9). On the statistic: fourteen rows were judged against R1's 3.295× while
+measuring R3, whose own floor is 2.290×. A ‡ marks a row that still carries a mismatch note — of
+statistic, of block, or of kind — and the note travels with the row in
+`v2/research/rebase/p2/floor_audit.json`.
 
-50 rank comparisons are enumerated; 25 of them are selections between candidate configurations, and 23 of those 25 do not clear the floor their own block licenses. 5 are exempt with the reason stated, 13 are on a statistic or a block for which **no floor has ever been measured**, and 38 carry an explicit block- or statistic-mismatch note.
+56 rank comparisons are enumerated; 25 of them are selections between candidate configurations. **13 of those 25 do not clear the floor their own statistic and block license, 1 clears it, and 11 cannot be judged at all** because no floor has ever been measured for the block they sit on. 5 rows are exempt with the reason stated, 25 of the 56 are unjudgeable for want of a floor, and 35 carry an explicit statistic-, block- or kind-mismatch note.
 
 | # | § | comparison | values | ratio | statistic | block | floor | clears? | what the claim rests on |
 |---|---|---|---|---:|---|---|---|:---:|---|
@@ -1156,118 +1302,141 @@ travels with the row in `v2/research/rebase/p2/floor_audit.json`.
 | 13 | §4.2 | within-arm seed fold, D2 I (perturbation basis) — three seeds, nothing else varied | 34.117 / 9.105 | **3.747×** | R1 | residualised | 3.295× ‡ | yes | the seed alone moves rank **further than five same-seed retrains do** (3.75× against 3.295×); the channel over the same three seeds moves 1.8–5.6%. |
 | 14 | §4.2 | within-arm seed fold, D1 P (`programme_only`) — three seeds, nothing else varied | 29.381 / 11.115 | **2.643×** | R1 | residualised | 3.295× ‡ | **no** | the stable arm; the channel over the same three seeds moves 1.8–5.6%. |
 | 15 | §4.2 | within-arm seed fold, D1 F (`programme_free`) — three seeds, nothing else varied | 13.418 / 6.394 | **2.099×** | R1 | residualised | 3.295× ‡ | **no** | the unstable arm; the channel over the same three seeds moves 1.8–5.6%. |
-| 16 | §4.3 | `programme_free` step-200 spread across five seeds | 45.646 / 7.545 | **6.050×** | R3 | training batch, in-run | **none measured** | **no floor** | five seeds, one step, no interval; the claim is that the spread is large. |
-| 17 | §4.3 | `programme_only` step-200 spread across five seeds | 112.078 / 94.952 | **1.180×** | R3 | training batch, in-run | **none measured** | **no floor** | five seeds, one step, no interval; the claim is that the spread is small. |
-| 18 | §4.3 | **the two spreads against each other** — 6.05× against 1.18× | 6.050 / 1.180 | **5.125×** | R3 | training batch, in-run | **none measured** | **no floor** | five seeds per arm and no interval on either spread. The claim survives because the two arms' step-200 *levels* are an order of magnitude apart and the supervised arm's five seeds agree to 18%, not because the ratio of the two spreads clears anything. |
-| 19 | §4.4(3), §5.4 | controlled 200-step probe, **seed held fixed** — min(m = 0.999) against max(m = 0) | 6.920 / 1.980 | **3.495×** | R3 | fixed held-out probe | 3.295× ‡ | yes | it clears by **6%** — no more comfortable than the 1.5% §4.1 declines to lean on — and it holds the **seed** fixed, which §4.2 measures as the dominant term. The seed-varied version of this same check is row 4.9a/5.4 below and it does not clear. |
-| 20 | §4.5(a) | **30 arm comparisons** — 5 statistics (R1, R2, R3, PR, PR_rownorm) × 6 pairs | 1.004× – 3.246× over 30 | **3.246×** | R1/R2/R3/PR | residualised | 3.295× ‡ | **no** | the **instability of the ordering** across statistics, not any magnitude. Every one of the 30 folds is inside the one floor that exists, which supports rather than undermines the claim: a verdict read off an unresolvable difference is exactly what §4.5 says a rank verdict is. |
-| 21 | §4.5(b) | the four **R3** rows of §4.5(b)'s table — D2 seeds 43 and 44, raw and residualised | 1.012× – 1.079× over 4 | **1.079×** | R3 | raw and residualised | 3.295× ‡ | **no** | the **sign flipping with the block**, on differences of 1–8%. The claim is that the block choice is worth more than the difference it adjudicates — which is a statement that the difference is unresolvable, made in the other direction. |
-| 22 | §4.5(c) | **18 comparisons** — 6 pairs × 3 co-trained views (`wsi`, `rna`, `full`) | 1.004× – 5.250× over 18 | **5.250×** | R1 | residualised, per view | **none measured** | **no floor** | the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. The 2/9 count is already not quoted as a rate (`rna_biology` is partly circular). |
-| 23 | §4.6, §4.6a, T1 | **the six pairs every one of T1's twelve metric rows is scored on** | 1.004× – 3.246× over 6 | **3.246×** | R1 | residualised | 3.295× | **no** | nothing. §4.6 gives three reasons not to read its counts — n = 6, D2 s44's 1.4 sampling SDs, and §4.6a's coordinate choice. **This is a fourth, and the paper does not currently state it**: not one of the six pairs is resolvable under the one metric that has a measured floor. |
-| 24 | §4.6, T1 | RankMe as published, the three D2 pairs — the row §4.6 quotes against ours | 1.248× – 3.382× over 3 | **3.382×** | RankMe (raw, uncentred, ε = 1e-7) | raw | **none measured** | **no floor** | nothing that this paper can check. §4.2 does measure RankMe's arm/seed split (29.1% arm, F = 1.09, n.s.) — which is the honest substitute for a floor it does not have. |
-| 25 | §4.7.1 | **the predeclared violation threshold** (2.0× fold) against the floor | 3.295 / 2.000 | **1.647×** | R1 | residualised | 3.295× ‡ | **no** | the fact itself: the fold a pair had to exceed to count as a necessity violation was **1.65× smaller than the floor** and below §4.2's 2.10–3.75× seed band, so the 66-pair scan could only ever return violations that are unresolvable. Both violations it returned (rows below) are. |
-| 26 | §4.7.4 | the surviving necessity violation — H44 against I43 | 34.117 / 9.143 | **3.732×** | R1 | residualised | 2.1–3.75× ‡ | **no** | +0.1101 more channel on the lower-rank artifact, a gap comparable to the headline D2 arm effect. It is presented as supporting, not load-bearing, and is partially pre-empted by Aldeneh et al. (ICASSP 2025). It clears the band by **0.5%**. |
-| 27 | §4.7.4, F6(d) | the second violation of the 66-pair scan — P44 against I43 | 34.117 / 11.115 | **3.070×** | R1 | residualised | 3.295× | **no** | +0.1206 more channel. **The draft names this pair only in `P2_FIGURES.md` F6(d) and attaches no floor verdict to it**; it is inside the 3.295× floor and inside §4.2's band, and it is cross-experiment as well as cross-seed. |
-| 28 | §4.8 | dilution d = 0 → 0.80, raw block | 196.187 / 161.226 | **1.217×** | R1 | raw | 3.111× ‡ | **exempt** | monotonicity over seven nested levels and the *ratio* of the two fractional changes (−3.10% rank against −66.7% channel), both read from the same representation through the same instrument. Single seed, single donor draw, no interval on any level-to-level difference. |
-| 29 | §4.8 | dilution d = 0 → 0.80, residualised block | 210.179 / 203.667 | **1.032×** | R1 | residualised | 3.295× ‡ | **exempt** | monotonicity over seven nested levels and the *ratio* of the two fractional changes (−3.10% rank against −66.7% channel), both read from the same representation through the same instrument. Single seed, single donor draw, no interval on any level-to-level difference. |
-| 30 | §4.9, §6.4 | the historical decorrelation instance — “+107% rank at flat benchmark” | 103.3 / 49.9 | **2.070×** | unknown — predates the consolidation | unknown | **none measured** | **exempt** | nothing. It is excluded from every count on **provenance**, not on the floor — and it happens also to be inside the floor, which is a second reason and not the operative one. |
-| 31 | §4.9 | the “16/16” instance — pinned at the batch size in every arm | 16 / 16 | **1.000×** | hard numerical matrix rank | 16-patient train batch | **none measured** | **exempt** | the co-measured collapse evidence — patient cosine 0.9999, retrieval 0.000 *below* its 0.062 chance level — and the fact that the R3 rank of the same objective falls 12.88 → 1.00. The rank column carries nothing. |
-| 32 | §4.9, §5.1, §5.4 | D1-A epoch 39 — `programme_only` 9.81 against `programme_free` 1.71 | 9.810 / 1.710 | **5.737×** | R3 | 282 held-out patients, live checkpoint | **none measured** | **no floor** | a collapse verdict with co-measured evidence: RNA-view mutual cosine 0.986, hard rank 11, and no exported readout at all. Its own source entry forbids concluding anything about supervision from it. |
-| 33 | §4.10 | clean in-batch InfoNCE, step 0 → 50 | 12.880 / 1.000 | **12.880×** | R3 | diagnostic script, train batch | **none measured** | **no floor** | positive and worst-negative cosine both 0.9993 and a minimum margin of −0.0001, co-measured. §4.10 is where the paper says rank works. |
-| 34 | §4.10 | the boundary — D2 s44's rank against its own nominal dimensionality (256) | 256.000 / 9.143 | **28.001×** | R1 | residualised | **none measured** | **no floor** | held-out channels of 0.5983 and 0.4757 against a **measured** permutation null of 0.140 — a co-measured quantity, not a ratio. A representation at 3.6% of nominal rank was carrying a large, permutation-significant channel. |
-| 35 | §5.1, instance 2 | **the residual**: gate rank 5.81 (16 memorised patients, frozen 64-key queue) against ~1.8 at cohort scale (3,118 streaming patients, live 4,096-key queue) | 5.810 / 1.800 | **3.228×** | R3 | TWO different blocks — see the note | **none measured** | **exempt** | two things, neither of them a rank difference. (i) The gate's own **binary** pass criterion — contrastive 0.012–0.057 against a ≤ 0.10 bar with retrieval 16/16 on three seeds. (ii) The cohort-scale arm being independently **collapsed**: RNA-view mutual cosine 0.977 / 0.986, hard rank 9 / 11, against the supervised sibling at 7.38 / 7.35. The claim — *a gate that certifies memorisation of 16 does not certify learning at 3,118* — is a statement about what the gate's regime removes, not a selection between two configurations. |
-| 36 | §5.1, instance 3; S1 | the five-arm regulariser sweep — widest between-arm fold at a shared step (50) | 4.080 / 2.620 | **1.557×** | R3 | fixed 256-patient held-out probe | **none measured** | **no floor** | an absolute-level claim, not a between-arm one: **all five** arms fall from a verified common initialisation of 67.55 to 1.59–3.43, i.e. ≥ 19.7×, including both regularisers at zero. The between-arm folds carry nothing and are not quoted. |
-| 37 | §5.4 row 1, §5.2 | m = 0.999 against m = 0, **one seed**, step 600 | 7.420 / 2.810 | **2.641×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | nothing — §5.4 says so. |
-| 38 | §5.4 row 2 | m = 0.999 against m = 0, **worst case over three seeds**, 500 steps | 10.450 / 3.180 | **3.286×** | R1 | fixed held-out probe | 3.295× ‡ | **no** | a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**. |
-| 39 | §5.4 row 3 | the same replication under the tripwire statistic | 6.850 / 2.810 | **2.438×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | as row above. |
-| 40 | §5.4 limit 2, Appendix C | **the value the project actually runs** — m = 0.999 over m = 0.99, step 600 | 7.420 / 5.880 | **1.262×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | nothing. The binary outcome supports **momentum against none**, not this value over its neighbour; `m = 0.999` is retained because it measured best in a sweep whose resolution the paper does not trust. |
-| 41 | §5.2 prose | m = 0.999 against m = 0 at step 400 — the widest fold past step 150 | 7.840 / 2.180 | **3.596×** | R3 | fixed held-out probe | 3.295× ‡ | yes | nothing quotable. **§5.2's prose says the effect is “2.6–3.3× at every step past 150”, which disagrees with its own table**: the per-step folds are 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600), and 4.343× at step 100. Flagged, not substituted (§5 is another agent's). This single-seed fold does exceed the floor at one step, but it varies no seed, and the seed-varied worst case above does not. |
-| 42 | §5.2 measurement 2 | m = 0.999 (6.89) against m = 0.99 (6.65) at step 100 | 6.890 / 6.650 | **1.036×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | **not the ordering.** What falsifies MoCo's staleness account here is that key-to-encoder agreement varies 2.06× (0.908 against 0.441) while rank is *indistinguishable* — an equality claim, which a 1.04× difference supports. The sentence “the best-agreeing arm does not have the best rank” reads an ordering off that 1.04× and should be restated as the equality it is. |
-| 43 | §5.2 measurement 2 | m = 0.999 (6.89) against no momentum (2.58) at step 100 | 6.890 / 2.580 | **2.671×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | the same binary outcome as §5.4; one seed. |
-| 44 | §5.2 measurement 3 | capacity 64 (6.17) against capacity 4,096 (2.16), fixed key encoder | 6.170 / 2.160 | **2.857×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | one seed, and the section's own admission that capacity confounds anchoring quality with negative count. It is one of three measurements said to rule the staleness account out, and it is inside the floor. |
-| 45 | §5.2 turnover falsification | the discriminating τ/T prediction — P4 (3.67) against P2 (3.53) | 3.670 / 3.530 | **1.040×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | **the predeclared reading, not the ordering.** The criterion required P4 to be the worst of its group and fixed “fails ≤ 3.5” in advance; P4 read 3.67 and so did not fail. That is a predicted effect being ABSENT. The draft's “the discriminating one inverted” reads an ordering off a 1.04× difference and overstates what the data support. |
-| 46 | §5.2 turnover falsification | “nearly flat in capacity” — 2,048 (3.53) against 8,192 (3.67) at m = 0.95 | 3.670 / 3.530 | **1.040×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | an **equality** claim, and the same 1.04× that cannot carry the ordering above does carry this. The two rows are the same two numbers used two ways, and are listed together deliberately. |
-| 47 | §5.2 turnover falsification | m = 0.95 → 0.999 at fixed capacity 4,096 — 2.91 against 7.82 | 7.820 / 2.910 | **2.687×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | one seed per cell; the surviving statement is monotonicity in m across five values. |
-| 48 | §4.9a | decorrelation 0.0 → 0.04 at m = 0.999, step 400 (R3 — the column quoted) | 8.010 / 4.320 | **1.854×** | R3 | fixed held-out probe | 3.295× ‡ | **no** | **monotonicity across three levels and a co-measured contradicting quantity**: the RNA-view mutual cosine rises 0.4774 → 0.7657 → 0.8696 on the *same runs* as rank rises. One seed per level. The magnitude carries nothing; the direction and the cosine do. Figure F9. |
-| 49 | §4.9a | the same three runs under the canonical statistic | 12.200 / 6.290 | **1.940×** | R1 | fixed held-out probe | 3.295× ‡ | **no** | as above. Recorded because the 1.85× the notebook entry quotes is the **R3** column; statistic-matched to the floor it is 1.940×, and both are inside. |
-| 50 | §4.1a, §5.4, §6.2 | **the like-for-like pair §5.4 says does not exist** — `ablate_decorr0.04` against `mseed_m0.999_s42`, identical configuration and seed, step 400 | 12.200 / 11.440 | **1.066×** | R1 | fixed held-out probe | **none measured** | **no floor** | nothing may be read off it as a floor. It is recorded because §5.4 and §6.2 both say **no like-for-like measurement exists in this regime**, and one does: the two runs share momentum, decorrelation, capacity, learning rate, seed and step-0 state (67.55 / 101.38 / 0.0342 / 0.3650), and `d1_momentum_probe.py` has no schedule that depends on the step budget. Over the eight shared logged steps the widest canonical fold is 1.128× (step 150). |
+| 16 | §4.3 | `programme_free` step-200 spread across five seeds | 45.646 / 7.545 | **6.050×** | R3 | training batch, in-run | **none measured** | **unjudgeable** | five seeds, one step, no interval; the claim is that the spread is large. |
+| 17 | §4.3 | `programme_only` step-200 spread across five seeds | 112.078 / 94.952 | **1.180×** | R3 | training batch, in-run | **none measured** | **unjudgeable** | five seeds, one step, no interval; the claim is that the spread is small. |
+| 18 | §4.3 | **the two spreads against each other** — 6.05× against 1.18× | 6.050 / 1.180 | **5.125×** | R3 | training batch, in-run | **none measured** | **unjudgeable** | five seeds per arm and no interval on either spread. The claim survives because the two arms' step-200 *levels* are an order of magnitude apart and the supervised arm's five seeds agree to 18%, not because the ratio of the two spreads clears anything. |
+| 19 | §4.4(3), §5.4 | controlled 200-step probe, **seed held fixed** — min(m = 0.999) against max(m = 0) | 6.920 / 1.980 | **3.495×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | it clears by **6%** — no more comfortable than the 1.5% §4.1 declines to lean on — and it holds the **seed** fixed, which §4.2 measures as the dominant term. The seed-varied version of this same check is row 4.9a/5.4 below and it does not clear. |
+| 20 | §4.5(a) | the six arm pairs under **R1** — canonical Roy & Vetterli order 1 | 1.004× – 3.246× over 6 | **3.246×** | R1 | residualised | 3.295× | **no** | the **instability of the ordering** across statistics, not any magnitude. Against R1's own floor of 3.295×, **0 of the 6** pairs are resolvable. **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.** |
+| 21 | §4.5(a) | the six arm pairs under **R2** — the order-2 Hill number of the singular values (`d1_audit.py`) | 1.014× – 2.381× over 6 | **2.381×** | R2 | residualised | 2.224× | yes | the **instability of the ordering** across statistics, not any magnitude. Against R2's own floor of 2.224×, **1 of the 6** pairs are resolvable (P43/F43). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.** |
+| 22 | §4.5(a) | the six arm pairs under **R3** — R2 on L2-normalised rows (the geometry probes and the in-run tripwire) | 1.042× – 2.476× over 6 | **2.476×** | R3 | residualised | 2.29× | yes | the **instability of the ordering** across statistics, not any magnitude. Against R3's own floor of 2.290×, **1 of the 6** pairs are resolvable (P43/F43). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.** |
+| 23 | §4.5(a) | the six arm pairs under **PR** — the eigenvalue participation ratio | 1.012× – 1.506× over 6 | **1.506×** | PR | residualised | 1.419× | yes | the **instability of the ordering** across statistics, not any magnitude. Against PR's own floor of 1.419×, **2 of the 6** pairs are resolvable (P43/F43, P44/F44). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.** |
+| 24 | §4.5(a) | the six arm pairs under **PR_rownorm** — the eigenvalue participation ratio on normalised rows | 1.020× – 1.652× over 6 | **1.652×** | PR_rownorm | residualised | 1.466× | yes | the **instability of the ordering** across statistics, not any magnitude. Against PR_rownorm's own floor of 1.466×, **2 of the 6** pairs are resolvable (P44/F44, P43/F43). **The count of resolvable pairs is itself statistic-dependent — 0 under R1, 1 under R2 and R3, 2 under the two participation ratios — which is §4.5's own thesis applied to the criterion rather than to the verdict.** |
+| 25 | §4.5(b) | the four **R3** rows of §4.5(b)'s table — D2 seeds 43 and 44, raw and residualised | 1.012× – 1.079× over 4 | **1.079×** | R3 | raw and residualised | 2.14× ‡ | **no** | the **sign flipping with the block**, on differences of 1–8%. The claim is that the block choice is worth more than the difference it adjudicates — which is a statement that the difference is unresolvable, made in the other direction. |
+| 26 | §4.5(c) | the six arm pairs on the co-trained **`wsi_biology`** view | 1.004× – 3.246× over 6 | **3.246×** | R1 | residualised | 3.295× | **no** | the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **3.295×**, **0 of the 6** pairs are resolvable. This is the view §4.1's floor is measured on and the only one of the three on which no pair is resolvable. `rna_biology` is also partly circular, so the 2/9 count is already not quoted as a rate. |
+| 27 | §4.5(c) | the six arm pairs on the co-trained **`rna_biology`** view | 1.116× – 3.014× over 6 | **3.014×** | R1 | residualised, `rna_biology` view | 1.019× | yes | the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **1.019×**, **6 of the 6** pairs are resolvable. **The floor is a property of the VIEW.** The same five retrains that spread 3.295× on `wsi_biology` spread 1.019× on `rna_biology` and 1.020× on `full_biology`: the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to within 2%. Every between-arm difference on this view is therefore resolvable, and none on `wsi_biology` is — on the same artifacts, the same statistic and the same runs. |
+| 28 | §4.5(c) | the six arm pairs on the co-trained **`full_biology`** view | 1.042× – 5.250× over 6 | **5.250×** | R1 | residualised, `full_biology` view | 1.02× | yes | the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **1.020×**, **6 of the 6** pairs are resolvable. **The floor is a property of the VIEW.** The same five retrains that spread 3.295× on `wsi_biology` spread 1.019× on `rna_biology` and 1.020× on `full_biology`: the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to within 2%. Every between-arm difference on this view is therefore resolvable, and none on `wsi_biology` is — on the same artifacts, the same statistic and the same runs. |
+| 29 | §4.6, §4.6a, T1 | **the six pairs every one of T1's twelve metric rows is scored on** | 1.004× – 3.246× over 6 | **3.246×** | R1 | residualised | 3.295× | **no** | nothing. §4.6 gives three reasons not to read its counts — n = 6, D2 s44's 1.4 sampling SDs, and §4.6a's coordinate choice. **This is a fourth, and the paper does not currently state it**: not one of the six pairs is resolvable under the one metric that has a measured floor. |
+| 30 | §4.6, T1 | RankMe as published, the three D2 pairs — the row §4.6 quotes against ours | 1.248× – 3.382× over 3 | **3.382×** | RankMe (raw, uncentred, ε = 1e-7) | raw | 1.811× | yes | **the one selection in this paper that clears a floor its own statistic and block licenses — and it is not ours.** RankMe as published has a retraining floor of **1.811×** on the raw exported block, against canonical R1's 3.111× on the same five runs, because its uncentred normalisation is dominated by the mean-offset direction, which is the stable part. Only **1 of the 3** D2 pairs clears it (s43, 3.382×; s42 is 1.677× and s44 is 1.248×), so the 3/3 count still rests on two unresolvable orderings — but the criterion no longer refuses the row, and the paper must say that the published metric is the more reproducible one on our own artifacts. |
+| 31 | §4.7.1 | **the predeclared violation threshold** (2.0× fold) against the floor | 3.295 / 2.000 | **1.647×** | R1 | residualised | 3.295× ‡ | **no** | the fact itself: the fold a pair had to exceed to count as a necessity violation was **1.65× smaller than the floor** and below §4.2's 2.10–3.75× seed band, so the 66-pair scan could only ever return violations that are unresolvable. Both violations it returned (rows below) are. |
+| 32 | §4.7.4 | the surviving necessity violation — H44 against I43 | 34.117 / 9.143 | **3.732×** | R1 | residualised | 2.1–3.75× ‡ | **no** | +0.1101 more channel on the lower-rank artifact, a gap comparable to the headline D2 arm effect. It is presented as supporting, not load-bearing, and is partially pre-empted by Aldeneh et al. (ICASSP 2025). It clears the band by **0.5%**. |
+| 33 | §4.7.4, F6(d) | the second violation of the 66-pair scan — P44 against I43 | 34.117 / 11.115 | **3.070×** | R1 | residualised | 3.295× | **no** | +0.1206 more channel. **The draft names this pair only in `P2_FIGURES.md` F6(d) and attaches no floor verdict to it**; it is inside the 3.295× floor and inside §4.2's band, and it is cross-experiment as well as cross-seed. |
+| 34 | §4.8 | dilution d = 0 → 0.80, raw block | 196.187 / 161.226 | **1.217×** | R1 | raw | 3.111× ‡ | **exempt** | monotonicity over seven nested levels and the *ratio* of the two fractional changes (−3.10% rank against −66.7% channel), both read from the same representation through the same instrument. Single seed, single donor draw, no interval on any level-to-level difference. |
+| 35 | §4.8 | dilution d = 0 → 0.80, residualised block | 210.179 / 203.667 | **1.032×** | R1 | residualised | 3.295× ‡ | **exempt** | monotonicity over seven nested levels and the *ratio* of the two fractional changes (−3.10% rank against −66.7% channel), both read from the same representation through the same instrument. Single seed, single donor draw, no interval on any level-to-level difference. |
+| 36 | §4.9, §6.4 | the historical decorrelation instance — “+107% rank at flat benchmark” | 103.3 / 49.9 | **2.070×** | unknown — predates the consolidation | unknown | **none measured** | **exempt** | nothing. It is excluded from every count on **provenance**, not on the floor — and it happens also to be inside the floor, which is a second reason and not the operative one. |
+| 37 | §4.9 | the “16/16” instance — pinned at the batch size in every arm | 16 / 16 | **1.000×** | hard numerical matrix rank | 16-patient train batch | **none measured** | **exempt** | the co-measured collapse evidence — patient cosine 0.9999, retrieval 0.000 *below* its 0.062 chance level — and the fact that the R3 rank of the same objective falls 12.88 → 1.00. The rank column carries nothing. |
+| 38 | §4.9, §5.1, §5.4 | D1-A epoch 39 — `programme_only` 9.81 against `programme_free` 1.71 | 9.810 / 1.710 | **5.737×** | R3 | 282 held-out patients, live checkpoint | **none measured** | **unjudgeable** | a collapse verdict with co-measured evidence: RNA-view mutual cosine 0.986, hard rank 11, and no exported readout at all. Its own source entry forbids concluding anything about supervision from it. |
+| 39 | §4.10 | clean in-batch InfoNCE, step 0 → 50 | 12.880 / 1.000 | **12.880×** | R3 | diagnostic script, train batch | **none measured** | **unjudgeable** | positive and worst-negative cosine both 0.9993 and a minimum margin of −0.0001, co-measured. §4.10 is where the paper says rank works. |
+| 40 | §4.10 | the boundary — D2 s44's rank against its own nominal dimensionality (256) | 256.000 / 9.143 | **28.001×** | R1 | residualised | **none measured** | **unjudgeable** | held-out channels of 0.5983 and 0.4757 against a **measured** permutation null of 0.140 — a co-measured quantity, not a ratio. A representation at 3.6% of nominal rank was carrying a large, permutation-significant channel. |
+| 41 | §5.1, instance 2 | **the residual**: gate rank 5.81 (16 memorised patients, frozen 64-key queue) against ~1.8 at cohort scale (3,118 streaming patients, live 4,096-key queue) | 5.810 / 1.800 | **3.228×** | R3 | TWO different blocks — see the note | **none measured** | **exempt** | two things, neither of them a rank difference. (i) The gate's own **binary** pass criterion — contrastive 0.012–0.057 against a ≤ 0.10 bar with retrieval 16/16 on three seeds. (ii) The cohort-scale arm being independently **collapsed**: RNA-view mutual cosine 0.977 / 0.986, hard rank 9 / 11, against the supervised sibling at 7.38 / 7.35. The claim — *a gate that certifies memorisation of 16 does not certify learning at 3,118* — is a statement about what the gate's regime removes, not a selection between two configurations. |
+| 42 | §5.1, instance 3; S1 | the five-arm regulariser sweep — widest between-arm fold at a shared step (50) | 4.080 / 2.620 | **1.557×** | R3 | fixed 256-patient held-out probe | **none measured** | **unjudgeable** | an absolute-level claim, not a between-arm one: **all five** arms fall from a verified common initialisation of 67.55 to 1.59–3.43, i.e. ≥ 19.7×, including both regularisers at zero. The between-arm folds carry nothing and are not quoted. |
+| 43 | §5.4 row 1, §5.2 | m = 0.999 against m = 0, **one seed**, step 600 | 7.420 / 2.810 | **2.641×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | nothing — §5.4 says so. |
+| 44 | §5.4 row 2 | m = 0.999 against m = 0, **worst case over three seeds**, 500 steps | 10.450 / 3.180 | **3.286×** | R1 | fixed held-out probe | **none measured** | **unjudgeable** | a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**. |
+| 45 | §5.4 row 3 | the same replication under the tripwire statistic | 6.850 / 2.810 | **2.438×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | as row above. |
+| 46 | §5.4 limit 2, Appendix C | **the value the project actually runs** — m = 0.999 over m = 0.99, step 600 | 7.420 / 5.880 | **1.262×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | nothing. The binary outcome supports **momentum against none**, not this value over its neighbour; `m = 0.999` is retained because it measured best in a sweep whose resolution the paper does not trust. |
+| 47 | §5.2 prose | m = 0.999 against m = 0 at step 400 — the widest fold past step 150 | 7.840 / 2.180 | **3.596×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | nothing quotable. **§5.2's prose says the effect is “2.6–3.3× at every step past 150”, which disagrees with its own table**: the per-step folds are 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600), and 4.343× at step 100. Flagged, not substituted (§5 is another agent's). This single-seed fold does exceed the floor at one step, but it varies no seed, and the seed-varied worst case above does not. |
+| 48 | §5.2 measurement 2 | m = 0.999 (6.89) against m = 0.99 (6.65) at step 100 | 6.890 / 6.650 | **1.036×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | **not the ordering.** What falsifies MoCo's staleness account here is that key-to-encoder agreement varies 2.06× (0.908 against 0.441) while rank is *indistinguishable* — an equality claim, which a 1.04× difference supports. The sentence “the best-agreeing arm does not have the best rank” reads an ordering off that 1.04× and should be restated as the equality it is. |
+| 49 | §5.2 measurement 2 | m = 0.999 (6.89) against no momentum (2.58) at step 100 | 6.890 / 2.580 | **2.671×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | the same binary outcome as §5.4; one seed. |
+| 50 | §5.2 measurement 3 | capacity 64 (6.17) against capacity 4,096 (2.16), fixed key encoder | 6.170 / 2.160 | **2.857×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | one seed, and the section's own admission that capacity confounds anchoring quality with negative count. It is one of three measurements said to rule the staleness account out, and it is inside the floor. |
+| 51 | §5.2 turnover falsification | the discriminating τ/T prediction — P4 (3.67) against P2 (3.53) | 3.670 / 3.530 | **1.040×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | **the predeclared reading, not the ordering.** The criterion required P4 to be the worst of its group and fixed “fails ≤ 3.5” in advance; P4 read 3.67 and so did not fail. That is a predicted effect being ABSENT. The draft's “the discriminating one inverted” reads an ordering off a 1.04× difference and overstates what the data support. |
+| 52 | §5.2 turnover falsification | “nearly flat in capacity” — 2,048 (3.53) against 8,192 (3.67) at m = 0.95 | 3.670 / 3.530 | **1.040×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | an **equality** claim, and the same 1.04× that cannot carry the ordering above does carry this. The two rows are the same two numbers used two ways, and are listed together deliberately. |
+| 53 | §5.2 turnover falsification | m = 0.95 → 0.999 at fixed capacity 4,096 — 2.91 against 7.82 | 7.820 / 2.910 | **2.687×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | one seed per cell; the surviving statement is monotonicity in m across five values. |
+| 54 | §4.9a | decorrelation 0.0 → 0.04 at m = 0.999, step 400 (R3 — the column quoted) | 8.010 / 4.320 | **1.854×** | R3 | fixed held-out probe | **none measured** | **unjudgeable** | **monotonicity across three levels and a co-measured contradicting quantity**: the RNA-view mutual cosine rises 0.4774 → 0.7657 → 0.8696 on the *same runs* as rank rises. One seed per level. The magnitude carries nothing; the direction and the cosine do. Figure F9. |
+| 55 | §4.9a | the same three runs under the canonical statistic | 12.200 / 6.290 | **1.940×** | R1 | fixed held-out probe | **none measured** | **unjudgeable** | as above. Recorded because the 1.85× the notebook entry quotes is the **R3** column; statistic-matched to the floor it is 1.940×, and both are inside. |
+| 56 | §4.1a, §5.4, §6.2 | **the like-for-like pair §5.4 says does not exist** — `ablate_decorr0.04` against `mseed_m0.999_s42`, identical configuration and seed, step 400 | 12.200 / 11.440 | **1.066×** | R1 | fixed held-out probe | **none measured** | **unjudgeable** | nothing may be read off it as a floor. It is recorded because §5.4 and §6.2 both say **no like-for-like measurement exists in this regime**, and one does: the two runs share momentum, decorrelation, capacity, learning rate, seed and step-0 state (67.55 / 101.38 / 0.0342 / 0.3650), and `d1_momentum_probe.py` has no schedule that depends on the step budget. Over the eight shared logged steps the widest canonical fold is 1.128× (step 150). |
 
-‡ = the row's statistic or block does not match the floor it is judged against; see the entry's
-`floor_note`. *Provenance and machine-checkable form:*
+‡ = the row carries a `floor_note`: its statistic, its block or its kind does not match the floor it
+is judged against, and the note says which. *Provenance and machine-checkable form:*
 `v2/research/rebase/p2/floor_audit.json`, checked by `v2/research/rebase/p2/p2_floor_audit.py`
 and `v2/tests/test_p2_floor_audit.py`, which **re-reads every value out of the file it came from**
-and fails if a ratio in this table disagrees with its source. The table above is *generated* from
-that list; it is not maintained by hand.
+and fails if a ratio in this table disagrees with its source, if a floor disagrees with the
+measurement file it was read from, or if a row records a verdict without a floor to record it
+against. Both tables above are *generated* from that list; neither is maintained by hand.
 
-**What the audit found that the paper did not already say.** Six things, in descending order of how
-much they cost us.
+**What the audit found that the paper did not already say.** In descending order of how much it costs
+us.
 
-1. **No floor exists for most of the paper's rank numbers.** §4.1's floor is measured for **canonical
-   R1 on the exported `wsi_biology` block, raw and residualised, and for nothing else**. Thirteen of
-   the fifty rows sit on a statistic (R2, R3, PR, RankMe, participation ratio, stable rank, α-ReQ,
-   LiDAR, hard rank) or a block (the fixed held-out probe, in-run training batches, the 16-patient
-   gate batch, the `rna_biology` and `full_biology` views) for which **no reproducibility floor has
-   ever been measured on this project**. Eight of T1's twelve metric rows are in that position: the
-   criterion cannot be applied to them at all, in either direction. §4.2's variance decomposition is
-   the only substitute the paper has, and it covers RankMe and nothing else.
-2. **§4.6's counts have a fourth defect, and it is the paper's own.** §4.6 refuses its counts on
+1. **Nothing in this paper clears a rank floor except the metric we are arguing against.** Of the 25
+   selections between candidate configurations, **13 fail a floor their own statistic and block
+   license, 11 cannot be judged at all, and exactly 1 clears** — row 30, **RankMe as published**,
+   whose floor (1.811× raw) is nearly half of ours (3.111× raw) on the same five runs. The two rows
+   the previous version of this table reported as clearing (§4.4(3)'s fixed-seed probe repeat at
+   3.495×, and §5.2's step-400 fold at 3.596×) are **both on the fixed held-out probe**, which has no
+   measured floor: they cleared a floor that does not license them, and they are now unjudgeable. The
+   count of failures fell from 23 to 13 — but not one of the ten that left the failing column moved
+   into the clearing one.
+2. **Every rank number in §5 is unjudgeable, and that is a sharper limitation than "it fails".**
+   Eleven of the 25 selections, and 25 of the 56 rows, sit on the fixed held-out probe, an in-run
+   training batch, the gate batch or a live checkpoint. The criterion cannot reach them in either
+   direction. §6.2 now names the one run that would change this.
+3. **§4.6's counts have a fourth defect, and it is the paper's own.** §4.6 refuses its counts on
    three grounds — n = 6, D2 s44's 1.4 sampling SDs, §4.6a's coordinate choice. To those add: **not
-   one of the six pairs those twelve metric rows are scored on is resolvable** under the one metric
-   that has a measured floor (row 23). The table is a record of orderings read off differences the
-   instrument cannot see.
-3. **§4.3's headline is the one claim the criterion cannot be applied to at all.** The compared
-   quantity is a *spread* (6.05× against 1.18×), and this project has measured a floor on rank
-   **levels** and never on a spread (rows 16–18). §4.3 survives on the size of the gap between the
-   two arms' step-200 levels and on five seeds per arm, not on a ratio that clears anything, and it
-   should say so.
-4. **The predeclared violation criterion of §4.7.1 could only ever return unresolvable violations.**
+   one of the six pairs those twelve metric rows are scored on is resolvable** under canonical R1
+   (row 29). The table is a record of orderings read off differences that instrument cannot see —
+   though see finding 4, because that verdict is not statistic-invariant either.
+4. **The resolvability verdict is itself under-determined, which is §4.5's thesis applied to the
+   criterion rather than to the ordering.** Scored against each statistic's own floor, the number of
+   §4.5(a)'s six arm pairs that are resolvable is **0 under R1, 1 under R2, 1 under R3, 2 under PR
+   and 2 under PR_rownorm** (rows 20–24); scored against each view's own floor it is **0 on
+   `wsi_biology` and 6 on each of `rna_biology` and `full_biology`** (rows 26–28). §4.5 says the
+   *verdict* flips with the statistic, the block and the view. So does the question of whether there
+   is a verdict to be had.
+5. **§4.3's headline is the one claim the criterion cannot be applied to at all**, and it is now
+   unjudgeable for two independent reasons. The compared quantity is a *spread* (6.05× against
+   1.18×), and this project has measured floors on rank **levels** — now for ten statistics, three
+   views and two blocks — and never on a spread; and the block is the in-run training batch, which
+   has no floor either (rows 16–18). §4.3 survives on the size of the gap between the two arms'
+   step-200 levels and on five seeds per arm, not on a ratio that clears anything.
+6. **The predeclared violation criterion of §4.7.1 could only ever return unresolvable violations.**
    Its fold threshold was **2.0×** — 1.65× *smaller* than the floor and below §4.2's 2.10–3.75× seed
-   band (row 25). Both violations the 66-pair scan returned are inside a floor: H44/I43 at 3.73×
+   band (row 31). Both violations the 66-pair scan returned are inside a floor: H44/I43 at 3.73×
    inside the seed band by 0.5% (already stated in §4.7.4), and **P44/I43 at 3.07×, inside the
    3.295× floor, which appears only in `P2_FIGURES.md` F6(d) and carries no floor verdict there**
-   (row 27). That is the sixth instance, and it is the one this audit was built to find.
-5. **Two claims in §5.2 read an ordering off a 1.04× rank difference** (rows 42, 45). The
+   (row 33). That is the sixth instance, and it is the one this audit was built to find.
+7. **Two claims in §5.2 read an ordering off a 1.04× rank difference** (rows 48, 51). The
    staleness falsification's second measurement — *"the best-agreeing arm does not have the best
    rank"* — compares **6.89 against 6.65**; and the turnover criterion's discriminating prediction —
-   *"the discriminating one inverted"* — compares **3.67 against 3.53**. Neither ordering is
-   resolvable. **Both claims survive when restated as what they actually are**: key-to-encoder
-   agreement varies 2.06× while rank is *indistinguishable*, and the predeclared bar (*"fails ≤
-   3.5"*) was simply **not met** — a predicted effect absent, not an inversion. An unresolvable
-   difference cannot carry an ordering and can carry a null, and row 46 is the same two numbers
-   doing exactly that.
-6. **A like-for-like floor for §5.4's regime does exist, at n = 2, and it is concordant.** §5.4 and
+   *"the discriminating one inverted"* — compares **3.67 against 3.53**. Both are on the probe block
+   and are therefore unjudgeable against any measured floor, which does not rescue them: an ordering
+   read off a 4% difference needs a floor smaller than 4% to be worth reading, and no floor this
+   project has measured, on any statistic or any view, is that small. **Both claims survive when
+   restated as what they actually are**: key-to-encoder agreement varies 2.06× while rank is
+   *indistinguishable*, and the predeclared bar (*"fails ≤ 3.5"*) was simply **not met** — a
+   predicted effect absent, not an inversion. Row 52 is the same two numbers doing exactly that.
+8. **A like-for-like floor for §5.4's regime does exist, at n = 2, and it is concordant.** §5.4 and
    §6.2 both record that no floor has been measured for the `programme_free` / held-out-probe
-   regime. Two runs in `~/e0_run/d1_diag/` are the same configuration at the same seed —
-   `ablate_decorr0.04` and `mseed_m0.999_s42` share momentum, decorrelation, capacity, learning
-   rate, seed and step-0 state, and `d1_momentum_probe.py` runs a constant learning rate with no
-   schedule keyed to the step budget — and they span **1.066×** at step 400, at most **1.128×** over
-   the eight shared logged steps (row 50). **This may not be quoted as a floor and is not**: it is a
-   *pair*, and §4.1's own argument is that any pair drawn from four concordant repeats spans at most
-   1.028×, so a floor measured that way would license everything in this paper. It is recorded
-   because "no like-for-like measurement exists" is no longer accurate and because the honest
-   version — *one pair exists, it is concordant, and a pair is not a floor* — is the version a
-   referee will check.
+   regime, and this audit confirms that none can be recovered from the exports. Two runs in
+   `~/e0_run/d1_diag/` are the same configuration at the same seed — `ablate_decorr0.04` and
+   `mseed_m0.999_s42` share momentum, decorrelation, capacity, learning rate, seed and step-0 state,
+   and `d1_momentum_probe.py` runs a constant learning rate with no schedule keyed to the step budget
+   — and they span **1.066×** at step 400, at most **1.128×** over the eight shared logged steps
+   (row 56). **This may not be quoted as a floor and is not**: it is a *pair*, and §4.1's own
+   argument is that any pair drawn from four concordant repeats spans at most 1.028×, so a floor
+   measured that way would license everything in this paper.
 
-**Exemptions, stated.** Five rows are exempt and each says why. §4.8's dose–response (rows 28–29):
+**Exemptions, stated.** Five rows are exempt and each says why. §4.8's dose–response (rows 34–35):
 the representation has no stochastically trained parameters — the only fitted step is a
 deterministic per-level PCA — so there is no retraining and §3.5 does not apply; the claim rests on
 monotonicity over seven nested levels and on the *ratio* of two fractional changes read from one
-representation through one instrument. §5.1's instance 2 (row 35): 5.81 on a 16-patient *train*
+representation through one instrument. §5.1's instance 2 (row 41): 5.81 on a 16-patient *train*
 batch against a frozen 64-key queue and ~1.8 on 282 *held-out* patients at cohort scale are **not
 two configurations and not the same block**, so §3.1's own rule forbids forming the ratio; the claim
 rests on the gate's binary pass criterion and on the cohort-scale arm being independently collapsed
-(see §5.1). §4.9's decorrelation instance (row 30) and its "16/16" instance (row 31) are excluded on
-provenance and on the statistic being a hard numerical rank, not on the floor. **An exemption stated
-is fine; an omission is not**, which is why the nuisance measurements (rows 11–18) and the
-collapse-regime readings (rows 32–34) are in the table too rather than left out as obviously
-inapplicable.
+(see §5.1). §4.9's decorrelation instance (row 36) and its "16/16" instance (row 37) are excluded on
+provenance and on the statistic being a hard numerical rank, not on the floor — and the hard rank now
+has a measured floor on the exported block, **1.000×**, which is a second reason nothing may be read
+off it. **An exemption stated is fine; an omission is not**, which is why the nuisance measurements
+(rows 11–18) and the collapse-regime readings (rows 38–40) are in the table too rather than left out
+as obviously inapplicable.
 
 **What this costs and what it buys.** It costs the paper any remaining licence to read a rank
-ordering anywhere in it: **23 of the 25 selections between candidate configurations are inside a
-floor**, and the two that clear do so by 6% (row 19, seed held *fixed*, which §4.2 says is the term
-that matters) and at a single step of a single-seed sweep (row 41). What it buys is that §1.3's rule
-is applied to this paper exhaustively and mechanically rather than opportunistically, and that the
-next comparison added to the draft is checked by a test rather than by a reviewer.
+ordering anywhere in it, and it costs more than the first version of this table admitted: **13 of the
+25 selections between candidate configurations are inside a floor their own statistic and block
+license, 11 cannot be judged at all, and the single one that clears is RankMe as published, not
+ours.** What it buys is three things. §1.3's rule is now applied to this paper exhaustively and
+mechanically rather than opportunistically; the next comparison added to the draft is checked by a
+test rather than by a reviewer; and the criterion itself is no longer being applied outside the scope
+of the one measurement that licenses it — which is the objection this paper makes to RankMe, made to
+us, and it had been true of us for as long as this subsection existed.
 
 ### 4.2 Where rank's variance lives: 34.5% arm, 65.5% training seed — and the channel is 98.0% arm
 
@@ -1331,7 +1500,7 @@ The sharpest single instance is strictly within one arm — no arm contrast at a
 That single line is the paper's cleanest object. It contains no arm effect to argue about, and it is
 inside RankMe's scope by RankMe's own sentence.
 
-### 4.3 The floor is a property of the arm, not of the statistic
+### 4.3 The floor is a property of the arm — and, §4.1a adds, of the statistic and of the view
 
 The reproducibility envelope is not a constant of the metric that could be measured once and reused. At
 the **same global training step**, on the **same configuration**, with only the seed differing:
@@ -1354,16 +1523,26 @@ versions of this table showed only the three, which understated the supervised a
 of 60 and is corrected here.*
 
 The supervised arm reproduces to **18%** across five seeds and to **0.3%** across the original three;
-the contrastive arm spans **6.05×** either way. **Rank's
-reproducibility is therefore not a property of the statistic — it is a property of the arm being
+the contrastive arm spans **6.05×** either way. **Rank's reproducibility is a property of the arm being
 measured, and it is worst exactly where the arm is interesting.** A reproducibility envelope measured on
 a well-behaved configuration does not transfer to the one being diagnosed, and the one being diagnosed
 is the configuration a practitioner is looking at when they reach for rank.
 
+**An earlier version of this section added "and not of the statistic". That is now measurably wrong
+and is withdrawn.** §4.1a measures the retraining floor for ten statistics on one block and finds it
+running from 1.000× (hard numerical rank) to 3.295× (canonical R1) — a 3.3× spread between statistics
+on the *same five runs* — and for the same statistic on three co-trained views, where it runs from
+1.019× to 3.295×. The reproducibility of a rank number depends on the arm, on the statistic and on the
+view, and the paper's argument does not need the stronger claim: **three axes of dependence make
+"calibrate the envelope once, then use it" less workable, not more.**
+
 This also disposes of the most natural repair: "calibrate the envelope once, then use it". There is no
-one envelope. On this stack the same statistic, at the same step, is reproducible to eighteen percent on
-one arm and unusable on its sibling — and §4.1's floor, measured on the *better-behaved* of the two,
-still swallows every arm comparison this project has made.
+one envelope, and §4.1a shows there is not even one per arm. On this stack the same statistic, at the
+same step, is reproducible to eighteen percent on one arm and unusable on its sibling; on the same five
+retrains of one arm it is reproducible to 2% under stable rank and unusable under canonical R1; and on
+those same five artifacts it is reproducible to 2% on the `rna_biology` view and unusable on
+`wsi_biology`. A practitioner who wants to use a rank difference has to calibrate the arm, the statistic
+and the view they are actually using.
 
 ### 4.4 Defeater check — is the metric fine and the estimator bad?
 
@@ -2676,7 +2855,8 @@ should be withdrawn to a replication.
 |---|---|
 | ~~A controlled repeat design for §4.1~~ | **CLOSED, at N = 5.** Five identical `programme_only` retrains at seed 42 give a **3.295×** rank floor against a **1.055×** channel spread, bimodally distributed. It replaced an n = 1 estimate of 2.69×. What it still cannot do is attribute retraining variance to the metric rather than to this stack, because there is only one stack; and it is measured on the *stable* arm at a fixed seed, so it is a floor rather than an envelope. §4.2 remains the contribution that does not depend on it. |
 | ~~A seed replication of §5.2's momentum sweep~~ | **CLOSED, and it does not clear §4.1's bar.** Three seeds per momentum at 500 steps: every m = 0.999 seed exceeds every m = 0 seed (canonical R1 11.26 / 10.45 / 10.55 against 3.18 / 1.13 / 2.36), so the single-seed defect is closed and §5.3's disjunction resolves in favour of separation. But the worst-case ratio is **3.29× against §4.1's 3.295× floor**, so the fix's *rank* difference is not resolvable by this paper's own criterion. Different arm, duration and block, so indicative rather than a like-for-like disqualification — and all three mismatches point toward a larger floor in this regime, not a smaller one. **§5 has been rewritten around it: §5.4 states the failure against our own criterion in its own subsection and rests the fix on a binary training outcome (`programme_free` completing uncollapsed 0 of 3 seeds before, 3 of 3 after, with intervals) rather than on the rank ratio.** What is still missing is a like-for-like **floor** for the `programme_free` / 500-step / held-out-probe regime. One same-seed **pair** in that regime does exist and is concordant (1.066× at step 400, ≤ 1.128× over the shared steps; §4.1a row 50) — **n = 2 is not a floor** by §4.1's own argument, and it is recorded rather than used. |
-| **A reproducibility floor for any statistic other than canonical R1, or on any block other than the exported `wsi_biology` one** | **Not measured, and §4.1a is what made the size of the gap visible.** The 3.295× / 3.111× floor exists for canonical R1 on the exported block and for nothing else. Thirteen of the fifty rank comparisons this paper makes or relies on sit on a statistic (R2, R3, PR, RankMe, participation ratio, stable rank, α-ReQ, LiDAR, hard rank) or a block (the fixed held-out probe, in-run training batches, the 16-patient gate batch, the `rna_biology` and `full_biology` views) with **no floor at all**, including eight of T1's twelve metric rows and every number in §5. The criterion cannot be applied to them in either direction, and §4.1a says so per row rather than leaving it to be inferred. |
+| ~~A reproducibility floor for any statistic other than canonical R1, or on any view other than `wsi_biology`~~ | **CLOSED for the statistics and the views, at n = 5, from exports that already existed.** §4.1a now carries a floor for every statistic T1 scores (R1, R2, R3, PR, PR_rownorm, RankMe raw and residualised, stable rank, α-ReQ, LiDAR, hard numerical rank) on the exported block raw and residualised, and for canonical R1 on all three co-trained views — the same five same-seed repeats, re-read. It is a re-derivation, not a re-run, and it should have been done when the repeats landed. Three results came out of it and two of them cost us: the floor spans **1.000× to 3.295×** between statistics on one block, so judging one statistic against another's floor was never admissible; **RankMe as published is the more reproducible statistic on our own artifacts** (1.811× raw against our 3.111×); and the floor is a property of the **view** (1.019× on `rna_biology` against 3.295× on `wsi_biology`), so the divergent repeat's collapse is a property of its WSI encoder rather than of the run. What is *not* closed is the arm and the seed: every floor is measured on `programme_only` at seed 42, and is a floor twice over for that reason. |
+| **A reproducibility floor on the fixed held-out probe, the in-run training batch, the 16-patient gate batch or a live checkpoint** | **Not measured, not recoverable from the exports, and this is now the paper's largest single gap.** The five repeats were *exported*, not probed: `~/e0_run/d1_envelope/` holds `rep{n}.npz` and a per-run `~/e0_run/d1_envelope/rep{n}/train_metrics.jsonl`, and neither carries a probe forward pass, a training batch's activations or a gate batch. **11 of §4.1a's 25 selections — and every rank number in §5 — sit on the first of those four blocks**, so this paper's central criterion cannot reach them in either direction: they are not failing it, they are outside it. **What would close it is one specific run: five same-seed repeats of the `programme_free` / 500-step configuration with `d1_momentum_probe.py` attached, read at a fixed step.** Until that exists, §5.4's statement that the momentum fix's rank difference "is not resolvable" is stronger than the evidence supports — the honest form is that it is *unjudgeable*, and §5.4 rests on a binary training outcome either way. |
 | **A per-block ground truth for the D1 arms** | **Not run.** §4.6a re-scores the *D2* arms on six target blocks and finds the selection verdict unstable on all twelve metric rows. The D1 arms were never scored on any block but the gene sets, so §4.6a's D1 column is held fixed in every row and is **not** evidence that the D1 half is block-stable. |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
 | ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
@@ -2955,11 +3135,16 @@ Reproduced verbatim so that any future quotation can carry it.
   monotonically (0.4774 → 0.8696) on the same three runs — §4.9a and figure F9. That rank change is
   **1.85× / 1.94×, inside §4.1's 3.295× floor**: the monotonicity and the co-measured cosine carry
   the observation, not the size, and it is **one seed per level**.
-- **The floor audit (§4.1a).** Fifty rank comparisons, each judged against the floor measured on its
-  own block; **23 of the 25 selections between candidate configurations are inside a floor**, and 13
-  rows sit on a statistic or a block for which **no floor has ever been measured**. Machine-checkable
-  at `v2/research/rebase/p2/floor_audit.json`, enforced by `v2/tests/test_p2_floor_audit.py`. Any
-  quotation of a rank comparison from this paper should be checked against that table first.
+- **The floor audit (§4.1a).** 56 rank comparisons, each judged against the floor measured on its
+  own **statistic and** block; of the 25 selections between candidate configurations, **13 fail, 11
+  cannot be judged at all, and 1 clears — and the one that clears is RankMe as published, not ours**.
+  25 of the 56 rows sit on a block for which **no floor has ever been measured**, including every
+  rank number in §5. **Unjudgeable is not a pass and not a failure**: the criterion has not been
+  applied to those rows, and the audit records `clears: null` for them rather than a verdict.
+  Machine-checkable at `v2/research/rebase/p2/floor_audit.json`, enforced by
+  `v2/tests/test_p2_floor_audit.py`. Any quotation of a rank comparison from this paper should be
+  checked against that table first — including the floor it is being judged against, which for eight
+  of T1's twelve metric rows was measured only on 2026-08-04 and for four blocks does not exist.
 - **D1-A's 9.81 / 1.71 (§4.9).** **Statistic R3**, `[NOT RECOMPUTED]` under R1. *"Nothing about programme
   supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
   defect, not an ablation."*

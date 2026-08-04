@@ -642,18 +642,30 @@ regime; §4.1's own argument is that a pair drawn from concordant repeats can li
 
 **Draft section.** §4.1a. **NEW 2026-08-04.**
 
-Fifty rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
-**block**, the floor **its own block licenses**, whether it clears, and what the claim rests on if it
-does not. **23 of the 25 selections between candidate configurations are inside a floor**; 13 rows sit
-on a statistic or a block for which **no floor has ever been measured**; 5 are exempt with the reason
-stated. Exemptions are stated, never taken silently.
+56 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
+**block**, the floor **its own statistic and block license**, whether it clears, and what the claim
+rests on if it does not. Of the 25 selections between candidate configurations, **13 fail, 11 are
+unjudgeable because no floor has ever been measured for the block they sit on, and 1 clears** — and
+the one that clears is **RankMe as published**, whose floor (1.811× raw) is nearly half of canonical
+R1's (3.111× raw) on the same five retrains. 25 of the 56 rows are unjudgeable; 5 are exempt with the
+reason stated. **Unjudgeable is not a pass and not a failure**, and the audit enforces the
+distinction: a row with no floor records `clears: null`.
+
+**A second generated table sits above it in §4.1a**: the floors themselves, one row per statistic per
+block per view, measured from the five exported same-seed repeats by
+`v2/research/rebase/p2/p2_envelope_floors.py` and rendered by `p2_floor_audit.py --floors`. It
+carries min, max, the floor, the other four repeats' own agreement, which repeat diverges and whether
+the bimodal shape §4.1 describes survives that change of statistic. It does not: the shape holds
+under R1, R2, R3 and residualised RankMe and under nothing else, though every statistic that moves at
+all puts the same repeat at the extreme.
 
 **This table is generated, not typed.** `v2/research/rebase/p2/floor_audit.json` is the list;
 `v2/research/rebase/p2/p2_floor_audit.py --markdown` renders exactly the table the draft prints, and
 `v2/tests/test_p2_floor_audit.py` **re-reads every value out of the file it came from** — a vendored
 box log, a JSON readout, or a named section of the draft — and fails if a ratio disagrees with its
 source, if a verdict disagrees with its floor, or if the draft's copy of the table has drifted from
-the list. A ‡ marks a row whose statistic or block does not match the floor it is judged against.
+the list. A ‡ marks a row whose statistic, block or kind does not match the floor it is judged
+against.
 
 **Provenance.** `floor_audit.json` cites, per row, a file under
 `v2/research/rebase/p2/figures/data/` or a section of `paper/P2_RANK_DRAFT.md`,

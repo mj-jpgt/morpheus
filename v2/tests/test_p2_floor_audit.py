@@ -267,3 +267,134 @@ def test_the_like_for_like_pair_is_the_same_configuration():
     assert fields[0] == fields[1], fields
     row = next(r for r in A.load()["comparisons"] if r["id"] == "4.9a-likeforlike-pair")
     assert row["floor"] is None and "not a floor" in row["floor_note"]
+
+
+# --------------------------------------------------------------------------
+# The expanded floor set, and the scope error it repairs
+# --------------------------------------------------------------------------
+def test_the_draft_prints_the_rendered_floor_table(audit, draft):
+    """§4.1a's measured-floor table is generated, like its audit table."""
+    assert A.render_floors_markdown(audit) in draft, (
+        "paper/P2_RANK_DRAFT.md §4.1a no longer matches "
+        "`p2_floor_audit.py --floors`. Regenerate it rather than editing the "
+        "table by hand.")
+
+
+def test_every_floor_names_a_statistic_a_block_and_a_caveat(audit):
+    """A floor with no statistic or block cannot be block-matched against anything.
+
+    And a floor with no caveat gets quoted as an estimate: every one of these is
+    n = 5, one arm, one seed, and a floor twice over.
+    """
+    for name, floor in audit["floors"].items():
+        assert floor["statistic"] and floor["block"] and floor["caveat"], name
+        assert floor.get("n") in (None, 5) or "low" in floor, name
+
+
+def test_the_expanded_floor_set_covers_every_statistic_t1_scores(audit):
+    """Eight of T1's twelve metric rows had no floor at all. None is left without one."""
+    statistics = {f["statistic"] for f in audit["floors"].values()}
+    for expected in ("R1", "R2", "R3", "PR", "PR_rownorm", "stable rank", "LiDAR",
+                     "α-ReQ |α−1|", "hard numerical matrix rank",
+                     "RankMe (raw, uncentred, ε = 1e-7)", "RankMe (residualised)"):
+        assert expected in statistics, expected
+    assert audit["statistics_with_no_measured_floor"] == []
+
+
+def test_the_floor_is_a_property_of_the_statistic_and_of_the_view(audit):
+    """§4.3's withdrawn claim, and §4.1a's third finding, asserted against the list."""
+    floors = audit["floors"]
+    assert floors["hard_rank_residualised_export"]["value"] == 1.0
+    assert floors["R1_residualised_export"]["value"] > 3.0
+    assert floors["R1_residualised_rna_view"]["value"] < 1.05
+    assert floors["R1_residualised_full_view"]["value"] < 1.05
+    assert floors["RankMe_published_raw_export"]["value"] < floors["R1_raw_export"]["value"]
+
+
+# --- unjudgeable is not a verdict -----------------------------------------
+def test_the_three_way_count_partitions_the_selections(audit):
+    """`failing` + `clearing` + `unjudgeable` must exhaust the selections.
+
+    The three-way split is the repair: for as long as a row with no floor could
+    record `clears: false`, eleven comparisons with no ruler at all were being
+    counted beside comparisons that had failed a measured one.
+    """
+    s = A.summary(audit)
+    assert (s["selection_failing"] + s["selection_clearing"]
+            + s["selection_unjudgeable"]) == s["selection"]
+    assert s["selection_unjudgeable"] > 0, "the absent floors are the point of the audit"
+
+
+def test_the_two_rows_that_used_to_clear_are_on_a_block_with_no_floor(audit):
+    """Both of the paper's former "clears" were probe-block rows judged against an export floor.
+
+    §4.4(3)'s fixed-seed probe repeat (3.495x, "clears by 6%") and §5.2's step-400
+    fold (3.596x) were the only two selections the audit reported as clearing.
+    Neither is on a block for which a floor has ever been measured.
+    """
+    for rid in ("4.4-3-fixedseed-probe", "5.2-per-step-max"):
+        row = next(r for r in audit["comparisons"] if r["id"] == rid)
+        assert row["floor"] is None and row["clears"] is None, rid
+        assert "UNJUDGEABLE" in row["floor_note"], rid
+
+
+def test_the_only_selection_that_clears_is_the_published_metric(audit):
+    """Bad news, asserted so it cannot quietly stop being true.
+
+    RankMe as published has a retraining floor of 1.811x on the raw exported
+    block against canonical R1's 3.111x on the same five runs, and its widest D2
+    fold clears it. It is the only selection in the audit that clears a floor its
+    own statistic and block license.
+    """
+    clearing = [r for r in audit["comparisons"]
+                if r["kind"] == "selection" and r["clears"] is True]
+    assert [r["id"] for r in clearing] == ["4.6-rankme-d2"]
+    assert clearing[0]["floor"] == "RankMe_published_raw_export"
+
+
+def test_every_rank_number_in_section_5_is_unjudgeable(audit):
+    """The named absent floor, as a property of the list rather than of the prose."""
+    for row in audit["comparisons"]:
+        if row["section"].startswith("§5.") and row["id"] != "5.1-instance2":
+            assert row["floor"] is None, row["id"]
+            assert row["clears"] is None, row["id"]
+
+
+# --- negative tests: does the checker catch the new failure modes? ---------
+def test_a_verdict_recorded_without_a_floor_is_caught(audit):
+    broken = copy.deepcopy(audit)
+    row = next(r for r in broken["comparisons"] if r["id"] == "5.4-row2-seedvaried")
+    row["clears"] = False
+    assert any("clears=False" in p and row["id"] in p for p in A.check(broken))
+
+
+def test_a_floor_recorded_without_a_verdict_is_caught(audit):
+    broken = copy.deepcopy(audit)
+    row = next(r for r in broken["comparisons"] if r["id"] == "4.6-six-pairs")
+    row["clears"] = None
+    assert any("clears=None" in p and row["id"] in p for p in A.check(broken))
+
+
+def test_a_floor_that_disagrees_with_the_file_it_was_measured_into_is_caught(audit):
+    broken = copy.deepcopy(audit)
+    broken["floors"]["R3_residualised_export"]["value"] = 3.295
+    assert any("R3_residualised_export" in p for p in A.check(broken))
+
+
+def test_a_floor_whose_independent_cross_check_disagrees_is_caught(audit):
+    """3.295x has two sources now. If they part, neither may be used."""
+    broken = copy.deepcopy(audit)
+    broken["floors"]["R1_residualised_export"]["cross_check"]["a"]["src"]["path"] = (
+        "floors.rna_biology.residualised.R1.max")
+    problems = A.check(broken)
+    assert any("cross-check" in p and "STOP" in p for p in problems), problems
+
+
+def test_a_floor_whose_recorded_shape_disagrees_with_its_source_is_caught(audit):
+    """Whether the bimodal shape survives a change of statistic is a claim, so it is checked."""
+    broken = copy.deepcopy(audit)
+    broken["floors"]["stable_rank_residualised_export"]["shape"]["bimodal"] = True
+    assert any("shape.bimodal" in p for p in A.check(broken))
+    broken = copy.deepcopy(audit)
+    broken["floors"]["R1_residualised_export"]["shape"]["outlier"] = "rep4"
+    assert any("shape.outlier" in p for p in A.check(broken))
