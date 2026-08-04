@@ -162,6 +162,24 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > block's own step-400 floors, since measured (1.449× R3 / 1.570× R1), **both clear**. The monotonicity
 > and the co-measured cosine are still what carry the finding, because a magnitude that clears an
 > n = 5 floor at one seed per level is not evidence of a dose–response.
+>
+> **12. The three selections item 10 left unjudgeable are now closed, all three clear, and item 8's
+> count moves with them.** §5.4 row 1 (m = 0.999 vs m = 0 at step 600, one seed) clears its own floor
+> by **1.51×**; §5.4 limit 2 (m = 0.999 vs m = 0.99, step 600) clears by **1.06×** — narrowly, and the
+> margin is statistic-conditional: under R3 the two arms separate by only 1.138× worst-case (inside
+> the floor), under canonical R1 by a clean 1.453× (outside it), at the exact momentum setting this
+> project ships; §5.2 measurement 3 (capacity 64, step 150) clears by **1.68×**, its previously
+> "never recorded" step recovered from vendored logs a parser had refused on a five-column header, not
+> missing data. **Item 8's "eight further selections... all eight are §5's" is now eleven**; the
+> §4.1a audit reads **13 fail / 12 clear / 0 unjudgeable** of 25 selections, 16 of 62 total rows still
+> unjudgeable for want of a floor. Separately, the centring account §5.2a offered for a rank/cosine
+> dissociation does not survive: three same-seed repeats per arm put the "dissociation" inside its own
+> retraining spread (0.223 across-arm vs 0.250 within-arm on the uncentred statistic), so the effect
+> item 9 explained was never established outside one seed, and neither account of it is at issue. The
+> centred-cosine measurement §6.2 named as unmeasured has since been run and is degenerate (seven of
+> nine readings within 0.04 of zero) — it settles nothing, for a reason recorded at §6.2. Reported in
+> `NOTEBOOK_ENTRIES/three_floors_close_the_last_three_unjudgeable_rows_20260805T0000Z.md` and
+> `NOTEBOOK_ENTRIES/the_dissociation_does_not_survive_its_own_floor_20260804T1800Z.md`.
 
 ---
 
@@ -1602,27 +1620,31 @@ against. Both tables above are *generated* from that list; neither is maintained
 us.
 
 1. **Nothing in §4 clears a rank floor except the metric we are arguing against.** Of the 25
-   selections, **13 fail a floor their own statistic and block license, 9 clear it and 3 cannot be
-   judged at all** — and **exactly one of the nine is on the exported artifact block**, which is the
-   block every between-arm comparison in §4 is measured on. That one is row 30, **RankMe as
-   published**, whose floor (1.811× raw) is nearly half of ours (3.111× raw) on the same five runs.
-   **The other eight are all §5's**, on the fixed held-out probe, and they clear a floor that did not
-   exist when this subsection was first written (finding 2). *The counting history is itself worth
-   recording, because two of its three steps cost us: 23 failures under one floor for everything; then
-   13 failures, 11 unjudgeable and 1 pass once block-matching was enforced — with not one of the ten
-   that left the failing column moving into the clearing one; then 13 / 9 / 3 once the probe block was
-   measured. **The thirteen failures have never moved.***
-2. **Every rank number in §5 was unjudgeable, and closing that gap is what produced eight of the nine
-   passes.** Eleven of the 25 selections sat on a block with no measured floor. §6.2 named the run
-   that would change it — five same-seed repeats of the `programme_free` / 500-step configuration with
-   the probe attached — and it was run, doubled to ten so that **both** arms were retrained. Eight of
-   the eleven became judgeable and all eight cleared, including the momentum fix (§5.4). **Three
-   remain**, each naming its own gap rather than sharing one excuse: two want a floor at **step 600**
-   (one of them also at **m = 0.99**), and one wants a **reading step** §5.2 never recorded, at a
-   **capacity** no repeat covers. §5.2a's four `direction` rows also remain outside, because the probe
-   floor was measured at `lr = 2e-4` and those arms are at `1e-3` and `4e-5` — and §5.2a's own result
-   is that the learning rate moves rank more than anything else, so that floor is the last one that
-   may be borrowed.
+   selections, **13 fail a floor their own statistic and block license, 12 clear it and 0 cannot be
+   judged at all** (finding 2 below closed the last three) — and **exactly one of the twelve is on the
+   exported artifact block**, which is the block every between-arm comparison in §4 is measured on.
+   That one is row 30, **RankMe as published**, whose floor (1.811× raw) is nearly half of ours
+   (3.111× raw) on the same five runs. **The other eleven are all §5's**, on the fixed held-out probe.
+   *The counting history is itself worth recording, because most of its steps cost us: 23 failures
+   under one floor for everything; then 13 failures, 11 unjudgeable and 1 pass once block-matching was
+   enforced — with not one of the ten that left the failing column moving into the clearing one; then
+   13 / 9 / 3 once the probe block was measured; then 13 / 12 / 0 once the last three selections had
+   floors on their own settings, one of them narrowly and statistic-conditionally (see finding 2).
+   **The thirteen failures have never moved.***
+2. **Every rank number in §5 was unjudgeable, and closing that gap is what produced eleven of the
+   twelve passes.** Eleven of the 25 selections sat on a block with no measured floor. §6.2 named the
+   run that would change it — five same-seed repeats of the `programme_free` / 500-step configuration
+   with the probe attached — and it was run, doubled to ten so that **both** arms were retrained.
+   Eight of the eleven became judgeable and all eight cleared, including the momentum fix (§5.4). **The
+   three that remained have since closed too**, each on the run that would settle it, named rather than
+   waved through: a floor at step 600 (clears by 1.51×), the same step at `m = 0.99` (clears by 1.06×,
+   narrowly — under R3 the two arms it compares separate by only 1.138× worst-case, inside the floor,
+   while under canonical R1 they separate by a clean 1.453×, so this pass is statistic-dependent at the
+   exact momentum this project ships), and the reading step §5.2 had called unrecoverable, since found
+   in vendored logs a parser had refused rather than lost (clears by 1.68×). §5.2a's four `direction`
+   rows remain outside, because the probe floor was measured at `lr = 2e-4` and those arms are at
+   `1e-3` and `4e-5` — and §5.2a's own result is that the learning rate moves rank more than anything
+   else, so that floor is the last one that may be borrowed.
 3. **§4.6's counts have a fourth defect, and it is the paper's own.** §4.6 refuses its counts on
    three grounds — n = 6, D2 s44's 1.4 sampling SDs, §4.6a's coordinate choice. To those add: **not
    one of the six pairs those twelve metric rows are scored on is resolvable** under canonical R1
@@ -3369,8 +3391,8 @@ sense. And it does **not** rescue the paper's other comparisons — **13 of the 
 still fail a floor their own statistic and block license**, including all seven of §4.1's between-arm
 differences, and the one selection that clears on the *exported* block is still RankMe as published
 rather than ours. **A paper whose criterion never returned a pass would be a paper whose criterion was
-a rhetorical device.** This one returns nine, eight of them on a block we had to build the floor for,
-and it still fails thirteen.
+a rhetorical device.** This one returns twelve, eleven of them on a block we had to build the floor
+for, and it still fails thirteen.
 
 **The n = 2 pair this subsection used to lean on is superseded, and behaved as it should have.**
 Earlier revisions recorded that no like-for-like floor existed for this regime but that one same-seed
@@ -3579,7 +3601,7 @@ should be withdrawn to a replication.
 | ~~**A probe floor at step 600, and at momentum values other than 0 and 0.999**~~ | **CLOSED, at n = 5 per arm, and both rows it was blocking now clear.** This row specified fifteen runs and fifteen were run: five identical repeats of each of m = 0.999, **m = 0.99** and m = 0 at a **600-step** budget, decorrelation 0.04, capacity 4,096, lr 2e-4, seed 42. **The arms are now written into the block string**, exactly as the reading step already was, so a floor built from m = 0.999 and m = 0 may not be applied to a comparison between m = 0.999 and m = 0.99 — and the three-arm run is therefore scored once per pair rather than once. Against its own two arms at its own step, **§5.4 row 1 clears by 1.51×** (2.641× against an R3 floor of 1.749×, carried by the m = 0 arm) and **§5.4 limit 2 clears by 1.06×** (1.262× against 1.195×, carried by m = 0.999); the second is a 5.6% pass and §5.4 limit 2 states in full what the same ten runs say against it. The floor's own lesson repeats and then breaks in a useful place: the collapsed arm carries it by about 1.5× where there is one, and the comparison with **no** collapsed arm — m = 0.999 against m = 0.99, where both train — returns the smallest of the sixteen probe floors at 1.195×. The rule is not "the collapsed arm is noisier"; it is "measure both sides". |
 | ~~**A reading step for §5.2's capacity sweep, and a floor at capacity 64**~~ | **CLOSED, and it took both halves — one of which cost a file copy and one of which cost the GPU.** The previous version of this row said the step *"was never recorded"* and the sweep's logs *"are not vendored"*. **Both were wrong.** `qsweep_d0.04_cap64.log` prints **6.17 at step 150** and `decorr_causal_0.04.log` prints **2.16 at step 150** — the two numbers §5.2 measurement 3 quotes, at one step, in the same row. What had kept them out of the audit was not missing data but a **header**: the older `decorr_causal` sweep harness (on the box; only its logs are vendored) prints a fifth column carrying the decorrelation *loss term*, and `PROBE_HEADERS` refused the file by design rather than guess which column was the rank. Naming the header recovered the step, and §4.1a row 50's two values now resolve from bytes instead of from this draft's own prose. What that recovery did **not** do — exactly as this row warned — is make the comparison judgeable, because a floor measured at capacity 4,096 may not be borrowed for capacity 64. That needed the GPU and has since been run: five same-seed repeats at **each** capacity, m = 0, decorrelation 0.04, lr 2e-4, seed 42, read at step 150, giving an R3 floor of **1.705×** carried by the capacity-4,096 arm, which **2.857× clears by 1.68×**. Two notes travel with the pass rather than being smoothed over. The floor is measured with `d1_momentum_probe.py` and the row with the `decorr_causal` harness, and **where the two harnesses overlap they agree at capacity 4,096** (the sweep's 2.16 against a same-seed span of 1.704–2.906) **but not quite at capacity 64**, where the sweep's published 6.17 sits **0.8% above the top** of its own five-run range of 5.003–6.123. And clearing a floor makes the reading resolvable, not §5.2's confound absent: capacity still changes anchoring quality and negative count together. |
 | **A reproducibility floor on the in-run training batch, the 16-patient gate batch or a live checkpoint** | **Not measured and not recoverable from the exports**, for the same reason as before: the `d1_envelope` repeats were exported, not probed, and carry no training-batch activations, no gate batch and no live checkpoint. §4.3's headline and §4.9's two historical instances sit on these. What each would cost is recorded per block in `P2_ENVELOPE_FLOORS.json`'s `absent_blocks`. |
-| **The RNA-view mutual cosine recomputed on the CENTRED representation, for §5.2a's three high-learning-rate arms** | **Not measured, and it is the one measurement that would settle whether §4.10's surviving use is under strain.** At `lr = 1e-3` centred R3 reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred RNA-view mutual cosine reads 0.9946 / 0.9257 / 0.5207. Either rank is insensitive to a real difference at the collapse floor, or the difference lives entirely in the mean-offset direction that centring removes — the same asymmetry that makes RankMe more reproducible than our statistic (§4.1b). It needs those three runs' activations, which the logs do not carry. **Until it exists, §4.10's boundary is stated with the ambiguity attached rather than resolved in our favour.** |
+| **The RNA-view mutual cosine recomputed on the CENTRED representation, for §5.2a's three high-learning-rate arms** | **Measured, and it settles nothing, for a reason that is itself informative.** At `lr = 1e-3` centred R3 reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred RNA-view mutual cosine reads 0.9946 / 0.9257 / 0.5207. Seven of nine centred readings sit between −0.004 and +0.037 — degenerate, and partly entailed by the centred rank itself being near 1 — and the centred cosine's own within-arm spread (up to 0.630) exceeds any across-arm difference on it. So it cannot adjudicate whether rank is insensitive to a real difference or the difference lives entirely in the mean-offset direction centring removes; both readings are consistent with a statistic too flat and too noisy at once to carry a verdict either way. **§4.10's boundary is stated with the ambiguity attached rather than resolved in our favour.** |
 | **A per-block ground truth for the D1 arms** | **Not run.** §4.6a re-scores the *D2* arms on six target blocks and finds the selection verdict unstable on all twelve metric rows. The D1 arms were never scored on any block but the gene sets, so §4.6a's D1 column is held fixed in every row and is **not** evidence that the D1 half is block-stable. |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
 | ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
@@ -3943,12 +3965,13 @@ Reproduced verbatim so that any future quotation can carry it.
   co-measured cosine are, and it is **one seed per level**.
 - **The floor audit (§4.1a).** 62 rank comparisons, each judged against the floor measured on its
   own **statistic, block and reading step**; of the 25 selections between candidate configurations,
-  **13 fail, 9 clear and 3 cannot be judged at all**. **The one clearing a floor on the *exported
+  **13 fail, 12 clear and 0 cannot be judged**. **The one clearing a floor on the *exported
   artifact* block — the block every between-arm comparison in §4 is measured on — is RankMe as
-  published, not ours**; the other eight are §5's, against the fixed held-out probe's own floor,
+  published, not ours**; the other eleven are §5's, against the fixed held-out probe's own floor,
   measured later. *The counting history: 23 failures when one floor was applied to everything; then
-  13 / 11 / 1 once block-matching was enforced; then 13 / 9 / 3 once the probe block was measured.
-  **The thirteen failures have never moved.***
+  13 / 11 / 1 once block-matching was enforced; then 13 / 9 / 3 once the probe block was measured;
+  then 13 / 12 / 0 once the last three selections had floors on their own settings (§"Status", item
+  12). **The thirteen failures have never moved.***
   19 of the 62 rows still sit on a block for which **no floor has been measured** — the in-run
   training batch, the gate batch, a live checkpoint, and the probe at steps, momenta, capacities or
   learning rates the repeats do not cover. **Unjudgeable is not a pass and not a failure**: the criterion has not been
