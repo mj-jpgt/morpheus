@@ -23,7 +23,8 @@ import tempfile
 import numpy as np
 import pandas as pd
 
-__all__ = ["load_reference_targets", "development_expression", "write_target_block"]
+__all__ = ["load_reference_targets", "development_expression", "development_expression_moments",
+           "write_target_block"]
 
 
 def _digest_strings(values) -> str:
@@ -61,6 +62,21 @@ def development_expression(rna_table: str | Path, reference: dict) -> tuple[np.n
     centring and scaling are estimated on those rows only, so no held-out cancer
     can influence the transform any baseline is built through.
     """
+    scaled, transform, _mean, _scale = development_expression_moments(rna_table, reference)
+    return scaled, transform
+
+
+def development_expression_moments(rna_table: str | Path, reference: dict
+                                   ) -> tuple[np.ndarray, dict, np.ndarray, np.ndarray]:
+    """:func:`development_expression`, additionally returning the fitted moments.
+
+    The moments are not a detail. ``build_pbs_targets`` divides the CRISPRi delta
+    by the *development gene standard deviation* before the dictionary SVD, so any
+    construction that wants to rebuild, reweight or re-derive that dictionary needs
+    the identical ``scale`` vector — and re-deriving it in a second place is exactly
+    the substitution this repository has been bitten by. One implementation, two
+    return shapes.
+    """
     from .build_pbs_targets import fit_development_expression_transform
 
     genes = reference["genes"]
@@ -94,7 +110,7 @@ def development_expression(rna_table: str | Path, reference: dict) -> tuple[np.n
         "mean_digest": sha256(np.ascontiguousarray(mean).view(np.uint8)).hexdigest(),
         "scale_digest": sha256(np.ascontiguousarray(scale).view(np.uint8)).hexdigest(),
         "rna_table": str(Path(rna_table).resolve()),
-    }
+    }, np.asarray(mean, dtype=np.float64), np.asarray(scale, dtype=np.float64)
 
 
 def write_target_block(output: str | Path, reference: dict, scores: np.ndarray,
