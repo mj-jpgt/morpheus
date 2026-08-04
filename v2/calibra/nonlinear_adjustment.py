@@ -70,9 +70,9 @@ from pathlib import Path
 
 import numpy as np
 
-from .calibration import _map, permutation_null
-from .residualise import (apply_pooled_tissue_source_site, confound_design,
-                          cross_fitted_residuals, pooled_tissue_source_site)
+from .calibration import _map
+from .residualise import (confound_design, cross_fitted_residuals,
+                          pooled_tissue_source_site)
 from .spectral import (effective_rank, heldout_top_cca, top_canonical_correlation)
 
 __all__ = ["cell_codes", "cell_design", "saturated_cell_residuals", "kernel_ridge_residuals",
