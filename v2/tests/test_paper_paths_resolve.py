@@ -49,6 +49,8 @@ BOX_TREES = {
     "p1_out": "P1 artifact outputs on the box",
     "e0_run": "D1/D2 run tree on the box",
     "runs": "training run outputs on the box",
+    "runs_misc": "one-off analysis run trees on the box, e.g. runs_misc/calibra_run/ which holds the "
+                 "Phase 1 cohort artifact P1 4.2's cancer-type certificate is computed from",
 }
 
 #: File extensions that make a bare token (no slash) a path rather than prose.
@@ -101,6 +103,10 @@ BOX_OUTPUT_BASENAMES = {
                        "test_paper_artifact_digests.py, not by this filename",
     "d2_i_seed42.npz": "runs/d2_final/artifacts/ on the box; same - see "
                        "test_paper_artifact_digests.py",
+    "diagnostic_full_seed42.npz": "runs_misc/calibra_run/artifacts/ on the box; three files share "
+                                  "this name and two of them are not the Phase 1 cohort, so its "
+                                  "identity is pinned by SHA-256 in test_paper_artifact_digests.py, "
+                                  "not by this filename",
     "certificate_adjusted/": "output directory under p1_evidence/track1/ on the box",
     "certificate_raw/": "output directory under p1_evidence/track1/ on the box",
 }
@@ -215,7 +221,8 @@ def test_box_paths_are_marked_as_such() -> None:
         if _is_box_path(token):
             continue
         head = token.split("/")[0]
-        if head in {"p1_evidence", "p1_out", "e0_run", "ws_rank", "ws_p2", "ws_d1", "runs"}:
+        if head in {"p1_evidence", "p1_out", "e0_run", "ws_rank", "ws_p2", "ws_d1", "runs",
+                    "runs_misc"}:
             text = (REPO_ROOT / paper).read_text(encoding="utf-8")
             # The citation is acceptable if the draft says, near it, that it is a box path.
             idx = text.find(token)

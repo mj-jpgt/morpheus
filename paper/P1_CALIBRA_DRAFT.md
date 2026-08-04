@@ -25,7 +25,7 @@ direction pair spanning the image and molecular blocks, pushes it through the *i
 including the residualisation, and reports what came back. On 2,530–6,427 TCGA patients with frozen
 H-Optimus-0 whole-slide features and bulk expression targets we report four things. (i) The
 adjustment works on the first moment and is verified rather than assumed, twice and on two different
-confounders: raw cancer-type balanced accuracy falls 0.463 → 0.035 against a chance rate of 0.048 (**artifact not identified** — §4.2), and
+confounders: raw cancer-type balanced accuracy falls 0.7339 → 0.0308 against a chance rate of 0.0476 (artifact `diagnostic_full_seed42.npz`, SHA-256 `72dcefcf05482288…`; §4.2 — this replaces a previously published 0.463 → 0.035 that **could not be reproduced**), and
 joint tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118 (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 21–45× drop
 with zero breaching axes in six representation states — while a nonlinear probe still recovers both
 confounds from the adjusted state at 3.15× and 3.45× chance, so what is certified is the class means
@@ -172,7 +172,7 @@ In descending order of how well evidenced they are.
 
 1. **A confound adjustment verified rather than asserted, on two different confounders, with the
    verification reported as a certificate — and with the certificate's own reach measured.**
-   Cancer-type balanced accuracy 0.463 → 0.035 (chance 0.048) (**artifact not identified** — §4.2); joint tissue-source-site balanced
+   Cancer-type balanced accuracy 0.7339 → 0.0308 (chance 0.0476) (artifact `diagnostic_full_seed42.npz`, SHA-256 `72dcefcf05482288…`; §4.2 — replacing a withdrawn, **unreproducible** 0.463 → 0.035); joint tissue-source-site balanced
    accuracy 0.3633 → 0.0118 (chance 0.0118) (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 21–45× drop with zero breaching axes across six
    states. What that certifies is the **first moment**: a nonlinear probe still recovers site at
    3.15× and cancer at 3.45× chance from the adjusted state, *p* at the floor, three probe families
@@ -647,19 +647,73 @@ this class should be understood as calibrating the *test*, not the instrument.
 ### 4.2 The adjustment is verified, not assumed — twice, on two different confounders
 
 **Cancer type.** From the residualised representation, out-of-fold balanced accuracy for cancer type
-falls from **0.463 raw to 0.035 adjusted**, against a chance rate of **0.048** (1/21 test cancers) at
-n = 2,530. The adjusted value is *below* chance, which is the expected behaviour of cross-fitted
-residualisation against the variable being removed.
+falls from **0.7339 raw to 0.0308 adjusted** on the `wsi_biology` state, against a chance rate of
+**0.0476** (1/21 test cancers) at n = 2,530 — a 23.8× drop, to below chance, which is the expected
+behaviour of cross-fitted residualisation against the variable being removed. Estimator:
+`confound_certificate.lda_oof_balanced_accuracy`, joint shrunk-covariance LDA over all 256 axes,
+per-axis standardisation, 5 class-stratified folds, seed 42. Adjustment: the identical 99-column
+`cancer` + pooled-`tss` cross-fitted design CALIBRA applies before it measures the channel.
 
-> **PROVENANCE UNRESOLVED — ARTIFACT NOT IDENTIFIED.** These three numbers cannot be traced to an
-> artifact. `v2/research/rebase/nature/PHASE1_RESULT.md` states them in prose and names no artifact
-> path and no hash; no run output on persistent storage records a cancer-type balanced accuracy of
-> 0.463 or 0.035, and an exhaustive search of `p1_evidence/`, `p1_out/` and `e0_run/` on the box
-> returns only unrelated coincidental digit matches. The cohort is also different from the tissue-source-site
-> arm below — n = 2,530 against n = 2,766 — so it cannot be inherited from it. **They are quoted here
-> only because they are already published; they are not reproducible from anything we can point to, and
-> they must either be regenerated with a hash-pinned artifact or withdrawn before submission.** This
-> is stated rather than resolved by picking whichever artifact happens to match.
+**Artifact, by content hash.** On the box, under
+`/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`:
+`runs_misc/calibra_run/artifacts/diagnostic_full_seed42.npz`, SHA-256
+`72dcefcf05482288e4a353f7697678b9f82f7648078e223345eb3f6444b82c71`, scored against
+`frozen_rna_targets.npz`, SHA-256
+`d526a7adc7456ac4f0e5e3ff71c0ef2bac96dc8488435ea714ba9840d8b51fb2`. A second file of the same name at
+`runs/v22_a10_11v21_20260725/artifacts/` on the box (SHA-256 `7674145216572fad…`) is **not** this one;
+a third at `runs/v21_release_20260720_retry3_resume_safe/artifacts/` is byte-identical to the first.
+Output: `v2/research/rebase/nature/p1_cancer_type/out/P1_CANCER_TYPE_CERTIFICATE.json`, produced by
+`v2/research/rebase/nature/p1_cancer_type_certificate.py`.
+
+> **THIS REPLACES A WITHDRAWN NUMBER.** Until 2026-08-05 this paragraph read *"falls from 0.463 raw to
+> 0.035 adjusted, against a chance rate of 0.048"*, sourced from `PHASE1_RESULT.md`, which stated it in
+> prose with no artifact path and no hash. **The pair could not be reproduced and is withdrawn.** The
+> *cohort* was identified — see the hash table below; `split == "test"` on that artifact, intersected
+> with the frozen RNA target table, is exactly 2,530 patients over 21 cancer types with a 99-column
+> design and 75 sites kept, six of six against what `PHASE1_RESULT.md` claims, and its 6,192-patient
+> split totals explain the n = 2,530 vs n = 2,766 difference from the tissue-source-site arm below. The
+> *numbers* were not: the canonical estimator returns 0.7339 → 0.0308 on that cohort. Only the chance
+> rate reproduces (1/21 = 0.047619, published as 0.048).
+>
+> **None of the 56 readings on this cohort — 7 representation states x 8 estimator variants from
+> this repository's own confound battery — has both published endpoints**; the closest is 0.16 away
+> in L1 (`wsi_biology`, k-NN: raw 0.4447, adjusted 0.1766). The way they fail is
+> informative rather than a rounding matter: 0.463 sits in the *nonlinear* band for this cohort
+> (k-NN 0.4447, prior-corrected k-NN 0.5083, forest 0.5240) while 0.035 sits in the *linear* band
+> (joint LDA 0.0308 standardised, 0.0333 unstandardised — all on artifact `72dcefcf05482288…`).
+> Every single estimator gives either a much
+> larger drop than the published 13.2× (LDA, 23.8×) or a much smaller one (k-NN 2.5×, forest 2.0×,
+> RBF-SVM 2.1×). The withdrawn ratio is not a ratio any one classifier produces here.
+>
+> The pair is **not** attributed to whichever reading sits nearest it. It came from a session probe
+> that never persisted: it was committed on 2026-07-30 (`4c7166b`), whereas
+> `v2/calibra/confound_certificate.py` — which defines the only balanced-accuracy functions in the
+> repository — was written on 2026-08-02; `run_calibra` has never emitted such a metric; the committed
+> run for that result, `runs/calibra_v2_local/`, records no balanced accuracy in any of its 122 data rows;
+> and no script computing one appears anywhere in git history, live or deleted.
+
+**The certificate is a first-moment statement, and the nonlinear reading on this same cohort is much
+weaker.** Same artifact, same state, same folds, same adjustment:
+
+| estimator (`wsi_biology`, n = 2,530, 21 classes, chance 0.0476) | raw | adjusted | drop | adjusted ÷ chance |
+|---|---:|---:|---:|---:|
+| **joint LDA, standardised** (the certificate) | **0.7339** | **0.0308** | **23.8×** | **0.65×** |
+| joint LDA, unstandardised | 0.7283 | 0.0333 | 21.9× | 0.70× |
+| k-NN, k = 15 | 0.4447 | 0.1766 | 2.5× | 3.71× |
+| k-NN, k = 15, prior-corrected | 0.5083 | 0.2284 | 2.2× | 4.80× |
+| random forest, 300 trees | 0.5240 | 0.2681 | 2.0× | 5.63× |
+| RBF-SVM | 0.6157 | 0.2958 | 2.1× | 6.21× |
+| per-axis nearest-class-mean, max over 256 axes | 0.1650 | 0.0516 | 3.2× | 1.08× |
+| *withdrawn (published 2026-07-30, unreproducible)* | *0.463* | *0.035* | *13.2×* | *0.74×* |
+
+The last column is a **raw ratio to chance**, not netted against a null that regenerates the
+adjustment inside each permutation, so it is not the same quantity as the 3.45× reported in §4.4 for
+the n = 2,766 arm and must not be quoted interchangeably with it. The direction is nonetheless the
+same and is the honest reading of the certificate: what the adjustment demonstrably removes is the
+class means.
+
+The certificate above is computed from the artifact whose SHA-256 is given at the head of this
+subsection (`72dcefcf05482288…`), and from no other file of that name.
 
 **Tissue source site.** The identical certificate, run on raw and on cancer+TSS cross-fitted
 residuals of the same states, n = 2,766, 85 pooled TSS classes (chance = 1/85 = 0.0118), 108-column
@@ -1513,7 +1567,7 @@ correlation of known strength onto a named direction pair and pushing it through
 pipeline.
 
 Applied to TCGA morphology and expression, the answers are: the adjustment removes what it claims to
-from the first moment (cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048 (**artifact not identified** — §4.2); joint site
+from the first moment (cancer-type balanced accuracy 0.7339 → 0.0308 against chance 0.0476 (artifact `diagnostic_full_seed42.npz`, SHA-256 `72dcefcf05482288…`; §4.2 — replacing a withdrawn, **unreproducible** 0.463 → 0.035); joint site
 accuracy 0.3633 → 0.0118 against chance 0.0118, with zero breaching axes in six states (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2)), and no
 further — a nonlinear probe recovers site at 3.15× and cancer at 3.45× chance from the adjusted state,
 against a null that regenerates the adjustment inside every permutation, so what the certificate

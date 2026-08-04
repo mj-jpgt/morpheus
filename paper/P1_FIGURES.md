@@ -57,10 +57,13 @@ and 0.3785 respectively. Plot only from these hashes:
 |---|---|---|
 | d2_h | `runs/d2_final/artifacts/d2_h_seed42.npz` | `4a18b94f1017b85dd576f30ee8e3caf92d7897630a7054efb70166191cbe69e3` |
 | d2_i | `runs/d2_final/artifacts/d2_i_seed42.npz` | `028e8635465dd3c6d3dbead25a8c204ca1ae0cee4aabb20e5412847fb147b665` |
+| Phase 1 cohort (panel d) | `runs_misc/calibra_run/artifacts/diagnostic_full_seed42.npz` | `72dcefcf05482288e4a353f7697678b9f82f7648078e223345eb3f6444b82c71` |
 
-Panel (d)'s cancer-type numbers (0.463 → 0.035) have **no identified artifact** — see P1 §4.2. Do not
-plot (d) as though it were provenanced; either regenerate it against a hashed artifact or drop the
-panel.
+Panel (d) was regenerated on 2026-08-05 and now plots **0.7339 → 0.0308** against chance **0.0476**
+from the hashed artifact above. The figures it used to carry, **0.463 → 0.035**, are **withdrawn**:
+they had **no identified artifact**, and re-running the check on the identified cohort did not
+reproduce them — see P1 §4.2. Do not plot the withdrawn pair. Values for (d) come from
+`v2/research/rebase/nature/p1_cancer_type/out/P1_CANCER_TYPE_CERTIFICATE.json`.
 
 **Panels.**
 - (a) Grouped bars, six state × artifact combinations: joint LDA balanced accuracy raw vs adjusted,
@@ -71,9 +74,14 @@ panel.
   (0.0334, *below* its own null p95 of 0.0392), and the joint value (0.3633) as a separate marker far
   to the right. This panel is the figure that carries the certification-rule finding.
 - (c) Breaching-axis counts raw → adjusted (17→0, 60→0, 58→0, 43→0, 61→0, 48→0).
-- (d) Small companion bar: cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048 (**artifact not identified**, see below; different
-  cohort, n = 2,530 — label it as such, do not merge with (a)). **This panel is a first-moment
-  statement and must be captioned as one** — it is *not* "cancer is gone"; see (e).
+- (d) Small companion bar: cancer-type balanced accuracy **0.7339 → 0.0308** against chance
+  **0.0476**, `wsi_biology`, artifact `diagnostic_full_seed42.npz` SHA-256 `72dcefcf05482288…`
+  (different cohort, n = 2,530, the pre-rebuild split — label it as such, do not merge with (a)).
+  **This panel is a first-moment statement and must be captioned as one** — it is *not* "cancer is
+  gone"; see (e). Overlay the like-for-like nonlinear reading on the same block, because it is far
+  weaker than the LDA bar: k-NN 0.4447 → 0.1766, forest 0.5240 → 0.2681, RBF-SVM 0.6157 → 0.2958.
+  Caption must record that this panel previously showed a withdrawn, unreproducible 0.463 → 0.035
+  (**artifact not identified**, see above); do not plot those values.
 - (e) **What the certificate does not cover, and how far it reaches.** Two paired bars for the same
   adjusted `d2_h::wsi_biology` block: the mean-based reading the certificate makes (joint LDA 0.0118 at
   chance 0.0118) beside the nonlinear reading on the identical block, netted against a null that

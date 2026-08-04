@@ -19,6 +19,17 @@ artifact, the draft must identify **which bytes**. Concretely:
   that keeps the registry honest: the failure mode being guarded against is not an absent hash, it is a
   *confident wrong* hash.
 
+**2026-08-05 — the first entry to go all the way through.** `0.463` was pinned here with
+`artifact: None` because nothing on disk recorded it. The cohort was then found, by structure rather
+than by matching: `run_calibra` selects `split == "test"` intersected with the target table, and on
+`diagnostic_full_seed42.npz` (`72dcefcf…`) that mask is exactly 2,530 patients / 21 cancers /
+99 confound columns / 75 sites, six of six against `PHASE1_RESULT.md`. Re-running the check there
+returned **0.7339 → 0.0308**, not 0.463 → 0.035, and none of the 56 readings on that cohort
+(7 states x 8 estimator variants) has both published endpoints. So the number was **withdrawn**, not attributed — and it stays in this registry
+with `artifact: None`, because it is still quoted in the drafts as withdrawn history and that is
+exactly the state that needs guarding. A withdrawal is a claim too, and it can rot the same way an
+attribution can.
+
 The digests below were taken on the box and are recorded here so the check runs in a checkout, where
 the artifacts themselves are not present. `test_recorded_digests_match_the_box_when_reachable`
 re-verifies them against the real files whenever this suite happens to run somewhere they are mounted.
@@ -66,6 +77,27 @@ ARTIFACTS = {
         "sha256": "b49dc3efaf0a25dd9aacbd4792b843bc8cefff3840f15c64002b9ca45df8c4e9",
         "note": "August re-run, NOT published",
     },
+    "calibra_phase1::diagnostic_full_seed42": {
+        "path": "runs_misc/calibra_run/artifacts/diagnostic_full_seed42.npz",
+        "sha256": "72dcefcf05482288e4a353f7697678b9f82f7648078e223345eb3f6444b82c71",
+        "note": "the Phase 1 cohort: split=='test' here is exactly the 2,530 patients / 21 cancers "
+                "/ 99 confound columns / 75 sites PHASE1_RESULT.md describes, from the pre-rebuild "
+                "6,192-patient split. P1 4.2's cancer-type certificate is computed from it. A "
+                "byte-identical copy sits at runs/v21_release_20260720_retry3_resume_safe/artifacts/",
+    },
+    "calibra_phase1::frozen_rna_targets": {
+        "path": "runs_misc/calibra_run/artifacts/frozen_rna_targets.npz",
+        "sha256": "d526a7adc7456ac4f0e5e3ff71c0ef2bac96dc8488435ea714ba9840d8b51fb2",
+        "note": "the molecular target table the Phase 1 cohort mask is intersected with; it is what "
+                "makes the 2,530 figure reproducible rather than merely plausible",
+    },
+    "v22_a10::diagnostic_full_seed42": {
+        "path": "../runs/v22_a10_11v21_20260725/artifacts/diagnostic_full_seed42.npz",
+        "sha256": "7674145216572fad4af5cecebb5069309584f954c735203f26ba96a4b0f8b1e6",
+        "note": "a THIRD file called diagnostic_full_seed42.npz, NOT the Phase 1 cohort; pinned so "
+                "that a future edit citing it is caught rather than accepted. Path is relative to "
+                "BOX_ROOT's parent, which is where this run tree lives",
+    },
 }
 
 #: Numbers a draft quotes, and the artifact each came from.
@@ -88,23 +120,52 @@ PINNED_NUMBERS = [
     },
     {
         "value": "0.463",
-        "what": "cancer-type raw balanced accuracy, P1 4.2",
+        "what": "cancer-type raw balanced accuracy, P1 4.2 -- WITHDRAWN 2026-08-05",
         "artifact": None,
         "unidentified_because":
-            "PHASE1_RESULT.md states it in prose with no artifact path and no hash; no run output "
-            "under p1_evidence/, p1_out/ or e0_run/ on the box records a cancer-type balanced "
-            "accuracy of 0.463 or 0.035, and the cohort (n = 2,530) differs from the site arm "
-            "(n = 2,766) so it cannot be inherited from it",
+            "WITHDRAWN, not merely unattributed. The cohort WAS identified on 2026-08-05 -- "
+            "calibra_phase1::diagnostic_full_seed42, whose split=='test' mask is exactly 2,530 "
+            "patients over 21 cancers with a 99-column design and 75 sites kept, six of six against "
+            "PHASE1_RESULT.md, from the pre-rebuild 6,192-patient split (which is the whole of the "
+            "n = 2,530 vs n = 2,766 gap). The NUMBERS were not: the canonical estimator returns "
+            "0.7339 -> 0.0308 on that cohort, and none of the 56 state x estimator readings there has both "
+            "published endpoints -- 0.463 lies in the nonlinear band (kNN 0.4447, forest 0.5240) "
+            "and 0.035 in the linear band (joint LDA 0.0308). Only the chance rate reproduced. It "
+            "came from a session probe that never persisted: it was committed 2026-07-30 (4c7166b) "
+            "while confound_certificate.py, which defines the only balanced-accuracy functions "
+            "here, was written 2026-08-02. It stays pinned with artifact None because it remains "
+            "quoted in the drafts AS WITHDRAWN HISTORY, and quoting it any other way is the defect "
+            "this file guards against",
+        "papers": ["paper/P1_CALIBRA_DRAFT.md", "paper/P1_FIGURES.md"],
+    },
+    {
+        "value": "0.7339",
+        "what": "cancer-type raw balanced accuracy, wsi_biology, joint LDA, P1 4.2 -- the measured "
+                "value that replaces the withdrawn 0.463",
+        "artifact": "calibra_phase1::diagnostic_full_seed42",
+        "papers": ["paper/P1_CALIBRA_DRAFT.md", "paper/P1_FIGURES.md"],
+    },
+    {
+        "value": "0.0308",
+        "what": "cancer-type adjusted balanced accuracy, wsi_biology, joint LDA, P1 4.2 -- the "
+                "measured value that replaces the withdrawn 0.035",
+        "artifact": "calibra_phase1::diagnostic_full_seed42",
         "papers": ["paper/P1_CALIBRA_DRAFT.md", "paper/P1_FIGURES.md"],
     },
 ]
 
 #: Phrases that count as declaring a number unattributable. One must appear near the number.
-UNIDENTIFIED_MARKERS = ("artifact not identified", "provenance unresolved", "no identified artifact")
+#:
+#: The last three were added on 2026-08-05 for 0.463, whose status moved from "we cannot find the
+#: artifact" to "we found the cohort, re-ran the check, and did not get this number". A withdrawn
+#: figure may still be quoted -- keeping it visible is what stops a correction from becoming a quiet
+#: deletion -- but it may only be quoted as withdrawn.
+UNIDENTIFIED_MARKERS = ("artifact not identified", "provenance unresolved", "no identified artifact",
+                        "could not be reproduced", "unreproducible", "withdrawn")
 
 #: Basenames that name an artifact whose identity matters. Citing one without a hash nearby is the
 #: defect this file exists to prevent.
-HASH_REQUIRED_BASENAMES = ("d2_h_seed42.npz", "d2_i_seed42.npz")
+HASH_REQUIRED_BASENAMES = ("d2_h_seed42.npz", "d2_i_seed42.npz", "diagnostic_full_seed42.npz")
 
 #: How far from a citation a hash may sit and still count as attached to it.
 WINDOW = 1600
