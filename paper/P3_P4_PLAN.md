@@ -443,11 +443,28 @@ answers in fluent prose about an analysis that could not have detected the effec
 **That table is P4's Figure 1**, and it is the abstention-curve axis Leibig et al. established as the
 right primary evaluation.
 
-**9.3 Does the certificate discriminate?** See the entry's Test A′ — a site code, a cancer code and
-pure noise planted into the state over a signal-to-noise ladder, with the reading fixed in advance:
-the site code must be refused, the other two must not, and if the site code stops being refused after
-the adjustment then "the adjusted state certifies" is a statement about the adjustment rather than
-evidence that any axis is site-free.
+**9.3 The certificate discriminates on the raw state and is near-inert on the adjusted one.** A site
+code, a cancer code and pure noise were planted into `d2_h_seed42::wsi_biology` over a
+signal-to-noise ladder, with the reading fixed in advance.
+
+* **Raw: the predeclared pattern holds at 4 of 4 strengths** (SNR 0.5, 1.0, 2.0, ∞). The site code is
+  always refused; the cancer code and the noise never are. A noiseless site code reads balanced
+  accuracy **1.0000** and is refused; a noiseless *cancer* code reads 0.2372 and is correctly **not**
+  refused, because its own within-cancer null sits at 0.2527 — the null declining to charge an axis
+  for lineage information it did not add. The state's joint LDA tracks the injected leak
+  monotonically (0.3795 → 0.4292 → 0.5264 → 0.7281 against a no-plant baseline of 0.3633).
+* **Adjusted: the site code stops being refused** at SNR 0.5, 1.0 and 2.0 — accuracy 0.0028–0.0100,
+  at or below the chance rate of 0.0118 — and is refused only when it is perfectly noiseless. The
+  predeclared consequence therefore applies: **the adjusted arm's blanket PASS is a statement about
+  the adjustment, not evidence that any axis is site-free, and may not be quoted as certification for
+  exposure.**
+* **A new caveat for the instrument**: at SNR = ∞ the adjusted arm also *falsely refuses* the cancer
+  code (0.2459, p at the resolution floor), because the design annihilates it and the per-axis
+  standardisation rescales the residue. On degenerate or near-null axes the adjusted certificate errs
+  in both directions.
+
+Taken together with §9.1: the certificate is a working instrument, it is being read on the wrong
+object, and §7.1 is what fixes that.
 
 ---
 

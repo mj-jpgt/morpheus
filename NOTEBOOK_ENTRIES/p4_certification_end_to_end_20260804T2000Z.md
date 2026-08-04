@@ -47,11 +47,11 @@ A3 is a property of the state and gates every axis in it at once, because a stat
 and fails jointly has not been shown to be site-free — it has been shown that nobody looked with
 enough resolution.
 
-**Result.** The seed-42 certificate rows were re-derived in this workspace and reproduce the
-published run exactly where they overlap (`d2_h::wsi_biology` raw: 17 breaching axes, joint LDA
-0.363263, both to six figures). Counts for all six cells are from
-`t13_confound_certificate_20260803T0152Z.md` (raw) and `t13_adjusted_certificate_and_p6_20260803T0300Z.md`
-(adjusted); the fractions are computed from them under the definition above.
+**Result.** All twelve cells (2 artifacts × 3 states × raw/adjusted) were **re-derived from scratch in
+this workspace** at 1,000 permutations, and every breaching count and every joint accuracy
+reproduces the published run of 2026-08-03 (`t13_confound_certificate_20260803T0152Z.md`,
+`t13_adjusted_certificate_and_p6_20260803T0300Z.md`) to the digits those entries quote. The
+answerable fractions are computed from that run under the definition above.
 
 | artifact | state | arm | breaching axes / 256 | joint LDA | joint null p95 | joint OK? | **answerable, per-axis only** | **answerable, strict** |
 |---|---|---|---:|---:|---:|:---:|---:|---:|
@@ -89,7 +89,63 @@ commit that introduced it, because a single-axis nearest-class-mean rule at 85 c
 detector by construction and a binary verdict at one SNR would not say *how strong* a site code has
 to be before it is refused.
 
-*(table filled below)*
+**Predeclared pass pattern: the site code must breach, the cancer code and the noise must not.**
+Chance rate 0.011765; per-axis nulls are within-cancer permutations, 1,000 draws; 259 axes scored
+(256 real + 3 planted).
+
+**Raw state — the certificate discriminates, at every strength tested.**
+
+| SNR | PLANT_site | its null p95 | perm p | breaches? | PLANT_cancer | its null p95 | breaches? | PLANT_noise | breaches? | state joint LDA |
+|---|---:|---:|---:|:---:|---:|---:|:---:|---:|:---:|---:|
+| 0.5 | 0.0245 | 0.0205 | 0.0040 | **YES** | 0.0159 | 0.0253 | no | 0.0083 | no | 0.3795 |
+| **1.0 (predeclared)** | 0.0287 | 0.0229 | 0.0010 | **YES** | 0.0280 | 0.0362 | no | 0.0083 | no | 0.4292 |
+| 2.0 | 0.0705 | 0.0264 | 0.0010 | **YES** | 0.0441 | 0.0554 | no | 0.0083 | no | 0.5264 |
+| ∞ (noiseless) | **1.0000** | 0.0397 | 0.0010 | **YES** | 0.2372 | 0.2527 | no | 0.0083 | no | 0.7281 |
+
+**The predeclared pattern holds at 4 of 4 strengths, including one weaker than the predeclared arm.**
+Three things make this a real control rather than a formality:
+
+* A **noiseless site code reads balanced accuracy 1.0000** and is refused at the resolution floor. The
+  instrument is not blunt.
+* A **noiseless cancer code reads 0.2372 and is NOT refused**, because its own within-cancer null sits
+  at 0.2527. That is the null doing exactly the job its docstring claims: cancer type predicts site
+  well above chance, and the certificate correctly declines to charge an axis for lineage information
+  it did not add. Had the null been a global permutation, this axis would have been refused and every
+  biology axis with it.
+* The **state's joint LDA tracks the injected leak monotonically** — 0.3795 → 0.4292 → 0.5264 →
+  0.7281 as the planted code strengthens, from a baseline of 0.3633 with nothing planted. The joint
+  row is sensitive to a single added axis out of 257.
+
+**Adjusted state — the certificate is near-inert against a site code at every realistic strength.**
+
+| SNR | PLANT_site | its null p95 | perm p | breaches? | PLANT_cancer breaches? | state joint LDA | joint OK? | axes breaching |
+|---|---:|---:|---:|:---:|:---:|---:|:---:|---:|
+| 0.5 | 0.0028 | 0.0183 | 0.9990 | no | no | 0.0067 | ✓ | 0 |
+| **1.0 (predeclared)** | 0.0090 | 0.0183 | 0.8601 | no | no | 0.0067 | ✓ | 0 |
+| 2.0 | 0.0100 | 0.0180 | 0.7872 | no | no | 0.0081 | ✓ | 0 |
+| ∞ (noiseless) | **0.2751** | 0.0236 | 0.0010 | **YES** | **YES** | 0.0387 | ✓ | 2 |
+
+**Reading, against the predeclared rule, and the first branch is taken.** `PLANT_site` **stops
+breaching after adjustment** at SNR 0.5, 1.0 and 2.0 — its accuracy falls to 0.0028–0.0100, at or
+below the chance rate of 0.0118. Per the predeclaration:
+
+> the adjusted certificate cannot tell a site code from a biology axis at any realistic strength,
+> because the adjustment removes site by construction. **"The adjusted state certifies" is a
+> statement about the adjustment, not evidence that any axis is site-free**, and the adjusted arm may
+> not be quoted as certification for exposure.
+
+The boundary is measured rather than asserted: the adjusted certificate retains power only against a
+**perfectly noiseless** site code, somewhere above SNR 2.0. It is not inert; it is close to it over
+the range any real axis occupies.
+
+**And it errs in the other direction too, which is new.** At SNR = ∞ the adjusted arm refuses
+`PLANT_cancer` as well (0.2459, p at the resolution floor). A pure cancer code carries no site
+information beyond cancer and must not breach — the raw arm correctly declines to refuse it. It
+breaches after adjustment because the design **annihilates** it, leaving numerical residue that the
+certificate's per-axis standardisation then rescales to unit variance before scoring. **So on
+degenerate or near-null axes the adjusted certificate produces false refusals as well as false
+passes.** That is a caveat that belongs with the instrument and is recorded here rather than in the
+place where it would be convenient to omit it.
 
 ---
 

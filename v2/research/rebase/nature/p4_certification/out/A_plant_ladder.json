@@ -1,0 +1,287 @@
+{
+  "state": "d2_h_seed42::wsi_biology",
+  "n_patients": 2766,
+  "predeclared_snr": 1.0,
+  "ladder": {
+    "0.5": {
+      "raw": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": false,
+        "joint_lda_balanced_accuracy": 0.3795063842951149,
+        "joint_null_p95": 0.1596241778127038,
+        "n_breaching_axes": 18,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.024503556452893902,
+            "null_p95": 0.020480026526611027,
+            "permutation_p": 0.003996003996003996,
+            "exceeds_null_p95": true,
+            "breaches": true
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.015929946189593813,
+            "null_p95": 0.025341027663672102,
+            "permutation_p": 0.8051948051948052,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.008346197800756686,
+            "null_p95": 0.019309722952600156,
+            "permutation_p": 0.936063936063936,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      },
+      "adjusted": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": true,
+        "joint_lda_balanced_accuracy": 0.006663104252002139,
+        "joint_null_p95": 0.046454303491367255,
+        "n_breaching_axes": 0,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.0027519289221416884,
+            "null_p95": 0.018318383729886086,
+            "permutation_p": 0.999000999000999,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.005390317718305933,
+            "null_p95": 0.018059981534325985,
+            "permutation_p": 0.988011988011988,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.0032017498347221085,
+            "null_p95": 0.01819030253188597,
+            "permutation_p": 1.0,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      }
+    },
+    "1.0": {
+      "raw": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": false,
+        "joint_lda_balanced_accuracy": 0.4291606700038353,
+        "joint_null_p95": 0.16921427071340417,
+        "n_breaching_axes": 18,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.028694455602514914,
+            "null_p95": 0.022903699208025912,
+            "permutation_p": 0.000999000999000999,
+            "exceeds_null_p95": true,
+            "breaches": true
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.02804490479079846,
+            "null_p95": 0.03616757993649813,
+            "permutation_p": 0.6273726273726273,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.008346197800756686,
+            "null_p95": 0.019309722952600156,
+            "permutation_p": 0.936063936063936,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      },
+      "adjusted": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": true,
+        "joint_lda_balanced_accuracy": 0.006663104252002139,
+        "joint_null_p95": 0.04617951891384116,
+        "n_breaching_axes": 0,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.00904245860574094,
+            "null_p95": 0.01826674043593556,
+            "permutation_p": 0.8601398601398601,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.004499531785300459,
+            "null_p95": 0.018237338868435964,
+            "permutation_p": 0.997002997002997,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.0032017498347221085,
+            "null_p95": 0.01819030253188597,
+            "permutation_p": 1.0,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      }
+    },
+    "2.0": {
+      "raw": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": false,
+        "joint_lda_balanced_accuracy": 0.5263650442898475,
+        "joint_null_p95": 0.18142396208208628,
+        "n_breaching_axes": 18,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.07053682416375721,
+            "null_p95": 0.02641847263822106,
+            "permutation_p": 0.000999000999000999,
+            "exceeds_null_p95": true,
+            "breaches": true
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.04414562293935077,
+            "null_p95": 0.05539097995038786,
+            "permutation_p": 0.6223776223776224,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.008346197800756686,
+            "null_p95": 0.019309722952600156,
+            "permutation_p": 0.936063936063936,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      },
+      "adjusted": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": true,
+        "joint_lda_balanced_accuracy": 0.008091675680573568,
+        "joint_null_p95": 0.0466223404484876,
+        "n_breaching_axes": 0,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.010006193188641422,
+            "null_p95": 0.018033412751401235,
+            "permutation_p": 0.7872127872127872,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.0020959900184713506,
+            "null_p95": 0.018031280082259953,
+            "permutation_p": 1.0,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.0032017498347221085,
+            "null_p95": 0.01819030253188597,
+            "permutation_p": 1.0,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      }
+    },
+    "inf": {
+      "raw": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": false,
+        "joint_lda_balanced_accuracy": 0.7280572991641225,
+        "joint_null_p95": 0.19666279934820516,
+        "n_breaching_axes": 18,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 1.0,
+            "null_p95": 0.03968132883562721,
+            "permutation_p": 0.000999000999000999,
+            "exceeds_null_p95": true,
+            "breaches": true
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.23722091886645713,
+            "null_p95": 0.25267666954612855,
+            "permutation_p": 0.8321678321678322,
+            "exceeds_null_p95": false,
+            "breaches": false
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.008346197800756686,
+            "null_p95": 0.019309722952600156,
+            "permutation_p": 0.936063936063936,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      },
+      "adjusted": {
+        "n_axes_total": 259,
+        "chance_rate": 0.011764705882352941,
+        "joint_certified": true,
+        "joint_lda_balanced_accuracy": 0.038725555910137835,
+        "joint_null_p95": 0.05932782721574917,
+        "n_breaching_axes": 2,
+        "planted": {
+          "PLANT_site": {
+            "axis": 256,
+            "balanced_accuracy": 0.2751144152869195,
+            "null_p95": 0.023647962727857418,
+            "permutation_p": 0.000999000999000999,
+            "exceeds_null_p95": true,
+            "breaches": true
+          },
+          "PLANT_cancer": {
+            "axis": 257,
+            "balanced_accuracy": 0.2458737140067631,
+            "null_p95": 0.0400381807031677,
+            "permutation_p": 0.000999000999000999,
+            "exceeds_null_p95": true,
+            "breaches": true
+          },
+          "PLANT_noise": {
+            "axis": 258,
+            "balanced_accuracy": 0.0032017498347221085,
+            "null_p95": 0.01819030253188597,
+            "permutation_p": 1.0,
+            "exceeds_null_p95": false,
+            "breaches": false
+          }
+        }
+      }
+    }
+  }
+}
