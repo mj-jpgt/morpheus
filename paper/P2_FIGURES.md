@@ -47,8 +47,9 @@ Not stylistic preferences. Each exists because the evidence would be misrepresen
    values, `(Σσ)²/Σσ²`; **R3** = R2 after L2-normalising rows. The "16/16" instance is a **hard
    numerical rank**, a fourth thing again. And a fifth statistic, the order-2 Hill number of the
    *eigenvalues* `(Σσ²)²/Σσ⁴`, appears in the draft under two names — as "participation ratio" in
-   §4.6 and, in error, as "R2" in §4.5(a). **Any panel derived from §4.5(a) must be redrawn from
-   `~/ws_p2/out/P2_RANK_VARIANTS.json`, not from the draft's current table.**
+   §4.6 and, until commit `a11549a`, as "R2" in §4.5(a). **Any panel derived from §4.5(a) must be
+   drawn from `~/ws_p2/out/P2_RANK_VARIANTS.json`, and no printing of that table older than
+   `a11549a` may be used.**
 2. **Every panel showing a rank *level* must show a reproducibility envelope**, as a shaded band or
    an annotated bracket: the 2.69× same-seed retraining envelope of §4.1, or the arm's own seed
    spread from §4.2's table. A level comparison drawn without it is the practice this paper exists

@@ -66,9 +66,15 @@ Two notes on the verification, because both were nearly missed:
   `core.autocrlf=true`, so every file arrived CRLF and all 402 blob hashes differed. Had I checked
   only file *count* and a couple of spot sizes, a workspace with every line ending altered would have
   passed. `git -c core.autocrlf=false -c core.eol=lf archive` is what produced the clean tree.
-- The commit HEAD pointed at moved during the work (another agent pushed `c3484bb`). `c3484bb`
-  differs from `7b37dce` by **one added `NOTEBOOK_ENTRIES/` file and no code**, so the workspace is
-  code-identical to the current tree; the run is attributed to `7b37dce` rather than to "HEAD".
+- The commit HEAD pointed at moved during the work (concurrent agents pushed `c3484bb`, `aaa37dd`,
+  `a11549a`). The run is therefore attributed to the commit the tree was verified against —
+  `7b37dce` — rather than to "HEAD", which is a moving target on a shared checkout.
+
+**Confirming re-run.** After the vendoring was finished, `~/ws_p2/morpheus` was rebuilt and
+re-verified against the final commit `144c9dc` (**405/405 files, 0 missing, 0 extra, 0 differing**)
+and the whole chain re-run. The two logs are **byte-identical** apart from the output filenames:
+`~/ws_p2/out/p2_run_7b37dce.log` and `~/ws_p2/out/p2_run.log`. Every number in §2 and §3 below is
+therefore reproduced twice, on two independently verified trees.
 
 **No other agent's workspace was read from, written to or imported.**
 
@@ -230,7 +236,10 @@ Separately: the D1 confidence intervals the paper marks as pending were written 
 - `v2/tests/test_effective_rank_canonical.py` — `p2_competing_metrics.py` added to `SVD_ALLOWLIST`
   with the reason (it implements RankMe, α-ReQ, LiDAR, stable rank and the eigenvalue PR, none of
   which is effective rank; effective rank itself is imported, never reimplemented)
-- Box: `~/ws_p2/morpheus` (verified tree), `~/ws_p2/out/` (log and JSON)
+- `paper/P2_FIGURES.md` — rewritten figure by figure against the surviving claim; the variance
+  decomposition now has its own row (F2), which it did not before
+- Box: `~/ws_p2/morpheus` (verified tree, rebuilt at `144c9dc`), `~/ws_p2/out/` (both logs and JSON).
+  **`~/ws_p2` is mine and holds no live job**; nothing else on the box was read from or written to.
 - Prior: `WORKSPACE_DRIFT_AUDIT_ALL_20260803T2359Z.md`,
   `p2_competing_metrics_and_necessity_test_20260803T2326Z.md`,
   `effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
