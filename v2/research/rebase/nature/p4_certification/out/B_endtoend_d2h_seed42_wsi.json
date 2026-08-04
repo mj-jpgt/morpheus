@@ -1,0 +1,250 @@
+{
+  "selection": {
+    "axis": 46,
+    "target": "HALLMARK_ALLOGRAFT_REJECTION",
+    "target_group": "hallmark_in_training",
+    "heldout_single_direction_correlation": 0.47034981052757835,
+    "rule": "argmax |heldout_single_direction_correlation| over 256 axes x 90 non-control targets, adjusted block"
+  },
+  "verdicts": {
+    "1_discovery_fold_only": "PASS",
+    "2_clears_detection_floor": "PASS",
+    "3_confound_certificate": "FAIL",
+    "4a_untouched_patients": "PASS",
+    "4b_external_cohort": "UNEVALUABLE",
+    "5_failures_exposed": "PASS"
+  },
+  "gate": {
+    "conditions_passed": 4,
+    "conditions_failed": 1,
+    "conditions_unevaluable": 1,
+    "certifiable": false
+  },
+  "conditions": {
+    "1_discovery_fold_only": {
+      "verdict": "PASS",
+      "n_train": 3118,
+      "n_val": 543,
+      "n_test": 2766,
+      "n_patients_in_both_test_and_development": 0,
+      "readout_fit_out_of_fold": true,
+      "note": "representation trained on train+val, axis read on test; the readout direction is fit out of fold inside heldout_single_direction_correlation, by construction."
+    },
+    "2_clears_detection_floor": {
+      "verdict": "PASS",
+      "criterion": "amended: abs(heldout_single_direction_correlation) > detection_floor",
+      "abs_single_direction_correlation": 0.47034981052757835,
+      "detection_floor": 0.05,
+      "transmission_floor": 0.01,
+      "observed_matched_direction": -0.4765244530200568,
+      "shipped_flag_observed_above_floor": false,
+      "floor_is_nan": false,
+      "levels": [
+        0.0,
+        0.01,
+        0.02,
+        0.05,
+        0.1,
+        0.2,
+        0.4
+      ],
+      "recovered_median": [
+        0.021994283223213413,
+        0.03169743075367295,
+        0.04139453230608917,
+        0.07045131336948583,
+        0.11877492125066967,
+        0.21511422690085055,
+        0.40726481081914095
+      ],
+      "delta_median": [
+        0.0,
+        0.009703147530459536,
+        0.01940024908287576,
+        0.04845703014627242,
+        0.09678063802745626,
+        0.19311994367763713,
+        0.38527052759592756
+      ],
+      "note": "spike_recovery_curve on the single axis against the single target, cancer+pooled TSS design. A NaN floor is scored FAIL: an unresolvable floor is not a pass."
+    },
+    "3_confound_certificate": {
+      "verdict": "FAIL",
+      "exposed_state": "raw",
+      "raw": {
+        "axis_balanced_accuracy": 0.027170412654189794,
+        "axis_null_p95": 0.03584940096081518,
+        "axis_exceeds_null_p95": false,
+        "axis_breaches": false,
+        "joint_certified": false,
+        "joint_lda_balanced_accuracy": 0.36326266849728855,
+        "joint_null_p95": 0.15385458058362966,
+        "chance_rate": 0.011764705882352941,
+        "state_n_breaching_axes": 17
+      },
+      "adjusted": {
+        "axis_balanced_accuracy": 0.0070949626223715985,
+        "axis_null_p95": 0.019969323504429867,
+        "axis_exceeds_null_p95": false,
+        "axis_breaches": false,
+        "joint_certified": true,
+        "joint_lda_balanced_accuracy": 0.011751410655812361,
+        "joint_null_p95": 0.05282269731024048,
+        "chance_rate": 0.011764705882352941,
+        "state_n_breaching_axes": 0
+      },
+      "note": "an axis shown to a user is a RAW axis; the exposed state decides the verdict."
+    },
+    "4a_untouched_patients": {
+      "verdict": "PASS",
+      "within_cohort_paired_absolute_correlation": 0.4765244530200567,
+      "median_out_of_site_observed": 0.49593560661766395,
+      "retained_fraction": 1.0407348531110747,
+      "predeclared_retention_bar": 0.5,
+      "same_sign_in_every_scored_fold": true,
+      "n_folds_scored": 5,
+      "n_folds_clearing_null": 5,
+      "n_folds_ci_clearing_null": 5,
+      "folds": [
+        {
+          "status": "scored",
+          "adjusted": true,
+          "n_heldout": 864,
+          "n_training": 1902,
+          "n_heldout_sites": 32,
+          "observed": 0.43341964288863866,
+          "null_median": 0.038728605764423135,
+          "null_p95": 0.08977628773323335,
+          "permutation_p": 0.000999000999000999,
+          "permutation_resolution": 0.000999000999000999,
+          "site_cluster_ci95": [
+            0.3452403596819395,
+            0.5090136185992037
+          ],
+          "patient_ci95": [
+            0.3610905998133595,
+            0.4999462062242376
+          ],
+          "clears_null": true,
+          "ci_clears_null": true,
+          "fold": 0,
+          "signed_within_heldout_sites": 0.25810036782352846
+        },
+        {
+          "status": "scored",
+          "adjusted": true,
+          "n_heldout": 501,
+          "n_training": 2265,
+          "n_heldout_sites": 65,
+          "observed": 0.4752661340459243,
+          "null_median": 0.032181183697213706,
+          "null_p95": 0.09398247191956718,
+          "permutation_p": 0.000999000999000999,
+          "permutation_resolution": 0.000999000999000999,
+          "site_cluster_ci95": [
+            0.4024696791711118,
+            0.5403646773995647
+          ],
+          "patient_ci95": [
+            0.38903568464428745,
+            0.5408575860391936
+          ],
+          "clears_null": true,
+          "ci_clears_null": true,
+          "fold": 1,
+          "signed_within_heldout_sites": 0.1707235623182397
+        },
+        {
+          "status": "scored",
+          "adjusted": true,
+          "n_heldout": 482,
+          "n_training": 2284,
+          "n_heldout_sites": 82,
+          "observed": 0.5252682507205635,
+          "null_median": 0.03209284318802193,
+          "null_p95": 0.0932175262534672,
+          "permutation_p": 0.000999000999000999,
+          "permutation_resolution": 0.000999000999000999,
+          "site_cluster_ci95": [
+            0.43945152746962407,
+            0.6027197273260243
+          ],
+          "patient_ci95": [
+            0.4503721856893899,
+            0.5984607613615983
+          ],
+          "clears_null": true,
+          "ci_clears_null": true,
+          "fold": 2,
+          "signed_within_heldout_sites": 0.12231596245853599
+        },
+        {
+          "status": "scored",
+          "adjusted": true,
+          "n_heldout": 466,
+          "n_training": 2300,
+          "n_heldout_sites": 84,
+          "observed": 0.49593560661766395,
+          "null_median": 0.03264512241669399,
+          "null_p95": 0.09077095213039138,
+          "permutation_p": 0.000999000999000999,
+          "permutation_resolution": 0.000999000999000999,
+          "site_cluster_ci95": [
+            0.41039037749366103,
+            0.5757396006478667
+          ],
+          "patient_ci95": [
+            0.4215132707573687,
+            0.5603987609140058
+          ],
+          "clears_null": true,
+          "ci_clears_null": true,
+          "fold": 3,
+          "signed_within_heldout_sites": 0.3280068969598213
+        },
+        {
+          "status": "scored",
+          "adjusted": true,
+          "n_heldout": 453,
+          "n_training": 2313,
+          "n_heldout_sites": 89,
+          "observed": 0.5167407958957863,
+          "null_median": 0.0336642067902332,
+          "null_p95": 0.10254857071822525,
+          "permutation_p": 0.000999000999000999,
+          "permutation_resolution": 0.000999000999000999,
+          "site_cluster_ci95": [
+            0.4410844606048931,
+            0.5860254218336982
+          ],
+          "patient_ci95": [
+            0.44720189903194457,
+            0.581463664307493
+          ],
+          "clears_null": true,
+          "ci_clears_null": true,
+          "fold": 4,
+          "signed_within_heldout_sites": 0.2591296720004246
+        }
+      ],
+      "note": "whole sites held out via leave_sites_out.site_folds; the fold-level verdicts clears_null / ci_clears_null are the helper's own predeclared bars and are reported alongside the retention bar declared for THIS test."
+    },
+    "4b_external_cohort": {
+      "verdict": "UNEVALUABLE",
+      "external_material_on_box": "external/cptac_gdc_rna is RNA-only STAR counts; HEST-1k spatial exists but no D2 axis has been read on it. No paired external H&E+RNA cohort on the box.",
+      "note": "claim_guards.no_external_cohort is undischarged for every morphology result on the project. Scored UNEVALUABLE, which counts as NOT PASSED for the gate."
+    },
+    "5_failures_exposed": {
+      "verdict": "PASS",
+      "kind": "procedural",
+      "certificate_names_breaching_axes": true,
+      "inadmissible_claim_emits_status_rows": 3,
+      "blockers_named": [
+        "composition_attribution",
+        "purity_confound",
+        "no_external_cohort"
+      ],
+      "note": "procedural, scored by inspection: certify_axes names breaching_axes rather than dropping them, and ClaimVerdict.as_rows emits a visible NaN status row per blocker."
+    }
+  }
+}

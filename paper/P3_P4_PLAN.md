@@ -51,9 +51,11 @@ both directions:
   the supervision works. Keeping those edges makes P4 look blocked by things that do not block it,
   and hides the two that do.
 
-**0.5 The one thing P4 has that nothing else in the literature has, still has no number in the
-paper** — the count of queries a certified interface refuses that a CellWhisperer-style interface
-answers. §8 produces it.
+**0.5 P4's contribution now has a number, and it is 90 of 90.** On 90 non-control target queries
+against `d2_h_seed42::wsi_biology`, a CellWhisperer-style policy answers all 90; ours answers **0**.
+The number that survives the one buildable fix is **62** — even with the site condition met, 62 of
+90 queries sit below their own CALIBRA detection floor, and for 23 of those the floor is
+unresolvable even at a planted r = 0.40. §9.2.
 
 ---
 
@@ -145,7 +147,7 @@ Three options were on the table. Each is argued and two are rejected.
 
 **The case for it.** P1's negative-control battery already contains the must-beat baseline table;
 `NOTEBOOK.md` says so explicitly ("the 'must beat' baselines are *literally* what P3 needs"). The
-PCA result physically lives in `p1_evidence/track1/`. If the surviving claim is only "Hallmark is
+PCA result physically lives on the box under `/lambda/.../p1_evidence/track1/`. If the surviving claim is only "Hallmark is
 never worse", that is one paragraph, and one paragraph belongs in someone else's paper.
 
 **Why it is rejected.** Three reasons, in order of weight.
@@ -305,7 +307,7 @@ condition was scored as the axis maximising `|heldout_single_direction_correlati
 90 non-control targets on the adjusted block of `d2_h_seed42::wsi_biology` — i.e. the single most
 favourable case available, so that a failure decides the gate in the negative for every weaker axis.
 Predeclaration: `NOTEBOOK_ENTRIES/PREDECLARED_p4_certification_system_tests_20260804T1750Z.md`.
-Result: `NOTEBOOK_ENTRIES/p4_certification_end_to_end_RESULTS.md` (see §9 for the pointer).
+Result: `NOTEBOOK_ENTRIES/p4_certification_end_to_end_20260804T2000Z.md`; measured numbers in §9.
 
 The axis selected was **axis 46 of `d2_h_seed42::wsi_biology`**, against
 **HALLMARK_ALLOGRAFT_REJECTION**, at an out-of-fold single-direction correlation of **0.4703** on the
