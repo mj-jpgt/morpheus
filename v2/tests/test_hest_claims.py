@@ -176,6 +176,27 @@ def test_slide_bootstrap_interval_brackets_the_point_and_counts_slides():
     assert out["ci95"][0] < out["point"] < out["ci95"][1]
 
 
+def test_pooled_r_of_the_slide_mean_baseline_is_the_root_of_the_between_slide_share():
+    """The identity that makes claim 5 quotable rather than rhetorical.
+
+    A per-slide-mean predictor's pooled Pearson r against the truth is exactly
+    ``sqrt(between-slide variance share)``.  Correlation is the square root of a variance
+    ratio, so a slide effect explaining only a third of the variance still yields a pooled r
+    near 0.6.  Measured on the real test partition: share 0.3568, pooled r 0.5973, and
+    sqrt(0.3568) = 0.5973.
+    """
+    from morpheus.v2.calibra.hest import per_slide_mean_baseline, pooled_r
+
+    rng = np.random.default_rng(9)
+    slides = _slides([80, 120, 60])
+    offsets = np.repeat(rng.normal(scale=1.3, size=(3, 4)), [80, 120, 60], axis=0)
+    targets = offsets + rng.normal(size=(260, 4))
+    mask = np.ones(len(slides), dtype=bool)
+    prediction = per_slide_mean_baseline(targets, slides, mask)
+    share = between_slide_variance_share(targets, slides, mask)
+    np.testing.assert_allclose(pooled_r(targets, prediction, mask), np.sqrt(share), atol=1e-12)
+
+
 def test_between_slide_variance_share_is_one_for_a_pure_slide_offset_and_zero_without_one():
     slides = _slides([50, 50, 50])
     offsets = np.repeat(np.asarray([[-2.0], [0.0], [2.0]]), 50, axis=0)

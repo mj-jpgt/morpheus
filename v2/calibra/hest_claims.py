@@ -51,8 +51,9 @@ from pathlib import Path
 
 import numpy as np
 
-from .calibration import permutation_null, spike_recovery_curve
-from .confound_certificate import _encode, _stratified_folds, balanced_accuracy, certify_axes
+from .calibration import _map, permutation_null, spike_recovery_curve
+from .confound_certificate import (_encode, _stratified_folds, balanced_accuracy,
+                                   certify_axes, within_stratum_permutations)
 from .hest import (HestAdapterError, normalise_expression, per_slide_mean_baseline, pooled_r,
                    within_slide_r)
 from .residualise import confound_design, cross_fitted_residuals, pooled_tissue_source_site
@@ -353,12 +354,31 @@ def stage_certificate(args) -> None:
     out["chance_rate"] = 1.0 / n_classes
     design, _, _ = spatial_confound_design(ids, cancers)
     adjusted = cross_fitted_residuals(x, design, seed=args.seed)
+    permutations = within_stratum_permutations(class_index, cancers,
+                                               n_permutations=args.knn_permutations,
+                                               seed=args.seed) if args.knn_permutations else []
     for arm, features in (("raw", x), ("adjusted", adjusted)):
         start = time.time()
-        out[f"knn_{arm}"] = knn_balanced_accuracy_oof(features, class_index, n_classes,
-                                                      k=args.knn_k, seed=args.seed)
-        print(f"[knn ] {arm:8s} balanced_accuracy={out[f'knn_{arm}']:.4f} "
-              f"chance={1.0/n_classes:.4f} ({time.time()-start:.0f} s)", flush=True)
+        observed = knn_balanced_accuracy_oof(features, class_index, n_classes,
+                                             k=args.knn_k, seed=args.seed)
+        record = {"balanced_accuracy": observed, "k": args.knn_k,
+                  "chance_rate": 1.0 / n_classes,
+                  "multiple_of_chance": observed * n_classes}
+        if permutations:
+            # The certificate's own convention: labels permuted WITHIN cancer type, so the
+            # null answers "beyond what cancer already explains" for this classifier too.
+            null = np.asarray(_map(lambda p: knn_balanced_accuracy_oof(
+                features, p, n_classes, k=args.knn_k, seed=args.seed),
+                [(p,) for p in permutations], args.n_jobs), dtype=np.float64)
+            record.update({"null_median": float(np.median(null)),
+                           "null_p95": float(np.percentile(null, 95)),
+                           "n_permutations": int(len(null)),
+                           "permutation_p": float((int((null >= observed).sum()) + 1.0)
+                                                  / (len(null) + 1.0))})
+        out[f"knn_{arm}"] = record
+        print(f"[knn ] {arm:8s} balanced_accuracy={observed:.4f} chance={1.0/n_classes:.4f} "
+              f"null_p95={record.get('null_p95', float('nan')):.4f} "
+              f"({time.time()-start:.0f} s)", flush=True)
     for residualise in (False, True):
         arm = "adjusted" if residualise else "raw"
         start = time.time()
@@ -687,6 +707,8 @@ def main() -> None:
     c.add_argument("--n-boot", type=int, default=100)
     c.add_argument("--n-boot-axes", type=int, default=8)
     c.add_argument("--knn-k", type=int, default=15)
+    c.add_argument("--knn-permutations", type=int, default=200,
+                   help="within-cancer label permutations for the kNN probe's own null")
     c.set_defaults(func=stage_certificate)
 
     h = common(sub.add_parser("channel"))
