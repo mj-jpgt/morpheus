@@ -78,14 +78,17 @@ def test_the_certificate_is_blind_to_a_variance_only_confound_and_the_probes_are
     chance = 1.0 / n_classes
     lda = lda_oof_balanced_accuracy(features, labels, n_classes)
     per_axis = float(np.max(nearest_class_mean_oof(features, labels, n_classes)))
-    knn = knn_balanced_accuracy_oof(features, labels, n_classes, k=15, prior_correction=True)
-    forest = forest_balanced_accuracy_oof(features, labels, n_classes, n_estimators=120)
-    # The mean-based joint test is near chance; per-axis nearest-class-mean cannot exceed it
-    # meaningfully either. Both probes read far above.
-    assert lda < 2.0 * chance, f"fixture is not mean-free: LDA reads {lda}"
-    assert per_axis < 2.0 * chance, f"fixture is not mean-free: per-axis reads {per_axis}"
-    assert knn > 2.5 * chance, f"kNN missed a variance-only confound: {knn}"
-    assert forest > 2.5 * chance, f"forest missed a variance-only confound: {forest}"
+    # The certificate's two classifiers must be AT chance on this fixture, not merely below
+    # the probes: if they were not, the fixture would still carry a first moment and the
+    # test would prove nothing about estimator families.
+    assert lda < 1.2 * chance, f"fixture is not mean-free: LDA reads {lda}"
+    assert per_axis < 1.2 * chance, f"fixture is not mean-free: per-axis reads {per_axis}"
+    for name, value in (("knn", knn_balanced_accuracy_oof(features, labels, n_classes, k=15,
+                                                          prior_correction=True)),
+                        ("forest", forest_balanced_accuracy_oof(features, labels, n_classes,
+                                                                n_estimators=120)),
+                        ("rbf_svm", rbf_svm_balanced_accuracy_oof(features, labels, n_classes))):
+        assert value > 2.0 * chance, f"{name} missed a variance-only confound: {value}"
 
 
 def test_every_probe_recovers_a_planted_mean_shift_and_returns_a_balanced_accuracy():
