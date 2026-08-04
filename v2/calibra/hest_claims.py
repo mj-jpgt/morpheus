@@ -354,30 +354,46 @@ def stage_certificate(args) -> None:
     out["chance_rate"] = 1.0 / n_classes
     design, _, _ = spatial_confound_design(ids, cancers)
     adjusted = cross_fitted_residuals(x, design, seed=args.seed)
-    permutations = within_stratum_permutations(class_index, cancers,
-                                               n_permutations=args.knn_permutations,
-                                               seed=args.seed) if args.knn_permutations else []
-    for arm, features in (("raw", x), ("adjusted", adjusted)):
+    # A slide that is the ONLY slide of its cancer label keeps its true labels under a
+    # within-cancer permutation, because permuting a constant is the identity. Five of the
+    # thirteen test slides are in that position, so the certificate's own null convention is
+    # partly degenerate here and cannot be read as a chance rate. Both nulls are therefore
+    # computed and the degenerate fraction is reported next to them.
+    fixed = sum(1 for c in np.unique(cancers) if len(np.unique(slides[cancers == c])) == 1)
+    out["within_cancer_null_is_degenerate"] = {
+        "n_slides_alone_in_their_cancer": int(fixed), "n_slides": int(len(counts)),
+        "fraction_of_labels_unpermuted": float(fixed) / float(max(len(counts), 1)),
+        "why": "within_stratum_permutations permutes rows inside a cancer; for a cancer with "
+               "one slide that is the identity, so those labels survive the null intact"}
+    nulls = {}
+    if args.knn_permutations:
+        nulls["within_cancer"] = within_stratum_permutations(
+            class_index, cancers, n_permutations=args.knn_permutations, seed=args.seed)
+        nulls["global"] = within_stratum_permutations(
+            class_index, np.zeros(len(class_index), dtype=int),
+            n_permutations=args.knn_permutations, seed=args.seed)
+    for arm, features in (("raw", x), ("adjusted", adjusted),
+                          ("adjusted_standardised",
+                           (adjusted - adjusted.mean(axis=0)) / np.maximum(adjusted.std(axis=0), 1e-12))):
         start = time.time()
         observed = knn_balanced_accuracy_oof(features, class_index, n_classes,
                                              k=args.knn_k, seed=args.seed)
         record = {"balanced_accuracy": observed, "k": args.knn_k,
                   "chance_rate": 1.0 / n_classes,
                   "multiple_of_chance": observed * n_classes}
-        if permutations:
-            # The certificate's own convention: labels permuted WITHIN cancer type, so the
-            # null answers "beyond what cancer already explains" for this classifier too.
+        for label, permutations in nulls.items():
             null = np.asarray(_map(lambda p: knn_balanced_accuracy_oof(
                 features, p, n_classes, k=args.knn_k, seed=args.seed),
                 [(p,) for p in permutations], args.n_jobs), dtype=np.float64)
-            record.update({"null_median": float(np.median(null)),
-                           "null_p95": float(np.percentile(null, 95)),
-                           "n_permutations": int(len(null)),
-                           "permutation_p": float((int((null >= observed).sum()) + 1.0)
-                                                  / (len(null) + 1.0))})
+            record[label] = {"null_median": float(np.median(null)),
+                             "null_p95": float(np.percentile(null, 95)),
+                             "n_permutations": int(len(null)),
+                             "permutation_p": float((int((null >= observed).sum()) + 1.0)
+                                                    / (len(null) + 1.0))}
         out[f"knn_{arm}"] = record
-        print(f"[knn ] {arm:8s} balanced_accuracy={observed:.4f} chance={1.0/n_classes:.4f} "
-              f"null_p95={record.get('null_p95', float('nan')):.4f} "
+        print(f"[knn ] {arm:22s} balanced_accuracy={observed:.4f} chance={1.0/n_classes:.4f} "
+              f"within_cancer_p95={record.get('within_cancer', {}).get('null_p95', float('nan')):.4f} "
+              f"global_p95={record.get('global', {}).get('null_p95', float('nan')):.4f} "
               f"({time.time()-start:.0f} s)", flush=True)
     for residualise in (() if args.knn_only else (False, True)):
         arm = "adjusted" if residualise else "raw"
