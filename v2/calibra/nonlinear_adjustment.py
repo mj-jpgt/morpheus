@@ -373,11 +373,22 @@ def cross_fitting_offset_energy(residual: np.ndarray, codes: np.ndarray,
     for index, (_, test) in enumerate(folds):
         fold_of[test] = index
     cell_fold = codes.astype(np.int64) * (len(folds) + 1) + fold_of
+    # For G groups of a block with no group structure, the expected share of energy in the
+    # group means is G / n -- each group's mean carries p * sigma^2 / n_g of energy over n_g
+    # rows.  Quoting the raw fraction without it says nothing, because a block cut into 525
+    # groups puts 19% of its energy in group means by arithmetic alone.
+    expected = {"cell": float(len(np.unique(codes))) / float(len(residual)),
+                "cell_fold": float(len(np.unique(cell_fold))) / float(len(residual))}
+    observed = {"cell": _group_energy(codes) / total if total > 0 else float("nan"),
+                "cell_fold": _group_energy(cell_fold) / total if total > 0 else float("nan")}
     return {
         "total_energy": total,
-        "cell_mean_energy_fraction": _group_energy(codes) / total if total > 0 else float("nan"),
-        "cell_fold_mean_energy_fraction": (_group_energy(cell_fold) / total if total > 0
-                                           else float("nan")),
+        "cell_mean_energy_fraction": observed["cell"],
+        "cell_fold_mean_energy_fraction": observed["cell_fold"],
+        "cell_mean_energy_expected_under_random_grouping": expected["cell"],
+        "cell_fold_mean_energy_expected_under_random_grouping": expected["cell_fold"],
+        "cell_mean_energy_ratio_to_expected": observed["cell"] / expected["cell"],
+        "cell_fold_mean_energy_ratio_to_expected": observed["cell_fold"] / expected["cell_fold"],
         "n_cells": n_cells,
         "n_folds": int(len(folds)),
     }
