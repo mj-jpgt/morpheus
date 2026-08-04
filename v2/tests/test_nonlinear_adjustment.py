@@ -23,9 +23,10 @@ from morpheus.v2.calibra.nonlinear_adjustment import (ADJUSTER_MODELS, KernelRid
                                                       adjuster_agreement, cell_codes, cell_design,
                                                       channel_under_adjustment,
                                                       cross_fitted_location_scale, cross_fitted_r2,
-                                                      forest_residuals, kernel_ridge_residuals,
+                                                      cross_fitting_offset_energy, forest_residuals,
+                                                      in_sample_residuals, kernel_ridge_residuals,
                                                       labels_only_ceiling, make_adjuster,
-                                                      saturated_cell_residuals)
+                                                      row_shuffled, saturated_cell_residuals)
 from morpheus.v2.calibra.nonlinear_confound_probe import knn_balanced_accuracy_oof
 from morpheus.v2.calibra.residualise import confound_design, cross_fitted_residuals
 
@@ -199,6 +200,47 @@ def test_location_scale_shrinkage_falls_back_to_pooled_for_an_unseen_cell():
     codes[:2] = 1                                  # a cell that some folds will not see
     adjusted = cross_fitted_location_scale(x, codes, n_splits=5, seed=42)
     assert np.isfinite(adjusted).all()
+
+
+# --- the cross-fitting artefact -----------------------------------------------------------
+
+def test_in_sample_residuals_zero_every_cell_mean_and_cross_fitted_ones_do_not():
+    """The property the diagnostic turns on, asserted rather than argued."""
+    rng = np.random.default_rng(7)
+    n, n_cells = 400, 20
+    codes = rng.integers(0, n_cells, n)
+    x = rng.normal(size=(n, 5)) + np.eye(n_cells)[codes] @ rng.normal(size=(n_cells, 5)) * 2.0
+    design = cell_design(codes)
+    in_sample = in_sample_residuals(x, design)
+    cross_fitted = saturated_cell_residuals(x, codes, seed=42)
+    in_energy = cross_fitting_offset_energy(in_sample, codes, seed=42)
+    cross_energy = cross_fitting_offset_energy(cross_fitted, codes, seed=42)
+    assert in_energy["cell_mean_energy_fraction"] < 1e-12
+    assert cross_energy["cell_mean_energy_fraction"] > 1e-4
+    assert cross_energy["cell_fold_mean_energy_fraction"] > in_energy["cell_fold_mean_energy_fraction"]
+
+
+def test_row_shuffle_preserves_geometry_and_destroys_the_association():
+    x, _, design, codes, _ = _toy()
+    shuffled = row_shuffled(x, seed=42)
+    assert sorted(map(tuple, shuffled.tolist())) == sorted(map(tuple, x.tolist()))
+    assert not np.array_equal(shuffled, x)
+
+
+def test_a_pure_noise_block_can_still_be_probed_after_cross_fitted_adjustment():
+    """Guard rail for the negative control: it must run and return a finite reading.
+
+    The control's *value* on real data is a measurement and is not asserted here; what is
+    asserted is that the path exists and produces a number, so that a run reporting it
+    cannot be reporting a silently-skipped step.
+    """
+    rng = np.random.default_rng(2)
+    n, n_cells = 500, 10
+    codes = rng.integers(0, n_cells, n)
+    noise = rng.normal(size=(n, 12))
+    adjusted = saturated_cell_residuals(noise, codes, seed=42)
+    reading = knn_balanced_accuracy_oof(adjusted, codes, n_cells, k=5, seed=42)
+    assert np.isfinite(reading) and 0.0 <= reading <= 1.0
 
 
 # --- reporting helpers --------------------------------------------------------------------

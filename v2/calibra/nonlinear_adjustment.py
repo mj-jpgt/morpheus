@@ -78,11 +78,13 @@ from .spectral import (effective_rank, heldout_top_cca, top_canonical_correlatio
 __all__ = ["cell_codes", "cell_design", "saturated_cell_residuals", "kernel_ridge_residuals",
            "KernelRidgeAdjuster", "forest_residuals", "cross_fitted_location_scale",
            "make_adjuster", "adjuster_agreement", "cross_fitted_r2",
-           "channel_under_adjustment", "labels_only_ceiling", "ADJUSTER_MODELS"]
+           "channel_under_adjustment", "labels_only_ceiling", "ADJUSTER_MODELS",
+           "in_sample_residuals", "row_shuffled", "cross_fitting_offset_energy"]
 
 #: Every adjustment arm this module can build, by name.  ``ridge`` is the incumbent and
 #: is ``cross_fitted_residuals`` itself, not a copy.
-ADJUSTER_MODELS = ("none", "ridge", "saturated", "kernel_ridge", "forest", "location_scale")
+ADJUSTER_MODELS = ("none", "ridge", "saturated", "kernel_ridge", "forest", "location_scale",
+                   "in_sample_additive", "in_sample_saturated")
 
 
 def _folds(n_rows: int, n_splits: int, seed: int) -> list[tuple[np.ndarray, np.ndarray]]:
@@ -289,6 +291,97 @@ def cross_fitted_location_scale(matrix: np.ndarray, codes: np.ndarray, *, n_spli
     return adjusted - adjusted.mean(axis=0, keepdims=True)
 
 
+# --- the cross-fitting artefact, and the two controls that isolate it --------------------
+
+def in_sample_residuals(matrix: np.ndarray, design: np.ndarray) -> np.ndarray:
+    """Residuals of ``matrix`` on ``design`` fitted on **all** rows, no cross-fitting.
+
+    Not an adjustment anyone should use for a channel: fitting the nuisance model on the
+    rows whose residuals it produces removes more than the confound, which is the
+    over-residualisation failure ``residualise.cross_fitted_residuals`` exists to avoid.
+    It is here as a **diagnostic**, because it has one property no cross-fitted residual
+    has: the residual mean of every design cell is **exactly zero** by the normal
+    equations.
+
+    That makes it the clean contrast for the question "is the confound recovery a
+    first-moment effect?".  A cross-fitted residual leaves each (cell x fold) group
+    displaced by that fold's estimation error ``mu_c - mu_hat_c^(-f)``, an offset of
+    order ``sigma / sqrt(n_c)`` **shared by every patient in the group** -- a group mean
+    shift that no cross-fitted adjustment of any flexibility can remove, because it is
+    created by the cross-fitting itself.  If a k-NN's recovery is that offset, it
+    survives the saturated arm and vanishes here.
+    """
+    matrix = np.asarray(matrix, dtype=np.float64)
+    design = np.asarray(design, dtype=np.float64)
+    if design.shape[1] == 0:
+        return matrix - matrix.mean(axis=0, keepdims=True)
+    fitted = design @ np.linalg.lstsq(design, matrix, rcond=None)[0]
+    residual = matrix - fitted
+    return residual - residual.mean(axis=0, keepdims=True)
+
+
+def row_shuffled(matrix: np.ndarray, *, seed: int = 42) -> np.ndarray:
+    """``matrix`` with its rows permuted -- the negative control for an adjustment artefact.
+
+    Shuffling rows destroys every association between the block and the confound labels
+    while preserving the block's marginal geometry exactly: the same rows, the same
+    covariance, the same effective rank.  Push the shuffled block through the *same*
+    design and the *same* adjuster and probe it with the *same* k-NN, and any recovery
+    that remains cannot be surviving confound structure, because there is none left to
+    survive.  It can only be structure the adjustment introduced.
+
+    This is the control the previous run's defence needed and did not have.
+    ``tcga_nonlinear_confound_probe_result_20260804T2100Z.md`` item 10 argues that
+    "any structure the residualiser itself introduced is inside the null as well as
+    inside the observed".  That is not so: the global null permutes the **labels** of the
+    already-residualised features, so a cell-tied artefact is broken in the null and
+    intact in the observed, and would be scored as signal.
+    """
+    matrix = np.asarray(matrix, dtype=np.float64)
+    order = np.random.default_rng(int(seed)).permutation(len(matrix))
+    return matrix[order]
+
+
+def cross_fitting_offset_energy(residual: np.ndarray, codes: np.ndarray,
+                                folds: list[tuple[np.ndarray, np.ndarray]] | None = None, *,
+                                n_splits: int = 5, seed: int = 42) -> dict:
+    """How much of a residual block's energy sits in per-cell and per-(cell x fold) means.
+
+    ``cell_mean_energy_fraction`` is ``0`` for :func:`in_sample_residuals` by
+    construction and strictly positive for any cross-fitted residual;
+    ``cell_fold_mean_energy_fraction`` isolates the part that is tied to the residualiser's
+    own folds and is therefore unambiguously an artefact of cross-fitting rather than a
+    property of the representation.  Reported so that "the adjustment leaves a group mean
+    offset" is a measured quantity and not an argument.
+    """
+    residual = np.asarray(residual, dtype=np.float64)
+    codes = np.asarray(codes, dtype=np.int64)
+    folds = folds if folds is not None else _folds(len(residual), n_splits, seed)
+    total = float((residual ** 2).sum())
+    n_cells = int(codes.max()) + 1 if codes.size else 0
+
+    def _group_energy(group: np.ndarray) -> float:
+        levels = np.unique(group)
+        energy = 0.0
+        for level in levels:
+            rows = np.flatnonzero(group == level)
+            energy += float(len(rows)) * float((residual[rows].mean(axis=0) ** 2).sum())
+        return energy
+
+    fold_of = np.empty(len(residual), dtype=np.int64)
+    for index, (_, test) in enumerate(folds):
+        fold_of[test] = index
+    cell_fold = codes.astype(np.int64) * (len(folds) + 1) + fold_of
+    return {
+        "total_energy": total,
+        "cell_mean_energy_fraction": _group_energy(codes) / total if total > 0 else float("nan"),
+        "cell_fold_mean_energy_fraction": (_group_energy(cell_fold) / total if total > 0
+                                           else float("nan")),
+        "n_cells": n_cells,
+        "n_folds": int(len(folds)),
+    }
+
+
 # --- arm construction --------------------------------------------------------------------
 
 def make_adjuster(model: str, *, design: np.ndarray | None = None,
@@ -329,6 +422,14 @@ def make_adjuster(model: str, *, design: np.ndarray | None = None,
             raise ValueError("location-scale adjustment needs cell codes")
         return lambda matrix: cross_fitted_location_scale(matrix, codes, n_splits=n_splits,
                                                           seed=seed, prior_count=prior_count)
+    if model == "in_sample_additive":
+        if design is None:
+            raise ValueError("in-sample additive adjustment needs a design")
+        return lambda matrix: in_sample_residuals(matrix, design)
+    if model == "in_sample_saturated":
+        if codes is None:
+            raise ValueError("in-sample saturated adjustment needs cell codes")
+        return lambda matrix: in_sample_residuals(matrix, cell_design(codes))
     raise ValueError(f"unknown adjustment model {model!r}; expected one of {ADJUSTER_MODELS}")
 
 
@@ -526,11 +627,38 @@ def _arm_specs(arms: list[str], kernel_grid: str, forest_trees: int, prior_count
             specs.append(("saturated", "saturated", {"alpha": 1e-6}))
         elif arm == "location_scale":
             specs.append(("location_scale", "location_scale", {"prior_count": float(prior_count)}))
-        elif arm in ("none", "ridge"):
+        elif arm in ("none", "ridge", "in_sample_additive", "in_sample_saturated"):
             specs.append((arm, arm, {}))
         else:
             raise ValueError(f"unknown arm {arm!r}")
     return specs
+
+
+def _run_probe(features: np.ndarray, block: dict, k_grid, args) -> dict:
+    """The k-NN confound probe on one already-adjusted block, for both targets.
+
+    Imported wholesale from ``nonlinear_confound_probe`` -- same estimator, same fold
+    rule, same nulls as the run that produced the 4.3-4.9x readings this run is testing.
+    The **global** null is the applicable bar because TCGA site nests inside cancer; the
+    within-cancer null is carried beside the site rows for decomposition only.
+    """
+    from .confound_certificate import _encode
+    from .nonlinear_confound_probe import nesting_diagnostic, probe_state
+
+    probes = {}
+    for target, labels, strata in (("site", block["tss"], block["cancers"]),
+                                   ("cancer", block["cancers"], None)):
+        classes, class_index = _encode(np.asarray(labels).astype(str))
+        probe = probe_state(features, class_index, int(len(classes)), strata=strata,
+                            k_grid=k_grid, forest_trees=0, run_svm=False,
+                            n_splits=args.n_splits, seed=args.seed,
+                            knn_permutations=args.probe_permutations, model_permutations=0,
+                            n_jobs=args.n_jobs,
+                            nulls="both" if strata is not None else "global")
+        if target == "site":
+            probe["nesting"] = nesting_diagnostic(class_index, strata, int(len(classes)))
+        probes[target] = probe
+    return probes
 
 
 def main() -> None:
@@ -557,6 +685,9 @@ def main() -> None:
     parser.add_argument("--probe-permutations", type=int, default=200)
     parser.add_argument("--probe-k-grid", default="1,3,5,10,15,25,50")
     parser.add_argument("--ceiling", action="store_true", help="step 2: the labels-only ceiling")
+    parser.add_argument("--shuffle-control", action="store_true",
+                        help="also probe the ROW-SHUFFLED block through the same adjuster: the "
+                             "negative control for structure the adjustment itself introduces")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-jobs", type=int, default=1)
     args = parser.parse_args()
@@ -639,26 +770,22 @@ def main() -> None:
                 record["params"] = kwargs
                 record["wall_seconds"] = round(time.time() - started, 1)
 
+                record["offset_energy"] = cross_fitting_offset_energy(
+                    adjusted_x, block["codes"], n_splits=args.n_splits, seed=args.seed)
+
                 if args.probe:
-                    from .nonlinear_confound_probe import nesting_diagnostic, probe_state
-                    from .confound_certificate import _encode
                     k_grid = tuple(int(v) for v in str(args.probe_k_grid).split(",") if v.strip())
-                    probes = {}
-                    for target, labels, strata in (
-                            ("site", block["tss"], block["cancers"]),
-                            ("cancer", block["cancers"], None)):
-                        classes, class_index = _encode(np.asarray(labels).astype(str))
-                        probe = probe_state(adjusted_x, class_index, int(len(classes)),
-                                            strata=strata, k_grid=k_grid, forest_trees=0,
-                                            run_svm=False, n_splits=args.n_splits, seed=args.seed,
-                                            knn_permutations=args.probe_permutations,
-                                            model_permutations=0, n_jobs=args.n_jobs,
-                                            nulls="both" if strata is not None else "global")
-                        if target == "site":
-                            probe["nesting"] = nesting_diagnostic(class_index, strata,
-                                                                  int(len(classes)))
-                        probes[target] = probe
-                    record["probe"] = probes
+                    record["probe"] = _run_probe(adjusted_x, block, k_grid, args)
+                    if args.shuffle_control:
+                        # The block's rows permuted BEFORE the adjustment: same geometry,
+                        # no confound association left. Anything the probe still reads
+                        # here was put there by the adjustment.
+                        shuffled = row_shuffled(block["x"], seed=args.seed)
+                        record["shuffle_control"] = {
+                            "adjusted": _run_probe(adjust(shuffled), block, k_grid, args),
+                            "raw": _run_probe(shuffled - shuffled.mean(axis=0, keepdims=True),
+                                              block, k_grid, args),
+                        }
 
                 results[f"{key_prefix}::{name}"] = record
                 observed = record["observed_top_cca"]
