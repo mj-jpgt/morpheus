@@ -424,11 +424,27 @@ a dependency upgrade underneath them would be exactly the kind of silent breakag
 finding. `torch` and the rest resolve from `~/venv` via `PYTHONPATH`; numpy 2.2.6 / sklearn 1.7.2 /
 pandas 2.3.3 are identical in both, checked before use.
 
-**Suite.** `v2/tests` on the verified workspace: **278 passed, 1 failed in 46.37 s.** The one failure
-is `test_paper_paths_resolve.py::test_no_box_output_basename_is_actually_in_the_repository` and is
-**pre-existing and not from this work**: it fires because commit `84b1bf9` (another agent's P2 figure
-work) vendored `P2_METRICS_D*.json`, `RANK_RECOMPUTE*.json`, `D1_PAIR*.json` and
-`D2_PER_ARTIFACT_READOUT.json` into `v2/research/rebase/p2/figures/data/`, and the test requires that
-newly-vendored files be removed from `BOX_OUTPUT_BASENAMES` so their citations start being checked.
-This workspace is a pristine 452/452-verified archive with zero edits, so the failure cannot originate
-here. Left for the P2 agent whose files trigger it rather than edited underneath them.
+**Suite.** Re-verified at the final commit on a *fresh* workspace built the same way — 518/518 files
+by git blob SHA-1, 0 mismatched, 0 missing, 0 extra — then run: **279 passed, 0 failed in 44.61 s**
+(`--ignore=v2/tests/test_p2_figures.py`).
+
+Two things must travel with that number:
+
+* `v2/tests/test_p2_figures.py` (24 tests, another agent's new P2 figure suite) cannot run in `~/venv`
+  at all: `ModuleNotFoundError: No module named 'matplotlib'`. Every one of its 24 results is that
+  import error, not an assertion. It is an environment gap on this box, not a code failure, and not
+  mine — but it means "the suite is green" is only checkable here for the other 279.
+* The one failure seen during the work was
+  `test_paper_paths_resolve.py::test_no_box_output_basename_is_actually_in_the_repository` at commit
+  `80a14d6`, from another agent's vendored figure data. It was fixed at their `da83bfd`, not by me.
+
+**The rank guard fired on this work and was right.** `test_effective_rank_canonical.py::
+test_no_second_definition_exists_in_the_tree` failed the moment `task3_sweep.py` was vendored,
+because that script computed a top-16 variance share from a hand-written decomposition. That is a
+spectral statistic written inline, which is precisely what this project has caught three
+substitutions under, and it was mine. It was rewritten to call `spectral.effective_rank`; the
+conclusion did not change and the reported number is now the canonical one. `subspace_check.py` was
+allowlisted rather than rewritten, with its reason recorded in the allowlist: its decomposition
+builds rank-k projections and no statistic is taken from the singular values. Worth knowing for
+whoever hits this next: **the guard is a source-text scan**, so naming the decomposition call even in
+a comment re-trips it.
