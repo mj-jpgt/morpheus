@@ -239,6 +239,20 @@ SVD_ALLOWLIST = {
     # compute a spectral statistic inline (top-16 variance share) and was NOT allowlisted --
     # it was rewritten to call `spectral.effective_rank` instead.
     "v2/research/rebase/nature/d2_coordinate_system/subspace_check.py",
+    # Principal angles between two column spaces. The singular values of `Qaᵀ Qb`
+    # are canonical COSINES, bounded in [0, 1], and the only statistics taken from
+    # them are their mean square, max and min -- a subspace-overlap measure, not a
+    # spectrum summary of a data matrix. It exists precisely because held-out
+    # top-CCA is invariant to reparametrisation, so a "new" basis has to be shown
+    # to span a different subspace. No rank is computed here.
+    "v2/perturbation_basis_common.py",
+    # The post-PBS basis constructions. Two SVDs: `ReferenceDictionary.fit`'s own
+    # decomposition (in the already-allowlisted `v2/pbs.py`, called not copied) and
+    # `PᵀQ = U S Vᵀ`, which is the CCA between the two covariance row spaces -- the
+    # construction itself, not a statistic. Where this module needs an effective
+    # rank, for the consensus basis's rank-starvation check, it IMPORTS
+    # `calibra.spectral.effective_rank`.
+    "v2/build_causal_basis_targets.py",
     "v2/calibra/claim_guards.py",                # the token appears only in prose
     "tests/test_claim_guards.py",                # ditto
     "v2/tests/test_effective_rank_canonical.py", # this file, which names the tokens
