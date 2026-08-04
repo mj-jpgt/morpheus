@@ -256,7 +256,8 @@ evidence and would be **parallel archival submissions**. TMLR's editorial policy
 archival, peer-reviewed venue". P1 §4.11 previously carried a four-row table of rank dissociations and
 P1 F11 plotted them. **Those have been removed from P1 and moved here**, per the four edits listed in
 `paper/P2_FIGURES.md` §"Cross-paper deconfliction"; the edits were executed in this pass and are
-recorded in §7 of the accompanying notebook entry. P1 §4.11 is now a two-sentence pointer. P1 §4.12(iv)
+recorded in §4 of `NOTEBOOK_ENTRIES/p2_rewritten_around_the_surviving_claim_20260804T1200Z.md`. P1
+§4.11 is now a two-paragraph pointer with no table and no rank numbers. P1 §4.12(iv)
 retains one sentence citing D2's rank values, because there it discharges an objection to P1's own
 ablation rather than making a claim about rank; that sentence and §4.1 of this paper must not both be
 described as a finding about effective rank.
