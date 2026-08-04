@@ -51,10 +51,31 @@ Two things must be said about the raw arm and neither is optional.
    all 256 axes reaches 20–31× chance. **A per-axis-only certificate, which is literally what the T1.3
    spec asks for, would have passed this.** The joint test must be a required field of the certificate
    schema, not an optional extra. That is a finding about the certification rule itself.
-2. **The adjustment fully discharges it.** After the same cancer + pooled-TSS cross-fitted
-   residualisation CALIBRA applies before every measurement, joint accuracy falls 21–45× to at or below
-   the chance rate, with zero breaching axes in all six state/artifact combinations. So the defect is a
-   property of the **raw representation**, and no adjusted number on this project is reading site.
+2. **The adjustment discharges it from the first moment, and the residual is measured and bounded
+   rather than assumed away.** After the same cancer + pooled-TSS cross-fitted residualisation CALIBRA
+   applies before every measurement, joint accuracy falls 21–45× to at or below the chance rate, with
+   zero breaching axes in all six state/artifact combinations. That is a statement about class means,
+   which is all an LDA certificate can make. Probes that are not functions of class means still recover
+   both confounds from the adjusted state — **3.15× chance for site, 3.45× for cancer**, netted against
+   a null that regenerates the adjustment inside every permutation, *p* at the resolution floor, k-NN,
+   random forest and RBF-SVM agreeing. The earlier sentence here — "no adjusted number on this project
+   is reading site" — was absolute and is **withdrawn**.
+   What replaces it is stronger, not weaker. A **saturated cancer × site cell design** spans every
+   function of the confound labels and therefore upper-bounds *any* conditional-mean adjustment; it
+   moves the `d2_h::wsi_biology` channel by 0.0001, **0.6052 → 0.6051**. The confound labels on their
+   own reach a channel of 0.1237 (additive) and 0.0903 (saturated), both below the real channel's null
+   median of 0.1483 — **11.2%** and **6.0%** of its excess over that null. So the residual is real, it
+   is bounded at roughly a tenth of the effect, and it cannot explain any adjusted number here.
+   *(`NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b, §8;
+   `NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md` §3–§5. The 21:30 entry
+   states the same correction in ratio form, `corrected_multiple` = observed ÷ regenerated-null median,
+   giving 2.73×/3.66× on this block and 2.4–3.3× / 3.1–3.7× across arms; the figures above are the
+   difference form and the two are not interchangeable.)*
+3. **The certificate's raw joint row anti-predicts what survives, so it is not a confoundedness
+   score.** D1-B `programme_free` (`d1_f`) has the lowest raw joint site LDA of the twelve artifacts
+   measured — 0.1071–0.1449 against `d1_p`'s 0.1778–0.3764 and `d2_i_seed43`'s 0.4735 — and the highest
+   post-adjustment nonlinear reading of the twelve, 6.21–7.38× chance for site and 4.98–6.69× for
+   cancer. A low raw joint LDA does not license a claim about the adjusted state.
 
 Consequences: P4's condition 4 blocks exposure of any raw axis; the certificate schema needs a
 `certified_on = {raw | adjusted}` field, because certifying on the adjusted state and then showing the

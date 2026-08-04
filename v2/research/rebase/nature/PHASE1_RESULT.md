@@ -27,9 +27,13 @@ perm p = 0.016 is the resolution floor at 60 permutations (no permutation exceed
 
 ## Two findings
 
-**F1 — the morphology↔molecular channel survives full confound adjustment and generalises.**
+**F1 — the morphology↔molecular channel survives confound adjustment and generalises.**
 Held-out 0.477 vs 0.151 chance for WSI-only features. The held-out estimate is close to in-sample
-(0.520), so this is **not** capacity inflation.
+(0.520), so this is **not** capacity inflation. "Full" would overstate it: the adjustment is
+conditional-mean only. The stronger and now-measured statement is that the channel survives the
+*upper bound* on conditional-mean adjustment — a saturated cancer × site cell design moves it
+0.6052 → 0.6051 — while the confound labels alone reach only 6.0–11.2% of its excess over null.
+See "Validity checks passed".
 
 **F2 — the head trained for biology is WORSE at biology than the head trained for identity.**
 wsi_identity 0.539 > wsi_biology 0.477, and the gap *widens* held-out. The retrieval-trained head
@@ -37,8 +41,24 @@ carries more molecular signal than the head explicitly supervised on molecular p
 functional counterpart of the earlier geometric finding (biology effective rank ~38 vs identity ~191).
 
 ## Validity checks passed
-- **Confound removal verified, not assumed:** cancer-type balanced accuracy from the residualised
-  representation drops to **0.035** (chance 0.048) from **0.463** raw. Cancer is gone.
+- **Confound removal verified, not assumed — and bounded, not absolute:** cancer-type balanced
+  accuracy from the residualised representation drops to **0.035** (chance 0.048) from **0.463**
+  raw. That is a statement about the **first moment**: the adjustment removes cancer from the
+  class means, which is what a mean-based scorer such as LDA can see. It is *not* the same as
+  "cancer is gone", and the stronger sentence is **refuted**. A nonlinear probe recovers cancer
+  from the adjusted state at **3.45× chance** and site at **3.15× chance**, netted against a null
+  that regenerates the adjustment inside every permutation, *p* at the resolution floor, with
+  k-NN, random forest and RBF-SVM agreeing. An equal-means synthetic confirms the mechanism:
+  where classes differ only in conditional variance, LDA reads 0.231 against a chance of 0.250
+  while k-NN reads 0.554, the forest 0.625 and the SVM 0.658 — a mean-based certificate cannot
+  see this by construction.
+  **The residual is real, and it is bounded.** A saturated cancer × site cell design — which spans
+  every function of the confound labels and therefore upper-bounds *any* conditional-mean
+  adjustment — moves the channel by 0.0001, **0.6052 → 0.6051**; and the confound labels on their
+  own account for only **6.0–11.2%** of the channel's excess over its own null. The surviving
+  confound cannot explain the finding.
+  *See `NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` and
+  `NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md`.*
 - **Held-out canonical directions** — removes the in-sample maximisation bias.
 - **Within-cancer permutation null** — preserves cohort structure, destroys only patient pairing.
 - **Rare-site pooling** — prevents singleton-site dummies acting as per-patient indicators.

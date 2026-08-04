@@ -118,3 +118,78 @@ theory says the effect is proportional to how much gets removed.
 Results: `p1_evidence/track1/certificate_adjusted/{confound_certificate.json,task_rows.csv}`,
 `p1_evidence/track2/{knobs_rows.csv,knobs_law.json}` under
 `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/p1_evidence/`.
+
+---
+
+## CORRECTION APPENDED 2026-08-04 21:40 UTC — "the site signal is gone" is refuted; the entry's numbers stand, its absolute sentences do not
+
+This entry is append-only, so nothing above has been altered. Read this block as binding wherever it
+contradicts the text above.
+
+**What is withdrawn.** Four sentences in this entry are absolute and are refuted by measurement:
+
+| line | withdrawn text |
+|---:|---|
+| 1 (title) | "The adjustment **fully discharges** the site confound" |
+| 27 | "this is not partial attenuation; the site signal is gone" |
+| 34 | "Every CALIBRA channel number in this project is measured on adjusted states and is therefore **not** reading tissue source site" |
+| 89 | "…is **completely fixed** by the correction we already apply before every measurement" |
+| 91 | "none of our measured numbers are contaminated by it" |
+| 106–107 | "**Every channel number on this project survives.** The `wsi_biology` adjusted top-CCA of 0.605 (d2_h) is not a site code" |
+
+**What still stands.** Every number above is reproduced and unchanged: joint accuracy 0.3633 → 0.0118
+against a chance rate of 0.0118, the 21–45× drop, zero breaching axes in every state, per-axis maxima
+falling to ~0.010–0.014. The entry's *finding about certification rules* — that a per-axis-only
+certificate would have passed this leak, and that the joint test must be a required field of the
+schema — is unaffected and is if anything reinforced below.
+
+**What the measurement actually shows.** The adjustment removes the confound from the **first
+moment**. LDA is a mean-based scorer, so a certificate built on it can certify exactly that and no
+more. Probing the same adjusted block with classifiers that are not functions of class means recovers
+both confounds: **3.15× chance for tissue source site and 3.45× for cancer type**, netted against a
+null that regenerates the adjustment inside every permutation so each draw carries an adjustment
+artefact of its own size, *p* at the 1/201 resolution floor, with k-NN, random forest and RBF-SVM all
+agreeing. A synthetic block with exactly equal class means and unequal conditional variances shows the
+blind spot directly: LDA reads 0.231 and the per-axis maximum 0.244 against chance 0.250, while k-NN
+reads 0.554, the forest 0.625 and the SVM 0.658.
+
+**The replacement claim is stronger than the one it replaces, and the entry's conclusion survives it.**
+Three measurements bound the residual:
+
+1. A **saturated cancer × site cell design** — one free parameter per occupied cell — spans every
+   function of the confound labels and therefore **upper-bounds any conditional-mean adjustment
+   whatsoever**, kernel, forest or boosted. It moves the `d2_h::wsi_biology` channel by 0.0001:
+   **0.6052 → 0.6051**, retention 0.998.
+2. The **confound labels alone** reach a channel of 0.1237 (additive design) and 0.0903 (saturated),
+   both *below* the real channel's own null median of 0.1483 — **11.2%** and **6.0%** of its excess
+   over that null.
+3. The residual is therefore not a conditional mean of any shape.
+
+So the 0.605 top-CCA is not a site code — but that is now a *measured and bounded* statement rather
+than an inference from the certificate, and the correct sentence is "the confound is removed from the
+first moment and cannot account for more than ~10% of the channel", not "the site signal is gone".
+
+**A finding this entry could not have had: the certificate's raw row anti-predicts what survives.**
+D1-B `programme_free` (`d1_f`) has the **lowest** raw joint site LDA of the twelve artifacts measured —
+0.1071–0.1449, against `d1_p`'s 0.1778–0.3764 and `d2_i_seed43`'s 0.4735 — and the **highest**
+post-adjustment nonlinear reading of all twelve, 6.21–7.38× chance for site and 4.98–6.69× for cancer.
+A low raw joint LDA does not predict a low post-adjustment reading; on this cohort it anti-predicts it.
+The raw joint row must therefore not be used as a proxy for "how confounded is this representation".
+
+**Sources.** `NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b (the
+3.15/3.45 figures, stated there as excess over the regenerated-null median in × chance) and §8 (the
+twelve-artifact breadth table); `NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md`
+§3–§5 (the saturated-cell arm, the labels-only ceiling). **Disagreement between sources, reported
+rather than resolved:** the 21:30 entry expresses the same correction as a *ratio*
+(`corrected_multiple` = observed ÷ regenerated-null median), giving **2.73× site / 3.66× cancer** on
+this block and **2.4–3.3× / 3.1–3.7×** across six adjuster arms, where the 21:00 entry uses the
+*difference* (observed × chance − null median × chance) giving 3.15× / 3.45×. Both are defensible and
+they are not interchangeable; any quotation must name which.
+
+**Not edited here.** `NOTEBOOK.md:1278` carries this entry's index row with the same absolute verb
+("**adjustment fully discharges site**"). `NOTEBOOK.md` is out of scope for this correction pass and
+is flagged rather than changed.
+
+Corrected documents: `paper/P1_CALIBRA_DRAFT.md` (abstract, §1.4, §4.2, §6),
+`paper/P1_FIGURES.md` (F2), `v2/research/rebase/nature/PHASE1_RESULT.md` (F1, validity checks),
+`v2/research/rebase/nature/TRACK1_NEGATIVE_CONTROLS.md` §T1.3.

@@ -44,8 +44,9 @@ keep the text.
 
 ### F2 — The adjustment is verified, not assumed
 
-**Claim.** The confound adjustment removes what it claims to remove, on two different confounders,
-and a per-axis certificate would have missed the leak.
+**Claim.** The confound adjustment removes what it claims to remove **from the first moment**, on two
+different confounders; a per-axis certificate would have missed the leak; and a nonlinear probe still
+recovers a bounded residual that the mean-based certificate cannot see.
 
 **Panels.**
 - (a) Grouped bars, six state × artifact combinations: joint LDA balanced accuracy raw vs adjusted,
@@ -57,16 +58,29 @@ and a per-axis certificate would have missed the leak.
   to the right. This panel is the figure that carries the certification-rule finding.
 - (c) Breaching-axis counts raw → adjusted (17→0, 60→0, 58→0, 43→0, 61→0, 48→0).
 - (d) Small companion bar: cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048 (different
-  cohort, n = 2,530 — label it as such, do not merge with (a)).
+  cohort, n = 2,530 — label it as such, do not merge with (a)). **This panel is a first-moment
+  statement and must be captioned as one** — it is *not* "cancer is gone"; see (e).
+- (e) **What the certificate does not cover, and how far it reaches.** Two paired bars for the same
+  adjusted `d2_h::wsi_biology` block: the mean-based reading the certificate makes (joint LDA 0.0118 at
+  chance 0.0118) beside the nonlinear reading on the identical block, netted against a null that
+  regenerates the adjustment inside every permutation — **3.15× chance for site, 3.45× for cancer**,
+  *p* at the 1/201 floor, with k-NN, random forest and RBF-SVM markers overlaid to show all three
+  families agree. Annotate the bound alongside it: a saturated cancer × site cell design, which spans
+  every function of the confound labels and upper-bounds any conditional-mean adjustment, moves the
+  channel **0.6052 → 0.6051**, and the labels alone account for **6.0–11.2%** of the channel's excess
+  over its own null. The panel's caption is the paper's replacement for "the confound is gone".
 
 **Data.** `p1_evidence/track1/certificate_raw/{confound_certificate.json,task_rows.csv}` and
 `certificate_adjusted/` (same filenames); tabulated in
 `v2/research/rebase/nature/TRACK1_NEGATIVE_CONTROLS.md` §T1.3 and
 `NOTEBOOK_ENTRIES/t13_confound_certificate_20260803T0152Z.md`. Panel (d) from
-`v2/research/rebase/nature/PHASE1_RESULT.md`.
+`v2/research/rebase/nature/PHASE1_RESULT.md`. Panel (e) from
+`NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b and
+`NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md` §3–§5, run outputs
+`p1_evidence/nonlinear_adjustment/{channel_main,regenerated_null}.json`.
 
 **Status.** (a), (c), (d) `PLOTTABLE`. (b) `NEEDS EXTRACTION` — needs the per-axis vector from
-`task_rows.csv` on the box.
+`task_rows.csv` on the box. (e) `PLOTTABLE` from the two JSON outputs named above.
 
 ---
 

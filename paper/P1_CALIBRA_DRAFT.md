@@ -24,12 +24,16 @@ We describe CALIBRA, an instrument that injects a correlation of known strength 
 direction pair spanning the image and molecular blocks, pushes it through the *identical* pipeline
 including the residualisation, and reports what came back. On 2,530–6,427 TCGA patients with frozen
 H-Optimus-0 whole-slide features and bulk expression targets we report four things. (i) The
-adjustment works and is verified rather than assumed, twice and on two different confounders: raw
-cancer-type balanced accuracy falls 0.463 → 0.035 against a chance rate of 0.048, and joint
-tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118, a 21–45× drop with
-zero breaching axes in six representation states. (ii) It does not destroy the signal it is meant to
-leave alone: injected-signal attenuation is 0.974–1.039 across six states and 1.07–1.12 across twelve
-design × sample-size cells. (iii) The floors themselves — a paired *transmission* floor censored at
+adjustment works on the first moment and is verified rather than assumed, twice and on two different
+confounders: raw cancer-type balanced accuracy falls 0.463 → 0.035 against a chance rate of 0.048, and
+joint tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118, a 21–45× drop
+with zero breaching axes in six representation states — while a nonlinear probe still recovers both
+confounds from the adjusted state at 3.15× and 3.45× chance, so what is certified is the class means
+and not every function of the representation. That residual is bounded: a saturated cancer × site cell
+design, which upper-bounds any conditional-mean adjustment, moves the channel 0.6052 → 0.6051, and the
+confound labels alone account for 6.0–11.2% of the channel's excess over its own null. (ii) It does
+not destroy the signal it is meant to leave alone: injected-signal attenuation is 0.974–1.039 across
+six states and 1.07–1.12 across twelve design × sample-size cells. (iii) The floors themselves — a paired *transmission* floor censored at
 ≤ 0.01, and an unpaired *detection* floor of 0.25–0.40 that is the only quotable detection limit —
 with a permutation *p* of 1/2001 for every state. (iv) The detection floor is set by a
 residualisation-induced correlation floor, not by sample size: it is pinned at 0.25–0.30 from
@@ -58,9 +62,12 @@ sometimes a permutation *p*, but not the effect size they would have failed to d
 small association cannot be distinguished from an insensitive analysis. We inject a correlation of
 known strength onto a named direction pair spanning image and molecular blocks and push it through
 the identical pipeline, including a cross-fitted residualisation against cancer type and tissue source
-site. On 2,530–6,427 TCGA patients the adjustment removes what it claims to (joint site accuracy
-0.3633 → 0.0118 against chance 0.0118, zero breaching axes in six states) and costs the signal
-essentially nothing (attenuation 0.974–1.039), but cannot detect a single-direction correlation below
+site. On 2,530–6,427 TCGA patients the adjustment removes what it claims to from the first moment
+(joint site accuracy 0.3633 → 0.0118 against chance 0.0118, zero breaching axes in six states) while a
+nonlinear probe still recovers site at 3.15× and cancer at 3.45× chance from the adjusted state — a
+residual bounded by a saturated cancer × site cell design that moves the channel only 0.6052 → 0.6051.
+It costs the signal essentially nothing (attenuation 0.974–1.039), but cannot detect a
+single-direction correlation below
 0.25–0.40. That floor does not improve from n = 1,000 to n = 6,427, because it is set by the
 residualisation-induced correlation — the Yule/Frisch–Waugh–Lovell partial correlation, reproduced by
 our pipeline to 8.6 × 10⁻¹⁶ — which is 20–35× larger for a real confound design than for a
@@ -164,9 +171,15 @@ publishable, and no such claim appears here.
 In descending order of how well evidenced they are.
 
 1. **A confound adjustment verified rather than asserted, on two different confounders, with the
-   verification reported as a certificate.** Cancer-type balanced accuracy 0.463 → 0.035 (chance
-   0.048); joint tissue-source-site balanced accuracy 0.3633 → 0.0118 (chance 0.0118), a 21–45× drop
-   with zero breaching axes across six states.
+   verification reported as a certificate — and with the certificate's own reach measured.**
+   Cancer-type balanced accuracy 0.463 → 0.035 (chance 0.048); joint tissue-source-site balanced
+   accuracy 0.3633 → 0.0118 (chance 0.0118), a 21–45× drop with zero breaching axes across six
+   states. What that certifies is the **first moment**: a nonlinear probe still recovers site at
+   3.15× and cancer at 3.45× chance from the adjusted state, *p* at the floor, three probe families
+   agreeing. The residual is bounded — a saturated cancer × site cell design, the upper bound on any
+   conditional-mean adjustment, moves the channel 0.6052 → 0.6051, and the labels alone account for
+   6.0–11.2% of its excess over null — so a mean-based certificate is sound for what it claims and
+   must not be read as "the confound is gone" (§4.2).
 2. **A demonstration that the same adjustment does not destroy signal.** Injected-signal attenuation
    0.974–1.039 across six states, 1.07–1.12 across twelve design × n cells, and 0.944–1.228 in the
    original 40-draw sweep — i.e. ≈ 1 in every measurement we have. This is the number that answers
@@ -678,9 +691,48 @@ the T1.3 criterion been implemented literally as our own specification wrote it 
 arguably dismissible, while the real leak is 31× chance in the joint direction. **The joint test must
 be a required field of the certificate schema, not an optional extra.**
 
-The adjustment discharges the leak completely: joint accuracy falls **21–45×** to at or below the
-chance rate, with **zero** breaching axes in all six state × artifact combinations. The defect is
-therefore a property of the raw representation, and no adjusted number in this paper is reading site.
+**(3) The adjustment discharges the leak from the first moment, and a nonlinear probe still finds
+a bounded residual. This is a stronger statement than "the leak is gone", and it is the one the
+evidence supports.** Joint accuracy falls **21–45×** to at or below the chance rate, with **zero**
+breaching axes in all six state × artifact combinations — so the confound is removed from the class
+means, which is exactly what this certificate, being built on LDA, is able to certify. It is not
+removed from every function of the representation. Probing the adjusted state with classifiers that
+are not functions of class means recovers both confounds: **3.15× chance for tissue source site and
+3.45× for cancer type**, netted against a null that regenerates the adjustment inside every
+permutation so that each draw carries an adjustment artefact of its own size, with *p* at the
+resolution floor and three probe families (k-NN, random forest, RBF-SVM) agreeing. A synthetic block
+with exactly equal class means and unequal conditional variances shows why the certificate cannot see
+this: LDA reads 0.231 and the per-axis maximum 0.244 against a chance of 0.250, while k-NN reads
+0.554, the forest 0.625 and the SVM 0.658.
+
+Three quantities bound the residual, and together they are why it cannot carry the paper's result.
+First, a **saturated cancer × site cell design** — one free parameter per occupied cell, which spans
+every function of the confound labels and therefore **upper-bounds any conditional-mean adjustment
+whatsoever**, kernel, forest or boosted — moves the `d2_h::wsi_biology` channel by 0.0001,
+**0.6052 → 0.6051** (retention 0.998). Second, the **confound labels on their own** reach a channel
+of 0.1237 (additive design) and 0.0903 (saturated design), both *below* the real channel's own null
+median of 0.1483; as a share of the channel's excess over that null they account for **11.2%** and
+**6.0%** respectively. Third, the residual is therefore not a conditional mean of any shape. The
+surviving confound is real, it is bounded at roughly a tenth of the effect, and it cannot explain
+the channel.
+
+Two consequences for certification, neither optional. An LDA-based certificate must state that it
+certifies the **first moment**, and must not be read as "the confound is gone"; and the certificate's
+**raw** joint row must not be used as a proxy for how confounded a representation is, because on this
+cohort it *anti-predicts* what survives. D1-B `programme_free` (`d1_f`) has the **lowest** raw joint
+site LDA of the twelve artifacts measured — 0.1071–0.1449, against `d1_p`'s 0.1778–0.3764 and
+`d2_i_seed43`'s 0.4735 — and the **highest** post-adjustment nonlinear reading of all twelve, at
+6.21–7.38× chance for site and 4.98–6.69× for cancer.
+
+*Provenance for (3): `NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b
+(the 3.15/3.45 figures, as excess over the regenerated-null median in × chance) and §8 (the
+twelve-artifact breadth table); `NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md`
+§3–§5 (the saturated-cell arm and the labels-only ceiling). Run outputs
+`p1_evidence/nonlinear_adjustment/{channel_main,regenerated_null,kernel_grid}.json` on persistent NFS.
+Note that the 21:30 entry reports the same correction as a **ratio** rather than a difference
+(`corrected_multiple` = observed ÷ regenerated-null median), which gives 2.73× site / 3.66× cancer for
+this block and 2.4–3.3× / 3.1–3.7× across six adjuster arms; the two estimators are not
+interchangeable and the figures quoted above are the difference form.*
 
 ### 4.3 …and the adjustment does not destroy signal
 
@@ -1425,16 +1477,23 @@ correlation of known strength onto a named direction pair and pushing it through
 pipeline.
 
 Applied to TCGA morphology and expression, the answers are: the adjustment removes what it claims to
-(cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048; joint site accuracy 0.3633 → 0.0118
-against chance 0.0118, with zero breaching axes in six states); it costs the signal essentially
+from the first moment (cancer-type balanced accuracy 0.463 → 0.035 against chance 0.048; joint site
+accuracy 0.3633 → 0.0118 against chance 0.0118, with zero breaching axes in six states), and no
+further — a nonlinear probe recovers site at 3.15× and cancer at 3.45× chance from the adjusted state,
+against a null that regenerates the adjustment inside every permutation, so what the certificate
+certifies is the class means; it costs the signal essentially
 nothing (attenuation 0.974–1.039); and it could not have seen a single-direction correlation below
 0.25–0.40. The last number is not improved by recruiting patients — it is pinned across a 6.4×
 increase in n — because it is set by a residualisation-induced correlation floor that is structural
 rather than a sampling term, 20–35× larger than what a matched-rank structureless design produces.
 
 The negative-control battery caught a real confound leak, located it in the raw representation,
-showed the adjustment discharging it, and — most usefully — showed that the per-axis certificate our
-own specification called for would have passed that leak. It also showed that three quarters of the
+showed the adjustment discharging it in the mean, measured what that discharge does *not* cover — a
+nonlinear residual at 3.15–3.45× chance, bounded above by a saturated cancer × site cell design that
+moves the channel 0.6052 → 0.6051 and by the confound labels reaching only 6.0–11.2% of the channel's
+excess over its null — and, most usefully, showed that the per-axis certificate our own specification
+called for would have passed that leak, and that the certificate's *raw* joint row anti-predicts what
+survives adjustment. It also showed that three quarters of the
 apparent per-target molecular legibility is reproduced by covariate-matched random gene sets, and that
 this is invariant to patch contamination.
 
