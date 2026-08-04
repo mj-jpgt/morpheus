@@ -892,6 +892,356 @@
     "path": "floors.channel.residualised.top_cca_16.shape"
    },
    "caveat": "not a rank statistic. It is here so that the asymmetry §4.1 rests on (rank 3.295×, channel 1.055×, same five runs) is machine-checked against the same file as the ranks."
+  },
+  "R1_probe_step100": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 100",
+   "value": 1.333,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 3.9963840819804455,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.100.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 2.9979395272476705,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.100.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep3",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.1892798331517442
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.100.wsi_biology.R1.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R1_probe_step200": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 200",
+   "value": 2.057,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 3.732927779485292,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.200.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.8147501318841404,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.200.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep1",
+    "outlier_is_low": false,
+    "bimodal": false,
+    "rest_fold": 1.3070321512801029
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.200.wsi_biology.R1.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R1_probe_step250": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 250",
+   "value": 1.9327,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 3.7327009754709737,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.250.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.931327965009003,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.250.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep1",
+    "outlier_is_low": false,
+    "bimodal": false,
+    "rest_fold": 1.6394708103508098
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.250.wsi_biology.R1.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R1_probe_step400": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 400",
+   "value": 1.5702,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.83705877492462,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.400.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.8068450626094121,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.400.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep5",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.3138658563122252
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.400.wsi_biology.R1.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R1_probe_step500": {
+   "statistic": "R1",
+   "block": "fixed held-out probe, step 500",
+   "value": 1.3674,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.353352308384059,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.500.wsi_biology.R1.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.720994489541004,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.500.wsi_biology.R1.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep5",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.2784239983387249
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.500.wsi_biology.R1.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R3_probe_step100": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 100",
+   "value": 1.4939,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.9266629592378908,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.100.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.9590966058235904,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.100.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep3",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.3646482324124873
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.100.wsi_biology.R3.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R3_probe_step200": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 200",
+   "value": 2.0407,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.987455808834254,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.200.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.4639716112178378,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.200.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep1",
+    "outlier_is_low": false,
+    "bimodal": false,
+    "rest_fold": 1.348831300442321
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.200.wsi_biology.R3.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R3_probe_step250": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 250",
+   "value": 2.0346,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.9954403109142445,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.250.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.4722671500721947,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.250.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep1",
+    "outlier_is_low": false,
+    "bimodal": false,
+    "rest_fold": 1.6152041032533742
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.250.wsi_biology.R3.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R3_probe_step400": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 400",
+   "value": 1.4489,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.1588372598063517,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.400.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.4899901758828202,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.400.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep5",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.1689822818348352
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.400.wsi_biology.R3.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
+  },
+  "R3_probe_step500": {
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 500",
+   "value": 1.5157,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of the two arms' own max/min at the SAME step and the SAME statistic; `floor_arm` in the source names which arm carried it. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 500): a floor at one step licenses no verdict at another.",
+   "a": {
+    "value": 2.0187357160077943,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.500.wsi_biology.R3.floor_max"
+    }
+   },
+   "b": {
+    "value": 1.331852476284984,
+    "src": {
+     "kind": "json",
+     "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+     "path": "floors.500.wsi_biology.R3.floor_min"
+    }
+   },
+   "shape": {
+    "outlier": "rep5",
+    "outlier_is_low": true,
+    "bimodal": false,
+    "rest_fold": 1.3307518377929377
+   },
+   "shape_src": {
+    "kind": "json",
+    "file": "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+    "path": "floors.500.wsi_biology.R3.arm_floor.m0.shape"
+   },
+   "floor_arm": "m0",
+   "n": 5
   }
  },
  "statistics_with_no_measured_floor": [],
@@ -1470,10 +1820,9 @@
    "comparison": "controlled 200-step probe, **seed held fixed** — min(m = 0.999) against max(m = 0)",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "clears": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it. **This row is one of the two the paper quoted as CLEARING the floor** (3.495×, 'by 6%'); it cleared an R1 exported-block floor while being an R3 probe-block measurement. It clears nothing that has been measured.",
+   "block": "fixed held-out probe, step 200",
+   "floor": "R3_probe_step200",
+   "clears": true,
    "a": {
     "value": 6.92,
     "src": {
@@ -2303,7 +2652,7 @@
    "statistic": "R3",
    "block": "fixed 256-patient held-out probe",
    "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: its five arms vary the **consistency weight** (1.0 / 0.1 / 0.0) as well as decorrelation, and none of them is the `programme_free` momentum configuration the repeats were run at.",
    "a": {
     "value": 4.08,
     "src": {
@@ -2335,7 +2684,7 @@
    "statistic": "R3",
    "block": "fixed held-out probe",
    "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: it is read at **step 600**, past the 500-step budget the repeats were run over, and a floor at step 500 licenses no verdict at step 600 any more than one block's floor licenses another's. Closing it is five more runs at a 600-step budget.",
    "a": {
     "value": 7.42,
     "src": {
@@ -2365,9 +2714,9 @@
    "comparison": "m = 0.999 against m = 0, **worst case over three seeds**, 500 steps",
    "kind": "selection",
    "statistic": "R1",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 500",
+   "floor": "R1_probe_step500",
+   "floor_note": "‡ KIND NOTE. The comparison VARIES the seed; the floor holds it fixed. That makes the floor a floor twice over for this row in particular — the spread it has to clear is measured without the term §4.2 calls dominant.",
    "a": {
     "value": 10.45,
     "src": {
@@ -2387,7 +2736,7 @@
     }
    },
    "rests_on": "a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**.",
-   "clears": null,
+   "clears": true,
    "ratio": 3.2862,
    "value_digits": 3
   },
@@ -2397,9 +2746,9 @@
    "comparison": "the same replication under the tripwire statistic",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 500",
+   "floor": "R3_probe_step500",
+   "floor_note": "‡ KIND NOTE. The comparison VARIES the seed; the floor holds it fixed. That makes the floor a floor twice over for this row in particular — the spread it has to clear is measured without the term §4.2 calls dominant.",
    "a": {
     "value": 6.85,
     "src": {
@@ -2419,7 +2768,7 @@
     }
    },
    "rests_on": "as row above.",
-   "clears": null,
+   "clears": true,
    "ratio": 2.4377,
    "value_digits": 3
   },
@@ -2431,7 +2780,7 @@
    "statistic": "R3",
    "block": "fixed held-out probe",
    "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: **two** reasons — it is read at **step 600**, and one of its arms is **m = 0.99**, which is neither of the two arms repeats were run for.",
    "a": {
     "value": 7.42,
     "src": {
@@ -2461,10 +2810,10 @@
    "comparison": "m = 0.999 against m = 0 at step 400 — the widest fold past step 150",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "clears": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it. **This row is the other of the two the paper quoted as clearing the floor.** Both were on this block.",
+   "block": "fixed held-out probe, step 400",
+   "floor": "R3_probe_step400",
+   "clears": true,
+   "floor_note": "‡ BUDGET NOTE. The row is read off a run with a longer step budget than the five repeats; `d1_momentum_probe.py` has no schedule that depends on the step budget (the same fact audit row 56 already rests on), so step N of a 600-step run is the same quantity as step N of these. Both arms are otherwise inside the measured regime: `programme_free`, momentum 0 or 0.999, decorrelation 0.04, capacity 4,096, lr 2e-4, seed 42.",
    "a": {
     "value": 7.84,
     "src": {
@@ -2493,9 +2842,9 @@
    "comparison": "m = 0.999 (6.89) against m = 0.99 (6.65) at step 100",
    "kind": "direction",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 100",
+   "floor": "R3_probe_step100",
+   "floor_note": "‡ ARM NOTE. The m = 0.999 side is one of the two arms the repeats were run on; the m = 0.99 side is not, and has no floor of its own. Same one-arm-to-two-arm extension as the §4.9a rows.",
    "a": {
     "value": 6.89,
     "src": {
@@ -2515,7 +2864,7 @@
     }
    },
    "rests_on": "**not the ordering.** What falsifies MoCo's staleness account here is that key-to-encoder agreement varies 2.06× (0.908 against 0.441) while rank is *indistinguishable* — an equality claim, which a 1.04× difference supports. The sentence “the best-agreeing arm does not have the best rank” reads an ordering off that 1.04× and should be restated as the equality it is.",
-   "clears": null,
+   "clears": false,
    "ratio": 1.0361,
    "value_digits": 3
   },
@@ -2525,9 +2874,9 @@
    "comparison": "m = 0.999 (6.89) against no momentum (2.58) at step 100",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 100",
+   "floor": "R3_probe_step100",
+   "floor_note": "‡ BUDGET NOTE. The row is read off a run with a longer step budget than the five repeats; `d1_momentum_probe.py` has no schedule that depends on the step budget (the same fact audit row 56 already rests on), so step N of a 600-step run is the same quantity as step N of these. Both arms are otherwise inside the measured regime: `programme_free`, momentum 0 or 0.999, decorrelation 0.04, capacity 4,096, lr 2e-4, seed 42.",
    "a": {
     "value": 6.89,
     "src": {
@@ -2547,7 +2896,7 @@
     }
    },
    "rests_on": "the same binary outcome as §5.4; one seed.",
-   "clears": null,
+   "clears": true,
    "ratio": 2.6705,
    "value_digits": 3
   },
@@ -2559,7 +2908,7 @@
    "statistic": "R3",
    "block": "fixed held-out probe",
    "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: one arm is at **capacity 64**, a configuration no repeat was run at, and §5.2 records **no reading step** for the sweep — the floor is measured per step and cannot be applied without one.",
    "a": {
     "value": 6.17,
     "src": {
@@ -2591,7 +2940,7 @@
    "statistic": "R3",
    "block": "fixed held-out probe",
    "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: both arms are at **m = 0.95** and at capacities **2,048 and 8,192**; the repeats are at m ∈ {0, 0.999} and capacity 4,096, and no reading step is recorded.",
    "a": {
     "value": 3.67,
     "src": {
@@ -2623,7 +2972,7 @@
    "statistic": "R3",
    "block": "fixed held-out probe",
    "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: as the row above — m = 0.95, capacities 2,048 and 8,192, no recorded step. The two rows are the same two numbers used two ways and stay together.",
    "a": {
     "value": 3.67,
     "src": {
@@ -2653,9 +3002,9 @@
    "comparison": "m = 0.95 → 0.999 at fixed capacity 4,096 — 2.91 against 7.82",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 250",
+   "floor": "R3_probe_step250",
+   "floor_note": "‡ ARM NOTE. The m = 0.999 side is `long_m0.999` at step 250, one of the two arms the repeats were run on; the m = 0.95 side is not, and has no floor of its own. The reading step is 250 for both, which vendoring the logs is what established — the row previously recorded none.",
    "a": {
     "value": 7.82,
     "src": {
@@ -2675,7 +3024,7 @@
     }
    },
    "rests_on": "one seed per cell; the surviving statement is monotonicity in m across five values.",
-   "clears": null,
+   "clears": true,
    "ratio": 2.6873,
    "value_digits": 3
   },
@@ -2685,9 +3034,9 @@
    "comparison": "decorrelation 0.0 → 0.04 at m = 0.999, step 400 (R3 — the column quoted)",
    "kind": "selection",
    "statistic": "R3",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 400",
+   "floor": "R3_probe_step400",
+   "floor_note": "‡ ARM NOTE. Both arms are at m = 0.999, capacity 4,096, lr 2e-4, seed 42, step 400, and the decorrelation = 0.04 arm is exactly the arm the m0999 floor is measured on — but the decorrelation = 0.0 arm has no floor of its own. This is the same one-arm-to-two-arm extension §4.1's exported floor is applied under, and it is recorded rather than assumed.",
    "a": {
     "value": 8.01,
     "src": {
@@ -2707,7 +3056,7 @@
     }
    },
    "rests_on": "**monotonicity across three levels and a co-measured contradicting quantity**: the RNA-view mutual cosine rises 0.4774 → 0.7657 → 0.8696 on the *same runs* as rank rises. One seed per level. The magnitude carries nothing; the direction and the cosine do. Figure F9.",
-   "clears": null,
+   "clears": true,
    "ratio": 1.8542,
    "value_digits": 3
   },
@@ -2717,9 +3066,9 @@
    "comparison": "the same three runs under the canonical statistic",
    "kind": "selection",
    "statistic": "R1",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** The fixed held-out probe has never had a retraining floor measured on it, and one cannot be recovered from the five exported repeats: they were exported, not probed. Until five repeats are re-run with `d1_momentum_probe.py` attached this comparison can be judged neither way. It was previously judged against the R1 exported-`wsi_biology` floor, which does not license it.",
+   "block": "fixed held-out probe, step 400",
+   "floor": "R1_probe_step400",
+   "floor_note": "‡ ARM NOTE. As the R3 row above: the decorrelation = 0.0 arm has no floor of its own.",
    "a": {
     "value": 12.2,
     "src": {
@@ -2739,7 +3088,7 @@
     }
    },
    "rests_on": "as above. Recorded because the 1.85× the notebook entry quotes is the **R3** column; statistic-matched to the floor it is 1.940×, and both are inside.",
-   "clears": null,
+   "clears": true,
    "ratio": 1.9396,
    "value_digits": 3
   },
@@ -2749,9 +3098,9 @@
    "comparison": "**the like-for-like pair §5.4 says does not exist** — `ablate_decorr0.04` against `mseed_m0.999_s42`, identical configuration and seed, step 400",
    "kind": "nuisance",
    "statistic": "R1",
-   "block": "fixed held-out probe",
-   "floor": null,
-   "floor_note": "**n = 2 is a pair, not a floor.** §4.1 states the trap in terms: any pair drawn from four concordant repeats spans at most 1.028×, and a measured floor of 1.03× would license every comparison in the paper. This pair may not be quoted as a floor for the momentum/probe regime The block is the fixed held-out probe, which still has no floor of its own.",
+   "block": "fixed held-out probe, step 400",
+   "floor": "R1_probe_step400",
+   "floor_note": "‡ SUPERSEDED, and kept. This row is an n = 2 same-configuration pair on exactly the arm the m0999 floor is measured on. The floor beside it is the n = 5 version of the same quantity. The row is a MEASUREMENT of the noise, not a claim resolved against it, so `clears` here reads as 'this pair's fold is larger than the five-repeat spread', not as a passing verdict.",
    "a": {
     "value": 12.2,
     "src": {
@@ -2771,7 +3120,7 @@
     }
    },
    "rests_on": "nothing may be read off it as a floor. It is recorded because §5.4 and §6.2 both say **no like-for-like measurement exists in this regime**, and one does: the two runs share momentum, decorrelation, capacity, learning rate, seed and step-0 state (67.55 / 101.38 / 0.0342 / 0.3650), and `d1_momentum_probe.py` has no schedule that depends on the step budget. Over the eight shared logged steps the widest canonical fold is 1.128× (step 150).",
-   "clears": null,
+   "clears": false,
    "ratio": 1.0664,
    "value_digits": 3
   },
@@ -2784,7 +3133,7 @@
    "block": "fixed held-out probe",
    "floor": null,
    "clears": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: both arms are at learning rates of **1e-3 and 4e-5**; the repeats are at **2e-4**, and §5.2a's own result is that the learning rate is the variable that moves rank most — so a floor at one rate is the last thing that may be borrowed for another.",
    "a": {
     "value": 12.3,
     "src": {
@@ -2816,7 +3165,7 @@
    "block": "fixed held-out probe",
    "floor": null,
    "clears": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: as the row above: learning rates 1e-3 and 4e-5, against the repeats' 2e-4.",
    "a": {
     "value": 35.24,
     "src": {
@@ -2848,7 +3197,7 @@
    "block": "fixed held-out probe",
    "floor": null,
    "clears": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: both arms are at learning rate **1e-3**, not the repeats' 2e-4.",
    "a": {
     "value": 1.06,
     "src": {
@@ -2880,7 +3229,7 @@
    "block": "fixed held-out probe",
    "floor": null,
    "clears": null,
-   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "floor_note": "**STILL UNJUDGEABLE.** The fixed held-out probe now HAS a retraining floor — five identical same-seed repeats of each of two arms, at every step `d1_momentum_probe.py` reads up to 500. It does not reach this row: both arms are at learning rate **4e-5**, not the repeats' 2e-4.",
    "a": {
     "value": 35.24,
     "src": {
@@ -2902,10 +3251,74 @@
    "rests_on": "nothing on its own. Momentum does move rank at the low rate (2.87×) and does not at the high rate (1.01×), which is why §5.2a says the collapse is *primarily* a learning-rate phenomenon rather than exclusively one. One seed per cell, on a block with no floor, so the 2.87× carries no verdict.",
    "ratio": 2.865,
    "value_digits": 2
+  },
+  {
+   "id": "5.2-families-m0",
+   "section": "§5.2",
+   "comparison": "**the same configuration, run twice** — `mom_0_d0.04` against `long_m0` at step 100, m = 0",
+   "kind": "nuisance",
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 100",
+   "a": {
+    "value": 2.58,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mom_0_d0.04.log",
+     "step": 100,
+     "column": "eff-rank"
+    }
+   },
+   "b": {
+    "value": 1.62,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/long_m0.log",
+     "step": 100,
+     "column": "eff-rank"
+    }
+   },
+   "ratio": 1.5926,
+   "value_digits": 2,
+   "rests_on": "nothing may be read off it as a claim: it is a MEASUREMENT of the noise. §5.2 quotes its table from `long_m*` and its staleness measurement from `mom_*` without saying they are different runs; the two share momentum, decorrelation 0.04, capacity 4,096, the default learning rate, the hardcoded seed 42 and the step-0 state 67.55, and differ only in step budget and GPU non-determinism. This is the low arm, where a fold is a ratio of two small numbers — which is exactly why the floor is measured on both arms and not only on the stable one.",
+   "floor": "R3_probe_step100",
+   "clears": true,
+   "floor_note": "‡ NUISANCE. An n = 2 same-configuration spread, listed beside the n = 5 floor measured at the same step on the same statistic. `clears` reads as 'this pair's fold is larger than the five-repeat spread', not as a passing verdict."
+  },
+  {
+   "id": "5.2-families-m0999",
+   "section": "§5.2",
+   "comparison": "**the same configuration, run twice** — `long_m0.999` against `mom_0.999_d0.04` at step 100, m = 0.999",
+   "kind": "nuisance",
+   "statistic": "R3",
+   "block": "fixed held-out probe, step 100",
+   "a": {
+    "value": 7.03,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/long_m0.999.log",
+     "step": 100,
+     "column": "eff-rank"
+    }
+   },
+   "b": {
+    "value": 6.89,
+    "src": {
+     "kind": "probe_log",
+     "file": "e0_run/d1_diag/mom_0.999_d0.04.log",
+     "step": 100,
+     "column": "eff-rank"
+    }
+   },
+   "ratio": 1.0203,
+   "value_digits": 2,
+   "rests_on": "nothing may be read off it as a claim: it is a MEASUREMENT of the noise. §5.2 quotes its table from `long_m*` and its staleness measurement from `mom_*` without saying they are different runs; the two share momentum, decorrelation 0.04, capacity 4,096, the default learning rate, the hardcoded seed 42 and the step-0 state 67.55, and differ only in step budget and GPU non-determinism. The high arm of the same pair of families, for contrast with the row above.",
+   "floor": "R3_probe_step100",
+   "clears": false,
+   "floor_note": "‡ NUISANCE. An n = 2 same-configuration spread, listed beside the n = 5 floor measured at the same step on the same statistic. `clears` reads as 'this pair's fold is larger than the five-repeat spread', not as a passing verdict."
   }
  ],
  "statistics_with_no_measured_floor_note": "NONE REMAIN on the exported block. Every statistic T1 scores — R1, R2, R3, PR, PR_rownorm, RankMe (raw and residualised), stable rank, α-ReQ |α−1|, LiDAR and the hard numerical rank — now has a floor of its own on the exported `wsi_biology` block, raw and residualised, measured on the same five same-seed repeats §4.1's R1 floor comes from. The floors differ by 3.3× between statistics (1.000× for the hard rank, 3.295× for R1), which is why judging one statistic against another's floor was never admissible.",
- "blocks_with_no_measured_floor_note": "NOT RECOVERABLE from the five repeats, and this is a result rather than a caveat: the repeats were EXPORTED, not probed. `~/e0_run/d1_envelope/` holds `rep{n}.npz` and per-run `train_metrics.jsonl` and neither carries a probe forward pass, a training batch's activations, or a gate batch. A floor on any of these four blocks requires re-running the five repeats with the probe or the tripwire attached, on a GPU. EVERY RANK NUMBER IN DRAFT §5 IS ON THE FIRST OF THEM, and is therefore unjudgeable against this paper's central criterion until that run exists. The per-block cost is stated in `absent_blocks` of figures/data/ws_floor/out/P2_ENVELOPE_FLOORS.json, which a test asserts this list against.",
+ "blocks_with_no_measured_floor_note": "THE FIXED HELD-OUT PROBE NOW HAS ONE, at every step `d1_momentum_probe.py` reads up to 500, for every statistic T1 scores, on both of the arms §5 compares — five identical same-seed repeats per arm of the `programme_free` / 500-step configuration, which is the run draft §6.2 predeclared. THREE BLOCKS STILL HAVE NO FLOOR and the reason is the same in each case: the five `d1_envelope` repeats were EXPORTED, not probed, so the in-run training batch, the 16-patient gate batch and the 282-patient live-checkpoint block each need their own GPU run. The per-block cost is stated in `absent_blocks` of figures/data/ws_floor/out/P2_ENVELOPE_FLOORS.json, which a test asserts this list against. What the probe floor does NOT cover is stated in `absent` of figures/data/e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json: step 600 and beyond, momentum values other than 0 and 0.999, capacities other than 4,096, and the residualised probe — on which this paper measures nothing.",
  "absent_blocks_src": {
   "kind": "json",
   "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",

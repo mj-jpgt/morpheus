@@ -418,13 +418,20 @@ def render_markdown(audit: dict | None = None) -> str:
 #: BETWEEN statistics on one block is the first thing the column shows.
 _FLOOR_GROUPS = [
     ("the exported `wsi_biology` block — the one §4.1 measures, every statistic T1 scores",
-     lambda name: not name.startswith("LiDAR") and not name.endswith(("_rna_view", "_full_view"))),
+     lambda name: (not name.startswith("LiDAR") and "_probe_step" not in name
+                   and not name.endswith(("_rna_view", "_full_view")))),
     ("the `wsi_biology` + `rna_biology` positive pair — LiDAR's block",
      lambda name: name.startswith("LiDAR")),
     ("the `rna_biology` view, canonical R1 — same five runs, same statistic, other view",
      lambda name: name.endswith("_rna_view")),
     ("the `full_biology` view, canonical R1 — same five runs, same statistic, other view",
      lambda name: name.endswith("_full_view")),
+    # The block draft §5's every rank number is measured on. It is listed last
+    # because it is the newest and its rows read differently from the four above:
+    # they are per STEP, not per view, and the `divergent run` column is a repeat
+    # of whichever ARM carried the larger fold rather than of a single arm.
+    ("the fixed held-out probe — the block every §5 rank number sits on, per reading step",
+     lambda name: "_probe_step" in name),
 ]
 
 
@@ -495,12 +502,17 @@ def summary_sentence(audit: dict | None = None) -> str:
     count that is maintained by hand drifts the moment a row is added.
     """
     s = summary(audit)
+    # "clears"/"clear" and the reason clause both used to be hard-coded for a
+    # count of one and for a block with no floor at all. Neither is true now: the
+    # fixed held-out probe HAS a floor, and what stops the remaining rows is that
+    # it was not measured at their reading step or on their arm.
+    verb = "clears" if s["selection_clearing"] == 1 else "clear"
     return (f"{s['total']} rank comparisons are enumerated; "
             f"{s['selection']} of them are selections between candidate configurations. "
             f"**{s['selection_failing']} of those {s['selection']} do not clear the floor their own "
-            f"statistic and block license, {s['selection_clearing']} clears it, and "
-            f"{s['selection_unjudgeable']} cannot be judged at all** because no floor has ever been "
-            f"measured for the block they sit on. "
+            f"statistic and block license, {s['selection_clearing']} {verb} it, and "
+            f"{s['selection_unjudgeable']} cannot be judged at all** because no floor has been "
+            f"measured for the statistic, block, reading step and arm they sit on. "
             f"{s['exempt']} rows are exempt with the reason stated, "
             f"{s['no_floor_measured']} of the {s['total']} are unjudgeable for want of a floor, and "
             f"{s['block_mismatched']} carry an explicit statistic-, block- or kind-mismatch note.")

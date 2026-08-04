@@ -1,0 +1,90 @@
+  m=0.999 rep1  step500  R1=  11.702  R3=   7.744  RankMe=  3.581  hard=   256
+  m=0.999 rep2  step500  R1=  11.690  R3=   7.639  RankMe=  3.386  hard=   256
+  m=0.999 rep3  step500  R1=  11.053  R3=   7.449  RankMe=  3.284  hard=   256
+  m=0.999 rep4  step500  R1=  11.179  R3=   7.532  RankMe=  3.749  hard=   256
+  m=0.999 rep5  step500  R1=  10.741  R3=   7.020  RankMe=  3.368  hard=   256
+  m=0.0   rep1  step500  R1=   2.299  R3=   2.019  RankMe=  1.733  hard=   256
+  m=0.0   rep2  step500  R1=   2.353  R3=   1.934  RankMe=  2.253  hard=   256
+  m=0.0   rep3  step500  R1=   1.843  R3=   1.517  RankMe=  2.068  hard=   256
+  m=0.0   rep4  step500  R1=   1.841  R3=   1.530  RankMe=  1.946  hard=   256
+  m=0.0   rep5  step500  R1=   1.721  R3=   1.332  RankMe=  1.822  hard=   256
+
+floor on the fixed held-out probe at step 500 (max/min over five same-seed repeats, per arm)
+            view          statistic     arm        min        max     fold  shape
+     wsi_biology                 PR   m0999     4.0072     4.7334   1.181x  not bimodal (outlier=rep5, rest=1.101x, sep=1.07)
+     wsi_biology                 PR      m0     1.0243     1.6331   1.594x  not bimodal (outlier=rep1, rest=1.314x, sep=1.21)
+                                 PR   FLOOR                         1.594x  carried by m=m0
+     wsi_biology         PR_rownorm   m0999     4.0072     4.7334   1.181x  not bimodal (outlier=rep5, rest=1.101x, sep=1.07)
+     wsi_biology         PR_rownorm      m0     1.0243     1.6331   1.594x  not bimodal (outlier=rep1, rest=1.314x, sep=1.21)
+                         PR_rownorm   FLOOR                         1.594x  carried by m=m0
+     wsi_biology                 R1   m0999    10.7413    11.7017   1.089x  not bimodal (outlier=rep5, rest=1.059x, sep=1.03)
+     wsi_biology                 R1      m0     1.7210     2.3534   1.367x  not bimodal (outlier=rep5, rest=1.278x, sep=1.07)
+                                 R1   FLOOR                         1.367x  carried by m=m0
+     wsi_biology                 R2   m0999     7.0195     7.7444   1.103x  not bimodal (outlier=rep5, rest=1.040x, sep=1.06)
+     wsi_biology                 R2      m0     1.3319     2.0187   1.516x  not bimodal (outlier=rep5, rest=1.331x, sep=1.14)
+                                 R2   FLOOR                         1.516x  carried by m=m0
+     wsi_biology                 R3   m0999     7.0195     7.7444   1.103x  not bimodal (outlier=rep5, rest=1.040x, sep=1.06)
+     wsi_biology                 R3      m0     1.3319     2.0187   1.516x  not bimodal (outlier=rep5, rest=1.331x, sep=1.14)
+                                 R3   FLOOR                         1.516x  carried by m=m0
+     wsi_biology             RankMe   m0999     3.2844     3.7490   1.141x  not bimodal (outlier=rep4, rest=1.090x, sep=1.05)
+     wsi_biology             RankMe      m0     1.7327     2.2532   1.300x  not bimodal (outlier=rep2, rest=1.193x, sep=1.09)
+                             RankMe   FLOOR                         1.300x  carried by m=m0
+     wsi_biology          alpha_req   m0999     2.7956     2.9930   1.071x  not bimodal (outlier=rep4, rest=1.046x, sep=1.02)
+     wsi_biology          alpha_req      m0     4.1328     5.6692   1.372x  not bimodal (outlier=rep1, rest=1.284x, sep=1.07)
+                          alpha_req   FLOOR                         1.372x  carried by m=m0
+     wsi_biology  alpha_req_abs_dev   m0999     1.7956     1.9930   1.110x  not bimodal (outlier=rep4, rest=1.070x, sep=1.04)
+     wsi_biology  alpha_req_abs_dev      m0     3.1328     4.6692   1.490x  not bimodal (outlier=rep1, rest=1.368x, sep=1.09)
+                  alpha_req_abs_dev   FLOOR                         1.490x  carried by m=m0
+     wsi_biology          hard_rank   m0999   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     wsi_biology          hard_rank      m0   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+                          hard_rank   FLOOR                         1.000x  carried by m=m0999
+     wsi_biology        stable_rank   m0999     2.4543     2.9471   1.201x  not bimodal (outlier=rep5, rest=1.082x, sep=1.11)
+     wsi_biology        stable_rank      m0     1.0121     1.3557   1.339x  not bimodal (outlier=rep1, rest=1.163x, sep=1.15)
+                        stable_rank   FLOOR                         1.339x  carried by m=m0
+     rna_biology                 PR   m0999     4.0036     4.6622   1.165x  not bimodal (outlier=rep5, rest=1.137x, sep=1.02)
+     rna_biology                 PR      m0     1.0372     1.6605   1.601x  not bimodal (outlier=rep4, rest=1.193x, sep=1.34)
+                                 PR   FLOOR                         1.601x  carried by m=m0
+     rna_biology         PR_rownorm   m0999     4.0036     4.6622   1.165x  not bimodal (outlier=rep5, rest=1.137x, sep=1.02)
+     rna_biology         PR_rownorm      m0     1.0372     1.6605   1.601x  not bimodal (outlier=rep4, rest=1.193x, sep=1.34)
+                         PR_rownorm   FLOOR                         1.601x  carried by m=m0
+     rna_biology                 R1   m0999    12.3541    13.0915   1.060x  not bimodal (outlier=rep4, rest=1.043x, sep=1.02)
+     rna_biology                 R1      m0     1.7139     2.1776   1.271x  not bimodal (outlier=rep3, rest=1.152x, sep=1.10)
+                                 R1   FLOOR                         1.271x  carried by m=m0
+     rna_biology                 R2   m0999     7.3737     8.1298   1.103x  not bimodal (outlier=rep2, rest=1.083x, sep=1.02)
+     rna_biology                 R2      m0     1.3792     1.9701   1.428x  not bimodal (outlier=rep4, rest=1.241x, sep=1.15)
+                                 R2   FLOOR                         1.428x  carried by m=m0
+     rna_biology                 R3   m0999     7.3737     8.1298   1.103x  not bimodal (outlier=rep2, rest=1.083x, sep=1.02)
+     rna_biology                 R3      m0     1.3792     1.9701   1.428x  not bimodal (outlier=rep4, rest=1.241x, sep=1.15)
+                                 R3   FLOOR                         1.428x  carried by m=m0
+     rna_biology             RankMe   m0999     6.9280     7.5438   1.089x  not bimodal (outlier=rep1, rest=1.057x, sep=1.03)
+     rna_biology             RankMe      m0     1.5286     1.9754   1.292x  not bimodal (outlier=rep2, rest=1.191x, sep=1.09)
+                             RankMe   FLOOR                         1.292x  carried by m=m0
+     rna_biology          alpha_req   m0999     2.2548     2.4912   1.105x  not bimodal (outlier=rep2, rest=1.078x, sep=1.03)
+     rna_biology          alpha_req      m0     2.3386     4.0387   1.727x  not bimodal (outlier=rep5, rest=1.345x, sep=1.28)
+                          alpha_req   FLOOR                         1.727x  carried by m=m0
+     rna_biology  alpha_req_abs_dev   m0999     1.2548     1.4912   1.188x  not bimodal (outlier=rep2, rest=1.137x, sep=1.05)
+     rna_biology  alpha_req_abs_dev      m0     1.3386     3.0387   2.270x  not bimodal (outlier=rep5, rest=1.602x, sep=1.42)
+                  alpha_req_abs_dev   FLOOR                         2.270x  carried by m=m0
+     rna_biology          hard_rank   m0999   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     rna_biology          hard_rank      m0   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+                          hard_rank   FLOOR                         1.000x  carried by m=m0999
+     rna_biology        stable_rank   m0999     2.6919     3.1941   1.187x  not bimodal (outlier=rep1, rest=1.166x, sep=1.02)
+     rna_biology        stable_rank      m0     1.0185     1.3769   1.352x  not bimodal (outlier=rep4, rest=1.100x, sep=1.23)
+                        stable_rank   FLOOR                         1.352x  carried by m=m0
+  wsi_rna_paired              LiDAR   m0999     8.2159     9.5538   1.163x  not bimodal (outlier=rep4, rest=1.060x, sep=1.10)
+  wsi_rna_paired              LiDAR      m0     2.0590     2.9802   1.447x  not bimodal (outlier=rep3, rest=1.138x, sep=1.27)
+                              LiDAR   FLOOR                         1.447x  carried by m=m0
+
+per-repeat, per-step canonical R1 and R3 on `wsi_biology` — never a mean
+  m=m0999  rep1  0:101.38/67.55 50:19.28/9.32 100:13.95/7.35 150:13.93/7.43 200:12.49/7.81 250:11.74/7.15 300:11.99/7.28 350:12.17/7.86 400:12.14/7.80 450:11.56/7.50 500:11.70/7.74
+  m=m0999  rep2  0:101.38/67.55 50:19.22/9.32 100:14.00/7.47 150:14.29/7.10 200:12.10/7.15 250:12.95/7.97 300:11.77/7.37 350:12.65/7.98 400:12.38/7.95 450:11.95/7.81 500:11.69/7.64
+  m=m0999  rep3  0:101.38/67.55 50:19.17/9.28 100:13.28/7.07 150:12.79/7.09 200:12.15/7.09 250:11.11/6.93 300:11.28/7.19 350:11.62/7.49 400:11.25/7.20 450:10.69/6.96 500:11.05/7.45
+  m=m0999  rep4  0:101.38/67.55 50:19.35/9.33 100:13.65/7.20 150:12.13/6.82 200:12.80/7.69 250:11.92/7.30 300:11.79/7.43 350:11.57/7.37 400:11.80/7.61 450:10.53/6.62 500:11.18/7.53
+  m=m0999  rep5  0:101.38/67.55 50:19.22/9.28 100:12.59/6.67 150:12.94/7.10 200:11.19/6.87 250:11.42/6.91 300:10.29/6.46 350:11.18/7.12 400:11.90/7.91 450:11.06/7.08 500:10.74/7.02
+  m=m0     rep1  0:101.38/67.55 50:6.32/4.10 100:4.00/2.83 150:3.72/2.61 200:3.73/2.99 250:3.73/3.00 300:2.59/1.98 350:2.22/1.55 400:2.84/2.16 450:2.14/1.73 500:2.30/2.02
+  m=m0     rep2  0:101.38/67.55 50:6.35/4.14 100:3.36/2.14 150:2.21/1.61 200:2.20/1.69 250:1.93/1.47 300:1.62/1.29 350:2.56/2.02 400:2.57/1.98 450:2.64/2.04 500:2.35/1.93
+  m=m0     rep3  0:101.38/67.55 50:6.33/4.12 100:3.00/1.96 150:3.10/2.26 200:2.10/1.51 250:2.23/1.74 300:1.81/1.42 350:2.26/1.91 400:2.16/1.85 450:2.25/1.83 500:1.84/1.52
+  m=m0     rep4  0:101.38/67.55 50:6.31/4.06 100:3.55/2.52 150:2.20/1.75 200:2.37/1.97 250:2.24/2.00 300:2.40/2.14 350:1.98/1.71 400:2.51/2.06 450:2.16/1.93 500:1.84/1.53
+  m=m0     rep5  0:101.38/67.55 50:6.38/4.13 100:3.98/2.93 150:3.70/2.99 200:1.81/1.46 250:3.17/2.38 300:1.55/1.26 350:1.60/1.31 400:1.81/1.49 450:1.99/1.57 500:1.72/1.33
+
+wrote /home/ubuntu/e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json

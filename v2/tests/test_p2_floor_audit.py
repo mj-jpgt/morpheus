@@ -265,8 +265,14 @@ def test_the_like_for_like_pair_is_the_same_configuration():
         assert match, rel
         fields.append(match.groups())
     assert fields[0] == fields[1], fields
+    # It is now SUPERSEDED: the same quantity at n = 5 on the same arm, statistic
+    # and step. The pair is kept rather than deleted, and it sits INSIDE the
+    # five-repeat spread -- which is what an n = 2 sample of the same noise
+    # should do, and is recorded rather than assumed.
     row = next(r for r in A.load()["comparisons"] if r["id"] == "4.9a-likeforlike-pair")
-    assert row["floor"] is None and "not a floor" in row["floor_note"]
+    assert row["floor"] == "R1_probe_step400"
+    assert row["clears"] is False
+    assert "SUPERSEDED" in row["floor_note"]
 
 
 # --------------------------------------------------------------------------
@@ -325,39 +331,83 @@ def test_the_three_way_count_partitions_the_selections(audit):
     assert s["selection_unjudgeable"] > 0, "the absent floors are the point of the audit"
 
 
-def test_the_two_rows_that_used_to_clear_are_on_a_block_with_no_floor(audit):
-    """Both of the paper's former "clears" were probe-block rows judged against an export floor.
+def test_the_two_rows_that_used_to_clear_now_clear_a_floor_on_their_own_block(audit):
+    """§4.4(3)'s probe repeat and §5.2's step-400 fold, judged at last.
 
-    §4.4(3)'s fixed-seed probe repeat (3.495x, "clears by 6%") and §5.2's step-400
-    fold (3.596x) were the only two selections the audit reported as clearing.
-    Neither is on a block for which a floor has ever been measured.
+    These two were the paper's only "clears" before §4.1a, then became
+    unjudgeable when the audit refused to let an EXPORT floor rule on a PROBE
+    row. The probe block now has a floor of its own at every step the harness
+    reads, so they are judged -- against the larger of the two arms' five-repeat
+    spreads at their own step, which is the m = 0 arm in both cases.
     """
-    for rid in ("4.4-3-fixedseed-probe", "5.2-per-step-max"):
+    for rid, floor in (("4.4-3-fixedseed-probe", "R3_probe_step200"),
+                       ("5.2-per-step-max", "R3_probe_step400")):
         row = next(r for r in audit["comparisons"] if r["id"] == rid)
-        assert row["floor"] is None and row["clears"] is None, rid
-        assert "UNJUDGEABLE" in row["floor_note"], rid
+        assert row["floor"] == floor, rid
+        assert row["clears"] is True, rid
+        assert row["block"] == audit["floors"][floor]["block"], rid
 
 
-def test_the_only_selection_that_clears_is_the_published_metric(audit):
-    """Bad news, asserted so it cannot quietly stop being true.
+def test_the_selections_that_clear_are_exactly_these(audit):
+    """Pinned so that neither a new pass nor a lost one can arrive quietly.
 
-    RankMe as published has a retraining floor of 1.811x on the raw exported
-    block against canonical R1's 3.111x on the same five runs, and its widest D2
-    fold clears it. It is the only selection in the audit that clears a floor its
-    own statistic and block license.
+    One of these is on the exported block -- RankMe as published, whose floor of
+    1.811x is low enough that its widest D2 fold gets over it. The other eight
+    are the probe-block rows the five-repeat floor made judgeable, and they are
+    listed by name because "all of them cleared" is the kind of result that has
+    to be checkable rather than asserted.
     """
-    clearing = [r for r in audit["comparisons"]
-                if r["kind"] == "selection" and r["clears"] is True]
-    assert [r["id"] for r in clearing] == ["4.6-rankme-d2"]
-    assert clearing[0]["floor"] == "RankMe_published_raw_export"
+    clearing = sorted(r["id"] for r in audit["comparisons"]
+                      if r["kind"] == "selection" and r["clears"] is True)
+    assert clearing == sorted([
+        "4.6-rankme-d2",
+        "4.4-3-fixedseed-probe",
+        "4.9a-decorr-r1",
+        "4.9a-decorr-r3",
+        "5.2-per-step-max",
+        "5.2-staleness-none",
+        "5.2-turnover-momentum",
+        "5.4-row2-seedvaried",
+        "5.4-row3-r3",
+    ]), clearing
 
 
-def test_every_rank_number_in_section_5_is_unjudgeable(audit):
-    """The named absent floor, as a property of the list rather than of the prose."""
-    for row in audit["comparisons"]:
-        if row["section"].startswith("§5.") and row["id"] != "5.1-instance2":
-            assert row["floor"] is None, row["id"]
-            assert row["clears"] is None, row["id"]
+def test_the_section_5_rows_that_remain_unjudgeable_say_which_gap_stops_them(audit):
+    """The probe block has a floor now; three §5 selections are still outside it.
+
+    Each is outside for a reason the floor cannot be stretched over: a reading
+    step past the 500 the repeats were run to, a momentum value no repeat was run
+    at, or a capacity no repeat was run at. The rule this file exists to enforce
+    is that a floor is never borrowed across a block, and a step and an arm are
+    part of this block's identity.
+    """
+    unjudged = {r["id"] for r in audit["comparisons"]
+                if r["kind"] == "selection" and r["floor"] is None}
+    assert unjudged == {"5.4-row1-step600", "5.4-m0999-over-m099", "5.2-capacity-64"}
+    for rid in unjudged:
+        row = next(r for r in audit["comparisons"] if r["id"] == rid)
+        assert "STILL UNJUDGEABLE" in row["floor_note"], rid
+        assert row["clears"] is None, rid
+
+
+def test_the_probe_floor_is_carried_by_the_collapsed_arm_and_is_not_bimodal(audit):
+    """Two properties of the new floor that the paper's argument turns on.
+
+    (a) At every step and both statistics it is the m = 0 arm -- the one at the
+    collapse floor -- that carries it, by roughly an order of magnitude more
+    spread than the m = 0.999 arm. A floor measured only on the stable arm would
+    have been between 1.09x and 1.17x and would have flattered every row.
+
+    (b) It is NOT bimodal, and the exported-block floor is. Four of five exported
+    repeats agree to 2% with rep2 at a third of them; nothing of that shape
+    appears on the probe block under either statistic at any step.
+    """
+    probe = {n: f for n, f in audit["floors"].items() if "_probe_step" in n}
+    assert len(probe) == 10, sorted(probe)
+    for name, floor in probe.items():
+        assert floor["floor_arm"] == "m0", name
+        assert floor["shape"]["bimodal"] is False, name
+    assert audit["floors"]["R1_residualised_export"]["shape"]["bimodal"] is True
 
 
 # --- negative tests: does the checker catch the new failure modes? ---------

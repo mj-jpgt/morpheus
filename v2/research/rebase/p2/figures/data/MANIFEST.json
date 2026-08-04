@@ -1,6 +1,6 @@
 {
  "box": "ubuntu@150.136.45.194",
- "fetched_utc": "2026-08-04T13:59:52Z",
+ "fetched_utc": "2026-08-04T15:52:21Z",
  "files": {
   "e0_run/collapse_diag.log": {
    "box_path": "~/e0_run/collapse_diag.log",
@@ -217,6 +217,78 @@
    "bytes": 739,
    "produced_by": null,
    "sha256": "a7a94ec45a0286a262d4768247fac6c071dacdae1e460fb729f1b632b341a85f"
+  },
+  "e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json": {
+   "box_path": "~/e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+   "bytes": 694586,
+   "produced_by": null,
+   "sha256": "25c8686dc5248e0a3a6692aac6e79a8280fc7baee86968f2ccafdb07f9d5ef76"
+  },
+  "e0_run/d1_probefloor/out/probe_floors_run.log": {
+   "box_path": "~/e0_run/d1_probefloor/out/probe_floors_run.log",
+   "bytes": 10098,
+   "produced_by": null,
+   "sha256": "2290ff23f8a30cf1b46e3d9964296f5c5fae793e50f07b2f1d4aa243a9aa4f1c"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.0_rep1.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.0_rep1.log",
+   "bytes": 1281,
+   "produced_by": null,
+   "sha256": "ccea2fad143c9b697a78edcfcdc815905260b7f76f9589211950e1075a02e998"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.0_rep2.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.0_rep2.log",
+   "bytes": 1281,
+   "produced_by": null,
+   "sha256": "e629e79b1b5b060aa4f129b2cb3526b7f7964e8d6a62d8e28361418d6e803082"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.0_rep3.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.0_rep3.log",
+   "bytes": 1281,
+   "produced_by": null,
+   "sha256": "7fad4fbcfaffba29b8c69c001add123b7bcbec5db5a21fd79286433e79bd3d6c"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.0_rep4.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.0_rep4.log",
+   "bytes": 1281,
+   "produced_by": null,
+   "sha256": "f7cf598b37e5e6534b7fc699b21fc9ab8b4597f4fdf4f1387d842216541f5a61"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.0_rep5.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.0_rep5.log",
+   "bytes": 1281,
+   "produced_by": null,
+   "sha256": "35af06f648016af2bacea7c9fd9ad4a68a06abd99a338cfb23f9cdab33237779"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.999_rep1.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.999_rep1.log",
+   "bytes": 1289,
+   "produced_by": null,
+   "sha256": "1ea59d6c9ad7f0e4b947c7d812096f44a5ac193dfa16c8f78f78cfff98ac3628"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.999_rep2.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.999_rep2.log",
+   "bytes": 1289,
+   "produced_by": null,
+   "sha256": "fa496d8a2e0e879fd7ad71b76c7b076e3ca56bd673ec0f0a32602bee8ff5fc81"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.999_rep3.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.999_rep3.log",
+   "bytes": 1289,
+   "produced_by": null,
+   "sha256": "039aed4c56fc4215c4e84e407de4dd37f26bf7288905e368813df6ad0267d66d"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.999_rep4.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.999_rep4.log",
+   "bytes": 1289,
+   "produced_by": null,
+   "sha256": "230c852dc12bfca96c02907920f174bb639ec5f4c66953205e41623b0e562195"
+  },
+  "e0_run/d1_probefloor/probefloor_m0.999_rep5.log": {
+   "box_path": "~/e0_run/d1_probefloor/probefloor_m0.999_rep5.log",
+   "bytes": 1289,
+   "produced_by": null,
+   "sha256": "abb27522f95dc05cd3ef3829dfc36d2387a3abe1aafd07ca89ef4f9ec48619f5"
   },
   "e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json": {
    "box_path": "~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json",
