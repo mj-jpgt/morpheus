@@ -907,6 +907,12 @@
    "claim": "the momentum effect is “2.6–3.3× at every step past 150”",
    "source_says": "the section's own table gives 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600) — a range of 2.208–3.596× — and 7.03 / 1.62 = 4.340× at step 100. (An earlier version of this record said 4.343×; the table is the only source in this repository and it gives 4.3395, so 4.340× is what may be quoted.)",
    "action": "REPORTED, THEN CORRECTED AT SOURCE (2026-08-05). §5.2 and `paper/QUEUE_ANCHORING.md` now print 2.208×–3.596× past step 150 and 4.340× at step 100, computed from the rows of §5.2's own table. Nothing in this audit was ever substituted from the prose range; the step-400 row quotes the table and always did."
+  },
+  {
+   "where": "paper/P2_RANK_DRAFT.md §5.2a provenance line and Appendix A; NOTEBOOK_ENTRIES/lr_test_and_decorrelation_reversal_20260804T1130Z.md and learning_rate_is_the_mechanism_20260805T0100Z.md",
+   "claim": "the six learning-rate arms ran for **400 steps**",
+   "source_says": "every one of the six logs now vendored at `figures/data/e0_run/d1_diag/lr_L*.log` echoes its own resolved argv on line 1 as `steps=200`, and each log's last row — the row §5.2a quotes as `final eff-rank` — is step **200**. The four rank values themselves (12.30 / 1.06 / 35.24 / 1.05, and 1.05 / 27.88 for L1 / L2) agree with the logs EXACTLY; it is only the step budget that does not. Note that 200 is also the reading step `NOTEBOOK_ENTRIES/PREDECLARED_learning_rate_test_20260804T2200Z.md` fixed in advance, so the logs agree with the predeclaration and the prose does not.",
+   "action": "REPORTED, NOT SUBSTITUTED. The audit rows for §5.2a were re-pointed at the logs and read at step 200, which is the only step those logs have; no value changed. The prose is §5.2a's owner's to correct, and this record is what carries the disagreement until it is. Nothing in this audit quotes '400 steps'."
   }
  ],
  "comparisons": [
