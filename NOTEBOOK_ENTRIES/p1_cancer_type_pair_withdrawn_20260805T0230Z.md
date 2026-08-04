@@ -16,7 +16,7 @@ to 1. Every statistic imported from `v2/calibra/`; nothing computed inline.
 ### The awkward part first
 
 **The published pair is not a pair any single estimator produces on this cohort.** Across all 56
-readings taken — 7 representation states x 8 estimator variants — not one has both endpoints; the
+readings taken — 7 representation states × 8 estimator variants — not one has both endpoints; the
 closest is 0.16 away in L1. Its "before", 0.463, lies in the *nonlinear* band; its "after", 0.035,
 lies in the *linear* band. Under a consistent estimator the drop is either far larger than the
 advertised 13.2× or far smaller:
@@ -213,6 +213,27 @@ supersede this reconstruction outright.
 **Not claimed:** that the July probe used any particular estimator. Fifty-six readings were taken and
 none reproduces the pair; the nearest single value to 0.463 is k-NN's raw 0.4447, and under k-NN the adjusted value is
 0.1766, five times the published 0.035. The estimator remains unknown and is recorded as unknown.
+
+### Suite
+
+Run on the box, `~/venv`, threads capped to 1, `pytest morpheus/v2/tests morpheus/tests -q`:
+
+| | result |
+|---|---|
+| baseline, commit `6a2392f` (predeclaration only, workspace `~/ws_p1base`) | `551 passed, 27 errors in 62.70s` |
+| this work, commit `c3a25d9` (workspace `~/ws_p1prov`) | `551 passed, 27 errors in 62.24s` |
+
+**Delta is zero**, and that is the expected number: no test function was added. The changes to
+`test_paper_artifact_digests.py` and `test_paper_paths_resolve.py` are registry and allowlist data,
+which run inside the existing parametrised tests. The 27 errors are `test_p2_figures` on missing
+matplotlib and are the known, expected condition in a checkout.
+
+One real failure was caught by the suite and fixed rather than allowlisted:
+`test_every_repository_path_cited_in_a_draft_exists` rejected a bare `frozen_rna_targets.npz` in
+§4.2, because the rule is that a bare filename must be unique inside the repository and this one
+exists only on the box. Written with its `runs_misc/` directory instead (`c3a25d9`). This is the
+guard behaving exactly as its docstring says it should — *"If this test fails, fix the citation. Do
+not add the path to the allowlist"* — on the very commit that extends it.
 
 ### Files / commits
 

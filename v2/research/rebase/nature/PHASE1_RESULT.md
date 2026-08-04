@@ -65,7 +65,8 @@ functional counterpart of the earlier geometric finding (biology effective rank 
 > The **numbers** were not reproduced. Re-run on that cohort with the project's own canonical
 > estimator (`confound_certificate.lda_oof_balanced_accuracy`, standardised, 5 stratified folds,
 > seed 42) the `wsi_biology` state gives **0.734 → 0.031**, not 0.463 → 0.035. None of the 56
-> readings on this cohort (7 states x 8 estimator variants) has both published endpoints; the published "before" lies in the *nonlinear* band and
+> readings on this cohort (7 states × 8 estimator variants) has both published endpoints; the
+> published "before" lies in the *nonlinear* band and
 > its "after" in the *linear* band (table below). Only the chance rate reproduces, exactly:
 > 1/21 = 0.047619. The published pair is withdrawn rather than rounded toward, and it is not
 > attributed to whichever reading happens to sit nearest it.

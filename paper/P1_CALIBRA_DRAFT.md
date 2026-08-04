@@ -675,7 +675,7 @@ Output: `v2/research/rebase/nature/p1_cancer_type/out/P1_CANCER_TYPE_CERTIFICATE
 > *numbers* were not: the canonical estimator returns 0.7339 → 0.0308 on that cohort. Only the chance
 > rate reproduces (1/21 = 0.047619, published as 0.048).
 >
-> **None of the 56 readings on this cohort — 7 representation states x 8 estimator variants from
+> **None of the 56 readings on this cohort — 7 representation states × 8 estimator variants from
 > this repository's own confound battery — has both published endpoints**; the closest is 0.16 away
 > in L1 (`wsi_biology`, k-NN: raw 0.4447, adjusted 0.1766). The way they fail is
 > informative rather than a rounding matter: 0.463 sits in the *nonlinear* band for this cohort
