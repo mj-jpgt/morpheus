@@ -147,8 +147,8 @@ error.
 
 ### 4. What changed
 
-**Withdrawn and replaced at all five sites**, with the withdrawn figure left visible rather than
-deleted:
+**Withdrawn and replaced at the four P1 sites that quote it, plus its origin**, with the withdrawn
+figure left visible rather than deleted:
 
 * `v2/research/rebase/nature/PHASE1_RESULT.md` — the origin. The `PROVENANCE UNRESOLVED` block becomes
   a withdrawal block that states the cohort, both hashes, the measured replacement and why the pair
@@ -184,15 +184,15 @@ classifier can no longer tell which cancer a patient has: it drops from getting 
 where random guessing gets 4.8%. Nobody could find the file that number came from. We have now found
 the *group of patients* it was measured on — 2,530 of them, and everything about that group matches
 the paper exactly, right down to the number of hospitals — but re-running the check on them gives
-73.4% before and 3.1% after, not 46.3% and 3.5%. Six different classifiers were tried and not one
-produces both of the published figures. So the old number is withdrawn and the new one, which is
+73.4% before and 3.1% after, not 46.3% and 3.5%. Eight classifier settings were tried across all
+seven feature blocks — 56 readings in all — and not one produces both of the published figures. So the old number is withdrawn and the new one, which is
 written to a file with a fingerprint attached, replaces it.
 
 The correction is not cosmetic and it does not simply flatter us. The image features carry far more
 cancer information to begin with than we said (73% not 46%), so the removal step is doing much more
 work than advertised. But that only holds for the *kind* of classifier the check uses — one that looks
 at averages. Ask a classifier that can see shapes rather than averages, and it still identifies the
-cancer four to six times better than chance after the removal. Both of those are worth saying out
+cancer roughly four to six times better than chance after the removal. Both of those are worth saying out
 loud, and the old number said neither.
 
 ### Meaning for the claim
@@ -211,8 +211,8 @@ re-run — the certificate is deterministic given the seed, so any movement is a
 supersede this reconstruction outright.
 
 **Not claimed:** that the July probe used any particular estimator. Fifty-six readings were taken and
-none reproduces the pair; the nearest single value to 0.463 is k-NN's raw 0.4447, and under k-NN the adjusted value is
-0.1766, five times the published 0.035. The estimator remains unknown and is recorded as unknown.
+none reproduces the pair; the nearest single value to 0.463 is k-NN's raw 0.4447, and under k-NN the
+adjusted value is 0.1766, five times the published 0.035. The estimator remains unknown and is recorded as unknown.
 
 ### Suite
 
