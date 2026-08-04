@@ -16,8 +16,40 @@ already on disk. That set is what this script computes.
 * ``spectral.paired_absolute_correlation``         -- the within-cohort reference magnitude
 * ``leave_sites_out.site_folds`` / ``evaluate_fold``-- condition 4a, whole sites held out
 * ``residualise.confound_design`` / ``cross_fitted_residuals`` / ``pooled_tissue_source_site``
+* ``inductive_adjustment.ConfoundAdjustmentOperator`` -- the exposable adjusted state (below)
 
 The three subcommands correspond one-to-one to Tests A, B and C of the predeclaration.
+
+The adjustment mode, added 2026-08-04 22:45
+-------------------------------------------
+The 20:00 end-to-end run found that condition 3 fails on the state a user would be shown, and named
+the reason: ``cross_fitted_residuals`` fits its nuisance model on folds of the very rows it scores,
+so **the state that certifies cannot be exposed** to a patient outside the fitting cohort. That entry
+could only report a counterfactual (28 of 90) obtained by relaxing condition 3.
+
+``--adjustment`` replaces the counterfactual with a measurement. It selects which rows are scored and
+how their adjusted coordinates are produced:
+
+``transductive`` (default)
+    Every row of the partition, adjusted in sample by ``cross_fitted_residuals``. Unchanged; this is
+    the published 20:00 path and it reproduces those numbers exactly. The adjusted state is **not**
+    exposable, so the exposed state stays ``raw``.
+``transductive_exposure``
+    The exposure fold only, adjusted in sample. The matched-n control: same rows, same n and same
+    design as the inductive arm, differing only in that the nuisance model saw the rows it scored.
+    Without it, a drop in the inductive arm confounds *inductive vs transductive* with *n halved*.
+``inductive``
+    A ``ConfoundAdjustmentOperator`` is fitted on the **discovery** fold and applied unchanged to the
+    exposure fold. Those coordinates are producible for a patient the operator never saw, so the
+    adjusted state becomes the **exposed** state and condition 3 is decided on it.
+
+Why the discovery fold is carved out of the certification cohort rather than taken from the
+representation's own train/val split: the D2 split holds out whole *cancers*, and TCGA assigns a TSS
+code per site per disease, so ``train+val`` and ``test`` share **0 of 32 cancer types and 0 of 610
+TSS codes**. An operator fitted on the representation's discovery fold would see every test cancer as
+an unseen level and every test site as ``OTHER``, and its adjustment would degenerate to subtracting
+a constant. Conditions 1 and 3 therefore cannot be discharged by the same split; see
+``NOTEBOOK_ENTRIES/PREDECLARED_p4_inductive_adjustment_20260804T2245Z.md`` §2.
 """
 from __future__ import annotations
 
@@ -30,6 +62,7 @@ import pandas as pd
 
 from morpheus.v2.calibra.calibration import spike_recovery_curve
 from morpheus.v2.calibra.confound_certificate import certify_axes, within_stratum_permutations
+from morpheus.v2.calibra.inductive_adjustment import ConfoundAdjustmentOperator
 from morpheus.v2.calibra.leave_sites_out import evaluate_fold, site_folds
 from morpheus.v2.calibra.residualise import (confound_design, cross_fitted_residuals,
                                              pooled_tissue_source_site)
@@ -74,6 +107,198 @@ def load_targets(path: Path, patient_ids: np.ndarray, groups: tuple[str, ...]) -
 def design_for(patient_ids: np.ndarray, cancers: np.ndarray, min_site_count: int = 10) -> np.ndarray:
     site, _ = pooled_tissue_source_site(patient_ids, min_site_count=min_site_count)
     return confound_design(pd.DataFrame({"cancer": cancers, "tss": site}), ["cancer", "tss"])
+
+
+# --------------------------------------------------------------------------------------
+# the discovery / exposure split, and the state that is actually exposed
+# --------------------------------------------------------------------------------------
+
+ADJUSTMENTS = ("transductive", "transductive_exposure", "inductive")
+
+
+def exposure_split(cancers: np.ndarray, *, discovery_fraction: float, seed: int) -> np.ndarray:
+    """Boolean mask, ``True`` = discovery fold. Permuted WITHIN cancer type.
+
+    Stratifying by cancer is not cosmetic: the operator's design is one-hot over cancer,
+    so a cancer present in the exposure fold and absent from the discovery fold is an
+    unseen level that ``DesignSpec.transform`` refuses outright. Every cancer with at
+    least two patients therefore contributes to both folds, and the refusal is left
+    switched on (``on_unseen_level="refuse"``) so that a split which broke this rule
+    would stop the run rather than silently adjust those rows as the baseline level.
+    """
+    cancers = np.asarray(cancers).astype(str)
+    if not 0.0 < discovery_fraction < 1.0:
+        raise ValueError("discovery_fraction must lie strictly between 0 and 1")
+    rng = np.random.default_rng(seed)
+    discovery = np.zeros(len(cancers), dtype=bool)
+    for cancer in sorted(set(cancers.tolist())):
+        rows = rng.permutation(np.flatnonzero(cancers == cancer))
+        k = int(round(len(rows) * discovery_fraction))
+        if len(rows) >= 2:
+            k = min(max(k, 1), len(rows) - 1)
+        discovery[rows[:k]] = True
+    return discovery
+
+
+def _adjustment_audit(raw: np.ndarray, adjusted: np.ndarray) -> dict:
+    """How much the adjustment actually moved the state.
+
+    Required by §6.1 of the predeclaration: a certificate PASS on a state the
+    adjustment barely touched is a statement about a null adjustment, so the
+    per-axis raw-vs-adjusted correlation and the residual variance ratio are
+    reported next to every verdict rather than left to be asked for.
+    """
+    raw = np.asarray(raw, dtype=np.float64)
+    adjusted = np.asarray(adjusted, dtype=np.float64)
+    a = raw - raw.mean(axis=0)
+    b = adjusted - adjusted.mean(axis=0)
+    denominator = np.sqrt((a * a).sum(axis=0) * (b * b).sum(axis=0))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        correlation = np.where(denominator > 1e-30, (a * b).sum(axis=0) / denominator, np.nan)
+        variance_ratio = np.where(raw.var(axis=0) > 1e-30,
+                                  adjusted.var(axis=0) / raw.var(axis=0), np.nan)
+    return {
+        "per_axis_corr_raw_adjusted_median": float(np.nanmedian(correlation)),
+        "per_axis_corr_raw_adjusted_min": float(np.nanmin(correlation)),
+        "per_axis_corr_raw_adjusted_max": float(np.nanmax(correlation)),
+        "n_axes_corr_above_0_99": int(np.sum(np.nan_to_num(correlation, nan=0.0) > 0.99)),
+        "residual_variance_ratio_median": float(np.nanmedian(variance_ratio)),
+        "residual_variance_ratio_min": float(np.nanmin(variance_ratio)),
+        "residual_variance_ratio_max": float(np.nanmax(variance_ratio)),
+    }
+
+
+def prepare_state(features: np.ndarray, target_scores, patient_ids: np.ndarray,
+                  cancers: np.ndarray, *, adjustment: str, discovery_fraction: float,
+                  seed: int, min_site_count: int) -> dict:
+    """Select the scored rows and produce their adjusted coordinates.
+
+    Returns the raw block, the adjusted block, the confound design on the scored rows,
+    and a provenance report. ``target_scores`` may be ``None`` (Test A' plants axes but
+    reads no target).
+
+    The detection floor is computed downstream from ``design`` — the scored rows' own
+    design — in **every** mode, so the two exposure arms are handed identical floors by
+    construction and no difference between them can be a floor difference.
+    """
+    if adjustment not in ADJUSTMENTS:
+        raise ValueError(f"adjustment must be one of {ADJUSTMENTS}")
+    features = np.asarray(features, dtype=np.float64)
+    patient_ids = np.asarray(patient_ids).astype(str)
+    cancers = np.asarray(cancers).astype(str)
+    targets = None if target_scores is None else np.asarray(target_scores, dtype=np.float64)
+
+    if adjustment == "transductive":
+        rows = np.arange(len(features))
+        design = design_for(patient_ids, cancers, min_site_count)
+        adjusted = cross_fitted_residuals(features, design, seed=seed)
+        adjusted_targets = (None if targets is None
+                            else cross_fitted_residuals(targets, design, seed=seed))
+        report = {"adjustment": adjustment, "n_scored": int(len(rows)),
+                  "n_design_columns": int(design.shape[1]),
+                  "exposable": False,
+                  "note": "in-sample cross-fitted residuals on every row of the partition; the "
+                          "published 20:00 path. Not producible for a new patient, so the exposed "
+                          "state stays raw."}
+        return {"rows": rows, "features": features, "targets": targets, "design": design,
+                "adjusted_features": adjusted, "adjusted_targets": adjusted_targets,
+                "patient_ids": patient_ids, "cancers": cancers,
+                "certify_internally": True, "exposable": False,
+                "audit": _adjustment_audit(features, adjusted), "report": report}
+
+    discovery = exposure_split(cancers, discovery_fraction=discovery_fraction, seed=seed)
+    rows = np.flatnonzero(~discovery)
+    fit_rows = np.flatnonzero(discovery)
+    overlap = sorted(set(patient_ids[fit_rows].tolist()) & set(patient_ids[rows].tolist()))
+    if overlap:                       # §6.3 of the predeclaration: the run is void if this fires
+        raise AssertionError(f"{len(overlap)} patient(s) in both discovery and exposure folds")
+    design = design_for(patient_ids[rows], cancers[rows], min_site_count)
+
+    if adjustment == "transductive_exposure":
+        adjusted = cross_fitted_residuals(features[rows], design, seed=seed)
+        adjusted_targets = (None if targets is None
+                            else cross_fitted_residuals(targets[rows], design, seed=seed))
+        report = {"adjustment": adjustment, "n_discovery": int(len(fit_rows)),
+                  "n_scored": int(len(rows)), "n_design_columns": int(design.shape[1]),
+                  "discovery_fraction": float(discovery_fraction), "exposable": False,
+                  "note": "matched-n control: the exposure fold adjusted in sample. Same rows and "
+                          "same design as the inductive arm; the nuisance model saw them."}
+        return {"rows": rows, "features": features[rows],
+                "targets": None if targets is None else targets[rows], "design": design,
+                "adjusted_features": adjusted, "adjusted_targets": adjusted_targets,
+                "patient_ids": patient_ids[rows], "cancers": cancers[rows],
+                "certify_internally": True, "exposable": False,
+                "audit": _adjustment_audit(features[rows], adjusted), "report": report}
+
+    # --- inductive: fit on the discovery fold, apply unchanged to the exposure fold ---
+    fit_frame = pd.DataFrame({"cancer": cancers[fit_rows]})
+    operator = ConfoundAdjustmentOperator.fit(
+        features[fit_rows], fit_frame, ["cancer", "tss"], patient_ids=patient_ids[fit_rows],
+        site_column="tss", min_site_count=min_site_count, n_splits=5, alpha=1.0, seed=seed,
+        cohort_name="d2_test_discovery_fold")
+    apply_frame = pd.DataFrame({"cancer": cancers[rows]})
+    adjusted, apply_report = operator.adjust(features[rows], apply_frame,
+                                             patient_ids=patient_ids[rows],
+                                             on_unseen_level="refuse")
+    adjusted_targets, target_report = None, None
+    if targets is not None:
+        target_operator = ConfoundAdjustmentOperator.fit(
+            targets[fit_rows], pd.DataFrame({"cancer": cancers[fit_rows]}), ["cancer", "tss"],
+            patient_ids=patient_ids[fit_rows], site_column="tss", min_site_count=min_site_count,
+            n_splits=5, alpha=1.0, seed=seed, cohort_name="d2_test_discovery_fold_targets")
+        adjusted_targets, target_report = target_operator.adjust(
+            targets[rows], pd.DataFrame({"cancer": cancers[rows]}),
+            patient_ids=patient_ids[rows], on_unseen_level="refuse")
+
+    pooling = operator.site_pooling
+    covered = int(np.sum(np.isin(
+        np.asarray([p.split("-")[1] if len(p.split("-")) > 1 else "NA"
+                    for p in patient_ids[rows]]), np.asarray(pooling.frequent))))
+    report = {
+        "adjustment": adjustment, "n_discovery": int(len(fit_rows)), "n_scored": int(len(rows)),
+        "discovery_fraction": float(discovery_fraction), "exposable": True,
+        "n_operator_design_columns": int(operator.provenance["n_design_columns"]),
+        "n_exposure_design_columns": int(design.shape[1]),
+        "n_frequent_sites_in_discovery_fold": len(pooling.frequent),
+        "n_exposure_rows_with_a_site_adjustment": covered,
+        "fraction_exposure_rows_with_a_site_adjustment": float(covered / max(len(rows), 1)),
+        "n_exposure_rows_pooled_to_OTHER": int(len(rows) - covered),
+        "operator_reference_digest": operator.provenance["reference_digest"],
+        "operator_provenance": operator.provenance,
+        "apply_report": apply_report,
+        "target_apply_report": target_report,
+        "note": "nuisance model fitted on the discovery fold ONLY and applied unchanged; these "
+                "coordinates are producible for a patient the operator never saw, so this is the "
+                "state condition 3 is decided on.",
+    }
+    return {"rows": rows, "features": features[rows],
+            "targets": None if targets is None else targets[rows], "design": design,
+            "adjusted_features": adjusted, "adjusted_targets": adjusted_targets,
+            "patient_ids": patient_ids[rows], "cancers": cancers[rows],
+            "certify_internally": False, "exposable": True,
+            "audit": _adjustment_audit(features[rows], adjusted), "report": report}
+
+
+def certificate_arms(state: dict, args, *, n_boot_axes: int | None = None) -> dict:
+    """``certify_axes`` on the raw block and on the adjusted block of a prepared state.
+
+    For the transductive arms the adjusted arm is produced by ``certify_axes``'s own
+    ``residualise=True`` branch, which is the identical design and seed — keeping the
+    published path byte-for-byte. For the inductive arm the block is *already* adjusted
+    by an out-of-sample operator, so it is handed over with ``residualise=False``.
+    """
+    arms = {}
+    for arm in ("raw", "adjusted"):
+        internal = state["certify_internally"] and arm == "adjusted"
+        block = state["features"] if (arm == "raw" or internal) else state["adjusted_features"]
+        arms[arm] = certify_axes(block, state["patient_ids"], state["cancers"],
+                                 min_site_count=args.min_site_count,
+                                 n_permutations=args.n_permutations, seed=args.seed,
+                                 n_boot=args.n_boot,
+                                 n_boot_axes=(args.n_boot_axes if n_boot_axes is None
+                                              else n_boot_axes),
+                                 residualise=internal, n_jobs=args.n_jobs)
+    return arms
 
 
 # --------------------------------------------------------------------------------------
@@ -173,19 +398,24 @@ def cmd_plant(args) -> None:
         planted = planted_axes(block["patient_ids"], block["cancers"], seed=args.seed,
                                min_site_count=args.min_site_count, snr=float(snr))
         augmented = np.column_stack([block["features"], planted])
-        for adjusted in (False, True):
-            result = certify_axes(augmented, block["patient_ids"], block["cancers"],
-                                  min_site_count=args.min_site_count, n_splits=args.n_splits,
-                                  n_permutations=args.n_permutations, seed=args.seed,
-                                  n_boot=args.n_boot,
-                                  # every planted axis must get a bootstrap CI
-                                  n_boot_axes=args.n_boot_axes + planted.shape[1],
-                                  residualise=adjusted, n_jobs=args.n_jobs)
+        # The planted columns take the SAME adjustment as the real ones. For the inductive
+        # arm that means they are part of the matrix the operator is fitted on over the
+        # discovery fold and are adjusted out of sample on the exposure fold; otherwise the
+        # ladder would grade a state nobody is exposed to.
+        planted_state = prepare_state(augmented, None, block["patient_ids"], block["cancers"],
+                                      adjustment=args.adjustment,
+                                      discovery_fraction=args.discovery_fraction, seed=args.seed,
+                                      min_site_count=args.min_site_count)
+        out["state_report"] = {k: v for k, v in planted_state["report"].items()
+                               if k not in ("operator_provenance", "apply_report",
+                                            "target_apply_report")}
+        # every planted axis must get a bootstrap CI
+        for arm, result in certificate_arms(
+                planted_state, args, n_boot_axes=args.n_boot_axes + planted.shape[1]).items():
             breaching = {int(a["axis"]) for a in result["breaching_axes"]}
             accuracy = np.asarray(result["per_axis_balanced_accuracy"])
             null_p95 = np.asarray(result["per_axis_null_p95"])
             axis_p = np.asarray(result["per_axis_permutation_p"])
-            arm = "adjusted" if adjusted else "raw"
             record = {
                 "n_axes_total": int(result["n_axes"]),
                 "chance_rate": float(result["chance_rate"]),
@@ -240,9 +470,14 @@ def cmd_endtoend(args) -> None:
     path = Path(args.artifact)
     block = load_state(path, args.state, "test")
     targets = load_targets(Path(args.targets), block["patient_ids"], tuple(args.target_groups))
-    design = design_for(block["patient_ids"], block["cancers"], args.min_site_count)
-    adjusted_features = cross_fitted_residuals(block["features"], design, seed=args.seed)
-    adjusted_targets = cross_fitted_residuals(targets["scores"], design, seed=args.seed)
+    state = prepare_state(block["features"], targets["scores"], block["patient_ids"],
+                          block["cancers"], adjustment=args.adjustment,
+                          discovery_fraction=args.discovery_fraction, seed=args.seed,
+                          min_site_count=args.min_site_count)
+    design = state["design"]
+    adjusted_features, adjusted_targets = state["adjusted_features"], state["adjusted_targets"]
+    print(f"[state] {json.dumps({k: v for k, v in state['report'].items() if k not in ('operator_provenance', 'apply_report', 'target_apply_report')})}", flush=True)
+    print(f"[audit] {json.dumps(state['audit'])}", flush=True)
 
     grid = channel_grid(adjusted_features, adjusted_targets, seed=args.seed, n_jobs=args.n_jobs)
     flat = np.abs(grid)
@@ -269,13 +504,20 @@ def cmd_endtoend(args) -> None:
         "n_train": block["n_train"], "n_val": block["n_val"], "n_test": block["n_test"],
         "n_patients_in_both_test_and_development": len(leak),
         "readout_fit_out_of_fold": True,
+        "adjustment": args.adjustment,
+        "nuisance_operator_discovery_fold": state["report"].get("n_discovery"),
+        "nuisance_operator_scored_rows": state["report"]["n_scored"],
+        "adjusted_state_is_exposable": bool(state["exposable"]),
         "note": "representation trained on train+val, axis read on test; the readout direction is "
-                "fit out of fold inside heldout_single_direction_correlation, by construction.",
+                "fit out of fold inside heldout_single_direction_correlation, by construction. "
+                "The NUISANCE operator has its own discovery fold, carved out of the test "
+                "partition, because train+val shares 0 cancer types and 0 TSS codes with test and "
+                "an operator fitted there is inapplicable by construction.",
     }
 
     # --- condition 2: clears the CALIBRA detection floor ----------------------------
-    curve = spike_recovery_curve(block["features"][:, axis][:, None],
-                                 targets["scores"][:, target][:, None], design,
+    curve = spike_recovery_curve(state["features"][:, axis][:, None],
+                                 state["targets"][:, target][:, None], design,
                                  n_draws=args.n_draws, seed=args.seed, n_jobs=args.n_jobs)
     # SCHEMA 2 (2026-08-04): the amendment below is now the library's own rule, so the
     # channel statistic is handed to the curve and ``observed_above_floor`` is a real
@@ -313,15 +555,11 @@ def cmd_endtoend(args) -> None:
 
     # --- condition 3: the confound certificate --------------------------------------
     certificate: dict[str, dict] = {}
-    for adjusted in (False, True):
-        result = certify_axes(block["features"], block["patient_ids"], block["cancers"],
-                              min_site_count=args.min_site_count, n_permutations=args.n_permutations,
-                              seed=args.seed, n_boot=args.n_boot,
-                              n_boot_axes=args.n_boot_axes, residualise=adjusted, n_jobs=args.n_jobs)
+    for arm, result in certificate_arms(state, args).items():
         breaching = {int(a["axis"]) for a in result["breaching_axes"]}
         accuracy = np.asarray(result["per_axis_balanced_accuracy"])
         null_p95 = np.asarray(result["per_axis_null_p95"])
-        certificate["adjusted" if adjusted else "raw"] = {
+        certificate[arm] = {
             "axis_balanced_accuracy": float(accuracy[axis]),
             "axis_null_p95": float(null_p95[axis]),
             "axis_exceeds_null_p95": bool(accuracy[axis] > null_p95[axis]),
@@ -332,25 +570,30 @@ def cmd_endtoend(args) -> None:
             "chance_rate": float(result["chance_rate"]),
             "state_n_breaching_axes": int(result["n_breaching_axes"]),
         }
-    exposed = certificate["raw"]
+    exposed_name = "adjusted" if state["exposable"] else "raw"
+    exposed = certificate[exposed_name]
     conditions["3_confound_certificate"] = {
         "verdict": "PASS" if (not exposed["axis_breaches"] and exposed["joint_certified"]) else "FAIL",
-        "exposed_state": "raw",
+        "exposed_state": exposed_name,
         "raw": certificate["raw"], "adjusted": certificate["adjusted"],
-        "note": "an axis shown to a user is a RAW axis; the exposed state decides the verdict.",
+        "adjustment_audit": state["audit"],
+        "note": "the exposed state decides the verdict. With a transductive adjustment the adjusted "
+                "coordinates cannot be produced for a new patient, so a user is shown a RAW axis; "
+                "with the inductive operator the adjusted coordinates ARE producible out of sample, "
+                "so the adjusted state is the exposed one.",
     }
 
     # --- condition 4a: replication in untouched patients (whole sites held out) ------
-    sites_raw, _ = pooled_tissue_source_site(block["patient_ids"], min_site_count=1)
-    pooled, _ = pooled_tissue_source_site(block["patient_ids"], min_site_count=args.min_site_count)
-    fold = site_folds(sites_raw, block["cancers"], n_folds=args.n_folds)
-    x_axis = block["features"][:, axis][:, None]
-    y_target = targets["scores"][:, target][:, None]
+    sites_raw, _ = pooled_tissue_source_site(state["patient_ids"], min_site_count=1)
+    pooled, _ = pooled_tissue_source_site(state["patient_ids"], min_site_count=args.min_site_count)
+    fold = site_folds(sites_raw, state["cancers"], n_folds=args.n_folds)
+    x_axis = state["features"][:, axis][:, None]
+    y_target = state["targets"][:, target][:, None]
     within = paired_absolute_correlation(adjusted_features[:, axis], adjusted_targets[:, target])
     folds = []
     for f in range(args.n_folds):
         held = fold == f
-        result = evaluate_fold(x_axis, y_target, block["cancers"], sites_raw, pooled, held,
+        result = evaluate_fold(x_axis, y_target, state["cancers"], sites_raw, pooled, held,
                                n_components=1, adjust=True, n_permutations=args.n_permutations,
                                n_boot=args.n_boot_sites, seed=args.seed + f)
         result["fold"] = int(f)
@@ -410,7 +653,8 @@ def cmd_endtoend(args) -> None:
             "conditions_failed": sum(1 for v in verdicts.values() if v == "FAIL"),
             "conditions_unevaluable": sum(1 for v in verdicts.values() if v == "UNEVALUABLE"),
             "certifiable": all(v == "PASS" for v in verdicts.values())}
-    out = {"selection": selection, "verdicts": verdicts, "gate": gate, "conditions": conditions}
+    out = {"selection": selection, "state": state["report"], "adjustment_audit": state["audit"],
+           "verdicts": verdicts, "gate": gate, "conditions": conditions}
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output).write_text(json.dumps(out, indent=2, default=float), encoding="utf-8")
     print(f"[gate] {json.dumps(verdicts)} -> {json.dumps(gate)}", flush=True)
@@ -425,20 +669,26 @@ def cmd_competitor(args) -> None:
     path = Path(args.artifact)
     block = load_state(path, args.state, "test")
     targets = load_targets(Path(args.targets), block["patient_ids"], tuple(args.target_groups))
-    design = design_for(block["patient_ids"], block["cancers"], args.min_site_count)
-    adjusted_features = cross_fitted_residuals(block["features"], design, seed=args.seed)
-    adjusted_targets = cross_fitted_residuals(targets["scores"], design, seed=args.seed)
+    state = prepare_state(block["features"], targets["scores"], block["patient_ids"],
+                          block["cancers"], adjustment=args.adjustment,
+                          discovery_fraction=args.discovery_fraction, seed=args.seed,
+                          min_site_count=args.min_site_count)
+    design = state["design"]
+    adjusted_features, adjusted_targets = state["adjusted_features"], state["adjusted_targets"]
+    print(f"[state] {json.dumps({k: v for k, v in state['report'].items() if k not in ('operator_provenance', 'apply_report', 'target_apply_report')})}", flush=True)
+    print(f"[audit] {json.dumps(state['audit'])}", flush=True)
 
     grid = channel_grid(adjusted_features, adjusted_targets, seed=args.seed, n_jobs=args.n_jobs)
     magnitude = np.abs(grid)
     magnitude[~np.isfinite(magnitude)] = -np.inf
     best_axis = np.argmax(magnitude, axis=0)                         # one supporting axis per target
 
-    certificate = certify_axes(block["features"], block["patient_ids"], block["cancers"],
-                               min_site_count=args.min_site_count,
-                               n_permutations=args.n_permutations, seed=args.seed,
-                               n_boot=args.n_boot, n_boot_axes=args.n_boot_axes,
-                               residualise=False, n_jobs=args.n_jobs)
+    # The certificate is read on the EXPOSED state: raw when the adjustment is transductive
+    # (its adjusted coordinates do not exist for a new patient), the inductively adjusted
+    # block when it is not.
+    arms = certificate_arms(state, args)
+    exposed_name = "adjusted" if state["exposable"] else "raw"
+    certificate = arms[exposed_name]
     breaching = {int(a["axis"]) for a in certificate["breaching_axes"]}
     accuracy = np.asarray(certificate["per_axis_balanced_accuracy"])
     null_p95 = np.asarray(certificate["per_axis_null_p95"])
@@ -446,7 +696,7 @@ def cmd_competitor(args) -> None:
 
     from joblib import Parallel, delayed
 
-    permutations = within_stratum_permutations(np.arange(len(block["cancers"])), block["cancers"],
+    permutations = within_stratum_permutations(np.arange(len(state["cancers"])), state["cancers"],
                                                n_permutations=args.n_null, seed=args.seed)
 
     def _one_target(t: int):
@@ -456,8 +706,8 @@ def cmd_competitor(args) -> None:
                                                                 adjusted_targets[order, t],
                                                                 seed=args.seed)
                            for order in permutations], dtype=np.float64)
-        curve_result = spike_recovery_curve(block["features"][:, axis][:, None],
-                                            targets["scores"][:, t][:, None], design,
+        curve_result = spike_recovery_curve(state["features"][:, axis][:, None],
+                                            state["targets"][:, t][:, None], design,
                                             n_draws=args.n_draws, seed=args.seed, n_jobs=1)
         curve_result.channel_statistic = float(abs(grid[axis, t]))
         curve_result.channel_statistic_name = "abs(heldout_single_direction_correlation)"
@@ -488,12 +738,26 @@ def cmd_competitor(args) -> None:
         row["refused_null"] = bool(not (row["abs_correlation"] > row["null_p95"]))
         row["answered_by_policy_C"] = bool(not (row["refused_site"] or row["refused_floor"]
                                                 or row["refused_null"]))
+        # The 20:00 entry's counterfactual, computed here on every arm so the projection
+        # and the measurement are the same quantity: condition 3 dropped, floor and null kept.
+        row["answered_with_condition_3_relaxed"] = bool(not (row["refused_floor"]
+                                                             or row["refused_null"]))
+
+    groups = sorted({r["target_group"] for r in rows})
+
+    def _by_group(key: str) -> dict:
+        return {g: int(sum(1 for r in rows if r["target_group"] == g and r[key])) for g in groups}
 
     n_n = len(rows)
     n_c = int(sum(r["answered_by_policy_C"] for r in rows))
+    n_relaxed = int(sum(r["answered_with_condition_3_relaxed"] for r in rows))
     out = {
         "state": f"{path.stem}::{args.state}",
-        "n_patients": int(len(block["patient_ids"])),
+        "adjustment": args.adjustment,
+        "adjustment_state": state["report"],
+        "adjustment_audit": state["audit"],
+        "exposed_state": exposed_name,
+        "n_patients": int(len(state["patient_ids"])),
         "joint_certified": joint_ok,
         "joint_lda_balanced_accuracy": float(certificate["joint_lda_balanced_accuracy"]),
         "joint_null_p95": float(certificate["joint_null_p95"]),
@@ -501,7 +765,14 @@ def cmd_competitor(args) -> None:
         "n_queries": n_n,
         "n_answered_policy_N_competitor_style": n_n,
         "n_answered_policy_C_certified": n_c,
+        "n_answered_with_condition_3_relaxed": n_relaxed,
         "gap": n_n - n_c,
+        "n_queries_by_group": {g: int(sum(1 for r in rows if r["target_group"] == g))
+                               for g in groups},
+        "answered_policy_C_by_group": _by_group("answered_by_policy_C"),
+        "answered_with_condition_3_relaxed_by_group": _by_group("answered_with_condition_3_relaxed"),
+        "n_targets_with_unresolvable_floor": int(sum(1 for r in rows
+                                                     if not np.isfinite(r["detection_floor"]))),
         "refusals_by_reason": {
             "site_certificate": int(sum(r["refused_site"] for r in rows)),
             "below_detection_floor": int(sum(r["refused_floor"] for r in rows)),
@@ -516,7 +787,8 @@ def cmd_competitor(args) -> None:
     }
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output).write_text(json.dumps(out, indent=2, default=float), encoding="utf-8")
-    print(f"[competitor] N={n_n} C={n_c} gap={out['gap']} "
+    print(f"[competitor/{args.adjustment}] N={n_n} C={n_c} relaxed={n_relaxed} gap={out['gap']} "
+          f"by_group={json.dumps(out['answered_with_condition_3_relaxed_by_group'])} "
           f"reasons={json.dumps(out['refusals_by_reason'])}", flush=True)
     print(f"[done] -> {args.output}", flush=True)
 
@@ -537,6 +809,12 @@ def main() -> None:
     common.add_argument("--seed", type=int, default=42)
     common.add_argument("--n-jobs", type=int, default=1)
     common.add_argument("--targets", default="")
+    common.add_argument("--adjustment", choices=ADJUSTMENTS, default="transductive",
+                        help="how the adjusted state is produced; see the module docstring. "
+                             "'transductive' is the published 20:00 path and reproduces it.")
+    common.add_argument("--discovery-fraction", type=float, default=0.5,
+                        help="share of the partition held back to FIT the nuisance operator; "
+                             "ignored by --adjustment transductive")
     common.add_argument("--target-groups", nargs="+",
                         default=["hallmark_in_training", "heldout_pathway", "immune_tme",
                                  "tumour_state"])
