@@ -514,6 +514,9 @@ def main(argv=None):
     ap.add_argument("--synthetic-only", action="store_true")
     ap.add_argument("--skip-synthetic", action="store_true")
     ap.add_argument("--synthetic-runs", type=int, default=25)
+    ap.add_argument("--conditions", nargs="+", default=list(CONDITIONS),
+                    help="run a subset of the synthetic conditions, so the three can go "
+                         "in parallel processes at one thread each")
     ap.add_argument("--synthetic-n", type=int, default=2766)
     ap.add_argument("--synthetic-d", type=int, default=256)
     a = ap.parse_args(argv)
@@ -526,12 +529,15 @@ def main(argv=None):
     if not a.skip_synthetic:
         out["synthetic"] = {"config": {"n": a.synthetic_n, "d": a.synthetic_d,
                                        "runs": a.synthetic_runs, "seed": a.seed,
-                                       "conditions": list(CONDITIONS)}}
-        for offset, condition in enumerate(CONDITIONS):
+                                       "conditions": list(a.conditions)}}
+        for condition in a.conditions:
             print(f"synthetic, {condition}:", flush=True)
+            # the seed offset is keyed to the condition, NOT to its position in the
+            # requested subset, so splitting the three across processes reproduces
+            # exactly what running them together would have produced
             out["synthetic"][condition] = synthetic_sweep(
                 n=a.synthetic_n, d=a.synthetic_d, runs=a.synthetic_runs,
-                seed=a.seed + offset, condition=condition)
+                seed=a.seed + CONDITIONS.index(condition), condition=condition)
 
     if not a.synthetic_only:
         paths = sorted(glob.glob(a.reps))
