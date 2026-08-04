@@ -272,3 +272,19 @@ def test_tiny_fold_is_reported_unavailable_not_silently_dropped():
     result = evaluate_fold(x, y, cancers, sites, pooled, fold == 0, n_components=3,
                            adjust=False, n_permutations=10, n_boot=10, seed=27)
     assert result["status"].startswith("unavailable_")
+
+
+def test_target_selection_refuses_a_group_that_matches_nothing(tmp_path):
+    """`all_non_control` is a protocol LABEL, not a group. Selecting it must not
+    silently yield an empty target block."""
+    from morpheus.v2.calibra.leave_sites_out import _load_targets
+
+    path = tmp_path / "targets.npz"
+    names = np.asarray(["HALLMARK_A", "HALLMARK_B", "RANDOM_CONTROL__1"])
+    np.savez(path, patient_ids=np.asarray(["TCGA-01-0001", "TCGA-01-0002"]),
+             target_names=names, target_groups=np.asarray(["hallmark", "hallmark", "random_control"]),
+             scores=np.zeros((2, 3)))
+    ids, kept, scores = _load_targets(str(path), "")
+    assert list(kept) == ["HALLMARK_A", "HALLMARK_B"] and scores.shape == (2, 2)
+    with pytest.raises(ValueError, match="matches no target"):
+        _load_targets(str(path), "all_non_control")

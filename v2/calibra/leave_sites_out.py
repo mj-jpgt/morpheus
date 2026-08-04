@@ -328,7 +328,15 @@ def leave_sites_out_channel(x: np.ndarray, y: np.ndarray, patient_ids: np.ndarra
 
 
 def _load_targets(path: str, target_group: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """The RNA target block, with RANDOM_CONTROL__ columns excluded as run_calibra excludes them."""
+    """The RNA target block, selected exactly as ``run_calibra.main`` selects it.
+
+    ``--target-group`` empty is the default and is what reproduces the published
+    channel: the block is every target whose name does NOT carry the
+    ``RANDOM_CONTROL__`` prefix. Note that ``all_non_control`` is the *label*
+    ``calibra_protocol.json`` records for that selection, not a value present in
+    ``target_groups`` — passing it as a group would silently select nothing, so an
+    empty selection raises rather than proceeding to a confusing failure downstream.
+    """
     raw = np.load(path, allow_pickle=True)
     ids = np.asarray([str(p) for p in raw["patient_ids"]])
     names = np.asarray([str(t) for t in raw["target_names"]])
@@ -337,7 +345,12 @@ def _load_targets(path: str, target_group: str) -> tuple[np.ndarray, np.ndarray,
     keep = np.ones(len(names), dtype=bool)
     if target_group:
         keep = groups == target_group
+        if not keep.any():
+            raise ValueError(f"--target-group {target_group!r} matches no target; "
+                             f"available groups are {sorted(set(groups.tolist()))}")
     keep &= ~np.char.startswith(names, "RANDOM_CONTROL__")
+    if not keep.any():
+        raise ValueError("target selection is empty after excluding RANDOM_CONTROL__ columns")
     return ids, names[keep], scores[:, keep]
 
 
@@ -347,7 +360,9 @@ def main() -> None:
     parser.add_argument("--targets", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--partition", default="test", choices=("test", "val", "all"))
-    parser.add_argument("--target-group", default="all_non_control")
+    parser.add_argument("--target-group", default="",
+                        help="restrict to one target_group; empty (the default) is the "
+                             "published channel's block: everything but RANDOM_CONTROL__")
     parser.add_argument("--n-folds", type=int, default=5)
     parser.add_argument("--n-components", type=int, default=16)
     parser.add_argument("--min-site-count", type=int, default=10)
