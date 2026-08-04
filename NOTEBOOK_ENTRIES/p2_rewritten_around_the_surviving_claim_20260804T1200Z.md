@@ -319,3 +319,63 @@ unsigned or the negative convention consistently. No figure caption in `P2_FIGUR
 delta.
 
 Suite after these edits: **326 passed**, thread-capped. Markdown only; nothing under `v2/` touched.
+
+---
+
+### 11. Addendum 5 — cited paths audited mechanically, and §4.1's envelope labelled n = 1
+
+**1. A path checker is now in the suite, and it found more than the four reported.**
+`v2/tests/test_paper_paths_resolve.py` (10 tests) extracts every backticked token that looks like a
+path from all six drafts and asserts that repository-relative ones resolve. It is the mechanical check
+§4.5(a) recommends, applied to us. Design notes: box paths (`~/…`, `/lambda/…`) and box-only trees
+(`p1_evidence`, `p1_out`, `e0_run`, `runs`) are skipped **by an explicit rule**, and a companion test
+requires each draft citing such a tree to declare it; DOIs, DBLP keys, API routes, formulas and pytest
+node IDs are filtered; brace expansions and globs resolve to their prefix directory.
+
+Fixed in `paper/P2_RANK_DRAFT.md`:
+
+| cited as | actual |
+|---|---|
+| `v2/research/rebase/recompute_rank.py` | `v2/research/rebase/rank_recompute_all_instances.py` |
+| `recompute_p1b.py` | `v2/research/rebase/rank_recompute_phase1b.py` |
+| `~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt` | `d1_p_seed{42,43,44}` and `d1_f_seed42`; `d1_f_seed43`/`d1_f_seed44` exist but hold no checkpoint |
+| `~/ws_d1/gatevar_*.log` | `~/e0_run/d1_diag/gatevar_{1..8}.log` |
+| `p1_evidence/dilution/` | a **box** path, now written with its `/lambda/…` prefix and marked "not a path in this repository"; build scripts are `v2/research/dilution/` |
+
+The same two script-name errors were in `paper/P2_FIGURES.md` and are fixed there too.
+
+**Beyond the four reported, the checker found:** `p1_evidence/*` cited bare as a repo path throughout
+**P1** (12 tokens in `P1_CALIBRA_DRAFT.md`, 9 in `P1_FIGURES.md`) — handled by the box-tree rule plus
+the declaration requirement rather than by rewriting P1's citations; and P1's `sim.py` / `sim3.py`,
+which P1 itself already flags as scratchpad files that "should be reproduced into" the repository, now
+recorded in `KNOWN_ABSENT` with that reason.
+
+**And the checker's first version had the same bug it exists to catch.** It reported
+`v2/calibra/hest.py:60–106` as missing because its line-range regex accepted a hyphen but not an
+**en-dash**, which the drafts also use. A checker that mis-parses a citation and reports a real file as
+absent is the mirror image of a draft that cites a file that is not there. Fixed, and the reason is a
+comment in the source.
+
+**2. §4.1's envelope is now labelled n = 1 wherever it appears.** The 2.69× figure rests on a **single**
+retraining pair. That is the same defect as §5.2's single-seed sweep applied to the paper's *central*
+argument rather than a supporting one, and the draft now says so in the abstract, in §4.1 twice, in
+§6.2 and in the conclusion: *"2.69× is one observation of a spread, not an estimated distribution"*, and
+*"if only one of the two survives review it should be §4.2"* — which reaches the same conclusion from 8
+within-arm degrees of freedom without using 2.69× at all. A controlled repeat is queued on the GPU.
+
+**3. Two independent recomputations now have a provenance row.** `~/ws_rank/` (canonical `spectral.py`)
+and `~/ws_p2/morpheus` (fresh workspace verified byte-equal to HEAD before execution, 402/402 files by
+git blob SHA-1, running the scripts vendored at `7b37dce`) reproduce §4.1, §4.2, §4.4(1), §4.5(b),
+§4.5(c), §4.6 and §4.7 to every published digit — **and both independently identified the §4.5(a)
+statistic substitution and the same corrected values** (3 of 6 → 2 of 6; D1 under canonical R2 is 3/3).
+Two independent agreements on a correction are worth more than either alone, and Appendix A now says so.
+
+**4. Read against the rebuilt figure plan.** `paper/P2_FIGURES.md` was rewritten against the surviving
+claim: F1 is the envelope, **F2 the variance decomposition** (previously absent despite being the most
+important display item), **F6 the necessity test placed before the figures that favour us** with both
+bootstraps drawn, and T1 prints the underpowering inside the table body. **No conflict with Results was
+found** — the figure plan's binding constraint 2 (every rank level needs an envelope) and its pending
+row for the retraining repeat both match §4.1 as now written, and its constraint 1 already names the
+fifth statistic that §4.5(a) documents.
+
+Suite: **336 passed** (326 + 10 new path tests), thread-capped.

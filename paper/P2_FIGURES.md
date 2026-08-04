@@ -807,7 +807,7 @@ agent's, and flagged in
   `d1_p_seed42`, `d1_p_seed43`, `d1_p_seed44`, `d1_f_seed42`. The draft's substantive statement is
   right — `d1_f_seed43` and `d1_f_seed44` exist as directories and hold no checkpoint.
 - Draft **line 2234** (Appendix B) cites the vendored rank-recomputation scripts as
-  `v2/research/rebase/recompute_rank.py` and `recompute_p1b.py`. **Neither exists**; the files are
+  `v2/research/rebase/rank_recompute_all_instances.py` and `v2/research/rebase/rank_recompute_phase1b.py`. **Neither exists**; the files are
   `v2/research/rebase/rank_recompute_all_instances.py` and
   `v2/research/rebase/rank_recompute_phase1b.py`.
 

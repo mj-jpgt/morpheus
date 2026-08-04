@@ -74,8 +74,9 @@ What survives is a different and better-powered claim, about **usefulness rather
 Four measurements carry it, on 12 frozen artifacts from 4 arms × 3 seeds of two matched-arm
 experiments in cross-modal morphology → bulk-transcriptome learning on 2,766 held-out TCGA patients.
 **(i)** Six of the seven between-arm rank differences this project has ever measured (**1.004× to
-2.19×**) fall inside the **2.69×** envelope produced by retraining one configuration with the same
-seed. **(ii)** A variance decomposition over the 12 artifacts puts effective rank at **34.5% arm /
+2.19×**) fall inside the **2.69×** spread produced by retraining one configuration with the same seed —
+an envelope estimated from **one** retraining pair, which we state as a limitation of that measurement
+rather than a property of the metric, and which is why (ii) carries the argument. **(ii)** A variance decomposition over the 12 artifacts puts effective rank at **34.5% arm /
 65.5% training-seed nuisance**, with the arm term not significant (F(3,8) = 1.41); the molecular
 channel those same artifacts carry is **98.0% arm**, F = 128.2. **(iii)** At a matched training step,
 one arm spans **6.05×** across three seeds while its sibling spans **1.003×** — the floor is a
@@ -922,8 +923,13 @@ rather than of the estimator.
 This is the paper's headline. It is a statement about **usefulness**, and it is measured inside the
 same-method regime RankMe reserves for itself.
 
-**The envelope.** Retraining one configuration — D2 arm H, seed 42, identical arguments, identical
-seed — against the re-export of the surviving original checkpoint:
+**The envelope, and the estimate it rests on.** The envelope comes from **one** retraining pair: D2
+arm H, seed 42, identical arguments and identical seed, against the re-export of the surviving original
+checkpoint. **It is an n = 1 estimate and must be read as one.** We state that here rather than in the
+limitations, because this section's headline — six of seven differences inside 2.69× — inherits it, and
+because it is the same defect as §5's single-seed momentum sweep applied to the paper's *central*
+argument rather than to a supporting one. §4.2 exists so the conclusion does not depend on this number,
+and reaches it from 8 within-arm degrees of freedom instead.
 
 | | held-out top-CCA | **canonical R1, residualised block** |
 |---|---:|---:|
@@ -933,7 +939,10 @@ seed — against the re-export of the surviving original checkpoint:
 
 Re-export is deterministic to five significant figures, so the export and readout path is not the
 source of the variance. Retraining is not deterministic: the channel moves by 0.035 and the effective
-rank by **2.69×**.
+rank by **2.69×**. **2.69× is one observation of a spread, not an estimated distribution** — it carries
+no interval, and nothing here licenses treating it as a calibrated threshold. What it does license is
+the comparison below, which is qualitative in the way that matters: six of seven between-arm differences
+are *smaller* than a single observed retraining move, and three are smaller by a wide margin.
 
 **The comparisons a rank-based selection rule would act on.** Every between-arm rank comparison this
 project has ever measured, all canonical R1, each with the block named in §4.9 or below:
@@ -956,8 +965,8 @@ project has ever measured, all canonical R1, each with the block named in §4.9 
 Every value recomputed under the canonical implementation on 2026-08-04 and reproducing the published
 figures exactly; outputs `~/ws_rank/RANK_RECOMPUTE.json`, `~/ws_rank/RANK_RECOMPUTE_P1B.json`.*
 
-**Six of seven, spanning 1.004× to 2.19×, are smaller than the spread of the same statistic when one
-configuration is retrained with the same seed.** Against those same D2 runs the paired channel
+**Six of seven, spanning 1.004× to 2.19×, are smaller than the one observed retraining spread of the
+same statistic at a fixed seed.** Against those same D2 runs the paired channel
 difference is **−0.1325 / −0.1089 / −0.1226** — the same sign 3/3, spread 0.024 on a mean of −0.121,
 with both patient- and cancer-clustered bootstrap CIs excluding zero in all three seeds (§4.9). The
 channel readout is **not** exempt from §3.5 either — 0.5861 against 0.6214 is a 6% move at one seed —
@@ -978,10 +987,14 @@ between-configuration difference does not exceed it, the comparison is uninforma
 this check proposed anywhere. It is cheap — one extra run — and on this stack it would have disqualified
 six of the seven rank comparisons this project made.
 
-**What this rests on, stated plainly.** The envelope is **one retraining pair on one configuration**.
-That is thin, and §4.2 exists because it is thin: the variance decomposition estimates the nuisance term
-from **8 within-arm degrees of freedom** across four arms rather than from a single pair, and reaches
-the same conclusion without depending on the 2.69× number at all.
+**What this rests on, stated plainly.** The envelope is **one retraining pair on one configuration** —
+n = 1, no interval. That is thin, and §4.2 exists because it is thin: the variance decomposition
+estimates the nuisance term from **8 within-arm degrees of freedom** across four arms rather than from a
+single pair, and reaches the same conclusion without depending on the 2.69× number at all. The two
+should be read together, and if only one survives review it should be §4.2. **A controlled repeat design
+— N retrainings of one configuration, rank and channel measured on each — is queued on the GPU and is
+named in §6.2 as the paper's most valuable missing measurement.** Until it reports, no sentence in this
+paper presents 2.69× as an established quantity.
 
 ### 4.2 Where rank's variance lives: 34.5% arm, 65.5% training seed — and the channel is 98.0% arm
 
@@ -1552,8 +1565,11 @@ same representation at each level, through the same instrument.
 `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`. Cohort 6,427 patients, 238,610 tumour
 patches, 7,644 slides; 2,766 evaluated on `test`. Instrument: 108-column cancer + pooled-TSS design, seed
 42, 16 components, 20 draws, 300 permutations (resolution 1/301 = 0.0033). Permutation null median
-0.145–0.147 at every level. Outputs `p1_evidence/dilution/`; artifact
-`~/p1_out/dilution/dilution_foreign_tumour_pca256.npz`. **Statistic R1 (canonical), given for both
+0.145–0.147 at every level. Outputs under `p1_evidence/dilution/` **on the box** —
+`/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/p1_evidence/dilution/`, **not a path
+in this repository**; the artifact this paper reads is
+`~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` and the build scripts are
+`v2/research/dilution/`. **Statistic R1 (canonical), given for both
 blocks.** Every value in both rank columns recomputed under the canonical implementation on 2026-08-04;
 the raw column reproduces the originally published figures exactly (196.187, 194.102, 190.532, 187.494,
 184.680, 176.523, 161.226).*
@@ -1696,8 +1712,8 @@ not reimplemented faithfully or benchmarked.
 **One further instance is `[NOT RECOMPUTED]` rather than recomputable.** The D1-A geometry probe's
 `programme_only` 9.81 / 10.47 against `programme_free` 1.71 (epoch 39, 282 held-out patients) is **R3 on
 live checkpoints**; recomputing it under R1 needs a GPU forward pass from the surviving checkpoints
-(`~/e0_run/d1_v1/d1_{p42,p43,p44,f42}/last.pt`; `f43` and `f44` were never written — the gate refused
-them) and the GPU was occupied by a training run that was not contended for. It is quoted nowhere in this
+(`~/e0_run/d1_v1/d1_p_seed{42,43,44}/last.pt` and `~/e0_run/d1_v1/d1_f_seed42/last.pt`; the
+`d1_f_seed43` and `d1_f_seed44` directories exist but hold no checkpoint — the gate refused those arms) and the GPU was occupied by a training run that was not contended for. It is quoted nowhere in this
 paper as a rank instance, and its source entry forbids the reading in any case: *"Nothing about programme
 supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
 defect, not an ablation."*
@@ -2036,7 +2052,7 @@ should be withdrawn to a replication.
 
 | would-be measurement | why it is absent |
 |---|---|
-| **A controlled repeat design for §4.1** — N retrainings of one configuration, rank and channel measured on each | **Not run.** §4.1's envelope rests on **one** retraining pair plus three-seed spreads. §4.2 exists because of this and reaches the same conclusion from 8 within-arm d.f. without the 2.69× number, but a proper repeat design is the single measurement that would make §4.1 unimpeachable. **This is now the most valuable missing measurement in the paper.** |
+| **A controlled repeat design for §4.1** — N retrainings of one configuration, rank and channel measured on each | **Not run; queued on the GPU.** §4.1's envelope is an **n = 1** estimate — one retraining pair, no interval — and the headline "six of seven differences fall inside it" inherits that. **This is the paper's most valuable missing measurement**, and it is the same defect as §5.2's single-seed sweep applied to the central argument rather than to a supporting one. §4.2 exists because of it and reaches the same conclusion from 8 within-arm d.f. without using 2.69× at all; if only one of the two survives review it should be §4.2. |
 | **A seed replication of §5.2's momentum sweep** | **Armed, not yet reported.** `m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported alongside the participation ratio. §5.3 states the consequence of its absence and why the single-seed sweep was a **defect** — the harness had its seed hardcoded — rather than a design choice. |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
 | ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
@@ -2138,8 +2154,8 @@ claim that replaced it had to be one that survives rank being right on average.
 
 It is. **The metric's between-arm differences are smaller than its own within-arm reproducibility floor,
 inside the regime its authors reserve for it.** Six of the seven between-arm rank differences this project
-ever measured — 1.004× to 2.19× — are inside the 2.69× envelope of retraining one configuration with the
-same seed. Across twelve matched artifacts, 65.5% of the variance in effective rank is training-seed
+ever measured — 1.004× to 2.19× — are inside the 2.69× spread we observed when one configuration was
+retrained with the same seed, an envelope measured from a single pair and reported as such. Across twelve matched artifacts, 65.5% of the variance in effective rank is training-seed
 nuisance and the arm term is not significant; across the same twelve, 98.0% of the variance in the
 molecular channel is the arm, at F = 128.2. And the floor is not a constant that could be calibrated once
 and reused: at a fixed training step, one arm spans 6.05× across three seeds while its sibling spans
@@ -2203,7 +2219,8 @@ to run the thing twice.
 | 3.2 | channel statistic, nulls, held-out re-estimation | `v2/calibra/spectral.py:78-108`, `v2/calibra/run_calibra.py`; metrics entry §4.4 | — |
 | 3.4 | D2 and D1 pair-manifest hashes and `objective_only_difference` | `D2_PAIR_MANIFEST.json`; `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json` | `~/e0_run/d2_v3/`, `~/e0_run/d1_v2/` |
 | 3.5, 4.1 | seed non-reproducibility; re-export vs retrain | `D2_RESULT.md` §4 | `~/e0_run/d2_v3/recovered_artifacts/` |
-| 4.1 | the seven between-arm ratios and the 2.69× envelope | recomputation entry §6 | `~/ws_rank/RANK_RECOMPUTE.json` |
+| 4.1 | the seven between-arm ratios and the 2.69× envelope (**n = 1**) | recomputation entry §6 | `~/ws_rank/RANK_RECOMPUTE.json` |
+| **4.1–4.7** | **two independent recomputations agree.** (i) `~/ws_rank/` under the canonical `spectral.py`, 2026-08-04; (ii) `~/ws_p2/morpheus`, a fresh workspace verified byte-equal to HEAD *before* execution (402/402 files by git blob SHA-1) running the scripts vendored at `7b37dce`. Both reproduce §4.1, §4.2, §4.4(1), §4.5(b), §4.5(c), §4.6 and §4.7 to every published digit, and both independently identified the §4.5(a) statistic substitution **and the same corrected values** (3 of 6 → 2 of 6; D1 under canonical R2 is 3/3). | `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`; `NOTEBOOK_ENTRIES/p2_vendored_and_reproduced_20260804T0255Z.md` | `~/ws_rank/`, `~/ws_p2/out/` |
 | 4.2 | variance decomposition and per-arm folds | metrics entry §4.1 | `~/e0_run/p2_necessity_and_variance.py` |
 | 4.3 | step-200 in-flight R3, 6.05× vs 1.003× | `~/e0_run/d1_v2/d1_{f,p}_seed{42,43,44}/train_metrics.jsonl`, `train_rank_tripwire_observed` | — |
 | 4.4 | subsampling SDs; probe repeats; tolerance and centring insensitivity | metrics entry §3; `NOTEBOOK_ENTRIES/rank_probe_repeat_variance_20260804T0900Z.md`; recomputation entry §2, §4 | `~/e0_run/P2_METRICS_ALL_SUBSAMPLED.json`, `~/e0_run/d1_diag/probevar_*.log` |
@@ -2211,10 +2228,10 @@ to run the thing twice.
 | 4.7 | necessity test, predeclaration, escalation | `NOTEBOOK_ENTRIES/PREDECLARED_D1_necessity_test_20260803T2300Z.md`; metrics entry §5; `d1_readout_preregistration_20260803T1700Z.md` | `~/e0_run/d1_v2/`, `~/e0_run/d1_audit.log` |
 | 4.7.2 | both paired bootstraps on the 40 untrained targets | `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` | patient and cancer-cluster CI₉₅ per seed |
 | 4.7.3, 6.3 | `random_control` arm gaps, absolute levels, and the qualified A3 verdict | D1 audit check A3; `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json`; T1.4's 76–82% random-gene-set finding | — |
-| 4.8 | dilution table, both blocks, the 1.95–21.5× range | `DILUTION_LOWER_BOUND.md` §2, §6; `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`; recomputation entry §5 | `p1_evidence/dilution/`; `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz` |
+| 4.8 | dilution table, both blocks, the 1.95–21.5× range | `DILUTION_LOWER_BOUND.md` §2, §6; `NOTEBOOK_ENTRIES/dilution_foreign_tumour_20260803T0355Z.md`; recomputation entry §5 | `p1_evidence/dilution/` **on the box**; `~/p1_out/dilution/dilution_foreign_tumour_pca256.npz`; build scripts `v2/research/dilution/` |
 | 4.9 | D2, Phase 1b, "16/16", decorrelation | `D2_RESULT.md` §2, §4; `PHASE1B_TARGETED_READOUT.md` §3, §5, §7; `NOTEBOOK.md` 2026-08-02 01:20 UTC; `ENGINE_CLD.md` §1 + `HANDOFF_BUILD_AGENT.md` §1–2 | **decorrelation: no artifact; cited source does not exist** |
 | 4.9, 4.10 | counter-measurement 12.88 → 1.00; collapse-regime values | `g26_rank_collapse_diagnosis_20260803T0500Z.md`; `d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`; `d1_programme_free_collapsing_in_training_20260803T1930Z.md`; `d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md` | `~/e0_run/d1_diag/`, `~/e0_run/d1_v1/` |
-| 5.1 | four gate instances; gate non-reproducibility over 8 runs | `g26_variance_floor_fix`, `g26_stepbudget_sweep`, `g26_passes`, `d1b_premise_fails_all_five_arms_collapse`, `d1_relaunch`, `d1a_control_complete_and_gate_fails_2of3_in_runner`, `g26_is_not_reproducible_20260804T0700Z.md` | `~/ws_d1/gatevar_*.log` |
+| 5.1 | four gate instances; gate non-reproducibility over 8 runs | `g26_variance_floor_fix`, `g26_stepbudget_sweep`, `g26_passes`, `d1b_premise_fails_all_five_arms_collapse`, `d1_relaunch`, `d1a_control_complete_and_gate_fails_2of3_in_runner`, `g26_is_not_reproducible_20260804T0700Z.md` | `~/e0_run/d1_diag/gatevar_{1..8}.log` |
 | 5.2 | momentum sweep, staleness falsification, turnover | `queue_size_implicates_the_key_set_20260803T2200Z.md`; `momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; `turnover_criterion_FALSIFIED_20260804T0330Z.md` | `~/e0_run/d1_diag/` |
 
 ## Appendix B — code index
@@ -2231,7 +2248,7 @@ to run the thing twice.
 | `permutation_null` | `v2/calibra/calibration.py` | all nulls in §3.2 |
 | paired bootstrap | `v2/paired_bootstrap.py` | §4.6, §4.7 (pending), §4.9 |
 | `symmetric_infonce` | `v2/losses.py:13` | §4.9, §5 |
-| rank recomputation scripts, vendored | `v2/research/rebase/recompute_rank.py`, `recompute_p1b.py` (commit `8609081`) | §3.1, §4.1, §4.8, §4.9 |
+| rank recomputation scripts, vendored | `v2/research/rebase/rank_recompute_all_instances.py`, `v2/research/rebase/rank_recompute_phase1b.py` (commit `8609081`) | §3.1, §4.1, §4.8, §4.9 |
 | `stable_rank` | `v2/calibra/e1_rank_information.py` | §4.6 only |
 
 ## Appendix C — the caveat that must travel with each number
