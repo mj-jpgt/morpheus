@@ -117,9 +117,11 @@ The task brief flagged that raw-vs-residualised flips arm orderings. It does. **
 | `random_control` | −0.0252 | **+0.0237** | **+0.0255** |
 | PBS codes (128) | −0.0306 | **+0.0100** | −0.0098 |
 
-On the raw block the D2 gap is 3–5× smaller and **seed 43 reverses**, on both the untrained-40 and
-the all-90 exam. The 3/3 consistency and the ~0.12 magnitude are properties of the residualised
-block specifically. Removing cancer and tissue-source-site is defensible — it is the whole point of
+These are **point estimates only** — `d2_compare` residualises unconditionally, so no bootstrap
+interval was produced for the raw block and none is claimed. On that understanding: the raw gap is
+3–5× smaller than the residualised one, and its **sign reverses in seed 43** on both the untrained-40
+and the all-90 exam. The 3/3 sign consistency and the ~0.12 magnitude are properties of the
+residualised block specifically. Removing cancer and tissue-source-site is defensible — it is the whole point of
 the design — but it must be said that it does not merely clean the estimate, it produces most of it.
 Any statement of the D2 effect must carry its block.
 
