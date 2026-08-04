@@ -31,7 +31,10 @@ with zero breaching axes in six representation states — while a nonlinear prob
 confounds from the adjusted state at 3.15× and 3.45× chance, so what is certified is the class means
 and not every function of the representation. That residual is bounded: a saturated cancer × site cell
 design, which upper-bounds any conditional-mean adjustment, moves the channel 0.6052 → 0.6051, and the
-confound labels alone account for 6.0–11.2% of the channel's excess over its own null. (ii) It does
+confound labels alone account for 6.0–11.2% of the channel's excess over its own null when the labels
+are encoded in the same columns the adjustment residualises against — a construction choice, not a
+free-standing property of the cohort: re-encoded on the operator's own frozen design, the same
+comparison reads consistent with zero (−0.3% to 6.4%, none significant at *p* < 0.05). (ii) It does
 not destroy the signal it is meant to leave alone: injected-signal attenuation is 0.974–1.039 across
 six states and 1.07–1.12 across twelve design × sample-size cells. (iii) The floors themselves — a paired *transmission* floor censored at
 ≤ 0.01, and an unpaired *detection* floor of 0.25–0.40 that is the only quotable detection limit —
@@ -178,7 +181,9 @@ In descending order of how well evidenced they are.
    3.15× and cancer at 3.45× chance from the adjusted state, *p* at the floor, three probe families
    agreeing. The residual is bounded — a saturated cancer × site cell design, the upper bound on any
    conditional-mean adjustment, moves the channel 0.6052 → 0.6051, and the labels alone account for
-   6.0–11.2% of its excess over null — so a mean-based certificate is sound for what it claims and
+   6.0–11.2% of its excess over null when encoded in the same columns the adjustment residualises
+   against — a re-encoding on the operator's own frozen design instead reads consistent with zero
+   (−0.3% to 6.4%, none significant) — so a mean-based certificate is sound for what it claims and
    must not be read as "the confound is gone" (§4.2).
 2. **A demonstration that the same adjustment does not destroy signal.** Injected-signal attenuation
    0.974–1.039 across six states, 1.07–1.12 across twelve design × n cells, and 0.944–1.228 in the
@@ -802,9 +807,27 @@ whatsoever**, kernel, forest or boosted — moves the `d2_h::wsi_biology` channe
 **0.6052 → 0.6051** (retention 0.998). Second, the **confound labels on their own** reach a channel
 of 0.1237 (additive design) and 0.0903 (saturated design), both *below* the real channel's own null
 median of 0.1483; as a share of the channel's excess over that null they account for **11.2%** and
-**6.0%** respectively. Third, the residual is therefore not a conditional mean of any shape. The
-surviving confound is real, it is bounded at roughly a tenth of the effect, and it cannot explain
-the channel.
+**6.0%** respectively — **when the labels are encoded in the same design columns the adjustment
+residualises against.** That is a construction coincidence, not a free-standing property of the
+cohort: `min_site_count` selection keeps 84 sites on the full 2,766-patient partition but only 57
+design columns on a 1,382-patient split, so a partition-wide labels block spans roughly 50 columns
+outside the adjustment's own reach. Re-encoded on the adjustment operator's own frozen design, the
+same three-arm comparison reads **−0.3% (*p* = 0.605), 6.4% (*p* = 0.086), −19.3% (*p* = 1.000)** —
+none distinguishable from zero. Third, the residual is therefore not a conditional mean of any shape.
+The surviving confound is real, it is bounded at roughly a tenth of the effect on the construction
+that first measured it, and under the construction that avoids the coincidence it is not
+distinguishable from no effect at all; either way it cannot explain the channel.
+
+**The channel itself, independent of the ceiling question, has now been validated out of sample.**
+Every number above is transductive — the nuisance model is fit on the rows it scores, which is true
+of every "adjusted" quantity on this project. Repeating the channel measurement with the
+nuisance model fit on a disjoint discovery fold and applied to unseen exposure-fold patients — the
+first genuinely out-of-sample test of this claim — leaves it essentially unmoved: retention **0.9966**
+(`d2_h`) and **0.9710** (`d2_i`) against the transductive reading, on the identical 1,382 patients, at
+*p* ≤ 0.0005. The inductive adjustment is doing real work, not merely reproducing the transductive one
+under a different name (raw-vs-adjusted correlation 0.75, variance ratio 0.59, 0 of 256 axes moved by
+&lt;1%) — it simply leaves more site information behind than the transductive fit does, and that
+residue does not turn out to be what drives the channel.
 
 Two consequences for certification, neither optional. An LDA-based certificate must state that it
 certifies the **first moment**, and must not be read as "the confound is gone"; and the certificate's
@@ -823,6 +846,16 @@ Note that the 21:30 entry reports the same correction as a **ratio** rather than
 (`corrected_multiple` = observed ÷ regenerated-null median), which gives 2.73× site / 3.66× cancer for
 this block and 2.4–3.3× / 3.1–3.7× across six adjuster arms; the two estimators are not
 interchangeable and the figures quoted above are the difference form.*
+
+*Provenance for the ceiling correction and the inductive channel validation:
+`NOTEBOOK_ENTRIES/p4_inductive_adjustment_measured_20260804T2300Z.md` (the 24× transductive/inductive
+gap on TCGA site recoverability that motivated re-testing the ceiling and the channel) and
+`NOTEBOOK_ENTRIES/inductive_channel_and_ceiling_result_20260804T2345Z.md` (the corrected ceiling
+arms, the channel retention figures, and the raw-vs-adjusted correlation and variance-ratio checks
+that rule out the inductive operator being a relabelled transductive one). The within-cancer and
+global permutation nulls agree to within 0.003 on every transductive arm above but diverge 46% on the
+inductive arm (0.2067 vs 0.3028) — retention reads 0.997 under this paper's convention and 0.757
+under a global-permutation convention; both are reported rather than one chosen silently.*
 
 ### 4.3 …and the adjustment does not destroy signal
 
