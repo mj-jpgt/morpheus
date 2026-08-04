@@ -2,7 +2,10 @@
 
 THE PAPER'S MOST IMPORTANT DISPLAY ITEM. It is the contribution that does not
 depend on a sign count, and it reaches F1's conclusion from 8 within-arm degrees
-of freedom without using the 2.69x number.
+of freedom without using F1's retraining floor at all. That independence mattered
+while the floor was an n = 1 estimate of 2.69x and it still matters now that it is
+a measured 3.295x over five repeats: F2 would read the same if the floor had never
+been measured.
 
 Claim: two-thirds of the variation in effective rank across twelve matched
 artifacts is training-seed nuisance; two percent of the variation in the

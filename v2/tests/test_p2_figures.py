@@ -347,11 +347,29 @@ def _synthetic_corpus(root: Path) -> dict:
     write("extracted/F3_TRIPWIRE_STEP200_R3_n5.json",
           {"statistic": "R3", "key": "train_rank_tripwire_observed", "epoch": 11,
            "global_step": 200, "runs": runs})
+    # The controlled retraining repeat, as it looks once it has reported. The
+    # shape is the real one: four repeats close together and one at a third of
+    # them, because F1(a) is drawn around that bimodality and a smooth spread
+    # would let a panel that averaged it away still pass.
+    env_rank_res = [28.320, 8.834, 28.348, 29.106, 28.959]
+    env_rank_raw = [24.481, 8.033, 24.504, 24.990, 24.912]
+    env_chan = [0.6182, 0.5859, 0.6123, 0.6110, 0.6098]
     write("extracted/F1_RETRAINING_REPEAT.json",
-          {"root": "/synthetic/d1_envelope", "expected": "rep{1..5}/", "complete": False,
+          {"root": "/synthetic/d1_envelope", "expected": "rep{1..5}/", "complete": True,
            "predeclaration": "NOTEBOOK_ENTRIES/SYNTHETIC.md",
-           "reps": {f"rep{i}": {"epochs_logged": 16, "last_epoch": 15,
-                                "artifact_npz": None, "rank": None, "channel": None}
+           "readout_log": "/synthetic/d1_envelope_readout.log",
+           "readout_module": "v2/research/rebase/d1_envelope_readout.py",
+           "statistic": "R1",
+           "printed_spread": {
+               key: {"min": min(vals), "max": max(vals),
+                     "spread": round(max(vals) / min(vals), 3)}
+               for key, vals in (("rank_residualised", env_rank_res),
+                                 ("rank_raw", env_rank_raw), ("channel", env_chan))},
+           "reps": {f"rep{i}": {"epochs_logged": 40, "last_epoch": 39,
+                                "artifact_npz": f"/synthetic/d1_envelope/rep{i}.npz",
+                                "rank_raw": env_rank_raw[i - 1],
+                                "rank_residualised": env_rank_res[i - 1],
+                                "channel": env_chan[i - 1]}
                     for i in range(1, 6)}})
     write("MANIFEST.json", {"fetched_utc": "synthetic", "box": "synthetic", "files": {}})
     return {"d2": d2, "d1": d1, "variants": variants, "dil_raw": dil_raw}
@@ -413,7 +431,25 @@ def _synthetic_repo(corpus) -> dict[str, str]:
     d1a_end = ("| arm | epoch | rank | hard | cos | std |\n|---|---|---|---|---|---|\n"
                "| `programme_free` seed 42 | 39 | 1.71 | 11 | 0.986 | 0.0156 |\n")
 
+    # T1's block-dependence band. The gene-set block MUST reproduce the metrics
+    # JSON's own untrained-40 contrast (T1 asserts exactly that), and one block
+    # flips seed 43, which is the shape of the real finding.
+    exam_panel = []
+    for key in ("geneset_untrained40", "pbs_codes128_ARM_I_OWN", "pca_basis128",
+                "pbs_shuffled_s1", "geneset_random_control", "random_dictionary128"):
+        for seed in SEEDS:
+            h = d2[f"H{seed}"]["points"]["untrained40"]["top_cca"]
+            i = d2[f"I{seed}"]["points"]["untrained40"]["top_cca"]
+            delta = i - h
+            if seed == 43 and key in ("pbs_codes128_ARM_I_OWN", "pca_basis128"):
+                delta = -delta
+            exam_panel.append({"exam": key, "seed": seed, "block": "residualised",
+                               "n_targets": 40, "point_hallmark": h, "point_pbs": i,
+                               "pbs_minus_hallmark": delta})
+
     return {
+        "v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json":
+            json.dumps(exam_panel),
         "v2/research/rebase/nature/D2_RESULT.md": d2_md,
         "v2/research/rebase/nature/DILUTION_LOWER_BOUND.md": dilution_md,
         "NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed"
@@ -505,18 +541,37 @@ def test_make_all_writes_every_item(figmod, tmp_path, monkeypatch):
         assert path.stat().st_size > 5_000, path
 
 
-def test_pending_measurement_fails_loudly(figmod, tmp_path, monkeypatch):
-    """--strict must raise rather than draw a placeholder."""
+def test_pending_measurement_fails_loudly(figmod):
+    """--strict must raise rather than draw a placeholder.
+
+    Every display item is currently PLOTTABLE -- F1(d)'s retraining repeat landed on
+    2026-08-04 and was the last pending panel -- so this asserts the mechanism itself
+    rather than a particular figure. The next pending measurement to be added must
+    still fail a release build, and that is what is checked here.
+    """
+    from matplotlib import pyplot as plt  # noqa: PLC0415
+
+    fig, ax = plt.subplots()
+    try:
+        with pytest.raises(figmod.PendingMeasurement):
+            figmod.pending_panel(ax, title="(x) synthetic", marker="[PENDING]",
+                                 blocked_on="a measurement", arrives_at="/nowhere",
+                                 strict=True)
+    finally:
+        plt.close(fig)
+
+
+def test_no_display_item_is_pending(figmod, tmp_path, monkeypatch):
+    """A release build must emit nine complete items with no hole in any of them."""
     monkeypatch.setattr(figmod, "OUT", tmp_path / "out")
-    monkeypatch.setattr(sys, "argv", ["fig_f1_envelope", "--strict"])
-    module = importlib.import_module("fig_f1_envelope")
-    importlib.reload(module)
-    monkeypatch.setattr(module.P, "OUT", tmp_path / "out")
-    repeat = module.P.load_json("extracted/F1_RETRAINING_REPEAT.json")
-    if repeat.get("complete"):
-        pytest.skip("the retraining repeat has landed; F1(d) must be redrawn with real data")
-    with pytest.raises(figmod.PendingMeasurement):
-        module.main()
+    monkeypatch.setattr(sys, "argv", ["make_all.py", "--strict"])
+    import make_all  # noqa: PLC0415
+    importlib.reload(make_all)
+    for name in MODULES:
+        module = importlib.import_module(name)
+        importlib.reload(module)
+        monkeypatch.setattr(module.P, "OUT", tmp_path / "out")
+    assert make_all.main() == 0, figmod.PENDING_LOG
 
 
 def test_vendored_data_matches_its_manifest(figmod):

@@ -36,7 +36,7 @@ import p2fig as P  # noqa: E402
 #: (identifier, module, one-line description) in the order the draft presents them.
 ITEMS = [
     ("F1", "fig_f1_envelope",
-     "the n = 1 retraining envelope and the seven arm ratios inside it"),
+     "the measured retraining floor (n = 5) and the seven arm ratios inside it"),
     ("F2", "fig_f2_variance",
      "where rank's variance lives: arm against training seed"),
     ("F3", "fig_f3_floor",

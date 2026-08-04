@@ -115,6 +115,24 @@ def nuisance_band() -> tuple[float, float]:
     return min(folds), max(folds)
 
 
+def retraining_floor() -> float:
+    """F1(a)'s measured floor: the rank spread over five identical retrains.
+
+    Read from the same extracted file F1 draws, so the two figures cannot quote
+    different floors. Nothing is recomputed: the per-repeat values were produced by
+    `v2/research/rebase/d1_envelope_readout.py` importing `calibra`.
+    """
+    rec = P.load_json("extracted/F1_RETRAINING_REPEAT.json")
+    assert rec.get("complete"), (
+        "F6(b): the retraining floor has not reported; F1 draws it as pending and "
+        "this panel must not invent one.")
+    vals = [r["rank_residualised"] for r in rec["reps"].values()]
+    got = max(vals) / min(vals)
+    printed = rec["printed_spread"]["rank_residualised"]["spread"]
+    assert abs(got - printed) < 1e-3, (got, printed)
+    return got
+
+
 def violations() -> list[dict]:
     """The 66-pair scan's hits, parsed from the run log that produced them."""
     log = P.load_text("ws_p2/out/p2_run.log")
@@ -184,9 +202,17 @@ def main() -> int:
     # ------------------------------------------------------------------ (b)
     ax_b.set_title("(b)  The three seeds, in rank", pad=9)
     ax_b.axhspan(band_lo, band_hi, color=C.ENVELOPE, alpha=0.35, linewidth=0, zorder=0)
+    # The second, independently measured floor: five identical retrains of one
+    # configuration at one seed (F1(a)). It is drawn here because section 4.7's
+    # reading of this panel now turns on it - all three folds sit inside it, so
+    # D1 resolves nothing about rank in either direction.
+    floor = retraining_floor()
+    ax_b.axhline(floor, color=C.MUTED, linewidth=1.0, linestyle=(0, (4, 2)), zorder=1)
     ax_b.text(0.99, 0.995,
               f"shaded: section 4.2's own WITHIN-ARM seed band,\n"
-              f"{band_lo:.2f}-{band_hi:.2f}$\\times$ (F2(b), four arms)",
+              f"{band_lo:.2f}-{band_hi:.2f}$\\times$ (F2(b), four arms)\n"
+              f"dashed: the MEASURED retraining floor, {floor:.3f}$\\times$\n"
+              "(F1(a), five identical retrains at one seed)",
               transform=ax_b.transAxes, ha="right", va="top", fontsize=6.2,
               color=C.MUTED, linespacing=1.5)
     xs = np.arange(len(pts))
@@ -211,9 +237,12 @@ def main() -> int:
                     + P.STAT["R1_short"] + ", residualised block", fontsize=6.4)
     P.grid(ax_b, axis="y")
     n_inside = sum(band_lo <= p["rank_p"] / p["rank_f"] <= band_hi for p in pts)
+    n_floor = sum(p["rank_p"] / p["rank_f"] <= floor for p in pts)
     ax_b.text(0.0, -0.34,
-              f"{n_inside} of 3 sit inside the nuisance band; all three are below the largest\n"
-              "within-arm seed fold this project has measured. Bar labels are the two R1 values.",
+              f"{n_inside} of 3 sit inside the nuisance band and {n_floor} of 3 are below the "
+              "MEASURED\nretraining floor, so D1 does not resolve rank in EITHER direction. "
+              "That does not\nrefute the necessity result opposite: the channel difference is "
+              "resolvable where the\nrank difference is not. Bar labels are the two R1 values.",
               transform=ax_b.transAxes, ha="left", va="top", fontsize=6.2, color=C.INK,
               linespacing=1.6)
 
