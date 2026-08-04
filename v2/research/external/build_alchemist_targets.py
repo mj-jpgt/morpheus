@@ -140,6 +140,15 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--workers", type=int, default=12)
     parser.add_argument("--validate-only", action="store_true")
+    # The frozen artifact records `minimum_required_coverage: 0.95`, but it plainly did not
+    # apply it as a per-signature drop in this symbol universe: its own manifest keeps
+    # HALLMARK_ADIPOGENESIS at 189/200 = 0.945. Applying 0.95 during validation would
+    # therefore drop ten hallmarks the frozen block retained, and G1 would silently be
+    # answering a smaller question than it claims to. So the gate runs uncut, and the
+    # coverage requirement is enforced where it actually protects something: on ALCHEMIST,
+    # the cohort whose gene coverage nobody has checked.
+    parser.add_argument("--validation-min-coverage", type=float, default=0.0)
+    parser.add_argument("--cohort-min-coverage", type=float, default=MINIMUM_REQUIRED_COVERAGE)
     args = parser.parse_args()
 
     output = Path(args.output_dir)
@@ -178,13 +187,15 @@ def main() -> None:
                           if len(by_patient[sample_patient[s]]) == 1][:400]
     print(f"[G1] validating on {len(validation_samples)} duplicate-free TCGA samples", flush=True)
     frame = tcga_expression(Path(args.tcga_rna), validation_samples)
-    block = score_signatures(frame, signatures)
+    block = score_signatures(frame, signatures, minimum_coverage=args.validation_min_coverage)
     patients = np.asarray([sample_patient[s] for s in validation_samples])
     report = validate_against_frozen(args.frozen_targets, patients, block.target_names,
                                      block.scores)
     report["gene_universe"] = int(frame.shape[0])
     report["unavailable_targets"] = unavailable
     report["coverage"] = block.coverage
+    report["validation_min_coverage"] = args.validation_min_coverage
+    report["cohort_min_coverage"] = args.cohort_min_coverage
     report["dropped_for_coverage"] = block.dropped_for_coverage
     (output / "G1_validation.json").write_text(json.dumps(report, indent=2, sort_keys=True))
     print(f"[G1] passed={report['n_passed']} failed={report['n_failed']} "
@@ -228,7 +239,7 @@ def main() -> None:
     for label, matrix, id_of in (
             ("tcga_nsclc", tcga_shared, lambda c: sample_patient[c]),
             ("alchemist", alch_shared, lambda c: c)):
-        scored = score_signatures(matrix, signatures)
+        scored = score_signatures(matrix, signatures, minimum_coverage=args.cohort_min_coverage)
         frame = pd.DataFrame(scored.scores, columns=scored.target_names)
         frame["id"] = [id_of(column) for column in matrix.columns]
         grouped = frame.groupby("id", sort=True).mean()
