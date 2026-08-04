@@ -12,20 +12,37 @@
 > (*"a slowly evolving key encoder is a core to making use of a queue"*), so the falsification is in
 > scope only because ours is a queue setting — which is now stated rather than left to be inferred.
 >
-> **And one thing the integration exposed, recorded here because it belongs with the numbers.** The
-> `m = 0` versus `m = 0.999` decision at step 600 rests on **2.81 against 7.42, a 2.64× ratio, which is
-> inside the 2.69× same-seed retraining envelope P2 §4.1 measures** — and this sweep is **one seed per
-> momentum value**. P2 §5.3 states why the fix is nonetheless reported as real (monotone across four m
-> values, flat over 400 steps, readings at the collapse floor, and a tight fixed-seed repeat with a
-> 3.5× separation and an empty band) and states equally plainly that **no seed replication of this
-> sweep exists**, which is the measurement that would close the gap.
+> **And the thing the integration exposed, updated 2026-08-04 now that the seed replication has
+> reported.** The `m = 0` versus `m = 0.999` decision at step 600 rests on **2.81 against 7.42, a 2.64×
+> ratio** — and this sweep is **one seed per momentum value**. The single-seed limitation was a
+> **defect, not a design choice: the momentum harness had its seed hardcoded**, so the sweep could not
+> have varied seeds had it been asked to; the "Limits" bullet below reading *"The sweep is one seed per
+> momentum value"* is a property of the apparatus, not a judgement that one seed sufficed.
 >
-> **The single-seed limitation was a defect, not a design choice: the momentum harness had its seed
-> hardcoded**, so the sweep could not have varied seeds had it been asked to. The "Limits" bullet below
-> reading *"The sweep is one seed per momentum value"* should be read as a property of the apparatus
-> rather than a judgement that one seed sufficed. A seed-replicated sweep is **armed** —
-> `m ∈ {0, 0.999} × 3 seeds`, canonical statistic reported alongside the participation ratio — and P2
-> §5.3 states in advance what each outcome licenses.
+> **The seed replication has now run** (`~/e0_run/d1_diag/mseed_*`, three seeds per momentum, 500
+> steps): canonical R1 **11.26 / 10.45 / 10.55** at m = 0.999 against **3.18 / 1.13 / 2.36** at m = 0;
+> R3 **7.40 / 6.85 / 7.15** against **2.81 / 1.05 / 2.06**, all on the fixed held-out probe. **Every
+> m = 0.999 seed exceeds every m = 0 seed on both statistics**, so the separation is not an artefact of
+> the one seed the harness allowed.
+>
+> **But it does not clear P2 §4.1's bar, and the file must not be read as though it did.** The
+> worst-case separation is **10.45 / 3.18 = 3.29×** against §4.1's measured retraining floor of
+> **3.295×** (canonical R1, residualised exported block; 3.111× raw) — **inside it**. The earlier
+> figure of 2.69× quoted in this header was the superseded n = 1 estimate and **must not be quoted as
+> the floor**. Different arm, duration and block make the comparison indicative rather than a
+> like-for-like disqualification, and all three mismatches point toward a *larger* floor in this regime
+> rather than a smaller one, so **by the paper's own criterion the momentum fix's rank difference is
+> not resolvable.**
+>
+> **What the fix actually rests on is a binary outcome, not a ratio** — see **P2 §5.4**, which is now a
+> subsection of its own. `programme_free` completed 40 epochs uncollapsed on **0 of 3** seeds before the
+> fix (the one arm that reached epoch 40 sat at R3 **1.71** with RNA-view mutual cosine **0.986**, and
+> no exports, CALIBRA or bootstrap were produced at all) and on **3 of 3** after it, with canonical R1
+> 13.418 / 7.600 / 6.394, a held-out channel of 0.5412 / 0.5336 / 0.5126 above its own `random_control`,
+> and paired bootstrap intervals per seed. Rank is how the collapse was **found**; it is not what
+> establishes the repair, and no sentence in this file may be quoted as though it were. The choice of
+> `m = 0.999` over `m = 0.99` (1.26×) is supported by nothing that clears the floor; only **momentum
+> against none** is.
 
 *Draft section, 2026-08-03. Companion to `LIVENESS_GATE_DESIGN.md`. Every number traces to a named
 entry in `NOTEBOOK_ENTRIES/` or a log under `~/e0_run/d1_diag/`. Claims not measured are marked as

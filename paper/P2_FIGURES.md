@@ -753,7 +753,7 @@ read as recommending per-feature spread as the replacement scalar.
 
 ### S4 — The worked example: momentum, graded in rank — and the seed replication that does not exist
 
-**Draft section.** §5.2, and §5.3's admission.
+**Draft section.** §5.2, and §5.4's admission.
 
 Centred R3 on a fixed held-out probe, capacity held at 4,096 in every arm, one verified common
 initialisation, steps 0→600 (40 epochs of this objective is 583 steps): m = 0 gives
@@ -768,7 +768,8 @@ from step 200 to 600.
 `~/e0_run/d1_diag/`.
 
 **Status.** `PLOTTABLE` as drawn — **and the seed replication has now landed, so the panel's marker
-must change rather than be dropped.** The original sweep is **one seed per momentum value**, and §4.2
+must change rather than be dropped. Draft §5.2 and the new §5.4 are rewritten around it; this panel is
+not yet redrawn.** The original sweep is **one seed per momentum value**, and §4.2
 measures the seed term as dominant for exactly this statistic on this stack. The single seed was a
 **defect, not a design choice** — the momentum harness had its seed hardcoded, so the sweep could not
 have varied seeds had we asked it to — and the panel must say which of the two it was.
@@ -776,7 +777,7 @@ have varied seeds had we asked it to — and the panel must say which of the two
 **The replication (2026-08-04, `~/e0_run/d1_diag/mseed_*`, three seeds per momentum, 500 steps):**
 canonical R1 **11.26 / 10.45 / 10.55** at m = 0.999 against **3.18 / 1.13 / 2.36** at m = 0; R3
 7.40 / 6.85 / 7.15 against 2.81 / 1.05 / 2.06. **Every m = 0.999 seed exceeds every m = 0 seed on both
-statistics**, so §5.3's disjunction resolves in favour of separation and the single-seed defect is
+statistics**, so the predeclared disjunction (now recorded in §5.4) resolves in favour of separation and the single-seed defect is
 closed. Replace `[MOMENTUM SEED REPLICATION PENDING]` with a **per-arm seed band drawn the way F2(b)
 draws one**.
 
@@ -791,8 +792,16 @@ different arm, duration and block, and no like-for-like floor for this regime ha
 **What does not depend on rank at all is the reason the fix was adopted** (the unfixed configuration
 collapses and the fixed one does not, visible in retrieval, in the contrastive loss, and in whether
 `programme_free` reaches 40 epochs without the tripwire firing), and the panel must not be drawn as
-though it did. *Numbers: `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md`
-§3. Draft §5.2 and §5.3 are **not yet rewritten** around this.*
+though it did. **Draft §5.4 states that binary outcome in the form the panel should annotate**:
+`programme_free` completed 40 epochs uncollapsed **0 of 3** seeds before the fix — the one arm that
+reached epoch 40 sat at R3 **1.71** with RNA-view mutual cosine **0.986**, and `run_d1` produced no
+exports, CALIBRA or bootstrap at all — and **3 of 3** after it, at canonical R1 13.418 / 7.600 / 6.394
+with a held-out channel of 0.5412 / 0.5336 / 0.5126 above its own `random_control` and a paired
+bootstrap interval per seed. **The choice of `m = 0.999` over `m = 0.99` (1.26×) is supported by
+nothing that clears the floor; only momentum against none is.** *Numbers:
+`NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3;
+`d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`; draft §3.3, §4.7.2, §4.7.3.
+Draft §5.2 and §5.4 **are** now rewritten around this.*
 
 **Caption must carry.** MoCo's staleness account is ruled out three ways and the alternative is
 stated as unconfirmed: the queue turns over completely every 19 steps; key-to-encoder cosine at step
@@ -884,7 +893,8 @@ input.
 | would-be figure | why it cannot be drawn | where the draft says so |
 |---|---|---|
 | **A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each | **Not run.** F1's envelope is one retraining pair; F2 reaches the same conclusion from 8 within-arm d.f. without it. **The paper's most valuable missing measurement.** | §4.4, §6.2 |
-| **A seed replication of S4's momentum sweep** | **Armed, not yet reported.** One seed per momentum value, against a statistic §4.2 measures as seed-dominated — and the single seed was a defect (hardcoded in the harness), not a design choice. | §5.3, §6.2 |
+| ~~A seed replication of S4's momentum sweep~~ | **REPORTED 2026-08-04, and it does not clear F1's floor.** Three seeds per momentum, 500 steps; every m = 0.999 seed exceeds every m = 0 seed, closing a single-seed defect that was **hardcoded in the harness**, not a design choice. But the worst-case separation is **3.29× against 3.295×**. S4 now carries that, and the draft rests the fix on a binary training outcome (§5.4) rather than on the ratio. | §5.2, §5.4, §6.2 |
+| **A like-for-like retraining floor for the momentum regime** | **Not measured.** F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets. | §3.2, §6.2, §6.3 |
 | Error bars on any dilution rank or channel value | Single seed, single donor draw; the source states there is no error bar on level-to-level differences. | §4.8, §6.2 |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run; "unchanged" means the point estimates differ by 0.002 and nothing more. | §4.9, §6.2 |
@@ -906,7 +916,7 @@ input.
 |---|---|---|
 | D1 paired bootstrap, 40 targets | **F6(b), F6(c)** | **RESOLVED.** `~/e0_run/d1_v2/D1_PAIRED_BOOTSTRAP_STRATIFIED.json` (00:08 UTC) and `D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json` (02:40 UTC); folded into draft §4.7.2 at commit `a11549a`. Draw **both** estimators; weight the cancer-cluster one. |
 | §4.5(a)'s statistic labels | **F5(a)** | **RESOLVED.** Corrected in the draft at `a11549a`; plot from `~/ws_p2/out/P2_RANK_VARIANTS.json`. |
-| **Momentum seed replication** | **S4** | **REPORTED 2026-08-04, and S4 is NOT yet redrawn around it.** Three seeds per momentum at 500 steps (`~/e0_run/d1_diag/mseed_*`): canonical R1 11.26 / 10.45 / 10.55 at m = 0.999 against 3.18 / 1.13 / 2.36 at m = 0, so every m = 0.999 seed exceeds every m = 0 seed on both statistics and the single-seed defect is closed. **But the worst-case separation is 3.29× against F1's 3.295× floor**, so S4 must carry that the fix's *rank* difference is not resolvable by §4.1's own criterion — different arm, duration and block, so indicative rather than a like-for-like disqualification. Numbers in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3. |
+| **Momentum seed replication** | **S4** | **REPORTED 2026-08-04. The draft is now rewritten around it (§5.2, §5.4); S4 itself is still to be redrawn.** Three seeds per momentum at 500 steps (`~/e0_run/d1_diag/mseed_*`): canonical R1 11.26 / 10.45 / 10.55 at m = 0.999 against 3.18 / 1.13 / 2.36 at m = 0, so every m = 0.999 seed exceeds every m = 0 seed on both statistics and the single-seed defect is closed. **But the worst-case separation is 3.29× against F1's 3.295× floor**, so S4 must carry that the fix's *rank* difference is not resolvable by §4.1's own criterion — different arm, duration and block, so indicative rather than a like-for-like disqualification, and all three mismatches point toward a larger floor in this regime. **S4 must also carry what the fix does rest on**, per new draft §5.4: `programme_free` completing 40 epochs uncollapsed **0 of 3** seeds before the fix and **3 of 3** after, with a channel and paired bootstrap intervals where no export existed at all. Numbers in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3. |
 | **Controlled retraining repeat design** | **F1(a), F1(b), F1(d), F4, F6(b)** | **RESOLVED at N = 5, 2026-08-04.** `~/e0_run/d1_envelope/rep{1..5}.npz`, readout `~/e0_run/d1_envelope_readout.log`, vendored and extracted to `v2/research/rebase/p2/figures/data/extracted/F1_RETRAINING_REPEAT.json`. Rank floor **3.295×** residualised / **3.111×** raw against a **1.055×** channel spread. Do **not** draw it as a fitted distribution or a confidence band: it is **bimodal** (four repeats within 2%, one at a third) and it is a **floor**, measured on the stable arm at a fixed seed. F1(a) plots the five values individually for that reason. |
 | **Per-block ground truth for the selection rule** | **T1** | **RESOLVED for the D2 half, 2026-08-04.** `v2/research/rebase/nature/d2_coordinate_system/out/EXAM_PANEL.json` re-scores both D2 arms on six target blocks; `v2/research/rebase/p2/p2_selection_rule_blocks.py` re-runs the rule with each as truth. Every metric row's D2 count moves; the ordering between canonical effective rank and RankMe reverses on two blocks. **Unresolved for the D1 half** — those arms were never scored on any block but the gene sets, so T1's band holds D1 fixed and says so. |
 | Per-step arrays for the collapse tracks | F8(b) | **RESOLVED, split.** The rank track has per-step values and is extracted (`v2/research/rebase/p2/collapse_tracks/diag_d.log`); the collapse-evidence quantities have endpoints only and keep the paired-marker treatment. Statistic corrected to **R3**. |

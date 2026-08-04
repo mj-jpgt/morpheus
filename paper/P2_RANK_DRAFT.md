@@ -39,12 +39,16 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > headline count from six of seven to seven of seven — *in our favour*, reported with the scepticism
 > that requires — and it makes **§4.7's necessity result unresolvable rather than refuted**, which is
 > the reading that was predeclared before the measurement existed.
-> (c) **§5.2's momentum sweep now has its seed replication** (`mseed_*`, three seeds per momentum);
-> every m = 0.999 seed exceeds every m = 0 seed, so §5.3's disjunction resolves in favour of
-> separation. **But the separation is 3.29× against §4.1's 3.30× floor**, so by §4.1's own criterion
-> that fix's *rank* difference is not resolvable either. §5.2 and §5.3 are **not yet rewritten around
-> this** and are flagged here rather than left to read as though the replication were still awaited;
-> the numbers are in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3.
+> (c) **§5.2's momentum sweep now has its seed replication, and §5 has been rewritten around it**
+> (`mseed_*`, three seeds per momentum, 500 steps). Every m = 0.999 seed exceeds every m = 0 seed, so
+> §5.3's predeclared disjunction resolves in favour of **separation**, and the single-seed defect — a
+> **hardcoded harness parameter**, not a design choice — is closed. **But the worst-case separation is
+> 3.29× against §4.1's 3.295× floor**, so by §4.1's own criterion that fix's *rank* difference is **not
+> resolvable either**. **That is now §5.4, a subsection of its own rather than a caveat**, and §5.2 no
+> longer rests the fix on a rank ratio: it rests on a **binary training outcome** — `programme_free`
+> produced no completed, uncollapsed, exportable run before the fix and three of three after it. The
+> numbers are in `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3 and
+> `NOTEBOOK_ENTRIES/p2_section5_rewritten_around_the_momentum_replication_20260804T2000Z.md`.
 >
 > **5. §4.6's ground truth is a coordinate choice, and §4.6a is new.** The D2 arm contrast the
 > selection-rule table scores against exists on gene-set targets and on **none** of the five other
@@ -125,7 +129,12 @@ reported for that reason.
 
 We report what cuts against us at equal prominence. Centred effective rank does fall to ~1 under
 total collapse, so the collapse-diagnostic use is supported; §5 is a worked example of exactly that
-use, in which a training gate and a queue fix are graded in rank. At effective rank 9.1 of a nominal
+use — not a separate contribution — in which a training gate and a queue fix are graded in rank. That
+worked example returns the paper's standard against the paper: the queue fix's own seed-replicated rank
+separation is **3.29×** against the **3.295×** floor of (i), so **it is inside our own floor too**, and
+§5.4 rests that fix on a binary training outcome — an objective that never once completed training
+uncollapsed, and does so on three of three seeds after the fix — rather than on the rank ratio that
+first drew attention to the problem. At effective rank 9.1 of a nominal
 256, two representations still read held-out channels of 0.5983 and 0.4757 against a permutation null
 of 0.140, so "low rank means little information" is false outside total collapse. We evaluated three
 published alternatives on the same artifacts and **none is better**: LiDAR picks the
@@ -954,7 +963,7 @@ rather than of the estimator.
 4. No number is compared across the statistics of §3.1, and no number is compared to a published RankMe
    value (§2.1, §2.6).
 5. Where an instance's own source file corrects, caveats or withdraws it, that text is quoted.
-6. Evidence that cuts against the claim is reported in §4.7, §4.10 and §5.3, at the same prominence as
+6. Evidence that cuts against the claim is reported in §4.7, §4.10 and §5.4, at the same prominence as
    the evidence that supports it.
 
 ---
@@ -1641,7 +1650,9 @@ the ones that failed.
 - **"`programme_free` simply collapsed again, so this is the collapse-diagnostic use, not a test of
   necessity."** *Rejected.* `programme_free` is **not** collapsed this time — canonical ranks 6.4–13.4
   against the ~1.7 of the defective earlier run — and its channel (0.513–0.541) sits clearly above its
-  own `random_control` (0.443–0.474). This is the "both arms train" branch. The queue fix (§5.2) worked.
+  own `random_control` (0.443–0.474). This is the "both arms train" branch. The queue fix (§5.2) worked —
+  and **this row is the evidence that fix actually rests on**, not its rank ratio, which §5.4 reports as
+  inside §4.1's floor like every other rank comparison in this paper.
 - **"The negative control passes, so the readout is clean."** *Only in the narrow sense, and the verdict
   must be recorded with its qualification.* Audit check A3 passes **on arm difference**: the
   `random_control` arm gap is **−0.0224 / −0.0072 / −0.0322** with all three CIs spanning zero, so
@@ -1986,11 +1997,16 @@ should be read as *"we did not falsify the collapse-diagnostic use"*, not as *"w
 ## 5. A worked example: the metric used inside the one regime this paper says it works
 
 The two sections that follow were drafted separately as `paper/LIVENESS_GATE_DESIGN.md` and
-`paper/QUEUE_ANCHORING.md` and are integrated here by the author's decision. They belong in this paper
-for a reason that is not merely convenience: **they are the same metric, on the same stack, used
-throughout as a collapse diagnostic — the one use §4.10 defends — and they are therefore the paper's
-demonstration of what the surviving recommendation looks like in practice.** §5.3 states, without
-softening, the one place where the demonstration strains against §4.1.
+`paper/QUEUE_ANCHORING.md` and are integrated here by the author's decision. **This is a worked example
+of the metric used in the regime the paper says it works, not a separate contribution**, and it is not
+to be split out: it belongs here for a reason that is not merely convenience — **it is the same metric,
+on the same stack, used throughout as a collapse diagnostic, the one use §4.10 defends — and it is
+therefore the paper's demonstration of what the surviving recommendation looks like in practice.**
+
+§5.3 states why the demonstration is not a contradiction. **§5.4 states the one place it fails the
+paper's own test, and does not defend it away**: the seed-replicated momentum separation is 3.29×
+against §4.1's 3.295× floor, so **the rank difference behind our own fix is not resolvable either** —
+and §5.4 sets out what the fix does rest on, which is not a rank ratio.
 
 ### 5.1 What a liveness gate certifies, and four ways we learned it certifies less than we assumed
 
@@ -2101,7 +2117,7 @@ a faithful re-implementation of it. (3) Simplifications made to defeat one patho
 to look for the next. (4) A gate that cannot fail on the training pathology should not be quoted as
 evidence about it.
 
-### 5.2 A queued contrastive objective needs an independent reference frame, not fresher keys — graded in rank
+### 5.2 A queued contrastive objective needs an independent reference frame, not fresher keys — found in rank, established on a binary outcome
 
 **The failing configuration.** A patient-paired cross-modal InfoNCE with a queue of detached negative
 keys, refreshed every step from the **query encoder itself** — the standard "end-to-end with a memory
@@ -2138,6 +2154,32 @@ spanning the full training duration, which matters because two earlier "fixes" o
 correct inside a short window and failed outside it. And `m = 0.9` **fails**, tracking the no-momentum arm
 rather than the working ones, so there is a threshold and it lies between 0.9 and 0.99. **`m = 0.999` is
 used because it measured best in this sweep. No mechanism is claimed.**
+
+**The sweep is one seed per momentum value, and that was a defect rather than a design choice.** The
+momentum harness had its **seed hardcoded**, so the sweep could not have varied seeds had we asked it
+to — the arms above are one seed because the apparatus admitted only one, not because a one-seed sweep
+was judged sufficient. That is recorded for the same reason §5.1's instance 4 is: **a measurement
+apparatus that silently constrains what can be measured produces something that reads as a decision and
+is not one.** A seed-replicated sweep was armed against a disjunction predeclared before it ran (§5.4),
+and it has since reported:
+
+| statistic | m | seed 42 | seed 43 | seed 44 | within-arm spread |
+|---|---|---:|---:|---:|---:|
+| **canonical R1** | **0.999** | **11.26** | **10.45** | **10.55** | **1.08×** |
+| **canonical R1** | **0** | **3.18** | **1.13** | **2.36** | **2.81×** |
+| R3 | 0.999 | 7.40 | 6.85 | 7.15 | 1.08× |
+| R3 | 0 | 2.81 | 1.05 | 2.06 | 2.68× |
+
+*Provenance: `~/e0_run/d1_diag/mseed_m{0,0.999}_s{42,43,44}.log`, produced by
+`v2/research/rebase/d1_momentum_probe.py`, 500 steps, three seeds per momentum. **Block: the fixed
+held-out probe** — canonical R1 and R3 read there, **not** the residualised exported `wsi_biology` block
+§4.1's floor is measured on, which is why §5.4 treats the two as non-substitutable. Reported in
+`NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3.*
+
+**Every m = 0.999 seed exceeds every m = 0 seed, on both statistics.** The separation is therefore not an
+artefact of the one seed the harness allowed, and the single-seed defect is closed. **What that does not
+do is make the rank difference resolvable by this paper's own criterion** — the worst-case separation is
+3.29× against a 3.295× floor — and §5.4 is about that, and about what the fix rests on instead.
 
 **The explanation we expected, and why it is wrong.** The natural account is MoCo's — **He, Fan, Wu, Xie
 & Girshick, "Momentum Contrast for Unsupervised Visual Representation Learning", CVPR 2020,
@@ -2186,7 +2228,7 @@ is exactly the regime where practitioners reason it should be harmless. The turn
 cheap diagnostic: it tells you staleness cannot be your problem, and on the anchoring account that is no
 reassurance at all.
 
-### 5.3 Why §5 is a demonstration and not a contradiction — and the one place it strains
+### 5.3 Why §5 is a demonstration and not a contradiction
 
 Every rank number in §5.1 and §5.2 is used in the regime §4.10 defends: **as a collapse diagnostic, near
 the floor, with independently co-measured evidence of collapse.** The readings that carry decisions are
@@ -2196,60 +2238,149 @@ agrees — patient-to-patient mutual cosine 0.977–1.0000, retrieval at or belo
 (1.98 to 6.92), not near either. Nothing in §5 selects between two healthy configurations on a rank
 difference, which is the practice §4.1 disqualifies.
 
-**Where it strains, stated rather than defended away.** In §5.2 the decision between `m = 0` and
-`m = 0.999` at step 600 rests on **2.81 against 7.42, a 2.64× ratio — which is inside the 3.295×
-retraining floor of §4.1**, and the sweep is **one seed per momentum value**. Taken as an isolated
-two-point rank comparison, §4.1's own rule would disqualify it.
+Two features of §5.2 also distinguish it from the practice §4.1 disqualifies, and they are stated here
+rather than in §5.4 because they are about the *shape* of the evidence and not about whether the ratio
+clears a floor. **It is not a two-point comparison**: the effect is monotone across four values of m and
+flat from step 200 to 600 in both working arms — nine time points × four arms, not one ratio. **And the
+readings sit at the collapse floor, where §4.10 says rank is reliable**, with the failing arms
+independently confirmed collapsed by mutual cosine; §4.1 constrains rank as a selection signal *between
+healthy configurations*, and §5.2's failing arms are not healthy. **Neither of those observations makes
+the ratio resolvable, and §5.4 does not let them be read as though they did.**
 
-**And the seed replication, which has since run, does not lift it clear.** Three seeds per momentum
-(`~/e0_run/d1_diag/mseed_*`, 500 steps) give canonical R1 of 11.26 / 10.45 / 10.55 at m = 0.999 against
-3.18 / 1.13 / 2.36 at m = 0, so **every m = 0.999 seed exceeds every m = 0 seed** and the single-seed
-defect named below is closed. But the worst-case separation is **10.45 / 3.18 = 3.29× against a 3.295×
-floor** — inside it, by §4.1's own criterion. On R3 it is 6.85 / 2.81 = 2.44×, also inside. The
-comparison is indicative rather than decisive in the other direction too: the floor was measured on
-`programme_only` at 40 epochs on an exported artifact, and these are `programme_free` at 500 steps on a
-held-out probe, so the quantities are not substitutable and a like-for-like floor for this regime has
-not been measured. *Provenance:
-`NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3.* **What does not depend
-on rank at all is the reason the fix was adopted**: the unfixed configuration collapses and the fixed one
-does not, visible in retrieval, in the contrastive loss, and in whether `programme_free` trains to 40
-epochs without the tripwire firing.
+### 5.4 The paper's own standard, applied to the paper: our own fix's rank difference is inside our own floor
 
-Three things are why we nonetheless report the fix as real, and a reader is entitled to weigh them:
+**The bad news first, and it is ours.** Every rank comparison behind the §5.2 fix is inside §4.1's
+measured retraining floor. All three quantifications of the momentum effect, with the statistic and
+block on which each was read:
 
-1. **It is not a two-point comparison.** The effect is **monotone across four values of m** and **flat
-   from step 200 to 600** in both working arms — nine time points × four arms, not one ratio. §4.1's rule
-   is about single between-configuration differences; a monotone, durable trend across a swept
-   hyperparameter is a different and stronger object.
-2. **The readings are at the floor, where §4.10 says rank is reliable**, and the collapsed arms are
-   independently confirmed collapsed by mutual cosine. §4.1 constrains rank as a *selection signal
-   between healthy configurations*; §5.2's failing arms are not healthy.
-3. **The controlled repeat measurement exists and is tight**: three repeats at step 200 with identical
-   inputs give 7.15 / 6.92 / 7.25 for m = 0.999 against 1.80 / 1.46 / 1.98 for m = 0 — a **3.5×
-   separation with an empty band**, which is the very check §4.1 asks a practitioner to run, and which
-   this comparison passes at that horizon — where all seven arm comparisons in §4.1 fail it. At the
-   500-step horizon with the seed varied, it does **not** pass: 3.29× against 3.295×.
+| comparison | statistic, block | ratio | judged against | resolvable? |
+|---|---|---:|---|:---:|
+| m = 0.999 vs m = 0, **one seed**, step 600 (§5.2's original table) | R3, fixed held-out probe | **2.64×** (7.42 / 2.81) | 3.295× | **no** |
+| m = 0.999 vs m = 0, **worst case over three seeds**, 500 steps | **canonical R1**, fixed held-out probe | **3.29×** (10.45 / 3.18) | **3.295×** | **no** |
+| the same replication under the tripwire statistic | R3, fixed held-out probe | **2.44×** (6.85 / 2.81) | 3.295× | **no** |
 
-**But point 3 is also the sharpest thing that cuts against §5.2 as published**, and we say so: those
-repeats hold the **seed** fixed, and §4.3 shows the same arm at the same step spans **6.05×** across
-seeds. **No seed replication of the momentum sweep exists.** So the honest status of the momentum choice
-is: monotone and durable at one seed, tight under stack non-determinism at one seed, and **untested
-against seed variation** — which is precisely the nuisance term §4.2 measures as dominant. `m = 0.999` is
-retained because it measured best and because the objective now trains, not because the rank difference
-that selected it clears this paper's own bar.
+*Provenance: `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3; logs
+`~/e0_run/d1_diag/mseed_*`, `~/e0_run/d1_diag/`. The floor is §4.1's, **canonical R1 on the residualised
+exported `wsi_biology` block**: 3.295× residualised, 3.111× raw.*
 
-**And the single-seed limitation was a defect, not a design choice.** The momentum harness had its
-**seed hardcoded**, so the sweep could not have varied seeds even had we asked it to — the arms in the
-table above are one seed because the harness admitted only one, not because a one-seed sweep was judged
-sufficient. That is worth recording for the same reason §5.1's instance 4 is: a measurement apparatus
-that silently constrains what can be measured produces a result that looks like a decision and is not
-one. **A seed-replicated sweep is armed** — `m ∈ {0, 0.999} × 3 seeds`, with the canonical statistic
-reported alongside the participation ratio the tripwire uses, so the two are comparable for the first
-time in this material. **It will close the gap between §4 and §5 either way**: if the m = 0 and m = 0.999
-distributions separate across seeds, §5.2's fix clears §4.1's own bar and the tension disappears; if they
-overlap, the momentum choice is a rank comparison this paper's rule disqualifies, and §5.2 must be
-rewritten to rest on the objective's downstream behaviour rather than on its rank. **We state that
-disjunction now, before the result, so the reading cannot be chosen afterwards.**
+So the seed replication resolved the disjunction predeclared below in favour of **separation** — every m = 0.999 seed
+above every m = 0 seed, on both statistics — and **did not** lift the comparison clear of the floor. By
+§4.1's own criterion, **the momentum fix's rank difference is not resolvable either.** Stated the way we
+would state it about someone else's paper: a 3.29× difference measured with an instrument whose
+same-seed retraining spread is 3.295× is not a difference that instrument can see.
+
+**Three qualifications are real, and none of them rescues it.** The floor was measured on
+`programme_only`, at 40 epochs, on the exported residualised block; the momentum runs are
+`programme_free`, at 500 steps, on a fixed held-out probe. **Different arm, different duration,
+different block**, so the two quantities are not substitutable and this is *indicative* rather than a
+like-for-like disqualification; **no like-for-like floor for this regime has been measured.** But a
+qualification only rescues a number if it points the right way, and these do not. The arm mismatch runs
+against us: §4.3 measures the floor as a property of the arm, and `programme_free` is the *unstable*
+one — 6.05× across five seeds at step 200 against `programme_only`'s 1.18× — so a floor measured in this
+regime would be expected to be **larger**, not smaller. The axis the replication varies is the **seed**,
+which §4.2 measures as the dominant nuisance term for exactly this statistic on exactly this stack. And
+the duration mismatch cuts the same way, since §4.1's floor accumulates over 40 epochs while these arms
+have had 500 steps to diverge. **The honest position is that the comparison is not decisive and that
+everything we know about its direction says a decisive version would be worse for us**, so we do not
+treat the mismatch as a reprieve.
+
+**The one rank measurement on this fix that does clear the floor holds fixed the variable that
+matters, and we report it with that stated.** §4.4(3)'s controlled repeat — three repeats of a 200-step
+probe with identical inputs, live queue — gives 7.15 / 6.92 / 7.25 at m = 0.999 against 1.80 / 1.46 /
+1.98 at m = 0, an empty band from 1.98 to 6.92 and the **3.5×** separation §4.4(3) quotes (6.92 / 1.98;
+R3, fixed held-out probe). That is outside the 3.295× floor, but by about **6%**, a margin no more comfortable than the
+1.5% §4.1 declines to lean on for D1-B seed 43 — and, decisively, **those repeats hold the seed fixed**,
+where §4.2 measures the seed as the dominant term and §4.3 measures it at 6.05× on this very arm. The
+seed-varied replication is the version of that check that matters, and it reads 3.29× against 3.295×.
+**A fixed-seed check that passes and a seed-varied check that fails are not two results to choose
+between; the second is the one the rule in §1.3 asks for.**
+
+**Block-matching is load-bearing here, which is why every rank in this paper is quoted with its
+statistic and its block.** §4.1's own table makes the point: D1-B's arm ratios exist in **raw**
+(2.02× / 3.09× / 1.68×) and **residualised** (2.190× / 3.246× / 1.738×) form, and seed 43's residualised
+3.246× judged against the **raw** floor of 3.111× would read as *outside* the floor when on its own block
+it is inside. A ratio and a floor from different blocks do not compare. The momentum numbers are on a
+third block again — a fixed held-out probe with no floor of its own — and that is a limitation of the
+comparison, not a defence of the fix.
+
+#### The fix was never justified by a rank ratio, and this is what it does rest on
+
+**Rank is how we noticed the problem, not how we established the repair.** What rank did was make an
+invisible failure visible: the objective falls from 67.55 at initialisation to ~2 within 150 steps under
+every setting of both regularisers suspected of causing it, while the memorisation gate — which freezes
+the queue — passes it (§5.1, instance 3). That is the collapse-diagnostic use §4.10 defends, at readings
+of ~2 where §4.10 says the diagnostic is reliable, and it is not a selection between two healthy
+configurations.
+
+**What established the repair is a binary outcome with a channel behind it.** Before the fix,
+`programme_free` had never produced a completed, uncollapsed, exportable run in this project's history:
+
+| | before the fix (D1-A, `~/e0_run/d1_v1/`) | after the fix (D1-B, `~/e0_run/d1_v2/`, `--biology-key-momentum 0.999`) |
+|---|---|---|
+| `programme_free` arms reaching epoch 40 | **1 of 3 seeds**; seeds 43 and 44 were refused by the liveness gate at contrastive **0.50883** and **2.14122** | **3 of 3** |
+| state of the arm that did reach epoch 40 | **collapsed** — R3 **1.71** at epoch 39 on 282 held-out patients against `programme_only`'s **9.81 / 10.47**, RNA-view mutual cosine **0.986**, hard rank 11 | **not collapsed** — canonical R1 **13.418 / 7.600 / 6.394** on the residualised held-out block |
+| exported artifacts, CALIBRA, paired bootstrap | **none.** `run_d1` raises on the first non-zero return code, so no exports, no CALIBRA and no bootstrap were produced at all | all six runs complete and live (`~/e0_run/d1_audit.log`, `[PASS] A1_all_six_runs_complete`), and **three paired bootstraps with CI₉₅ per seed** (§4.7.2) |
+| held-out molecular channel | **not measurable** | **0.5412 / 0.5336 / 0.5126**, clearly above its own `random_control` at **0.4504 / 0.4738 / 0.4425** |
+
+*Provenance: `NOTEBOOK_ENTRIES/d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`
+(D1-A dispositions, epoch-40 geometry probe, gate outcomes);
+`NOTEBOOK_ENTRIES/d1b_blocked_gate_does_not_exercise_the_fix_20260804T0500Z.md` (the momentum flag
+verified in all three runners' argv and in the pair manifest); §3.3, §4.7.2 and §4.7.3 for the D1-B
+values. **The pre-fix ranks are R3 and the post-fix ranks are canonical R1**, so the two columns'
+rank rows are not a ratio and are not quoted as one — they are a collapsed/not-collapsed verdict, each
+with independent co-measured evidence.*
+
+**That is a change of kind, not a change of degree.** It is the difference between an experiment that
+produces no readout and one that produces three, each with an interval; between a representation at
+mutual cosine 0.986 across 282 patients and one carrying a channel above its own negative control.
+**None of it is a ratio, and none of it is inside anyone's noise floor.** §4.7.3 states the same thing
+from the other side, when it rejects the deflation that D1's necessity test merely re-measured the
+collapse: *"`programme_free` is **not** collapsed this time… This is the 'both arms train' branch. The
+queue fix (§5.2) worked."*
+
+**Three limits on that argument, stated because they are the ones a referee will find.**
+
+1. **It is a before/after across two launches, not a controlled contrast.**
+   `~/e0_run/d1_v2/D1_PAIR_MANIFEST.json`'s
+   `"objective_only_difference": true` matches the two *arms within* D1-B (§3.4); no manifest asserts
+   that the momentum encoder is the only difference between D1-A and D1-B. The direction is unambiguous
+   and the outcome is binary, but this is not the same object as a matched ablation.
+2. **What the binary outcome supports is momentum versus none, not `m = 0.999` over `m = 0.99`.** At
+   step 600 those two read 7.42 against 5.88 — a **1.26×** difference, deep inside every floor in this
+   paper, with no seed replication of the intermediate values. **The specific value this project runs was
+   selected by a rank comparison our own rule disqualifies**, and we say so rather than letting the
+   binary outcome launder it. `m = 0.999` is retained because it measured best in a sweep whose
+   resolution we do not trust and because the objective trains under it; that is the whole of the
+   justification for the value.
+3. **The seed replication is 500 steps, not 40 epochs.** Durability of the *replicated* arms past 500
+   steps is unmeasured; the 40-epoch evidence is D1-B's completion, which is the binary outcome and not
+   the rank curve.
+
+#### What this costs the paper, and why it is stated at this length
+
+**§4.1's rule has now disqualified every rank comparison this project has ever made** — the seven
+between-arm differences of §4.1, and the hyperparameter choice of §5.2. We regard that as the rule
+working rather than the rule failing, and the alternative — applying the floor to RankMe's use and
+exempting our own — is precisely the double standard this paper accuses the practice of. **A rank ratio
+inside our own measured floor cannot carry a claim, and we do not permit it to carry ours.**
+
+What it does not cost is §5's purpose. §5 is a worked example of the metric used in the regime §4.10
+defends, and the momentum episode is a *better* example for having failed the test: rank found a
+collapse that a gate could not see, at readings where the collapse diagnostic is reliable, and then
+proved unable to grade the repair it had prompted. **Diagnosis and selection are different uses, and
+this section is the sharpest illustration in the paper that a metric can be good at the first and
+useless at the second on the same objective, in the same week, on the same stack.**
+
+**The disjunction we predeclared, and the way it under-specified its own outcome.** Before the
+replication ran, this section committed to a reading of each branch: *if the m = 0 and m = 0.999
+distributions separate across seeds, §5.2's fix clears §4.1's own bar and the tension disappears; if
+they overlap, the momentum choice is a rank comparison this paper's rule disqualifies, and §5.2 must be
+rewritten to rest on the objective's downstream behaviour rather than on its rank.* **The distributions
+separated and the ratio still did not clear the bar.** The disjunction conflated two different
+questions — whether the arms separate, and whether the separation exceeds the floor — and it was written
+before the floor's value was known. We record it as under-specified rather than claim it resolved
+cleanly, and we have taken the branch it assigned to overlap: **§5.2 now rests on the objective's
+downstream behaviour, and the rank curve is reported as the diagnostic that found the problem.**
 
 **Two further honest limits carried from the source drafts.** Instance 3's *cause* is established only as
 far as "the key set, not the objective's weighting"; the mechanism is open, MoCo's staleness account was
@@ -2287,7 +2418,7 @@ should be withdrawn to a replication.
 | would-be measurement | why it is absent |
 |---|---|
 | ~~A controlled repeat design for §4.1~~ | **CLOSED, at N = 5.** Five identical `programme_only` retrains at seed 42 give a **3.295×** rank floor against a **1.055×** channel spread, bimodally distributed. It replaced an n = 1 estimate of 2.69×. What it still cannot do is attribute retraining variance to the metric rather than to this stack, because there is only one stack; and it is measured on the *stable* arm at a fixed seed, so it is a floor rather than an envelope. §4.2 remains the contribution that does not depend on it. |
-| ~~A seed replication of §5.2's momentum sweep~~ | **CLOSED, and it does not clear §4.1's bar.** Three seeds per momentum at 500 steps: every m = 0.999 seed exceeds every m = 0 seed (canonical R1 11.26 / 10.45 / 10.55 against 3.18 / 1.13 / 2.36), so the single-seed defect is closed and §5.3's disjunction resolves in favour of separation. But the worst-case ratio is **3.29× against §4.1's 3.295× floor**, so the fix's *rank* difference is not resolvable by this paper's own criterion. Different arm, duration and block, so indicative rather than a like-for-like disqualification. **§5.2 and §5.3 are not yet rewritten around this.** |
+| ~~A seed replication of §5.2's momentum sweep~~ | **CLOSED, and it does not clear §4.1's bar.** Three seeds per momentum at 500 steps: every m = 0.999 seed exceeds every m = 0 seed (canonical R1 11.26 / 10.45 / 10.55 against 3.18 / 1.13 / 2.36), so the single-seed defect is closed and §5.3's disjunction resolves in favour of separation. But the worst-case ratio is **3.29× against §4.1's 3.295× floor**, so the fix's *rank* difference is not resolvable by this paper's own criterion. Different arm, duration and block, so indicative rather than a like-for-like disqualification — and all three mismatches point toward a larger floor in this regime, not a smaller one. **§5 has been rewritten around it: §5.4 states the failure against our own criterion in its own subsection and rests the fix on a binary training outcome (`programme_free` completing uncollapsed 0 of 3 seeds before, 3 of 3 after, with intervals) rather than on the rank ratio.** What is still missing is a like-for-like floor for the `programme_free` / 500-step / held-out-probe regime. |
 | **A per-block ground truth for the D1 arms** | **Not run.** §4.6a re-scores the *D2* arms on six target blocks and finds the selection verdict unstable on all twelve metric rows. The D1 arms were never scored on any block but the gene sets, so §4.6a's D1 column is held fixed in every row and is **not** evidence that the D1 half is block-stable. |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
 | ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
@@ -2403,8 +2534,15 @@ between-configuration difference to exceed it.**
 
 We report at equal prominence the evidence that constrains this. Centred effective rank does fall to ~1
 under total collapse, so the collapse-diagnostic use survives — and §5 is that use, at length, on a
-training gate and a queue fix that this project actually made and that this paper grades in rank, with the
-one place the demonstration strains against §4.1 stated rather than defended away. A representation at
+training gate and a queue fix that this project actually made and that this paper grades in rank. **The
+worked example ends by failing the paper's own test.** The queue fix's seed-replicated rank separation is
+**3.29×** against the **3.295×** floor above, so our own hyperparameter decision is a rank comparison our
+own rule disqualifies; §5.4 says so in its own subsection and rests that fix where it always actually
+rested — on a binary training outcome, an objective that had never once completed training uncollapsed
+and that does so on three of three seeds after the repair, with a measured channel and paired bootstrap
+intervals where there had previously been no readout at all. Rank was how we noticed the failure; it was
+never how we established the repair, and a ratio inside our own floor is not permitted to carry our claim
+any more than it is permitted to carry anyone else's. A representation at
 3.6% of its nominal dimensionality still carried a large, permutation-significant channel, so "low rank
 means little information" is false outside total collapse. The instance this project once called its most
 dramatic turns out to be a *hard* matrix rank at a structural ceiling, and that description is withdrawn
@@ -2472,6 +2610,8 @@ to run the thing twice.
 | 4.9, 4.10 | counter-measurement 12.88 → 1.00; collapse-regime values | `g26_rank_collapse_diagnosis_20260803T0500Z.md`; `d1b_premise_fails_all_five_arms_collapse_20260803T2030Z.md`; `d1_programme_free_collapsing_in_training_20260803T1930Z.md`; `d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md` | `~/e0_run/d1_diag/`, `~/e0_run/d1_v1/` |
 | 5.1 | four gate instances; gate non-reproducibility over 8 runs | `g26_variance_floor_fix`, `g26_stepbudget_sweep`, `g26_passes`, `d1b_premise_fails_all_five_arms_collapse`, `d1_relaunch`, `d1a_control_complete_and_gate_fails_2of3_in_runner`, `g26_is_not_reproducible_20260804T0700Z.md` | `~/e0_run/d1_diag/gatevar_{1..8}.log` |
 | 5.2 | momentum sweep, staleness falsification, turnover | `queue_size_implicates_the_key_set_20260803T2200Z.md`; `momentum_rescues_rank_but_staleness_is_not_the_mechanism_20260803T2330Z.md`; `turnover_criterion_FALSIFIED_20260804T0330Z.md` | `~/e0_run/d1_diag/` |
+| 5.2, 5.4 | **momentum seed replication**, three seeds per momentum, 500 steps, canonical R1 and R3 on the fixed held-out probe | `NOTEBOOK_ENTRIES/retraining_envelope_and_momentum_seeds_20260804T1000Z.md` §3; `v2/research/rebase/d1_momentum_probe.py` | `~/e0_run/d1_diag/mseed_m{0,0.999}_s{42,43,44}.log` |
+| 5.4 | the binary outcome the fix rests on: D1-A dispositions and epoch-40 collapse; D1-B completion, ranks, channel and intervals | `NOTEBOOK_ENTRIES/d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`; `d1b_blocked_gate_does_not_exercise_the_fix_20260804T0500Z.md`; §3.3, §4.7.2, §4.7.3 | `~/e0_run/d1_v1/`, `~/e0_run/d1_v2/`, `~/e0_run/d1_audit.log` |
 
 ## Appendix B — code index
 
@@ -2548,13 +2688,21 @@ Reproduced verbatim so that any future quotation can carry it.
 - **D1-A's 9.81 / 1.71 (§4.9).** **Statistic R3**, `[NOT RECOMPUTED]` under R1. *"Nothing about programme
   supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
   defect, not an ablation."*
-- **§5's momentum sweep.** **One seed per momentum value** — because the harness had its seed
-  **hardcoded**, a defect rather than a judgement — centred R3, durability established only to step 600
-  against a 583-step training duration. Its m = 0 against m = 0.999 ratio (2.64×) is **inside** §4.1's
-  3.295× disqualifying floor; §5.3 states why it is nonetheless reported. **The seed replication has
-  since run** and separates the two momenta 3/3 on both statistics, closing the single-seed defect — but
-  at a worst-case 3.29× against that same 3.295× floor, so the *rank* difference remains unresolvable by
-  this paper's own criterion, and the fix's justification does not rest on it. The anchoring account is **not confirmed** and should
-  not be cited as established; the turnover sharpening was predeclared, tested and **refuted**.
+- **§5's momentum sweep (§5.2, §5.4).** The original sweep is **one seed per momentum value** — because
+  the harness had its seed **hardcoded**, a defect rather than a judgement — centred R3, durability
+  established only to step 600 against a 583-step training duration; its m = 0 against m = 0.999 ratio
+  (2.64×) is **inside** §4.1's 3.295× disqualifying floor. **The seed replication has since run** (three
+  seeds per momentum, 500 steps, canonical R1 and R3 on a **fixed held-out probe**, not §4.1's
+  residualised exported block) and separates the two momenta 3/3 on both statistics, closing the
+  single-seed defect — **but at a worst-case 3.29× against that same 3.295× floor**, so the *rank*
+  difference is **not resolvable by this paper's own criterion**. Different arm, duration and block, so
+  indicative rather than a like-for-like disqualification; all three mismatches point toward a larger
+  floor in this regime, and no like-for-like floor has been measured. **The fix's justification does not
+  rest on any rank ratio and must never be quoted as though it did**: it rests on the binary outcome of
+  §5.4 — `programme_free` completing 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after,
+  with a channel and paired bootstrap intervals where there had been no exported readout at all. **The
+  choice of `m = 0.999` over `m = 0.99` (1.26×) is not supported by anything**; only momentum against
+  none is. The anchoring account is **not confirmed** and should not be cited as established; the
+  turnover sharpening was predeclared, tested and **refuted**.
 - **All rank numbers.** RankMe's ε sits outside the division, so its statistic is not the exponential of a
   Shannon entropy and **no number in this paper is comparable to a published RankMe value**.
