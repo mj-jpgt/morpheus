@@ -79,21 +79,16 @@ IGNORE_EXACT = {
 #: Output files that are written on the GPU box and are cited by bare name because the surrounding
 #: prose already gives their directory. Each must say where it lives.
 BOX_OUTPUT_BASENAMES = {
+    # Entries are removed from here as soon as the file is vendored, so that its
+    # citations start being checked instead of excused. The ten P2 readouts that
+    # used to sit here are now under v2/research/rebase/p2/figures/data/, pulled by
+    # that directory's extract_from_box.py and pinned by its MANIFEST.json;
+    # test_no_box_output_basename_is_actually_in_the_repository is what caught them.
     "D1_PAIRED_BOOTSTRAP.json": "~/e0_run/d1_v2/",
-    "D1_PAIRED_BOOTSTRAP_STRATIFIED.json": "~/e0_run/d1_v2/",
-    "D1_PAIRED_BOOTSTRAP_RANDOM_CONTROL.json": "~/e0_run/d1_v2/",
-    "D1_PAIR_MANIFEST.json": "~/e0_run/d1_v2/",
     "D1_READOUT_INDEX.json": "~/e0_run/d1_v2/",
     "D1_AUDIT.json": "~/e0_run/d1_v2/",
     "D2_PAIR_MANIFEST.json": "~/e0_run/d2_v3/",
-    "D2_PER_ARTIFACT_READOUT.json": "~/e0_run/d2_v3/",
-    "P2_METRICS_D1.json": "~/e0_run/ or ~/ws_p2/out/",
-    "P2_METRICS_D2.json": "~/e0_run/ or ~/ws_p2/out/",
     "P2_METRICS_ALL_SUBSAMPLED.json": "~/e0_run/ or ~/ws_p2/out/",
-    "P2_ROBUSTNESS.json": "~/e0_run/ or ~/ws_p2/out/",
-    "P2_RANK_VARIANTS.json": "~/ws_p2/out/",
-    "RANK_RECOMPUTE.json": "~/ws_rank/",
-    "RANK_RECOMPUTE_P1B.json": "~/ws_rank/",
     "d1_audit.log": "~/e0_run/",
     "d2_readout.py": "on the box; not vendored - see P2 6.2",
     "collapse_diag.py": "scratchpad/ on the A100; not vendored",
