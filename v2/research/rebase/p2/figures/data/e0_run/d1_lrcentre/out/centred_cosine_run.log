@@ -1,0 +1,31 @@
+  m=0      rep1  step200  wsi R1=  1.212 R3= 1.093  rna R1=  1.401 R3= 1.215  cos= 0.7144 centred=-0.0017
+  m=0      rep2  step200  wsi R1=  1.081 R3= 1.028  rna R1=  1.344 R3= 1.155  cos= 0.9640 centred= 0.2264
+  m=0      rep3  step200  wsi R1=  1.261 R3= 1.110  rna R1=  1.320 R3= 1.153  cos= 0.8723 centred= 0.0037
+  m=0.9    rep1  step200  wsi R1=  1.301 R3= 1.129  rna R1=  1.417 R3= 1.203  cos= 0.9270 centred= 0.0370
+  m=0.9    rep2  step200  wsi R1=  1.093 R3= 1.032  rna R1=  1.226 R3= 1.086  cos= 0.9789 centred= 0.6362
+  m=0.9    rep3  step200  wsi R1=  1.187 R3= 1.072  rna R1=  1.308 R3= 1.127  cos= 0.9863 centred= 0.0060
+  m=0.999  rep1  step200  wsi R1=  1.199 R3= 1.086  rna R1=  1.022 R3= 1.005  cos= 0.9292 centred= 0.0081
+  m=0.999  rep2  step200  wsi R1=  1.052 R3= 1.016  rna R1=  1.243 R3= 1.091  cos= 0.7561 centred=-0.0037
+  m=0.999  rep3  step200  wsi R1=  1.556 R3= 1.290  rna R1=  1.713 R3= 1.405  cos= 0.8872 centred= 0.0285
+
+state/log guard: 45 rows, largest |recomputed − printed| = 4.97e-05  (tolerance 1e-04)
+
+per repeat, never a mean — step 200, fixed held-out probe, lr = 1e-3, seed 42
+     arm   rep |   wsi R1   wsi R3 |   rna R1   rna R3 |      cos  cos(ctr)   offset
+      m0  rep1 |    1.212    1.093 |    1.401    1.215 |   0.7144   -0.0017    1.586
+      m0  rep2 |    1.081    1.028 |    1.344    1.155 |   0.9640    0.2264    5.184
+      m0  rep3 |    1.261    1.110 |    1.320    1.153 |   0.8723    0.0037    2.620
+     m09  rep1 |    1.301    1.129 |    1.417    1.203 |   0.9270    0.0370    3.572
+     m09  rep2 |    1.093    1.032 |    1.226    1.086 |   0.9789    0.6362    6.832
+     m09  rep3 |    1.187    1.072 |    1.308    1.127 |   0.9863    0.0060    8.504
+   m0999  rep1 |    1.199    1.086 |    1.022    1.005 |   0.9292    0.0081    3.630
+   m0999  rep2 |    1.052    1.016 |    1.243    1.091 |   0.7561   -0.0037    1.765
+   m0999  rep3 |    1.556    1.290 |    1.713    1.405 |   0.8872    0.0285    2.811
+
+across-arm spread per repeat, and the within-arm floor — step 200
+     mutual_cosine_uncentred  across rep1:0.2148  rep2:0.2229  rep3:0.1140   |  within m0:0.2495  m09:0.0593  m0999:0.1731
+       mutual_cosine_centred  across rep1:0.0388  rep2:0.6398  rep3:0.0249   |  within m0:0.2281  m09:0.6302  m0999:0.0322
+           mean_offset_ratio  across rep1:2.0444  rep2:5.0670  rep3:5.8842   |  within m0:3.5975  m09:4.9317  m0999:1.8653
+
+verdict: neither — report the magnitudes and do not adjudicate (predeclared third branch)
+wrote /home/ubuntu/e0_run/d1_lrcentre/out/P2_CENTRED_COSINE.json

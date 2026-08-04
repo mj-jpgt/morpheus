@@ -1,0 +1,11 @@
+decorrelation=0.04  consistency=1.0  capacity=64  steps=300  probe patients=256
+  step  eff-rank  feat-std  rna-rna  contrastive    decorr
+     0     67.55    0.0342   0.3650          nan       nan
+    50      9.49    0.0071   0.6979       5.1843     19.14
+   100      6.12    0.0047   0.9429       5.2324      7.48
+   150      6.17    0.0061   0.9257       3.9004      5.65
+   200      6.41    0.0051   0.9237       5.3316      4.21
+   250      6.90    0.0034   0.9705       5.3109      2.89
+   300      6.39    0.0052   0.9403       3.8568      3.04
+
+DONE decorrelation=0.04 final_eff_rank=6.39 rna_rna=0.9403
