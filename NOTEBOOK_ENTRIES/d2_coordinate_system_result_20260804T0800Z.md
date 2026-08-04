@@ -87,7 +87,35 @@ finding, but it is a claim of **no disadvantage for Hallmark supervision**, not 
 advantage for it. P3's headline hypothesis — that interventional coordinates are a *better*
 supervision target — remains unsupported; the *magnitude* of its refutation does not.
 
-#### 1a. The two exams really are different spaces, so the shift is not a relabelling
+#### 1a. The −0.12 is unique to gene-set targets — it is absent on every other block on disk
+
+Two readings of the tie were still open after Test 1: either arm I's training bought it exactly
+enough to draw on its own coordinates (specific), or the arms tie on *any* expression-derived
+128-column block and the gene-set exam is the outlier (generic). Four such blocks already exist on
+disk and neither arm trained on three of them. Same `d2_compare` machinery, point estimates only
+(`EXAM_PANEL.json`), residualised block, top-CCA at 16, Δ = arm I − arm H:
+
+| exam block | seed 42 | seed 43 | seed 44 | mean |
+|---|---:|---:|---:|---:|
+| gene sets, untrained 40 | −0.1325 | −0.1089 | −0.1226 | **−0.1213** |
+| **PBS codes 128 (arm I's own supervision)** | −0.0098 | +0.0088 | −0.0026 | **−0.0012** |
+| PCA basis 128 | −0.0201 | +0.0049 | −0.0284 | −0.0145 |
+| gene-label-shuffled PBS 128 (s1) | −0.0359 | −0.0057 | −0.0175 | −0.0197 |
+| `random_control` gene sets (90) | −0.0099 | −0.0280 | −0.0268 | −0.0216 |
+| size/spectrum-matched random dictionary 128 | −0.0597 | −0.0132 | −0.0454 | −0.0394 |
+
+**The −0.12 appears on exactly one block: the gene sets.** On all four 128-column
+expression-derived blocks the arm gap is −0.001 to −0.04 — at or inside the −0.0216 mean of the
+published `random_control` negative control. The published effect is 3–100× larger than the gap on
+any other molecular target space that exists here.
+
+This also settles the specificity question, and modestly in arm I's favour: arm I does best,
+relative to arm H, on precisely the block it was trained on (−0.0012), and progressively worse on
+blocks further from its supervision (PCA −0.0145, shuffled-PBS −0.0197, random dictionary −0.0394).
+Its training did buy it something, on the order of 0.01–0.04, in its own neighbourhood. Arm H is
+still never behind by more than noise anywhere.
+
+#### 1b. The two exams really are different spaces, so the shift is not a relabelling
 
 A +0.12 shift from swapping target blocks would be inexplicable if the blocks were near-identical.
 They are not. Canonical correlations between the 40 gene-set targets and the 128 PBS codes on the
@@ -105,7 +133,7 @@ is already 0.521 and the mean over 16 is 0.35. The exams overlap in part and dif
 is exactly the configuration in which "which basis is the exam written in" is a live confound rather
 than a pedantic one.
 
-#### 1b. The raw block, which has never been reported, is weaker still
+#### 1c. The raw block, which has never been reported, is weaker still
 
 The task brief flagged that raw-vs-residualised flips arm orderings. It does. **Unresidualised**
 (no cancer/TSS removal), same statistic, same partition:

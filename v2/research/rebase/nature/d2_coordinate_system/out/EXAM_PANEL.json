@@ -1,0 +1,164 @@
+[
+  {
+    "exam": "geneset_untrained40",
+    "seed": 42,
+    "block": "residualised",
+    "n_targets": 40,
+    "point_hallmark": 0.6125515560670496,
+    "point_pbs": 0.48002586050724316,
+    "pbs_minus_hallmark": -0.13252569555980642
+  },
+  {
+    "exam": "geneset_untrained40",
+    "seed": 43,
+    "block": "residualised",
+    "n_targets": 40,
+    "point_hallmark": 0.5970180659703433,
+    "point_pbs": 0.4881500813903556,
+    "pbs_minus_hallmark": -0.10886798457998775
+  },
+  {
+    "exam": "geneset_untrained40",
+    "seed": 44,
+    "block": "residualised",
+    "n_targets": 40,
+    "point_hallmark": 0.5982672623910414,
+    "point_pbs": 0.47565492310362245,
+    "pbs_minus_hallmark": -0.12261233928741899
+  },
+  {
+    "exam": "pbs_codes128_ARM_I_OWN",
+    "seed": 42,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5559870774245025,
+    "point_pbs": 0.5462210613015891,
+    "pbs_minus_hallmark": -0.00976601612291339
+  },
+  {
+    "exam": "pbs_codes128_ARM_I_OWN",
+    "seed": 43,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5202484960851279,
+    "point_pbs": 0.5290678363978312,
+    "pbs_minus_hallmark": 0.008819340312703261
+  },
+  {
+    "exam": "pbs_codes128_ARM_I_OWN",
+    "seed": 44,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.53345011996862,
+    "point_pbs": 0.5308798951623444,
+    "pbs_minus_hallmark": -0.002570224806275667
+  },
+  {
+    "exam": "pbs_shuffled_s1",
+    "seed": 42,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5427192482920302,
+    "point_pbs": 0.5068471930759294,
+    "pbs_minus_hallmark": -0.03587205521610082
+  },
+  {
+    "exam": "pbs_shuffled_s1",
+    "seed": 43,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5215141149605115,
+    "point_pbs": 0.5158377300243597,
+    "pbs_minus_hallmark": -0.005676384936151746
+  },
+  {
+    "exam": "pbs_shuffled_s1",
+    "seed": 44,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5113291928782087,
+    "point_pbs": 0.49380897090715825,
+    "pbs_minus_hallmark": -0.01752022197105041
+  },
+  {
+    "exam": "pca_basis128",
+    "seed": 42,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.592660895061136,
+    "point_pbs": 0.5725411098335726,
+    "pbs_minus_hallmark": -0.020119785227563303
+  },
+  {
+    "exam": "pca_basis128",
+    "seed": 43,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5547075379206712,
+    "point_pbs": 0.5596464408182797,
+    "pbs_minus_hallmark": 0.004938902897608566
+  },
+  {
+    "exam": "pca_basis128",
+    "seed": 44,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5760513601749712,
+    "point_pbs": 0.5476631431546021,
+    "pbs_minus_hallmark": -0.02838821702036909
+  },
+  {
+    "exam": "random_dictionary128",
+    "seed": 42,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5322259354064556,
+    "point_pbs": 0.4724780217492368,
+    "pbs_minus_hallmark": -0.059747913657218765
+  },
+  {
+    "exam": "random_dictionary128",
+    "seed": 43,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.5019192191842018,
+    "point_pbs": 0.48872943580582506,
+    "pbs_minus_hallmark": -0.01318978337837673
+  },
+  {
+    "exam": "random_dictionary128",
+    "seed": 44,
+    "block": "residualised",
+    "n_targets": 128,
+    "point_hallmark": 0.507574596298857,
+    "point_pbs": 0.46221569931891476,
+    "pbs_minus_hallmark": -0.045358896979942276
+  },
+  {
+    "exam": "geneset_random_control",
+    "seed": 42,
+    "block": "residualised",
+    "n_targets": 90,
+    "point_hallmark": 0.46711633522740953,
+    "point_pbs": 0.4571973005793994,
+    "pbs_minus_hallmark": -0.009919034648010139
+  },
+  {
+    "exam": "geneset_random_control",
+    "seed": 43,
+    "block": "residualised",
+    "n_targets": 90,
+    "point_hallmark": 0.4680722539658722,
+    "point_pbs": 0.44002737765208383,
+    "pbs_minus_hallmark": -0.02804487631378838
+  },
+  {
+    "exam": "geneset_random_control",
+    "seed": 44,
+    "block": "residualised",
+    "n_targets": 90,
+    "point_hallmark": 0.46367282994532183,
+    "point_pbs": 0.4368731610990706,
+    "pbs_minus_hallmark": -0.026799668846251234
+  }
+]
