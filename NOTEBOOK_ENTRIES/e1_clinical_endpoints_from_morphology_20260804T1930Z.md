@@ -184,6 +184,38 @@ interval covers chance. Per cancer it scatters 0.393–0.721 with six of fourtee
 what noise looks like. Note the raw pooled 0.6223 vs within-cancer 0.5571: the same lineage inflation
 again. **Anatomic stage is not legible in the morphology of the primary, in this representation.**
 
+### 3d. Exploratory driver genes — twelve, no band, adjusted, graded against measured chance only
+
+| gene | n+ | within-cancer (adj) | CI95 | pooled | measured chance | cancers | verdict |
+|---|---:|---:|---|---:|---:|---:|---|
+| ATM | 165 | 0.6135 | [0.5563, 0.6659] | 0.6125 | 0.5468 | 10 | above chance |
+| KMT2D | 317 | 0.5997 | [0.5516, 0.6380] | 0.5913 | 0.5334 | 13 | above chance |
+| ARID1A | 243 | 0.5981 | [0.5485, 0.6480] | 0.5854 | 0.5412 | 9 | above chance |
+| SMAD4 | 113 | 0.6544 | [0.5492, 0.6967] | 0.5943 | 0.5708 | 7 | covers chance |
+| NRAS | 127 | 0.6171 | [0.4694, 0.6841] | 0.5292 | 0.5854 | 4 | covers chance |
+| FBXW7 | 140 | 0.6030 | [0.5349, 0.6665] | 0.5952 | 0.5483 | 7 | covers chance |
+| RB1 | 138 | 0.5916 | [0.5427, 0.6476] | 0.6186 | 0.5534 | 6 | covers chance |
+| BRCA2 | 130 | 0.5800 | [0.5143, 0.6555] | 0.5802 | 0.5518 | 6 | covers chance |
+| NF1 | 143 | 0.5701 | [0.5022, 0.6308] | 0.5758 | 0.5530 | 7 | covers chance |
+| CTNNB1 | 145 | 0.5679 | [0.5074, 0.6514] | 0.5957 | 0.5619 | 6 | covers chance |
+| PTEN | 116 | 0.5396 | [0.4822, 0.6181] | 0.5543 | 0.5547 | 10 | covers chance |
+| CDKN2A | 112 | 0.4768 | [0.4130, 0.5517] | 0.4614 | 0.5682 | 6 | covers chance |
+
+**Nine of twelve cover measured chance.** Three (ATM, KMT2D, ARID1A) clear it. They are **not
+promoted** — the pre-registration forbids moving an endpoint from exploratory to confirmatory after
+the fact, they have no band, and with fourteen exploratory endpoints tested and no multiplicity
+correction, three clearing at this margin is close to what one should expect anyway.
+
+One observation offered as a **hypothesis, not a claim**: the four genes that clear chance across many
+cancers — TP53, ATM, KMT2D, ARID1A — are all large genes whose mutation correlates with tumour
+mutational burden, and TMB plausibly tracks nuclear atypia, which is visible. The same explanation
+would cover why *grade* is the strongest readout in the entry. If that is what is happening, this
+representation carries **one** morphological axis of roughly grade/atypia strength, and every
+"mutation prediction" above is that axis re-expressed — not gene-specific information. Testing that
+would mean checking whether the probes for TP53, ATM, KMT2D, ARID1A and grade are mutually
+predictable and collapse onto a single direction. **Not tested here; recorded as the obvious next
+experiment.**
+
 ---
 
 ## 4. What this means
@@ -214,9 +246,13 @@ again. **Anatomic stage is not legible in the morphology of the primary, in this
 * **TP53's marginal pass depends on the overlap rule.** Under a stricter rule (point estimate inside
   the band) it would fail. The rule was fixed in advance and I am reporting against it, with the
   marginality stated rather than buried.
-* **Multiplicity.** Six banded endpoints plus fourteen exploratory ones. ARID1A (§3d) clears chance
-  in the exploratory set and is *not* promoted; per the pre-registration, no endpoint moves from
-  exploratory to confirmatory after the fact.
+* **Multiplicity.** Six banded endpoints plus fourteen exploratory ones. Grade, ATM, KMT2D and ARID1A
+  clear chance in the exploratory set and are *not* promoted; per the pre-registration, no endpoint
+  moves from exploratory to confirmatory after the fact. Four of fourteen clearing, uncorrected, is
+  close to what chance would give at this margin.
+* **The endpoints that clear may all be one axis.** See §3d: TP53, ATM, KMT2D, ARID1A and grade could
+  plausibly be a single atypia/TMB-like direction rather than five readouts. If so, the honest count
+  of distinct capabilities here is **one**, not five. Untested.
 * **dMMR is uninformative, not negative.** 147 patients in one cancer, 42 positive, measured chance
   0.596. It had no power to detect the published 0.74. This was declared underpowered in advance.
 
