@@ -262,8 +262,16 @@ def main() -> None:
         print(f"[score] {label}: {grouped.shape[0]} ids x {len(scored.target_names)} targets, "
               f"dropped_for_coverage={scored.dropped_for_coverage}", flush=True)
 
+    # Gate G1 as predeclared: a target that does not reproduce the frozen block is dropped
+    # from BOTH cohorts. The 15 curated mechanism programmes fail because their gene lists
+    # are not recoverable from any artifact on disk, so keeping them would mean scoring
+    # ALCHEMIST on a signature that is not the one TCGA was scored on.
+    g1_passed = set(report["passed"])
+    shared_names = set(results["tcga_nsclc"]["names"]) & set(results["alchemist"]["names"])
     common = [name for name in results["tcga_nsclc"]["names"]
-              if name in set(results["alchemist"]["names"])]
+              if name in shared_names and name in g1_passed]
+    print(f"[gate] G1 passed {len(g1_passed)}; present in both cohorts after the "
+          f"coverage cut: {len(common)}", flush=True)
     for label in results:
         keep = [results[label]["names"].index(name) for name in common]
         ids = results[label]["ids"]
@@ -287,7 +295,37 @@ def main() -> None:
                 "gmt": args.gmt,
                 "value_column": "tpm_unstranded" if label == "alchemist" else "EBPlusPlus_RSEM",
             }, sort_keys=True)))
-    print(f"[done] {len(common)} shared targets written to {output}", flush=True)
+    # Sensitivity: G1 only, coverage cut removed. Intersecting the two gene universes
+    # shrinks per-signature coverage, so the 0.95 rule removes 15 targets that pass G1
+    # outright. Emitting both means the headline cannot depend on that particular cut.
+    relaxed = {}
+    for label, matrix, id_of in (("tcga_nsclc", tcga_shared, lambda c: sample_patient[c]),
+                                 ("alchemist", alch_shared, lambda c: c)):
+        scored = score_signatures(matrix, signatures, minimum_coverage=0.0)
+        frame = pd.DataFrame(scored.scores, columns=scored.target_names)
+        frame["id"] = [id_of(column) for column in matrix.columns]
+        grouped = frame.groupby("id", sort=True).mean()
+        relaxed[label] = (np.asarray(grouped.index, dtype=str), scored.target_names,
+                          grouped.to_numpy(dtype=np.float64))
+    relaxed_common = [n for n in relaxed["tcga_nsclc"][1]
+                      if n in set(relaxed["alchemist"][1]) and n in g1_passed]
+    for label in relaxed:
+        ids, names_r, values = relaxed[label]
+        keep = [names_r.index(n) for n in relaxed_common]
+        np.savez_compressed(
+            output / f"{label}_targets_nocoveragecut.npz",
+            patient_ids=np.asarray([patient_of[label](i) or i for i in ids], dtype=str),
+            case_ids=np.asarray(ids, dtype=str),
+            cancers=np.asarray([cancer_of[label](i) for i in ids], dtype=str),
+            target_names=np.asarray(relaxed_common),
+            target_groups=np.asarray([dict(zip(frozen_names, frozen_groups))[n]
+                                      for n in relaxed_common]),
+            scores=values[:, keep].astype(np.float32),
+            metadata_json=np.asarray(json.dumps({
+                "cohort": label, "variant": "G1 only, no coverage cut",
+                "shared_universe_size": len(shared)}, sort_keys=True)))
+    print(f"[done] {len(common)} targets (G1 + coverage) and {len(relaxed_common)} "
+          f"(G1 only) written to {output}", flush=True)
 
 
 if __name__ == "__main__":
