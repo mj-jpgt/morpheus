@@ -396,9 +396,12 @@ disagrees with the information ordering most often — 3 of 6 pairs against 1 of
 The practitioner-facing form, which is the sentence we would want quoted:
 
 > *Before using a rank difference to select between configurations, retrain one configuration with the
-> same seed several times and measure the rank spread. If the between-configuration difference does not
+> same seed several times and measure the rank spread **on the view and with the statistic you intend
+> to compare with**. If the between-configuration difference does not
 > exceed it, the comparison is uninformative.* On this stack that check would have disqualified **all
-> seven** rank comparisons this project ever made. It says *several* repeats because the spread we
+> seven** rank comparisons this project ever made on the view they were read from — and licensed all
+> twelve of the same comparisons on the two views nobody reports (§4.1b), which is why the view is in
+> the rule and not in a footnote. It says *several* repeats because the spread we
 > measured is bimodal: any pair drawn from our four concordant repeats spans at most 1.028×, so a
 > single retraining pair can return a floor that licenses everything.
 
@@ -1106,7 +1109,7 @@ rather than of the estimator.
 
 ## 4. Results
 
-### 4.1 All seven between-arm rank differences ever measured are inside the statistic's own retraining floor — and the floor is bimodal
+### 4.1 All seven between-arm rank differences ever measured are inside the statistic's own retraining floor on the view they are read from — and the floor is bimodal
 
 This is the paper's headline. It is a statement about **usefulness**, and it is measured inside the
 same-method regime RankMe reserves for itself.
@@ -1211,8 +1214,11 @@ seed 42) is comfortably inside the floor, which is an independent reason why tha
 ordering carries no weight.
 
 **Stated as a rule a practitioner can apply:** *before using a rank difference to select between
-configurations, retrain one configuration with the same seed several times and measure the rank spread;
-if the between-configuration difference does not exceed it, the comparison is uninformative.* We have
+configurations, retrain one configuration with the same seed several times and measure the rank spread
+**on the view and with the statistic you are actually going to compare with**;
+if the between-configuration difference does not exceed it, the comparison is uninformative.*
+§4.1b is why the rule names the view and the statistic: the same five retrains below give a floor of
+3.295× here, 1.019× on `rna_biology`, and 1.811× under RankMe as published on the raw block. We have
 not seen this check proposed anywhere, and on this stack it would have disqualified **every** rank
 comparison this project made. The bimodality is why the rule says *several* repeats and not one: a
 single pair draws two runs, and any pair drawn from our four concordant repeats spans at most **1.028×**

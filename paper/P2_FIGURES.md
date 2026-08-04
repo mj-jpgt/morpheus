@@ -91,7 +91,10 @@ it. The panel letters below are the new ones.
 
 **Claim.** **All seven** of the between-arm rank differences this project has ever measured are
 smaller than the spread of the same statistic when one configuration is retrained, at the same seed,
-five times.
+five times — **on the `wsi_biology` view, under canonical R1**. Both conditions are load-bearing and
+**T9 is the figure that says so**: on `rna_biology` and `full_biology` the same five retrains spread
+1.019× and 1.020× and every between-arm difference clears. F1 must not be captioned as though the
+floor were a property of the metric.
 
 **Panels.**
 
@@ -151,7 +154,11 @@ non-determinism, architecture or schedule. Statistic **R1**, block **residualise
 D1-B point and **raw** for the Phase 1b point, which is judged against the raw-block floor of 3.111×
 and whose arms were never verified matched (§3.4). The seventh point clears by **1.5%**. The claim does
 not rest on this figure alone: F2 reaches the same conclusion from 8 within-arm degrees of freedom
-without using the floor at all.
+without using the floor at all. **And the view and the statistic must be named in the caption as
+conditions, not as details**: this floor is `wsi_biology` under canonical R1; the same five runs give
+1.019× on `rna_biology`, 1.020× on `full_biology`, 2.290× under R3, 1.224× under stable rank and
+1.000× under the hard numerical rank, and **1.811× under RankMe as published on the raw block against
+our own 3.111×** (T9).
 
 ---
 
@@ -1121,8 +1128,8 @@ account is not excluded (§4.10, §6.2).
 
 | would-be figure | why it cannot be drawn | where the draft says so |
 |---|---|---|
-| **A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each | **Not run.** F1's envelope is one retraining pair; F2 reaches the same conclusion from 8 within-arm d.f. without it. **The paper's most valuable missing measurement.** | §4.4, §6.2 |
-| ~~A seed replication of S4's momentum sweep~~ | **REPORTED 2026-08-04, and it does not clear F1's floor.** Three seeds per momentum, 500 steps; every m = 0.999 seed exceeds every m = 0 seed, closing a single-seed defect that was **hardcoded in the harness**, not a design choice. But the worst-case separation is **3.29× against 3.295×**. S4 now carries that, and the draft rests the fix on a binary training outcome (§5.4) rather than on the ratio. | §5.2, §5.4, §6.2 |
+| ~~**A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each~~ | **CLOSED at N = 5 (2026-08-04), and this row was stale.** F1 panel (a) is that design: five identical `programme_only` retrains at seed 42, rank and channel measured on each, giving a **3.295×** floor against a **1.055×** channel spread. It replaced the n = 1 estimate of 2.69×. What it still cannot do is attribute retraining variance to the metric rather than to this stack, and it is measured on the stable arm at a fixed seed, so it is a floor rather than an envelope. F2 remains the panel that does not depend on it. | §4.1, §4.4, §6.2 |
+| ~~A seed replication of S4's momentum sweep~~ | **REPORTED 2026-08-04, and it does not clear F1's floor.** Three seeds per momentum, 500 steps; every m = 0.999 seed exceeds every m = 0 seed, closing a single-seed defect that was **hardcoded in the harness**, not a design choice. But the worst-case separation is **3.29×** against a **3.295×** floor measured on a *different block*, and the block these runs are read on has no floor at all — so the comparison is **unjudgeable**, not failing. S4 and §5.4 now carry that word, and the draft rests the fix on a binary training outcome (§5.4) rather than on the ratio. | §5.2, §5.4, §6.2 |
 | **The six `lr_L*.log` learning-rate logs, vendored** | **Not vendored, and this is the weakest provenance in the paper's only established mechanism result.** `ablate_decorr*` and `mseed_*` were copied into the vendored `d1_diag` directory under `v2/research/rebase/p2/figures/data/` and every value read from them is re-parsed from the copy by `v2/tests/test_p2_floor_audit.py`. `lr_L{1..6}.log` were not, so §5.2a's four audit rows resolve against **the draft's own table** — the weakest of the three source kinds the audit supports. **Closing it is a file copy; nothing needs re-running.** | §5.2a, §6.4, S9 |
 | **The RNA-view mutual cosine on the CENTRED representation, for the three `lr = 1e-3` arms** | **Not measured.** Rank reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred cosine reads 0.9946 / 0.9257 / 0.5207. Either rank is insensitive at the collapse floor or the whole difference is in the mean-offset direction centring removes — the same asymmetry that makes RankMe more reproducible than our statistic (T9, §4.1b). Needs the runs' activations, which the logs do not carry. | §4.10, §6.2, S9 |
 | **A like-for-like retraining floor for the momentum regime** | **Not measured — but one same-seed PAIR in that regime now has been, and it is concordant** (`ablate_decorr0.04` against `mseed_m0.999_s42`: 1.066× at step 400, ≤ 1.128× over the shared steps; draft §4.1a row 56). **n = 2 is a pair, not a floor**, and §4.1's own argument is that a pair drawn from concordant repeats can license everything, so it is recorded and not used. F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
