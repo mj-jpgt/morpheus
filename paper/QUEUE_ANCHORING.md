@@ -94,11 +94,17 @@ this objective is used for amounts to **583 steps**, so the table spans the real
 | **600** | **2.81** | **2.23** | **5.88** | **7.42** |
 
 Three things this table shows that a single number would not. The effect is **monotone in m** and
-large — 2.6–3.3× at every step past 150. It is **durable**: both working arms are flat from step 200 to
+large — the per-step fold `m = 0.999 / m = 0` is **3.363× (200), 2.208× (300), 3.596× (400), 3.132×
+(500), 2.641× (600)**, a range of **2.208×–3.596×** past step 150, and **4.340×** at step 100.
+*An earlier version of this sentence said "2.6–3.3× at every step past 150"; **both ends of that range
+are wrong against the table above** and it is corrected here (draft §4.1a, row 47).* It is **durable**:
+both working arms are flat from step 200 to
 600, spanning the full 583-step training duration, which matters because two earlier "fixes" on this
 objective looked correct inside a short window and failed outside it. And `m = 0.9` **fails**, tracking
 the no-momentum arm rather than the working ones, so this is not a matter of perturbing the key
-encoder slightly — there is a threshold, and it lies between m = 0.9 and m = 0.99.
+encoder slightly — there is a threshold in m **at this learning rate**, and it lies between m = 0.9 and
+m = 0.99. A predeclared learning-rate test has since shown that the threshold moves with the learning
+rate and is not a property of m at all: see draft §5.2a.
 
 **`m = 0.999` is used because it measured best in this sweep. No mechanism is claimed.** That is a
 weaker justification than a hyperparameter usually receives and it is stated deliberately: two

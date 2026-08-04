@@ -905,8 +905,8 @@
   {
    "where": "paper/P2_RANK_DRAFT.md §5.2 and paper/QUEUE_ANCHORING.md",
    "claim": "the momentum effect is “2.6–3.3× at every step past 150”",
-   "source_says": "the section's own table gives 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600) — a range of 2.208–3.596× — and 4.343× at step 100",
-   "action": "REPORTED, NOT SUBSTITUTED. §5 is another agent's section. Neither the prose range nor a replacement is used anywhere in this audit; the step-400 row quotes the table."
+   "source_says": "the section's own table gives 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600) — a range of 2.208–3.596× — and 7.03 / 1.62 = 4.340× at step 100. (An earlier version of this record said 4.343×; the table is the only source in this repository and it gives 4.3395, so 4.340× is what may be quoted.)",
+   "action": "REPORTED, THEN CORRECTED AT SOURCE (2026-08-05). §5.2 and `paper/QUEUE_ANCHORING.md` now print 2.208×–3.596× past step 150 and 4.340× at step 100, computed from the rows of §5.2's own table. Nothing in this audit was ever substituted from the prose range; the step-400 row quotes the table and always did."
   }
  ],
  "comparisons": [
@@ -2471,7 +2471,7 @@
      "literal": "2.18"
     }
    },
-   "rests_on": "nothing quotable. **§5.2's prose says the effect is “2.6–3.3× at every step past 150”, which disagrees with its own table**: the per-step folds are 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600), and 4.343× at step 100. Flagged, not substituted (§5 is another agent's). This single-seed fold does exceed the floor at one step, but it varies no seed, and the seed-varied worst case above does not.",
+   "rests_on": "nothing quotable. **§5.2's prose used to say the effect is “2.6–3.3× at every step past 150”, which disagreed with its own table**: the per-step folds are 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600), and **4.340×** at step 100 — both ends of the quoted range were wrong. **CORRECTED in §5.2 and in `paper/QUEUE_ANCHORING.md` on 2026-08-05**; the range now printed is 2.208×–3.596×, computed from the rows of that table and from nothing else. *A previous version of this note gave the step-100 fold as 4.343×; the only source in this repository is §5.2's own table, 7.03 / 1.62 = 4.3395, so **4.340×** is the number the source supports and 4.343× is withdrawn.* This single-seed fold does exceed 3.295× at one step, but it varies no seed, it is on a block with no floor, and the seed-varied worst case above does not.",
    "ratio": 3.5963,
    "value_digits": 3
   },
@@ -2762,6 +2762,134 @@
    "clears": null,
    "ratio": 1.0664,
    "value_digits": 3
+  },
+  {
+   "id": "5.2a-lr-at-m0",
+   "section": "§5.2a",
+   "comparison": "**the learning rate at zero momentum** — L6 (lr 4e-5, m = 0) against L3 (lr 1e-3, m = 0)",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": null,
+   "clears": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "a": {
+    "value": 12.3,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "12.30"
+    }
+   },
+   "b": {
+    "value": 1.06,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "1.06"
+    }
+   },
+   "rests_on": "**the predeclared sign, not the magnitude.** With momentum held at zero, dropping the learning rate 25× takes the representation from the collapse floor to 12.30 — the arm the momentum-threshold account predicted would **fail**. One seed per cell.",
+   "ratio": 11.6038,
+   "value_digits": 2
+  },
+  {
+   "id": "5.2a-lr-at-m0999",
+   "section": "§5.2a",
+   "comparison": "**the learning rate at maximal momentum** — L4 (lr 4e-5, m = 0.999) against L5 (lr 1e-3, m = 0.999)",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": null,
+   "clears": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "a": {
+    "value": 35.24,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "35.24"
+    }
+   },
+   "b": {
+    "value": 1.05,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "1.05"
+    }
+   },
+   "rests_on": "**the predeclared sign, not the magnitude.** With momentum held at 0.999, dropping the learning rate 25× takes the representation from the collapse floor to 35.24 — and L5, at maximal momentum and the high rate, is the arm the momentum-threshold account predicted would **work**. L5 and L6 are the two cells that account cannot survive. One seed per cell.",
+   "ratio": 33.5619,
+   "value_digits": 2
+  },
+  {
+   "id": "5.2a-m-at-high-lr",
+   "section": "§5.2a",
+   "comparison": "**momentum at the high learning rate — an EQUALITY claim** — L3 (m = 0) against L5 (m = 0.999), both lr 1e-3",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": null,
+   "clears": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "a": {
+    "value": 1.06,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "1.06"
+    }
+   },
+   "b": {
+    "value": 1.05,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "1.05"
+    }
+   },
+   "rests_on": "**an equality, which is the shape a 1.01× difference can carry.** Momentum from 0 to 0.999 moves rank by 1.01× at lr 1e-3, where the momentum-threshold account required a large effect. It is entered as a `direction` row for the same reason rows 51–52 are: an ordering may not be read off it, and an equality may.",
+   "ratio": 1.0095,
+   "value_digits": 2
+  },
+  {
+   "id": "5.2a-m-at-low-lr",
+   "section": "§5.2a",
+   "comparison": "momentum at the low learning rate — L4 (m = 0.999) against L6 (m = 0), both lr 4e-5",
+   "kind": "direction",
+   "statistic": "R3",
+   "block": "fixed held-out probe",
+   "floor": null,
+   "clears": null,
+   "floor_note": "**UNJUDGEABLE — no floor exists on this block.** Every §5.2a arm is read on the fixed held-out probe, which has never had a retraining floor measured on it and cannot get one from the five exported repeats (they were exported, not probed). The learning-rate test is not resolved by a magnitude and does not need to be: it was predeclared as a pair of opposite-signed predictions and is read on the sign of the outcome.",
+   "a": {
+    "value": 35.24,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "35.24"
+    }
+   },
+   "b": {
+    "value": 12.3,
+    "src": {
+     "kind": "markdown",
+     "file": "paper/P2_RANK_DRAFT.md",
+     "heading": "5.2a",
+     "literal": "12.30"
+    }
+   },
+   "rests_on": "nothing on its own. Momentum does move rank at the low rate (2.87×) and does not at the high rate (1.01×), which is why §5.2a says the collapse is *primarily* a learning-rate phenomenon rather than exclusively one. One seed per cell, on a block with no floor, so the 2.87× carries no verdict.",
+   "ratio": 2.865,
+   "value_digits": 2
   }
  ],
  "statistics_with_no_measured_floor_note": "NONE REMAIN on the exported block. Every statistic T1 scores — R1, R2, R3, PR, PR_rownorm, RankMe (raw and residualised), stable rank, α-ReQ |α−1|, LiDAR and the hard numerical rank — now has a floor of its own on the exported `wsi_biology` block, raw and residualised, measured on the same five same-seed repeats §4.1's R1 floor comes from. The floors differ by 3.3× between statistics (1.000× for the hard rank, 3.295× for R1), which is why judging one statistic against another's floor was never admissible.",

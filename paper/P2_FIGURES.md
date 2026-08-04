@@ -205,11 +205,16 @@ its own definition.
 
 ---
 
-### F3 — The floor is a property of the arm, not of the statistic
+### F3 — The floor is a property of the arm — and, T9 adds, of the statistic and of the view
 
-**Draft section.** §4.3.
+**Draft section.** §4.3. **Title corrected 2026-08-05:** this figure was specified as *"a property of
+the arm, **not** of the statistic"*. That is measurably wrong — §4.1a measures the floor for ten
+statistics on one block and finds it running 1.000×–3.295× — and the claim is withdrawn from the
+title, from §4.3 and from §1.4's contribution list. F3 keeps the **arm** axis; **T9 carries the
+statistic and view axes**, and the two must be read as one result in three parts.
 
-**Claim.** There is no one reproducibility envelope to calibrate and reuse. At the same global
+**Claim.** There is no one reproducibility envelope to calibrate and reuse **on any of its three
+axes**. This panel shows the arm axis: at the same global
 training step, on the same configuration, with only the seed differing, one arm reproduces to three
 parts in a thousand and its sibling spans a factor of six.
 
@@ -642,12 +647,12 @@ regime; §4.1's own argument is that a pair drawn from concordant repeats can li
 
 **Draft section.** §4.1a. **NEW 2026-08-04.**
 
-56 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
+60 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
 **block**, the floor **its own statistic and block license**, whether it clears, and what the claim
 rests on if it does not. Of the 25 selections between candidate configurations, **13 fail, 11 are
 unjudgeable because no floor has ever been measured for the block they sit on, and 1 clears** — and
 the one that clears is **RankMe as published**, whose floor (1.811× raw) is nearly half of canonical
-R1's (3.111× raw) on the same five retrains. 25 of the 56 rows are unjudgeable; 5 are exempt with the
+R1's (3.111× raw) on the same five retrains. 29 of the 60 rows are unjudgeable; 5 are exempt with the
 reason stated. **Unjudgeable is not a pass and not a failure**, and the audit enforces the
 distinction: a row with no floor records `clears: null`.
 
@@ -675,10 +680,71 @@ against.
 
 **Must carry.** Block-matching is load-bearing: D1-B seed 43 is **3.246×** residualised and
 **3.091×** raw, and its residualised figure against the *raw* floor of 3.111× reads as **outside**
-the floor when on its own block it is inside. The table also records one **open source
-disagreement**, reported and not substituted: §5.2's prose says the momentum effect is
-*"2.6–3.3× at every step past 150"*, where the section's own table gives 2.208×–3.596× over steps
-200–600 (and 4.343× at step 100).
+the floor when on its own block it is inside. The table also records one source
+disagreement, reported and never substituted, and **now corrected at source**: §5.2's prose said the
+momentum effect was *"2.6–3.3× at every step past 150"*, where the section's own table gives
+**2.208×–3.596×** over steps 200–600 — **both ends of the quoted range were wrong** — and **4.340×**
+at step 100. §5.2 and `paper/QUEUE_ANCHORING.md` now print the corrected range. *An earlier version of
+this note and of `floor_audit.json` gave the step-100 fold as 4.343×; the only source in this
+repository is §5.2's table, 7.03 / 1.62 = 4.3395, so 4.340× is what may be quoted and 4.343× is
+withdrawn.*
+
+**Four rows are new (57–60): §5.2a's learning-rate arms.** They are `direction` rows, not selections,
+so the 13 / 11 / 1 split of the 25 selections is unchanged; all four are on the fixed held-out probe
+and are therefore **unjudgeable**. They are in the table because §5.2a is the paper's only established
+mechanism result and its rank comparisons must be audited like everyone else's — and because the one
+that matters most is an **equality**: momentum from 0 to 0.999 moves rank **1.01×** at `lr = 1e-3`,
+which is the shape a 1.01× difference can carry and the shape the momentum-threshold account cannot
+survive.
+
+### T9 — The floor is a property of the VIEW, and of the STATISTIC — **NEW 2026-08-05**
+
+**Draft section.** §4.1b, and §4.1a's floor table it is drawn from. **This result had no display item
+and it is now the claim §4 is organised around**, which is why it gets one.
+
+**Claim.** The reproducibility floor is not a property of effective rank. It is a property of the
+**view** the rank is read from and the **statistic** it is read with, on the same five same-seed
+retrains, from the same artifacts. **The difference between "unusable" and "usable" is a choice of
+co-trained view that no paper we have read reports making.**
+
+**Panel A — the view axis.** Canonical R1, residualised, the five `programme_only` repeats, one row
+per co-trained view, with the between-arm resolvability count printed beside each:
+
+| view | min | max | **floor** | divergent repeat | **§4.5(c) pairs resolvable** |
+|---|---:|---:|---:|---|:---:|
+| `wsi_biology` | 8.8340 | 29.1057 | **3.295×** | rep2, low, **bimodal** | **0 of 6** |
+| `full_biology` | 29.8042 | 30.3991 | **1.020×** | rep2, **high** | **6 of 6** |
+| `rna_biology` | 27.2245 | 27.7497 | **1.019×** | rep2, low, by **1.9%** | **6 of 6** |
+
+**Panel B — the statistic axis**, one block (exported `wsi_biology`, residualised), same five runs:
+**1.000×** hard numerical rank · **1.224×** stable rank · **1.419×** PR · **1.466×** PR_rownorm ·
+**2.224×** R2 · **2.290×** R3 · **2.299×** α-ReQ |α−1| · **3.295×** canonical R1 · **3.295×**
+residualised RankMe. And on the **raw** block, the row that costs the paper most: **1.811×** RankMe as
+published against **3.111×** canonical R1.
+
+**Data.** `v2/research/rebase/p2/figures/data/ws_floor/out/P2_ENVELOPE_FLOORS.json`, measured by
+`v2/research/rebase/p2/p2_envelope_floors.py` (CPU only, thread-capped, workspace verified 543/543
+files by git blob SHA-1). Every number above is already rendered by
+`p2_floor_audit.py --floors`, which generates §4.1a's floor table; the resolvability counts are rows
+26–28 of `floor_audit.json`. **Nothing here is recomputed and nothing is typed by hand** — if this
+table is drawn rather than printed, it must be drawn from that JSON.
+
+**Status.** `PLOTTABLE` (text table; the two panels are already generated as one table by
+`p2_floor_audit.py --floors` and may be printed as-is if the figure budget does not stretch to a
+drawn version).
+
+**Caption must carry.** Four things, in this order. **(1)** The floor is a floor **twice over** on
+every row — the stable arm, and same-seed repeats that exclude seed variation entirely — n = 5, one
+arm, one seed, one stack, no interval; these are not estimated distributions. **(2)** The divergent
+repeat is identified by **ten of the ten statistics that move at all**, so nothing hides it; what
+changes is the magnitude, and the four-concordant-plus-a-factor shape survives **only** under R1, R2,
+R3 and residualised RankMe. That reads as a **redistribution of spectral mass in the tail**, which
+entropy-based statistics see by construction and dominant-subspace statistics do not. **(3)** The
+`rna_biology` ground truth is partly circular (§4.5(c)) and this table is **not** a recommendation to
+switch views: on that view every difference is resolvable and the rank ordering is wrong on **3 of 6**
+pairs, against **1 of 6** on `wsi_biology`. **(4)** RankMe's 1.811× against our 3.111× is **on the raw
+block only**; on the residualised block, where the mean offset is already gone, the two coincide at
+3.295×, which is the evidence for the mechanism rather than a qualification of it.
 
 ### T1 — Rank as a selection rule against the published alternatives — **and it is underpowered**
 
@@ -894,12 +960,15 @@ draws one**.
 
 **But the panel must now carry the awkward number instead.** The worst-case separation is
 **min(m = 0.999) / max(m = 0) = 10.45 / 3.18 = 3.29×, against F1's measured retraining floor of
-3.295×** — inside it. By §4.1's own criterion the momentum fix's *rank* difference is **not
-resolvable either**, and the panel says so rather than leaving it for a referee. On R3 it is
-6.85 / 2.81 = 2.44×, also inside. Three caveats make this indicative rather than a like-for-like
+3.295×**. **That floor is on a different block**, and the fixed held-out probe these runs are read
+on has never had one measured, so the correct word is **unjudgeable**, not "not resolvable": the
+criterion cannot reach the comparison in either direction, and the panel must say that rather than
+print a failure it cannot support. On R3 it is 6.85 / 2.81 = 2.44×, likewise unjudgeable. **The panel
+must also point at S9**: the mechanism behind this fix is not momentum but the learning rate, and the
+threshold in `m` this panel draws is a property of the one learning rate it was measured at. Three caveats make this indicative rather than a like-for-like
 disqualification, and none of them rescues it: the floor was measured on `programme_only` at 40 epochs
 on an exported artifact, and these runs are `programme_free` at 500 steps on a held-out probe —
-different arm, duration and block, and no like-for-like floor for this regime has been measured — though one same-seed **pair** in it now has been, and is concordant (1.066× at step 400; §4.1a row 50). **n = 2 is a pair, not a floor**, and the panel must not draw it as one.
+different arm, duration and block, and no like-for-like floor for this regime has been measured — though one same-seed **pair** in it now has been, and is concordant (1.066× at step 400; §4.1a row 56). **n = 2 is a pair, not a floor**, and the panel must not draw it as one.
 **What does not depend on rank at all is the reason the fix was adopted** (the unfixed configuration
 collapses and the fixed one does not, visible in retrieval, in the contrastive loss, and in whether
 `programme_free` reaches 40 epochs without the tripwire firing), and the panel must not be drawn as
@@ -914,8 +983,10 @@ nothing that clears the floor; only momentum against none is.** *Numbers:
 `d1a_control_complete_and_gate_fails_2of3_in_runner_20260804T0100Z.md`; draft §3.3, §4.7.2, §4.7.3.
 Draft §5.2 and §5.4 **are** now rewritten around this.*
 
-**Caption must carry.** MoCo's staleness account is ruled out three ways and the alternative is
-stated as unconfirmed: the queue turns over completely every 19 steps; key-to-encoder cosine at step
+**Caption must carry.** MoCo's staleness account is ruled out three ways, and the anchoring
+alternative is stated as unconfirmed and now also as **incomplete** (S9 shows this collapse is
+primarily a learning-rate phenomenon, and an anchoring account has to explain why the same decoupling
+is unnecessary at `4e-5` and useless at `1e-3`): the queue turns over completely every 19 steps; key-to-encoder cosine at step
 100 is 0.427 / **0.908** / 0.441 for m = 0 / 0.99 / 0.999 against ranks 2.58 / 6.65 / **6.89**, so the
 best-agreeing arm does not have the best rank; and at fixed key encoder the strongest arm is capacity
 **64**, entirely overwritten every step (rank 6.17 against 2.16 at capacity 4,096). MoCo advances its
@@ -999,13 +1070,62 @@ input.
 
 ---
 
+### S9 — The learning-rate test: the mechanism, and three dead accounts before it — **NEW 2026-08-05**
+
+**Draft section.** §5.2a.
+
+**Claim.** The collapse §5.2 fixes with a momentum key encoder is primarily a **learning-rate**
+phenomenon. Learning rate separates the outcomes perfectly; momentum separates none of them at the
+high rate. Momentum is **neither necessary nor sufficient**.
+
+**Panel.** Six arms as a 2 × 2 (+2) grid, all 400 steps from the same verified initialisation
+**67.55**, centred **R3** on the fixed held-out probe, with the RNA-view mutual cosine printed in each
+cell:
+
+| | m = 0 | m = 0.9 | m = 0.99 | m = 0.999 |
+|---|---|---|---|---|
+| **lr 1e-3** | L3 — **1.06** (cos 0.9946) | L1 — **1.05** (cos 0.9257) | — | **L5 — 1.05** (cos 0.5207) |
+| **lr 4e-5** | **L6 — 12.30** (cos 0.8199) | — | L2 — **27.88** (cos 0.5436) | L4 — **35.24** (cos 0.3807) |
+
+**L5 and L6 are the load-bearing cells and must be marked as such**: L5 fails at maximal momentum and
+L6 succeeds at zero momentum, which is the pair the predeclaration named as decisive. **L1–L4 were run
+and read first, against a predeclaration that discriminated a different pair of accounts; the 2 × 2
+above is what showed that design could not separate momentum from learning rate, and the two empty
+cells were predeclared before they ran.** The panel must show the empty cells as having been empty.
+
+**Provenance.** `~/e0_run/d1_diag/lr_L{1..6}.log`, `v2/research/rebase/d1_momentum_probe.py` with an
+`lr` argument (module default `2e-4`, the project's training rate). Predeclaration
+`NOTEBOOK_ENTRIES/PREDECLARED_learning_rate_test_20260804T2200Z.md` (`f68a7ac`); L1–L4 in
+`lr_test_and_decorrelation_reversal_20260804T1130Z.md`; L5/L6 in
+`NOTEBOOK_ENTRIES/learning_rate_is_the_mechanism_20260805T0100Z.md`.
+
+**Status.** `PENDING VENDORING` — the six logs are **not** in the vendored `d1_diag` directory, unlike
+the `ablate_decorr*` and `mseed_*` logs beside them, so no value in this panel is re-parsed from a copy
+in this repository. It is `PLOTTABLE` from the draft's table and must not be drawn as though its
+provenance were equal to F9's. Closing it is a file copy; draft §6.4 states the gap.
+
+**Caption must carry.** **(1)** This is the **fourth** account proposed for this collapse and the
+**first to survive a predeclared test**; regulariser weighting, MoCo staleness and the `τ/T` turnover
+criterion were each falsified, the last two by experiments built to test them. **(2)** At the training
+rate actually used, `2e-4`, momentum **does** rescue the objective, and the seed-varied replication of
+that (S4) is unambiguous — **lowering the learning rate would have solved the original problem more
+simply and we did not try it**. **(3)** One seed per cell, on a block with **no measured floor**: all
+four contrasts are **unjudgeable** (§4.1a rows 57–60) and the result rests on a predeclared sign, not
+on a magnitude. **(4)** The cosine column is the reason the panel prints two numbers per cell: rank is
+moved 11.6–33.6× by the learning rate and at most 2.9× by momentum, while the cosine on the same six
+runs is moved 1.2–1.4× by the learning rate and **1.9–2.2× by momentum** — the two instruments order
+the two knobs oppositely. The cosine is **uncentred** and the rank is **centred**, and that alternative
+account is not excluded (§4.10, §6.2).
+
 ## Figures the paper does NOT have, and says so
 
 | would-be figure | why it cannot be drawn | where the draft says so |
 |---|---|---|
 | **A controlled repeat design for the envelope** — N retrainings of one configuration with rank and channel measured on each | **Not run.** F1's envelope is one retraining pair; F2 reaches the same conclusion from 8 within-arm d.f. without it. **The paper's most valuable missing measurement.** | §4.4, §6.2 |
 | ~~A seed replication of S4's momentum sweep~~ | **REPORTED 2026-08-04, and it does not clear F1's floor.** Three seeds per momentum, 500 steps; every m = 0.999 seed exceeds every m = 0 seed, closing a single-seed defect that was **hardcoded in the harness**, not a design choice. But the worst-case separation is **3.29× against 3.295×**. S4 now carries that, and the draft rests the fix on a binary training outcome (§5.4) rather than on the ratio. | §5.2, §5.4, §6.2 |
-| **A like-for-like retraining floor for the momentum regime** | **Not measured — but one same-seed PAIR in that regime now has been, and it is concordant** (`ablate_decorr0.04` against `mseed_m0.999_s42`: 1.066× at step 400, ≤ 1.128× over the shared steps; draft §4.1a row 50). **n = 2 is a pair, not a floor**, and §4.1's own argument is that a pair drawn from concordant repeats can license everything, so it is recorded and not used. F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
+| **The six `lr_L*.log` learning-rate logs, vendored** | **Not vendored, and this is the weakest provenance in the paper's only established mechanism result.** `ablate_decorr*` and `mseed_*` were copied into the vendored `d1_diag` directory under `v2/research/rebase/p2/figures/data/` and every value read from them is re-parsed from the copy by `v2/tests/test_p2_floor_audit.py`. `lr_L{1..6}.log` were not, so §5.2a's four audit rows resolve against **the draft's own table** — the weakest of the three source kinds the audit supports. **Closing it is a file copy; nothing needs re-running.** | §5.2a, §6.4, S9 |
+| **The RNA-view mutual cosine on the CENTRED representation, for the three `lr = 1e-3` arms** | **Not measured.** Rank reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred cosine reads 0.9946 / 0.9257 / 0.5207. Either rank is insensitive at the collapse floor or the whole difference is in the mean-offset direction centring removes — the same asymmetry that makes RankMe more reproducible than our statistic (T9, §4.1b). Needs the runs' activations, which the logs do not carry. | §4.10, §6.2, S9 |
+| **A like-for-like retraining floor for the momentum regime** | **Not measured — but one same-seed PAIR in that regime now has been, and it is concordant** (`ablate_decorr0.04` against `mseed_m0.999_s42`: 1.066× at step 400, ≤ 1.128× over the shared steps; draft §4.1a row 56). **n = 2 is a pair, not a floor**, and §4.1's own argument is that a pair drawn from concordant repeats can license everything, so it is recorded and not used. F1's floor is `programme_only`, 40 epochs, residualised exported block; S4's runs are `programme_free`, 500 steps, fixed held-out probe. Every quotation of the 3.29× / 3.295× comparison must say so — and must also say that all three mismatches point toward a *larger* floor in this regime, so the mismatch is not a reprieve. | §5.4, §6.2 |
 | **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets. | §3.2, §6.2, §6.3 |
 | Error bars on any dilution rank or channel value | Single seed, single donor draw; the source states there is no error bar on level-to-level differences. | §4.8, §6.2 |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run; "unchanged" means the point estimates differ by 0.002 and nothing more. | §4.9, §6.2 |

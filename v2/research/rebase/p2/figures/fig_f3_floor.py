@@ -1,8 +1,16 @@
-"""F3 - The floor is a property of the arm, not of the statistic.  (P2 draft 4.3)
+"""F3 - The floor is a property of the arm.  (P2 draft 4.3)
 
 Claim: there is no one reproducibility envelope to calibrate and reuse. At the
 same global training step, on the same configuration, with only the seed
 differing, one arm reproduces to a fifth and its sibling spans a factor of six.
+
+TITLE CORRECTED 2026-08-05. This figure was titled "a property of the arm, NOT
+of the statistic". That second half is measurably wrong: p2_envelope_floors.py
+measures the retraining floor for ten statistics on one block and finds it
+running 1.000x (hard numerical rank) to 3.295x (canonical R1) on the SAME five
+runs, and for one statistic across three co-trained views from 1.019x to
+3.295x. The claim is withdrawn from draft 4.3, from 1.4 and from this title.
+F3 keeps the ARM axis; the statistic and view axes are P2_FIGURES.md T9.
 
 STATISTIC AND BLOCK. Statistic R3 - the in-run tripwire, centred and
 L2-row-normalised, order-2 - NOT R1, and the block is a TRAINING BATCH at
@@ -121,7 +129,8 @@ def main() -> int:
         + "block: " + P.BLOCK["train"]
         + ";  key `train_rank_tripwire_observed`", fontsize=6.8, labelpad=8)
     P.grid(ax, axis="x")
-    ax.set_title("F3   The reproducibility floor is a property of the ARM, not of the statistic\n"
+    ax.set_title("F3   The reproducibility floor is a property of the ARM "
+                 "(and of the statistic, and of the view - T9)\n"
                  "      same configuration, same global step, only the training seed differs",
                  pad=10)
 
