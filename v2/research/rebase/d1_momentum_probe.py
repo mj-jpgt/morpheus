@@ -14,9 +14,28 @@ a falsifiable prediction: momentum should flatten it substantially at the same
 capacity. If the curve barely moves and rank still recovers, the MoCo story is
 wrong.
 
-usage: momentum_test.py <momentum> <decorrelation> <steps>
+usage: momentum_test.py <momentum> <decorrelation> <steps> [capacity] [lr] [seed] [export_dir]
        momentum = 0 means no momentum encoder (current behaviour)
+
+`export_dir` is OPTIONAL and PURELY ADDITIVE: when given, the probe states
+`geometry()` already computes are written to `<export_dir>/probe_step<N>.npz` at
+every step it is read, alongside the probe's patient row indices. Nothing else
+changes -- the same two statistics are computed from the same tensors and the
+printed columns are byte-for-byte what they were -- so a log written with the
+argument present is comparable to one written without it.
+
+It exists because the probe block is the block EVERY rank number in draft §5 sits
+on, and it is the one block for which no retraining floor could be measured: the
+five `d1_envelope` repeats were exported, not probed, and this script printed two
+statistics rather than saving the states they were read off. A floor for the
+other statistics the paper scores (R2, PR, RankMe, stable rank, α-ReQ, LiDAR, the
+hard numerical rank) therefore needed the states themselves. Saving them is
+cheaper than a second GPU run per statistic, and it keeps the rule that no rank
+statistic is ever computed inside this file by an inline formula: the export
+carries matrices, and `p2_probe_floors.py` scores them through the same imports
+`p2_envelope_floors.py` uses.
 """
+import os
 import sys, copy
 import numpy as np, torch, torch.nn.functional as F
 from torch import nn
@@ -33,6 +52,9 @@ CAPACITY = int(sys.argv[4]) if len(sys.argv) > 4 else 4096
 LR = float(sys.argv[5]) if len(sys.argv) > 5 else 2e-4
 SEED_ARG = int(sys.argv[6]) if len(sys.argv) > 6 else 42
 SEED = SEED_ARG
+EXPORT = sys.argv[7] if len(sys.argv) > 7 else None
+if EXPORT:
+    os.makedirs(EXPORT, exist_ok=True)
 D = "/home/ubuntu/e0_run/data/"
 S = D + "paired_split_maximal.json"
 torch.manual_seed(SEED); np.random.seed(SEED)
@@ -84,7 +106,7 @@ def ema_update():
 
 
 @torch.no_grad()
-def geometry():
+def geometry(at_step: int | None = None):
     """Reports BOTH: the canonical Roy & Vetterli order-1 statistic that P2 quotes,
     and the R3 participation ratio the earlier sweep used, on the same states.
     Block: held-out test patients, WSI biology view, rows at own norms, centred."""
@@ -92,6 +114,12 @@ def geometry():
     w = model(probe, view="wsi")["z_biology"].float()
     r = model(probe, view="rna")["z_biology"].float()
     model.train()
+    # The states, not a statistic. Written only when `export_dir` was passed; the
+    # two numbers below are computed from these same tensors either way.
+    if EXPORT is not None and at_step is not None:
+        np.savez(os.path.join(EXPORT, f"probe_step{at_step}.npz"),
+                 wsi_biology=w.cpu().numpy(), rna_biology=r.cpu().numpy(),
+                 indices=np.asarray(probe["indices"].cpu().numpy()))
     wn, rn = F.normalize(w, dim=-1), F.normalize(r, dim=-1)
     eye = torch.eye(NP, dtype=torch.bool, device="cuda")
     # BOTH statistics come from the canonical function, neither is computed inline.
@@ -149,7 +177,7 @@ while step < STEPS:
     for raw in UncappedHoptimusBatches(data, train_idx, 8192, SEED + step, shuffle=True):
         batch = {k: (v.cuda(non_blocking=True) if isinstance(v, torch.Tensor) else v) for k, v in raw.items()}
         if step % 50 == 0:
-            er, sd, rr, can = geometry()
+            er, sd, rr, can = geometry(step)
             print(f"{step:>6}{er:>10.2f}{can:>11.2f}{sd:>10.4f}{rr:>9.4f}"
                   f"{(last_c if step else float('nan')):>13.4f}", flush=True)
             curve = staleness(step)
@@ -187,7 +215,7 @@ while step < STEPS:
         step += 1
         if step >= STEPS:
             break
-er, sd, rr, can = geometry()
+er, sd, rr, can = geometry(step)
 print(f"{step:>6}{er:>10.2f}{can:>11.2f}{sd:>10.4f}{rr:>9.4f}{last_c:>13.4f}", flush=True)
 curve = staleness(step)
 if curve:
