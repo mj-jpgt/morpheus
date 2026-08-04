@@ -40,7 +40,8 @@ from morpheus.v2.calibra.calibration import spike_recovery_curve, spike_targets 
 from morpheus.v2.calibra.residualise import cross_fitted_residuals  # noqa: E402
 from morpheus.v2.calibra.spectral import paired_absolute_correlation  # noqa: E402
 
-from direction_matched_floor import build_state, fitted_pairs, random_pairs  # noqa: E402
+from direction_matched_floor import (build_state, fitted_pairs, random_pairs,  # noqa: E402
+                                     stratified_order)
 
 
 def raw_and_residual_alignment(x, y, design, pairs, *, seed):
@@ -79,6 +80,8 @@ def main() -> None:
     parser.add_argument("--min-site-count", type=int, default=10)
     parser.add_argument("--n-mechanism-pairs", type=int, default=8)
     parser.add_argument("--n-jobs", type=int, default=1)
+    parser.add_argument("--skip-h6", action="store_true",
+                        help="mechanism block only; H6 itself is unaffected by it")
     args = parser.parse_args()
 
     levels = tuple(float(v) for v in args.levels.split(","))
@@ -105,16 +108,22 @@ def main() -> None:
                                                   args.min_site_count)
 
             # H6: the shipped path, no direction arguments, shipped protocol.
-            result = spike_recovery_curve(x, y, design, levels=levels, n_draws=args.n_draws,
-                                          n_components=args.n_components, seed=args.seed,
-                                          n_jobs=args.n_jobs)
-            summary = result.summary()
-            detection_ok = bool(np.isclose(summary["detection_floor"],
-                                           float(row["detection_floor"]), equal_nan=True))
-            transmission_ok = bool(np.isclose(summary["transmission_floor"],
-                                              float(row["transmission_floor"]), equal_nan=True))
-            matched_ok = bool(np.isclose(summary["observed_matched_direction"],
-                                         float(row["observed_matched_direction"]), atol=1e-9))
+            if args.skip_h6:
+                summary = {"detection_floor": float("nan"), "transmission_floor": float("nan"),
+                           "observed_matched_direction": float("nan"),
+                           "baseline_recovered_median": float("nan")}
+                detection_ok = transmission_ok = matched_ok = False
+            else:
+                result = spike_recovery_curve(x, y, design, levels=levels, n_draws=args.n_draws,
+                                              n_components=args.n_components, seed=args.seed,
+                                              n_jobs=args.n_jobs)
+                summary = result.summary()
+                detection_ok = bool(np.isclose(summary["detection_floor"],
+                                               float(row["detection_floor"]), equal_nan=True))
+                transmission_ok = bool(np.isclose(summary["transmission_floor"],
+                                                  float(row["transmission_floor"]), equal_nan=True))
+                matched_ok = bool(np.isclose(summary["observed_matched_direction"],
+                                             float(row["observed_matched_direction"]), atol=1e-9))
 
             x_res = cross_fitted_residuals(x, design, seed=args.seed)
             y_res = cross_fitted_residuals(y, design, seed=args.seed)
@@ -129,6 +138,19 @@ def main() -> None:
                     random_pairs(x.shape[1], y.shape[1], n_draws=n, seed=args.seed),
                     seed=args.seed),
             }
+            # The SAME fitted pairs on the pairing-destroyed cohort. This is the cell
+            # the primary floors were measured in, so if its level-0 baseline is also
+            # inflated the cause must still be a large raw-space rho -- cancer-mediated
+            # rather than channel-mediated, since a within-cancer permutation preserves
+            # cancer structure on both sides. Measured, not asserted.
+            y_perm = y[stratified_order(strata, np.random.default_rng(args.seed))]
+            mechanism["fitted_on_permuted_cohort"] = raw_and_residual_alignment(
+                x, y_perm, design,
+                fitted_pairs(x_res, y_res, n_draws=n, n_components=args.n_components,
+                             seed=args.seed), seed=args.seed)
+            mechanism["random_on_permuted_cohort"] = raw_and_residual_alignment(
+                x, y_perm, design,
+                random_pairs(x.shape[1], y.shape[1], n_draws=n, seed=args.seed), seed=args.seed)
 
             record = {
                 "method": path.stem, "state": state,
@@ -153,7 +175,11 @@ def main() -> None:
                   f"rho_raw fitted={mechanism['fitted']['rho_raw_median']:.3f} "
                   f"random={mechanism['random']['rho_raw_median']:.3f} | "
                   f"level0 fitted={mechanism['fitted']['level0_readout_abs_median']:.3f} "
-                  f"random={mechanism['random']['level0_readout_abs_median']:.3f}", flush=True)
+                  f"random={mechanism['random']['level0_readout_abs_median']:.3f} | PERM "
+                  f"rho_raw fitted={mechanism['fitted_on_permuted_cohort']['rho_raw_median']:.3f} "
+                  f"random={mechanism['random_on_permuted_cohort']['rho_raw_median']:.3f} "
+                  f"level0 fitted={mechanism['fitted_on_permuted_cohort']['level0_readout_abs_median']:.3f} "
+                  f"random={mechanism['random_on_permuted_cohort']['level0_readout_abs_median']:.3f}", flush=True)
             Path(args.out).write_text(json.dumps(results, indent=2))
 
     failed = [r for r in results if not (r["H6_detection_floor_reproduced"]
