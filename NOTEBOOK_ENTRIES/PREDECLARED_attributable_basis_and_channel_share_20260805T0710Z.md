@@ -204,5 +204,48 @@ Any new module that computes an SVD will be allowlisted in
 `v2/tests/test_effective_rank_canonical.py` **with its reasoning written inline**, as the previous
 post-PBS modules were.
 
+---
+
+### AMENDMENT, 2026-08-05 07:55 UTC — a sixth arm, added before any real number was computed
+
+Written while the self-tests were being made to pass, **before the perturbation data had been
+opened**. Nothing in this amendment was informed by a measurement on the real cohort; it was forced by
+a synthetic unit test and by an algebraic fact the test exposed. Recorded here rather than folded
+silently into the design.
+
+**What the unit test showed.** Planting two cell lines whose per-axis agreement was concentrated on
+two of five axes, the cross-line-maximising rotation could not improve its objective from any start.
+The reason is the same conservation the R² arm already carried: with unit-variance profiles the
+per-axis cross-line correlation is `r_kᵀ M r_k`, and its sum over an orthonormal basis is `tr(M)`.
+**Mean cross-line agreement is a budget a rotation can redistribute but not increase.** The
+originally-declared `xline` objective (maximise the mean) is therefore inert for the same reason
+`r2opt` is, and predicting "it will not help" would have been predicting a tautology.
+
+**What changes.** `xline` now maximises a smooth surrogate for the quantity the certificate actually
+*counts* — `mean_k sigmoid((rho_k − 0.30)/0.05)`, the number of axes clearing the certificate's own
+cross-line bar — which under a conserved total is maximised by **spreading** agreement evenly rather
+than concentrating it. The original mean-maximising objective is kept as a separate arm,
+`xline_mean`, and is predicted to be inert. Both are fitted on atom fold A only and both may be
+judged only on the fold-B certificate.
+
+**Added prediction.** `xline` **will** raise the plain (circular) certified count substantially —
+I predeclare **above 60 of 128** — because with a median cross-line Spearman of 0.262 over 128 axes
+the "budget" is large relative to a 0.30 bar and an equalising rotation should push most axes just
+over it. **That number will mean nothing on its own.** The claim stands or falls on the fold-B count:
+if `xline` beats `none` on fold B by more than the optimiser's across-start spread, cross-line
+replication really was being wasted by the PCA basis; if fold B collapses to at or below `none`, then
+what the plain count demonstrates is only that **the certificate is optimisable**, which is a finding
+about the certificate and not about the biology, and it must be reported as a caveat on the 29/128
+rather than as a bigger number.
+
+**A bug found and fixed in the same pass, recorded because it would have silently faked an
+invariance.** The quadratic form `diag(RᵀMR)` was written `np.einsum("ij,jk,ik->k", R, M, R)`, which
+contracts to `Σ_j (RᵀR)_{jk} M_{jk} = diag(M)` — i.e. **constant for every rotation**. Both iterative
+arms would have reported "the objective cannot be improved" from any start, and that would have read
+exactly like the conservation argument being confirmed. It was caught only because a planted test
+demanded an *increase* and got equality to fifteen decimal places from three independent random
+starts, which is not what a real optimum looks like. Corrected to `"ik,ij,jk->k"`; the closed-form R²
+test, which used explicit `np.diag`, was correct throughout and is what pins the identity.
+
 Related: [[post_pbs_constructions_result_20260804T2300Z]],
 [[PREDECLARED_past_pbs_constructions_20260804T2240Z]]

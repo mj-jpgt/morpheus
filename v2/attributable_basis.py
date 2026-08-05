@@ -36,14 +36,28 @@ Four rotations, two of which never see a certificate quantity:
     condition already passes 128 of 128, this arm cannot raise the certified count
     through the quantity it optimises. It is here because it is the objective the
     question names, and because a provably-inert objective is part of the answer.
-``xline``
-    Maximises aggregate K562-vs-RPE1 agreement of the atom-cosine profile — the
-    condition that does the actual rejecting (78 of 99 non-certified axes). It is
-    **circular against the plain certificate** and must never be quoted from it.
-    It is fitted on one half of the shared atoms (:func:`perturbation_basis_common.atom_folds`)
-    and the only number that may be read as evidence for it is the certificate
+``xline_mean`` / ``xline``
+    Maximise K562-vs-RPE1 agreement of the atom-cosine profile — the condition that
+    does the actual rejecting (78 of 99 non-certified axes). Both are **circular
+    against the plain certificate** and must never be quoted from it: they are
+    fitted on one half of the shared atoms (:func:`perturbation_basis_common.atom_folds`)
+    and the only number that may be read as evidence for them is the certificate
     scored on the other half, which the report computes for every arm including
     the identity.
+
+    They differ in *what* they maximise, and the difference matters more than it
+    looks. ``xline_mean`` maximises the mean per-axis correlation between the two
+    lines — and that quantity is very nearly conserved under rotation for the same
+    reason the mean R² is: with ``p_k = q_k = 1`` the per-axis correlation is
+    ``r_kᵀ M r_k`` and its sum over an orthonormal basis is ``tr(M)``. A rotation
+    can move cross-line agreement *between* axes; it cannot manufacture more of
+    it. ``xline`` therefore maximises a smooth surrogate for the quantity the
+    certificate actually counts — **the number of axes whose agreement clears
+    0.30** — which under a conserved total is maximised by *spreading* the
+    agreement evenly rather than concentrating it. If a certified count can be
+    raised that way and the raise survives on held-out atoms, the 29/128 is a
+    statement about the PCA basis; if it collapses on held-out atoms, the
+    certificate was merely optimisable.
 
 Both iterative arms ascend on the orthogonal group with a polar retraction, from
 several starts, and report the spread across starts: a win smaller than the
@@ -65,7 +79,11 @@ __all__ = ["ROTATIONS", "varimax_rotation", "ica_rotation", "r2_optimising_rotat
 
 #: The named rotations. ``none`` is the identity and exists so the baseline arm is
 #: run through the identical driver rather than trusted from a previous entry.
-ROTATIONS = ("none", "varimax", "ica", "r2opt", "xline")
+ROTATIONS = ("none", "varimax", "ica", "r2opt", "xline_mean", "xline")
+
+#: The certificate's cross-line bar. `xline` maximises a smooth count of axes above
+#: it, so it is read from the certificate rather than chosen here.
+CROSS_LINE_FLOOR = 0.30
 
 
 def _polar(matrix: np.ndarray) -> np.ndarray:
@@ -189,13 +207,13 @@ def r2_optimising_rotation(residual: np.ndarray, targets: np.ndarray, *, seeds=(
     width = a_matrix.shape[0]
 
     def value(rotation):
-        a = np.einsum("ij,jk,ik->k", rotation, a_matrix, rotation)
-        b = np.einsum("ij,jk,ik->k", rotation, b_matrix, rotation)
+        a = np.einsum("ik,ij,jk->k", rotation, a_matrix, rotation)
+        b = np.einsum("ik,ij,jk->k", rotation, b_matrix, rotation)
         return float(np.mean(1.0 - a / np.maximum(b, 1e-300)))
 
     def grad(rotation):
-        a = np.einsum("ij,jk,ik->k", rotation, a_matrix, rotation)
-        b = np.maximum(np.einsum("ij,jk,ik->k", rotation, b_matrix, rotation), 1e-300)
+        a = np.einsum("ik,ij,jk->k", rotation, a_matrix, rotation)
+        b = np.maximum(np.einsum("ik,ij,jk->k", rotation, b_matrix, rotation), 1e-300)
         return (-2.0 / width) * (a_matrix @ rotation / b[None, :]
                                  - b_matrix @ rotation * (a / b ** 2)[None, :])
 
@@ -213,18 +231,23 @@ def r2_optimising_rotation(residual: np.ndarray, targets: np.ndarray, *, seeds=(
 
 
 def cross_line_rotation(cosine_a: np.ndarray, cosine_b: np.ndarray, rows: np.ndarray, *,
-                        seeds=(0, 1, 2), max_iter: int = 500) -> dict:
-    """Orthogonal rotation maximising mean K562-vs-RPE1 atom-profile agreement.
+                        objective: str = "count", floor: float = CROSS_LINE_FLOOR,
+                        tau: float = 0.05, seeds=(0, 1, 2), max_iter: int = 500) -> dict:
+    """Orthogonal rotation maximising K562-vs-RPE1 atom-profile agreement.
 
     ``cosine_a`` / ``cosine_b`` are the ``[atom, axis]`` unnormalised cosine
     profiles of the two cell lines, restricted to ``rows`` — the fitting half of
-    the shared atoms. The objective is the mean **Pearson** correlation between
-    the two lines' profiles, per axis; the certificate scores **Spearman**, so
-    even this arm is optimising a surrogate rather than the graded quantity, and
-    it is still the arm most at risk of scoring itself. Its plain certificate
-    count is an upper bound with no evidential value; the fold-B count is the one
-    that means anything.
+    the shared atoms.
+
+    ``objective='mean'`` maximises the mean per-axis **Pearson** correlation.
+    ``objective='count'`` maximises ``mean_k sigmoid((rho_k - floor)/tau)``, a
+    smooth count of axes clearing the certificate's bar. The certificate scores
+    **Spearman**, so both are surrogates for the graded quantity even before the
+    circularity is considered; the fold-B certificate is the only number either
+    may be judged on.
     """
+    if objective not in ("mean", "count"):
+        raise ValueError(f"unknown cross-line objective {objective!r}")
     a = np.asarray(cosine_a, dtype=np.float64)[rows]
     b = np.asarray(cosine_b, dtype=np.float64)[rows]
     a = a - a.mean(axis=0, keepdims=True)
@@ -233,30 +256,47 @@ def cross_line_rotation(cosine_a: np.ndarray, cosine_b: np.ndarray, rows: np.nda
     saa, sbb = a.T @ a, b.T @ b
     width = cross.shape[0]
 
-    def parts(rotation):
-        m = np.einsum("ij,jk,ik->k", rotation, cross, rotation)
-        p = np.maximum(np.einsum("ij,jk,ik->k", rotation, saa, rotation), 1e-300)
-        q = np.maximum(np.einsum("ij,jk,ik->k", rotation, sbb, rotation), 1e-300)
-        return m, p, q
+    def correlation(rotation):
+        """Per-axis cross-line Pearson correlation, and its per-column gradient."""
+        m = np.einsum("ik,ij,jk->k", rotation, cross, rotation)
+        p = np.maximum(np.einsum("ik,ij,jk->k", rotation, saa, rotation), 1e-300)
+        q = np.maximum(np.einsum("ik,ij,jk->k", rotation, sbb, rotation), 1e-300)
+        root = np.sqrt(p * q)
+        direction = (2.0 * (cross @ rotation) / root[None, :]
+                     - (saa @ rotation * (m * q / root ** 3)[None, :]
+                        + sbb @ rotation * (m * p / root ** 3)[None, :]))
+        return m / root, direction
 
     def value(rotation):
-        m, p, q = parts(rotation)
-        return float(np.mean(m / np.sqrt(p * q)))
+        rho, _ = correlation(rotation)
+        if objective == "mean":
+            return float(np.mean(rho))
+        return float(np.mean(1.0 / (1.0 + np.exp(-(rho - floor) / tau))))
 
     def grad(rotation):
-        m, p, q = parts(rotation)
-        root = np.sqrt(p * q)
-        return (2.0 / width) * (cross @ rotation / root[None, :]
-                                - 0.5 * (saa @ rotation * (m * q / root ** 3)[None, :]
-                                         + sbb @ rotation * (m * p / root ** 3)[None, :]))
+        rho, direction = correlation(rotation)
+        if objective == "mean":
+            return direction / width
+        sigmoid = 1.0 / (1.0 + np.exp(-(rho - floor) / tau))
+        return direction * (sigmoid * (1.0 - sigmoid) / tau)[None, :] / width
 
     runs = [_orthogonal_ascent(value, grad, start, max_iter=max_iter)
             for start in [np.eye(width)] + [_random_rotation(width, s) for s in seeds[1:]]]
     best = max(runs, key=lambda run: run["objective"])
+    rho_identity, _ = correlation(np.eye(width))
+    rho_best, _ = correlation(best["rotation"])
     return {"rotation": best["rotation"], "objective": best["objective"],
             "objective_at_identity": value(np.eye(width)),
             "objective_by_start": [run["objective"] for run in runs],
             "n_iterations_by_start": [run["n_iterations"] for run in runs],
+            "objective_kind": objective, "floor": float(floor), "tau": float(tau),
+            # The conservation the docstring claims, measured on the real matrices
+            # rather than asserted: if these two are equal the mean agreement is a
+            # budget the rotation can only redistribute.
+            "mean_correlation_at_identity": float(np.mean(rho_identity)),
+            "mean_correlation_at_best": float(np.mean(rho_best)),
+            "n_above_floor_at_identity": int((rho_identity >= floor).sum()),
+            "n_above_floor_at_best": int((rho_best >= floor).sum()),
             "n_fitting_atoms": int(len(rows))}
 
 
@@ -299,7 +339,8 @@ def fit_rotation(*, method: str, pbs_targets: str, rna_table: str, perturbation:
         diagnostics["n_shared_atoms"] = int(len(aligned["shared_atoms"]))
         diagnostics["n_atoms_fold_a"] = int(len(fold_a))
         diagnostics["n_atoms_fold_b"] = int(len(fold_b))
-        fitted = cross_line_rotation(cosine_a, cosine_b, fold_a, max_iter=max_iter)
+        fitted = cross_line_rotation(cosine_a, cosine_b, fold_a, max_iter=max_iter,
+                                     objective="mean" if method == "xline_mean" else "count")
 
     rotation = np.asarray(fitted.pop("rotation"), dtype=np.float64)
     diagnostics.update({key: value for key, value in fitted.items()})

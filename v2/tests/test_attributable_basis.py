@@ -156,24 +156,44 @@ def test_r2_optimising_rotation_never_decreases_its_own_objective():
     assert len(fitted["objective_by_start"]) == 3
 
 
-def test_cross_line_rotation_recovers_a_planted_agreeing_direction():
-    """One direction agrees across the two lines; the rest are independent noise."""
-    rng = np.random.default_rng(51)
-    n_atoms, width = 300, 5
-    shared = rng.normal(size=n_atoms)
-    hidden = np.linalg.qr(rng.normal(size=(width, width)))[0]
-    a = np.column_stack([shared] + [rng.normal(size=n_atoms) for _ in range(width - 1)]) @ hidden.T
-    b = np.column_stack([shared] + [rng.normal(size=n_atoms) for _ in range(width - 1)]) @ hidden.T
-    rows = np.arange(n_atoms)
-    fitted = cross_line_rotation(a, b, rows, max_iter=200)
+def _two_line_profiles(weights, n_atoms, seed):
+    """Two ``[atom, axis]`` profiles whose per-axis cross-line correlation is ``w²``."""
+    rng = np.random.default_rng(seed)
+    weights = np.asarray(weights, dtype=float)
+    shared = rng.normal(size=(n_atoms, len(weights)))
+    residual = np.sqrt(np.maximum(1.0 - weights ** 2, 0.0))
+    return (shared * weights + rng.normal(size=shared.shape) * residual,
+            shared * weights + rng.normal(size=shared.shape) * residual)
+
+
+def test_mean_cross_line_agreement_is_a_budget_a_rotation_can_only_redistribute():
+    """The conservation the `xline` design turns on, measured rather than argued.
+
+    With unit-variance profiles the per-axis cross-line correlation is
+    ``r_kᵀ M r_k`` and its sum over an orthonormal basis is ``tr(M)``, so no
+    rotation can raise the MEAN. This is why `xline_mean` is expected to be inert
+    and `xline` maximises a count instead.
+    """
+    a, b = _two_line_profiles([1.0, 0.7, 0.5, 0.2, 0.0], 4000, 51)
+    fitted = cross_line_rotation(a, b, np.arange(len(a)), objective="mean", max_iter=200)
+    assert fitted["mean_correlation_at_best"] == pytest.approx(
+        fitted["mean_correlation_at_identity"], abs=0.02)
+
+
+def test_the_count_objective_spreads_a_concentrated_agreement_over_more_axes():
+    """Budget ~1.5 concentrated on two axes; the bar is 0.30, so ~5 axes can clear it."""
+    a, b = _two_line_profiles([1.0, np.sqrt(0.5), 0.0, 0.0, 0.0], 6000, 53)
+    rows = np.arange(len(a))
+    fitted = cross_line_rotation(a, b, rows, objective="count", floor=0.30, max_iter=400)
+    assert fitted["n_above_floor_at_identity"] == 2, fitted["n_above_floor_at_identity"]
+    assert fitted["n_above_floor_at_best"] > fitted["n_above_floor_at_identity"], fitted
     assert fitted["objective"] > fitted["objective_at_identity"]
-    best = np.abs([np.corrcoef((a @ fitted["rotation"])[:, k], (b @ fitted["rotation"])[:, k])[0, 1]
-                   for k in range(width)]).max()
-    assert best > 0.8, best
+    # ... and it did it by redistributing, not by creating agreement.
+    assert fitted["mean_correlation_at_best"] <= fitted["mean_correlation_at_identity"] + 0.03
 
 
 def test_the_registry_names_every_arm_that_was_predeclared():
-    assert set(ROTATIONS) == {"none", "varimax", "ica", "r2opt", "xline"}
+    assert set(ROTATIONS) == {"none", "varimax", "ica", "r2opt", "xline_mean", "xline"}
 
 
 # --- the guard that makes a basis-choice test a basis-choice test --------
