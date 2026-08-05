@@ -253,6 +253,13 @@ SVD_ALLOWLIST = {
     # rank, for the consensus basis's rank-starvation check, it IMPORTS
     # `calibra.spectral.effective_rank`.
     "v2/build_causal_basis_targets.py",
+    # The attributable-basis rotations. The only SVD is `_polar`, which returns
+    # `U Vᵀ` and DISCARDS the singular values entirely -- it is the projection onto
+    # the orthogonal group used as the retraction for ascent on O(n), and as the
+    # varimax update. No statistic is taken from a spectrum anywhere in the module;
+    # the R² it optimises comes from `causal_attribution.gene_fold_ridge_r2` and the
+    # subspace overlap it reports comes from `perturbation_basis_common.subspace_alignment`.
+    "v2/attributable_basis.py",
     "v2/calibra/claim_guards.py",                # the token appears only in prose
     "tests/test_claim_guards.py",                # ditto
     "v2/tests/test_effective_rank_canonical.py", # this file, which names the tokens

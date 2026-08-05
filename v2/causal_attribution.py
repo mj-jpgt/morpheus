@@ -47,10 +47,11 @@ import numpy as np
 import pandas as pd
 
 from .baseline_target_common import development_expression_moments, load_reference_targets
-from .perturbation_basis_common import load_aligned_response
+from .perturbation_basis_common import atom_folds, load_aligned_response, subspace_alignment
 
 __all__ = ["RIDGE_ALPHAS", "CERTIFICATE", "gene_fold_ridge_r2", "atom_cosines",
-           "certifiable_attribution", "attribution_report"]
+           "certifiable_attribution", "attribution_report", "development_pca",
+           "cross_line_alignment", "validated_rotation"]
 
 #: The four conditions an axis must meet before its causal name may be quoted.
 #: Conjunctive by design — an axis that reconstructs from the atom span but whose
@@ -71,7 +72,7 @@ def _digest(values: np.ndarray) -> str:
 
 
 def gene_fold_ridge_r2(gram: np.ndarray, targets: np.ndarray, *, alphas=RIDGE_ALPHAS,
-                       n_folds: int = 5, seed: int = 0) -> dict:
+                       n_folds: int = 5, seed: int = 0, return_prediction: bool = False) -> dict:
     """Out-of-fold R² of reconstructing each column of ``targets`` from the atom span.
 
     ``gram`` is ``X Xᵀ`` for the ``[gene, atom]`` design ``X``; passing the Gram
@@ -88,6 +89,16 @@ def gene_fold_ridge_r2(gram: np.ndarray, targets: np.ndarray, *, alphas=RIDGE_AL
     the mean out-of-fold R². Every arm selects its own alpha under the identical
     rule and the full alpha curve is returned, so the selection cannot advantage
     one arm over another.
+
+    ``return_prediction`` additionally returns the out-of-fold prediction at the
+    selected alpha. It is **off by default and changes nothing when off** — the
+    returned dictionary is byte-identical without it, which
+    ``test_attributable_basis.py`` asserts. It exists because the out-of-fold
+    residual ``E = targets - prediction`` is what makes the R² of *any* rotation
+    ``targets @ R`` computable in closed form (the estimator is linear in the
+    target block, so the rotated residual is ``E @ R``). Without it, searching the
+    orthogonal group for an R²-maximising rotation would need a second copy of
+    this ridge, which is exactly the substitution this project keeps catching.
     """
     gram = np.asarray(gram, dtype=np.float64)
     targets = np.asarray(targets, dtype=np.float64)
@@ -96,6 +107,7 @@ def gene_fold_ridge_r2(gram: np.ndarray, targets: np.ndarray, *, alphas=RIDGE_AL
         raise ValueError("gene-fold ridge needs a [gene, gene] Gram and [gene, target] targets")
     folds = np.array_split(np.random.default_rng(seed).permutation(n_genes), n_folds)
     curve = np.zeros((len(alphas), targets.shape[1]), dtype=np.float64)
+    predictions = []
     for index, alpha in enumerate(alphas):
         prediction = np.zeros_like(targets)
         for fold in folds:
@@ -107,9 +119,14 @@ def gene_fold_ridge_r2(gram: np.ndarray, targets: np.ndarray, *, alphas=RIDGE_AL
         residual = ((targets - prediction) ** 2).sum(axis=0)
         total = ((targets - targets.mean(axis=0, keepdims=True)) ** 2).sum(axis=0)
         curve[index] = 1.0 - residual / np.maximum(total, 1e-300)
+        if return_prediction:
+            predictions.append(prediction)
     best = int(np.argmax(curve.mean(axis=1)))
-    return {"alphas": [float(a) for a in alphas], "r2_curve": curve, "selected_alpha": float(alphas[best]),
-            "selected_index": best, "r2": curve[best].copy(), "n_folds": int(n_folds), "seed": int(seed)}
+    result = {"alphas": [float(a) for a in alphas], "r2_curve": curve, "selected_alpha": float(alphas[best]),
+              "selected_index": best, "r2": curve[best].copy(), "n_folds": int(n_folds), "seed": int(seed)}
+    if return_prediction:
+        result["prediction"] = predictions[best]
+    return result
 
 
 def atom_cosines(response: np.ndarray, directions: np.ndarray) -> np.ndarray:
@@ -252,11 +269,17 @@ def certifiable_attribution(table: pd.DataFrame, *, shuffle_ceiling: float = 0.2
             & (table["attributed_set_coherence_percentile"].to_numpy(float) > coherence_floor))
 
 
-def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, output: str,
-                       secondary_perturbation: str = "", pca_targets: str = "",
-                       artifacts: tuple[str, ...] = (), states: tuple[str, ...] = ("wsi_biology",),
-                       n_components: int = 0, partition: str = "test", n_top_atoms: int = 10,
-                       seed: int = 0) -> dict:
+def development_pca(pbs_targets: str, rna_table: str, *, n_components: int = 0,
+                    pca_targets: str = "") -> dict:
+    """The frozen development-fit PCA block: loadings, scores, and its verification.
+
+    Split out of :func:`attribution_report` so that a rotation fitted in
+    :mod:`morpheus.v2.attributable_basis` and the certificate that scores it are
+    reading *the same* PCA, from one piece of code, rather than two fits that
+    happen to agree today. The verification against ``pca_targets`` is part of the
+    same object for the same reason: the axes attributed must be the ones that beat
+    PBS, and a caller cannot obtain the loadings without also obtaining the proof.
+    """
     reference = load_reference_targets(pbs_targets)
     expression, transform, _mean, scale = development_expression_moments(rna_table, reference)
     genes = [str(g) for g in reference["genes"]]
@@ -276,6 +299,94 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
             frozen_scores.shape == axis_scores.shape
             and float(np.abs(frozen_scores - axis_scores).max()) < 1e-3)
         verification["max_abs_difference_vs_frozen"] = float(np.abs(frozen_scores - axis_scores).max())
+    return {"reference": reference, "genes": genes, "scale": scale, "width": width,
+            "loadings": loadings, "axis_scores": axis_scores, "verification": verification,
+            "explained_variance_ratio": np.asarray(pca.explained_variance_ratio_, dtype=np.float64),
+            "expression_transform": transform}
+
+
+def cross_line_alignment(primary: dict, secondary: dict, loadings: np.ndarray) -> dict:
+    """Align two perturbation lines onto their shared atoms and shared genes.
+
+    The K562 and RPE1 files do not carry the same genes or the same atoms, so a
+    cross-line comparison is only meaningful on the intersection of both. This is
+    the one place that intersection is taken. It is split out because the rotation
+    that maximises cross-line agreement and the certificate condition that scores
+    cross-line agreement have to be looking at the *same* 1,764 atoms and 6,207
+    genes; deriving the intersection twice is how the "held-out atoms" claim would
+    quietly stop being true.
+    """
+    atom_ids, gene_index = primary["atom_ids"], primary["gene_index"]
+    shared_genes = np.intersect1d(gene_index, secondary["gene_index"])
+    shared_atoms = np.intersect1d(atom_ids, secondary["atom_ids"])
+    primary_order, secondary_order = np.argsort(atom_ids), np.argsort(secondary["atom_ids"])
+    rows_a = primary_order[np.searchsorted(atom_ids, shared_atoms, sorter=primary_order)]
+    rows_b = secondary_order[np.searchsorted(secondary["atom_ids"], shared_atoms, sorter=secondary_order)]
+    cols_a = np.searchsorted(gene_index, shared_genes)
+    cols_b = np.searchsorted(secondary["gene_index"], shared_genes)
+    return {"directions": np.asarray(loadings, dtype=np.float64)[shared_genes],
+            "response_a": primary["response"][np.ix_(rows_a, cols_a)],
+            "response_b": secondary["response"][np.ix_(rows_b, cols_b)],
+            "shared_atoms": shared_atoms, "shared_genes": shared_genes}
+
+
+def validated_rotation(path: str, loadings: np.ndarray) -> tuple[np.ndarray, dict]:
+    """Load a rotation and REFUSE it unless it leaves the subspace exactly alone.
+
+    Two ways a "basis-choice test" silently stops being one, both fatal here
+    rather than reported as a caveat: a matrix that is not orthogonal (the axes
+    are no longer a basis and per-axis quantities are no longer comparable), and
+    a matrix that moves the span (the arm now has different information, so a
+    higher certified count would mean nothing about basis choice).
+    """
+    width = np.asarray(loadings).shape[1]
+    matrix = np.asarray(np.load(path, allow_pickle=True)["rotation"], dtype=np.float64)
+    if matrix.shape != (width, width):
+        raise ValueError(f"rotation must be [{width}, {width}], got {matrix.shape}")
+    orthogonality = float(np.abs(matrix.T @ matrix - np.eye(width)).max())
+    if orthogonality > 1e-8:
+        raise ValueError(f"rotation is not orthogonal: max |RᵀR - I| = {orthogonality:.3e}")
+    overlap = subspace_alignment(loadings, np.asarray(loadings) @ matrix)
+    if abs(overlap["mean_squared_cosine"] - 1.0) > 1e-8:
+        raise ValueError("rotation moved the span; that is not a basis-choice test")
+    return matrix, {"status": "rotated", "path": str(Path(path).resolve()),
+                    "max_abs_orthogonality_error": orthogonality,
+                    "mean_squared_cosine_vs_pca_span": overlap["mean_squared_cosine"],
+                    "rotation_digest": _digest(matrix)}
+
+
+def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, output: str,
+                       secondary_perturbation: str = "", pca_targets: str = "",
+                       artifacts: tuple[str, ...] = (), states: tuple[str, ...] = ("wsi_biology",),
+                       n_components: int = 0, partition: str = "test", n_top_atoms: int = 10,
+                       seed: int = 0, rotation: str = "") -> dict:
+    """Score the four-condition certificate on the PCA axes, or on a rotation of them.
+
+    ``rotation`` is a path to an ``.npz`` holding an orthogonal ``[axis, axis]``
+    matrix ``R`` under the key ``rotation``, written by
+    :mod:`morpheus.v2.attributable_basis`. When given, the loadings and the scores
+    are both post-multiplied by it, which leaves the 128-dimensional **span**
+    exactly unchanged (asserted, not assumed) and changes only which directions
+    inside it are scored. Everything after that line — the nulls, the ridge, the
+    cosines, the coherence, the legibility, the certificate and its thresholds —
+    is the identical code path, so a difference in the certified count is a fact
+    about the basis rather than about the harness.
+    """
+    block = development_pca(pbs_targets, rna_table, n_components=n_components, pca_targets=pca_targets)
+    reference, genes, scale = block["reference"], block["genes"], block["scale"]
+    width, transform, verification = block["width"], block["expression_transform"], block["verification"]
+    loadings, axis_scores = block["loadings"], block["axis_scores"]
+    explained_variance_ratio = block["explained_variance_ratio"]
+
+    rotation_summary: dict = {"status": "identity", "path": ""}
+    if rotation:
+        matrix, rotation_summary = validated_rotation(rotation, loadings)
+        # The variance an axis carries is a property of the DIRECTION, not of the
+        # PCA ordering, so it has to be recomputed for a rotated axis rather than
+        # inherited: R diag(v) Rᵀ's diagonal, normalised the way PCA normalises.
+        explained_variance_ratio = (matrix ** 2 * explained_variance_ratio[:, None]).sum(axis=0)
+        loadings = loadings @ matrix
+        axis_scores = np.asarray(np.asarray(axis_scores, dtype=np.float64) @ matrix, dtype=np.float32)
 
     primary = load_aligned_response(perturbation, genes, scale, scaling="tcga_sd")
     gene_index, response, atom_ids = primary["gene_index"], primary["response"], primary["atom_ids"]
@@ -297,21 +408,24 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
 
     cross_line: dict[str, object] = {"status": "not_requested"}
     cross_line_spearman = np.full(width, np.nan)
+    cross_line_fold = {"a": np.full(width, np.nan), "b": np.full(width, np.nan)}
     if secondary_perturbation:
         secondary = load_aligned_response(secondary_perturbation, genes, scale, scaling="tcga_sd")
-        shared_genes = np.intersect1d(gene_index, secondary["gene_index"])
-        shared_atoms = np.intersect1d(atom_ids, secondary["atom_ids"])
-        primary_order, secondary_order = np.argsort(atom_ids), np.argsort(secondary["atom_ids"])
-        rows_a = primary_order[np.searchsorted(atom_ids, shared_atoms, sorter=primary_order)]
-        rows_b = secondary_order[np.searchsorted(secondary["atom_ids"], shared_atoms, sorter=secondary_order)]
-        cols_a = np.searchsorted(gene_index, shared_genes)
-        cols_b = np.searchsorted(secondary["gene_index"], shared_genes)
-        directions = loadings[shared_genes]
-        cosine_a = atom_cosines(response[np.ix_(rows_a, cols_a)], directions)
-        cosine_b = atom_cosines(secondary["response"][np.ix_(rows_b, cols_b)], directions)
+        aligned = cross_line_alignment(primary, secondary, loadings)
+        cosine_a = atom_cosines(aligned["response_a"], aligned["directions"])
+        cosine_b = atom_cosines(aligned["response_b"], aligned["directions"])
         cross_line_spearman = np.asarray([_spearman(cosine_a[:, k], cosine_b[:, k]) for k in range(width)])
-        cross_line = {"status": "scored", "n_shared_atoms": int(len(shared_atoms)),
-                      "n_shared_genes": int(len(shared_genes)),
+        # The SAME 50/50 atom split a cross-line-optimising rotation is fitted on,
+        # scored here for EVERY arm including the identity, so that "held out from
+        # the rotation" is a column in the table rather than a claim in prose.
+        fold_a, fold_b = atom_folds(len(aligned["shared_atoms"]), seed=seed)
+        for name, rows in (("a", fold_a), ("b", fold_b)):
+            cross_line_fold[name] = np.asarray([_spearman(cosine_a[rows, k], cosine_b[rows, k])
+                                                for k in range(width)])
+        cross_line = {"status": "scored", "n_shared_atoms": int(len(aligned["shared_atoms"])),
+                      "n_shared_genes": int(len(aligned["shared_genes"])),
+                      "n_atoms_fold_a": int(len(fold_a)), "n_atoms_fold_b": int(len(fold_b)),
+                      "atom_fold_seed": int(seed),
                       "secondary": secondary["provenance"]}
 
     shuffle_spearman = np.asarray([_spearman(cosine[:, k], cosine_shuffled[:, k]) for k in range(width)])
@@ -324,7 +438,7 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
     for k in range(width):
         order = np.argsort(-np.abs(cosine[:, k]))[:n_top_atoms]
         record = {"axis": f"PCA_{k:03d}", "axis_index": k,
-                  "explained_variance_ratio": float(pca.explained_variance_ratio_[k]),
+                  "explained_variance_ratio": float(explained_variance_ratio[k]),
                   "r2_cv": float(arms["axes"]["r2"][k]),
                   "r2_cv_random_direction_null": float(arms["random_direction_null"]["r2"][k]),
                   "r2_cv_gene_label_shuffle_null": float(arms["gene_label_shuffle_null"]["r2"][k]),
@@ -333,6 +447,8 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
                   "top_atom_cosine_random_direction_null": float(np.abs(cosine_random[:, k]).max()),
                   "shuffle_rank_spearman": float(shuffle_spearman[k]),
                   "cross_line_rank_spearman": float(cross_line_spearman[k]),
+                  "cross_line_rank_spearman_atom_fold_a": float(cross_line_fold["a"][k]),
+                  "cross_line_rank_spearman_atom_fold_b": float(cross_line_fold["b"][k]),
                   "attributed_set_coherence": float(coherence["coherence"][k]),
                   "attributed_set_coherence_percentile": float(coherence["percentile"][k]),
                   "attributed_set_coherence_random_direction_null": float(coherence_null["coherence"][k]),
@@ -348,7 +464,7 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
         "n_axes": int(width), "n_atoms": int(len(atom_ids)), "n_genes": int(len(gene_index)),
         "pbs_targets": str(Path(pbs_targets).resolve()),
         "perturbation": primary["provenance"], "expression_transform": transform,
-        "pca_verification": verification, "cross_line": cross_line,
+        "pca_verification": verification, "cross_line": cross_line, "rotation": rotation_summary,
         "ridge": {arm: {"selected_alpha": value["selected_alpha"], "alphas": value["alphas"],
                         "mean_r2_by_alpha": value["r2_curve"].mean(axis=1).round(6).tolist(),
                         "median_r2": float(np.median(value["r2"]))}
@@ -376,6 +492,20 @@ def attribution_report(*, pbs_targets: str, rna_table: str, perturbation: str, o
         "n_failing_cross_line": int((table["cross_line_rank_spearman"].to_numpy(float) < 0.30).sum()),
         "n_failing_coherence": int((table["attributed_set_coherence_percentile"].to_numpy(float) <= 0.95).sum()),
         "certified_axes": table.loc[certified, "axis"].tolist()}
+    # The identical certificate with condition 3 read on the held-out half of the
+    # shared atoms. For the identity arm this is a noisier version of the same
+    # thing; for a rotation FITTED to maximise cross-line agreement on the other
+    # half it is the only version that is not circular. Computed for every arm so
+    # the two are comparable, and through `certifiable_attribution` itself so the
+    # thresholds cannot drift from the headline count's.
+    for fold in ("a", "b"):
+        column = f"cross_line_rank_spearman_atom_fold_{fold}"
+        if table[column].notna().any():
+            substituted = table.assign(cross_line_rank_spearman=table[column])
+            mask = certifiable_attribution(substituted)
+            summary["causal_name_certificate"][f"n_certified_atom_fold_{fold}"] = int(mask.sum())
+            summary["causal_name_certificate"][f"certified_axes_atom_fold_{fold}"] = \
+                table.loc[mask, "axis"].tolist()
     variance = table["explained_variance_ratio"].to_numpy(dtype=float)
     r2 = table["r2_cv"].to_numpy(dtype=float)
     cosine_column = table["top_atom_cosine"].to_numpy(dtype=float)
@@ -424,13 +554,14 @@ def main() -> None:
     parser.add_argument("--partition", default="test")
     parser.add_argument("--n-top-atoms", type=int, default=10)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--rotation", default="", help="npz with an orthogonal [axis, axis] 'rotation'")
     args = parser.parse_args()
     print(json.dumps(attribution_report(
         pbs_targets=args.pbs_targets, rna_table=args.rna_table, perturbation=args.perturbation,
         output=args.output, secondary_perturbation=args.secondary_perturbation,
         pca_targets=args.pca_targets, artifacts=tuple(args.artifacts), states=tuple(args.states),
         n_components=args.n_components, partition=args.partition, n_top_atoms=args.n_top_atoms,
-        seed=args.seed), indent=2, sort_keys=True))
+        seed=args.seed, rotation=args.rotation), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

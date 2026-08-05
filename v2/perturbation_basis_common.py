@@ -31,7 +31,22 @@ from pathlib import Path
 
 import numpy as np
 
-__all__ = ["SCALINGS", "load_aligned_response", "subspace_alignment"]
+__all__ = ["SCALINGS", "load_aligned_response", "subspace_alignment", "atom_folds"]
+
+
+def atom_folds(n_atoms: int, *, seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
+    """A seeded 50/50 split of atom ROW indices into (fold_a, fold_b).
+
+    Lives here, next to the loader, because two callers must agree on it exactly
+    and neither may re-roll it: a rotation fitted to maximise cross-cell-line
+    agreement is fitted on fold A, and the only cross-line number that may be read
+    as evidence for that rotation is computed on fold B. If the fitter and the
+    scorer derived the split separately they could drift, and the held-out claim
+    would be false without anything failing.
+    """
+    order = np.random.default_rng(seed).permutation(int(n_atoms))
+    cut = int(n_atoms) // 2
+    return np.sort(order[:cut]), np.sort(order[cut:])
 
 #: The declared perturbation-side scalings. Named so a deviation cannot be silent.
 SCALINGS = ("tcga_sd", "own_sd", "raw")
