@@ -324,13 +324,35 @@ def test_the_expanded_floor_set_covers_every_statistic_t1_scores(audit):
 
 
 def test_the_floor_is_a_property_of_the_statistic_and_of_the_view(audit):
-    """§4.3's withdrawn claim, and §4.1a's third finding, asserted against the list."""
+    """§4.3's withdrawn claim, and §4.1a's third finding, asserted against the list.
+
+    Updated 2026-08-05 for the both-arm floor
+    (`NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md`): the
+    `rna_biology`/`full_biology` view floors and the RankMe/R1 raw-block comparison
+    were measured on `programme_only` alone, and both arms now carry a floor. The
+    view floors are larger under the both-arm reading (still far below
+    `wsi_biology`'s 3.295×, which is what "the floor is a property of the view"
+    asserts) and the RankMe-vs-R1 raw-block comparison REVERSES: RankMe's own
+    floor is now the *larger* of the two, not the smaller -- the paper's flagship
+    self-criticism reversing under its own criterion, applied one level up.
+    """
     floors = audit["floors"]
     assert floors["hard_rank_residualised_export"]["value"] == 1.0
     assert floors["R1_residualised_export"]["value"] > 3.0
-    assert floors["R1_residualised_rna_view"]["value"] < 1.05
-    assert floors["R1_residualised_full_view"]["value"] < 1.05
-    assert floors["RankMe_published_raw_export"]["value"] < floors["R1_raw_export"]["value"]
+    # Both-arm floors: still a fraction of the wsi_biology floor (the view effect
+    # survives), but no longer under the single-arm 1.05x -- the arm effect that
+    # inflates them is part of the finding, not noise to round away.
+    assert floors["R1_residualised_rna_view"]["value"] < 1.30
+    assert floors["R1_residualised_rna_view"]["value"] > 1.05
+    assert floors["R1_residualised_full_view"]["value"] < 1.50
+    assert floors["R1_residualised_full_view"]["value"] > 1.05
+    assert (floors["R1_residualised_rna_view"]["value"]
+            < floors["R1_residualised_export"]["value"])
+    assert (floors["R1_residualised_full_view"]["value"]
+            < floors["R1_residualised_export"]["value"])
+    # REVERSED under the both-arm floor: RankMe's own floor is now the LARGER of
+    # the two, not the smaller -- see finding (ii) of the notebook entry above.
+    assert floors["RankMe_published_raw_export"]["value"] > floors["R1_raw_export"]["value"]
 
 
 # --- unjudgeable is not a verdict -----------------------------------------
@@ -373,21 +395,33 @@ def test_the_two_rows_that_used_to_clear_now_clear_a_floor_on_their_own_block(au
 def test_the_selections_that_clear_are_exactly_these(audit):
     """Pinned so that neither a new pass nor a lost one can arrive quietly.
 
-    One of these is on the exported block -- RankMe as published, whose floor of
-    1.811x is low enough that its widest D2 fold gets over it. The other eight
-    are the probe-block rows the five-repeat floor made judgeable, and they are
-    listed by name because "all of them cleared" is the kind of result that has
-    to be checkable rather than asserted.
+    All ten of these are on the fixed held-out probe block; NONE is on the
+    exported artifact block any longer. `4.6-rankme-d2` was in this list and is
+    NOT any longer: it was the paper's one selection clearing a floor on the
+    exported block, RankMe as published against its own single-arm floor of
+    1.811x. Measured on both arms
+    (`NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md`),
+    that floor is 3.5484x, carried by the previously-unmeasured unstable arm, and
+    the row's own 3.382x fold no longer clears it. That is the second row this
+    audit has ever recorded leaving the clearing column -- the first was
+    `5.4-m0999-over-m099`, below -- and, like that one, it left because a floor
+    that had only ever been measured on one arm was finally measured on both, not
+    because anything about the row itself was reinterpreted.
+
+    The remaining ten are the probe-block rows the five-repeat floor made
+    judgeable, and they are listed by name because "all of them cleared" is the
+    kind of result that has to be checkable rather than asserted.
 
     `5.4-m0999-over-m099` was in this list and is NOT any longer: it cleared its
     five-repeat floor by 5.6% and fails its ten-repeat one. That is the only row
-    this audit has ever recorded leaving the clearing column, and it left it
-    because the claim was pushed rather than because anything was reinterpreted.
+    this audit has ever recorded leaving the clearing column on its OWN block's
+    measurement (as opposed to `4.6-rankme-d2`, which left because the floor
+    gained a second, previously-unmeasured arm) -- and it left it because the
+    claim was pushed rather than because anything was reinterpreted.
     """
     clearing = sorted(r["id"] for r in audit["comparisons"]
                       if r["kind"] == "selection" and r["clears"] is True)
     assert clearing == sorted([
-        "4.6-rankme-d2",
         "4.4-3-fixedseed-probe",
         "4.9a-decorr-r1",
         "4.9a-decorr-r3",

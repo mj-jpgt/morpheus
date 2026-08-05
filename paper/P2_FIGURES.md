@@ -16,16 +16,25 @@ selection signal"* — is WITHDRAWN** (draft §4.1b); any figure or caption stil
 > smaller than its own within-arm reproducibility floor — inside the regime its proponents explicitly
 > reserve for it — and its dynamic range there is dominated by the one factor that carries no
 > information, the training seed. On `rna_biology` and `full_biology`, same statistic, same five runs,
-> the floor is fifty times smaller and every between-arm difference clears it.
+> measured on **both training arms** (a correction of 2026-08-05 — see below), the floor is roughly
+> ten times smaller and most, not every, between-arm difference clears it.
 
-**And the fact the figure set must not bury** (draft §4.1b): on the raw exported block **RankMe as
-published has a retraining floor of 1.811× against our centred statistic's 3.111×** on the same five
-retrains, and RankMe is the only selection in the paper's own audit that clears a floor on the
-**exported artifact block** — the block every between-arm comparison in §4 is measured on. (**Eleven**
-further selections clear; every one is §5's, against probe-block floors — T10's ten same-seed repeats
-at step 500 plus the three later floors at step 600, at `m = 0.99`, and at capacity 64.
-*Updated 2026-08-05: this said "eight" while only T10's floor existed;
-`NOTEBOOK_ENTRIES/three_floors_close_the_last_three_unjudgeable_rows_20260805T0000Z.md`.*) **T9**
+**And the fact the figure set must not bury, updated 2026-08-05 and now reversed** (draft §4.1b): on
+the raw exported block **RankMe as
+published had a retraining floor of 1.811× against our centred statistic's 3.111× — measured on
+`programme_only` alone.** Measured on both training arms
+(`NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md`), RankMe's own floor is
+**3.5484×**, carried by `programme_free`, larger than our centred statistic's unchanged 3.111× — **the
+comparison reverses, and no selection in the paper's own audit any longer clears a floor on the
+exported artifact block.** (**Ten**
+selections clear, all of them §5's, against probe-block floors — T10's ten same-seed repeats
+at step 500 plus the three later floors at step 600, at `m = 0.99`, and at capacity 64, minus the
+`m = 0.99` row itself once pushed to n = 10.
+*Updated 2026-08-05: this said "eleven" including the exported-block RankMe row, which has since
+been measured on both arms and stopped clearing;
+`NOTEBOOK_ENTRIES/three_floors_close_the_last_three_unjudgeable_rows_20260805T0000Z.md`,
+`limit2_breaks_at_ten_repeats_20260805T0330Z.md`,
+`unstable_arm_exported_floor_measured_20260805T0755Z.md`.*) **T9**
 carries both halves; **F1** must be captioned as measuring one view with one statistic, not as
 measuring the metric.
 
@@ -108,8 +117,11 @@ it. The panel letters below are the new ones.
 **Claim.** **All seven** of the between-arm rank differences this project has ever measured are
 smaller than the spread of the same statistic when one configuration is retrained, at the same seed,
 five times — **on the `wsi_biology` view, under canonical R1**. Both conditions are load-bearing and
-**T9 is the figure that says so**: on `rna_biology` and `full_biology` the same five retrains spread
-1.019× and 1.020× and every between-arm difference clears. F1 must not be captioned as though the
+**T9 is the figure that says so**: on `rna_biology` and `full_biology` the same five `programme_only`
+retrains spread 1.019× and 1.020×, but the floor that licenses a verdict is measured on **both**
+training arms — 1.230× and 1.422×, carried by `programme_free` — and clears **most, not every**,
+between-arm difference (4 of 6 `rna_biology`, 3 of 6 `full_biology`; updated 2026-08-05, see T9). F1
+must not be captioned as though the
 floor were a property of the metric.
 
 **Panels.**
@@ -171,10 +183,14 @@ D1-B point and **raw** for the Phase 1b point, which is judged against the raw-b
 and whose arms were never verified matched (§3.4). The seventh point clears by **1.5%**. The claim does
 not rest on this figure alone: F2 reaches the same conclusion from 8 within-arm degrees of freedom
 without using the floor at all. **And the view and the statistic must be named in the caption as
-conditions, not as details**: this floor is `wsi_biology` under canonical R1; the same five runs give
-1.019× on `rna_biology`, 1.020× on `full_biology`, 2.290× under R3, 1.224× under stable rank and
-1.000× under the hard numerical rank, and **1.811× under RankMe as published on the raw block against
-our own 3.111×** (T9).
+conditions, not as details**: this floor is `wsi_biology` under canonical R1; the same five
+`programme_only` runs give
+1.019× on `rna_biology` and 1.020× on `full_biology` alone, 2.290× under R3, 1.224× under stable rank
+and
+1.000× under the hard numerical rank. **Measured on both training arms (2026-08-05), the
+`rna_biology`/`full_biology` floors that license a verdict are 1.230×/1.422×, carried by
+`programme_free`, and RankMe as published now has a floor of 3.5484× on the raw block against our own
+3.111× — the reverse of the earlier single-arm reading of 1.811×** (T9).
 
 ---
 
@@ -690,16 +706,21 @@ regime; §4.1's own argument is that a pair drawn from concordant repeats can li
 62 rows, one per rank comparison, each with its two values, its fold, its **statistic**, its
 **block**, the floor **its own statistic, block and reading step license**, whether it clears, and
 what the claim rests on if it does not. Of the 25 selections between candidate configurations,
-**13 fail, 12 clear and 0 are unjudgeable** — every selection now has a floor measured on its own
-statistic, block, reading step and arm. **Exactly one of the twelve is on the exported artifact
-block** — the block every between-arm comparison in §4 is measured on — and it is **RankMe as
-published**, whose floor (1.811× raw) is nearly half of canonical
-R1's (3.111× raw) on the same five retrains. The other **eleven** are §5's, against the probe-block
+**15 fail, 10 clear and 0 are unjudgeable** — every selection now has a floor measured on its own
+statistic, block, reading step and arm. **Zero clear a floor on the exported artifact
+block** — the block every between-arm comparison in §4 is measured on. Not **RankMe as
+published** (floor 1.811× raw on `programme_only` alone, but 3.5484× raw measured on both training
+arms — larger than canonical
+R1's 3.111×, so the row that used to clear no longer does), and not ours. All **ten** are §5's, against the probe-block
 floors of **T10** and the three later ones (step 600, step 600 at `m = 0.99`, capacity 64 at step
 150). *The counting history is part of the table's value: 23 failures when one floor was applied
 to everything, then 13 / 11 / 1 once block-matching was enforced, then 13 / 9 / 3 once the probe block
-was measured, then **13 / 12 / 0** once the last three selections had floors on their own settings —
-**the thirteen failures never moved**.* **16** of the 62 rows are unjudgeable; 5 are exempt with the
+was measured, then 13 / 12 / 0 once the last three selections had floors on their own settings, then
+14 / 11 / 0 once the narrowest of those passes was pushed from five same-seed repeats per arm to ten
+and stopped clearing, then **15 / 10 / 0** once the exported block's RankMe row was measured on both
+training arms rather than `programme_only` alone and stopped clearing too —
+**no failure has ever moved into the clearing column; two passes have now moved the other way, on two
+independent mechanisms**.* **16** of the 62 rows are unjudgeable; 5 are exempt with the
 reason stated. **Unjudgeable is not a pass and not a failure**, and the audit enforces the
 distinction: a row with no floor records `clears: null`. **Every count in this paragraph is generated
 by `p2_floor_audit.summary()` and must be re-read from it rather than edited here** — the 13 / 9 / 3
@@ -760,20 +781,26 @@ and it is now the claim §4 is organised around**, which is why it gets one.
 retrains, from the same artifacts. **The difference between "unusable" and "usable" is a choice of
 co-trained view that no paper we have read reports making.**
 
-**Panel A — the view axis.** Canonical R1, residualised, the five `programme_only` repeats, one row
-per co-trained view, with the between-arm resolvability count printed beside each:
+**Panel A — the view axis.** Canonical R1, residualised, five repeats per arm, one row
+per co-trained view, with the between-arm resolvability count printed beside each. The
+`programme_only`-only figures are kept for provenance; the floor that licenses a verdict is the
+**both-arm** one (2026-08-05 correction), carried by `programme_free` on the two views that had never
+been measured on it before:
 
-| view | min | max | **floor** | divergent repeat | **§4.5(c) pairs resolvable** |
-|---|---:|---:|---:|---|:---:|
-| `wsi_biology` | 8.8340 | 29.1057 | **3.295×** | rep2, low, **bimodal** | **0 of 6** |
-| `full_biology` | 29.8042 | 30.3991 | **1.020×** | rep2, **high** | **6 of 6** |
-| `rna_biology` | 27.2245 | 27.7497 | **1.019×** | rep2, low, by **1.9%** | **6 of 6** |
+| view | min (`programme_only`) | max (`programme_only`) | floor, `programme_only` alone | **floor, both arms** | divergent repeat | **§4.5(c) pairs resolvable** |
+|---|---:|---:|---:|---:|---|:---:|
+| `wsi_biology` | 8.8340 | 29.1057 | 3.295× | **3.295×** (unchanged; `programme_free` reads 1.4254×, smaller) | rep2, low, **bimodal** | **0 of 6** |
+| `full_biology` | 29.8042 | 30.3991 | 1.020× | **1.422×** | rep2, **high** | **3 of 6** |
+| `rna_biology` | 27.2245 | 27.7497 | 1.019× | **1.230×** | rep2, low, by **1.9%** | **4 of 6** |
 
-**Panel B — the statistic axis**, one block (exported `wsi_biology`, residualised), same five runs:
-**1.000×** hard numerical rank · **1.224×** stable rank · **1.419×** PR · **1.466×** PR_rownorm ·
+**Panel B — the statistic axis**, one block (exported `wsi_biology`, residualised), same five
+`programme_only` runs: **1.000×** hard numerical rank · **1.224×** stable rank · **1.419×** PR ·
+**1.466×** PR_rownorm ·
 **2.224×** R2 · **2.290×** R3 · **2.299×** α-ReQ |α−1| · **3.295×** canonical R1 · **3.295×**
-residualised RankMe. And on the **raw** block, the row that costs the paper most: **1.811×** RankMe as
-published against **3.111×** canonical R1.
+residualised RankMe. And on the **raw** block, the row that costs the paper most and has since
+reversed: **1.811×** RankMe as
+published on `programme_only` alone, against **3.111×** canonical R1 — but **3.5484×** measured on
+both training arms (carried by `programme_free`), now the LARGER of the two.
 
 **Data.** `v2/research/rebase/p2/figures/data/ws_floor/out/P2_ENVELOPE_FLOORS.json`, measured by
 `v2/research/rebase/p2/p2_envelope_floors.py` (CPU only, thread-capped, workspace verified 543/543
@@ -794,10 +821,15 @@ changes is the magnitude, and the four-concordant-plus-a-factor shape survives *
 R3 and residualised RankMe. That reads as a **redistribution of spectral mass in the tail**, which
 entropy-based statistics see by construction and dominant-subspace statistics do not. **(3)** The
 `rna_biology` ground truth is partly circular (§4.5(c)) and this table is **not** a recommendation to
-switch views: on that view every difference is resolvable and the rank ordering is wrong on **3 of 6**
-pairs, against **1 of 6** on `wsi_biology`. **(4)** RankMe's 1.811× against our 3.111× is **on the raw
+switch views: on that view **4 of 6** differences are resolvable (both-arm floor) and the rank ordering
+is wrong on **1 of 4** (the surviving D2 pair); on `full_biology`, **3 of 6** are resolvable — all
+three D1 pairs, no D2 pair clears the both-arm floor — and the ordering is right on **3 of 3**; against
+**1 of 6** wrong on `wsi_biology`. All five of the losses from 12/12 to 7/12 are D2 pairs, and no D2
+arm has ever had its own retraining floor measured on either training arm. **(4)** RankMe's floor is
+**on the raw
 block only**; on the residualised block, where the mean offset is already gone, the two coincide at
-3.295×, which is the evidence for the mechanism rather than a qualification of it.
+3.295×, which is the evidence for the mechanism rather than a qualification of it — and the mechanism's
+*sign* (which arm's mean-offset direction is the stable one) is what turned out to be arm-conditional.
 
 ### T10 — The fixed held-out probe has a floor, it is carried by the collapsed arm, and it is not bimodal — **NEW 2026-08-04**
 
@@ -1292,7 +1324,7 @@ adjudicate".* (Draft §4.10, §5.2a, §6.2;
 | ~~**The six `lr_L*.log` learning-rate logs, vendored**~~ | **CLOSED 2026-08-04, and closing it found four errors in §5's prose** — the step budget (200, not 400), the two run families §5.2 presents as one, "40 epochs = 583 steps" against a 1,500-step budget, and §6.4's "six rows" for four. Every affected value re-resolved exactly; only the provenance and the prose moved. *Superseded text:* **Not vendored, and this was the weakest provenance in the paper's only established mechanism result.** `ablate_decorr*` and `mseed_*` were copied into the vendored `d1_diag` directory under `v2/research/rebase/p2/figures/data/` and every value read from them is re-parsed from the copy by `v2/tests/test_p2_floor_audit.py`. `lr_L{1..6}.log` were not, so §5.2a's four audit rows resolve against **the draft's own table** — the weakest of the three source kinds the audit supports. **Closing it is a file copy; nothing needs re-running.** | §5.2a, §6.4, S9 |
 | ~~**The RNA-view mutual cosine on the CENTRED representation, for the three `lr = 1e-3` arms**~~ | **MEASURED, and it settles nothing — which is itself the finding.** Centred R3 reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred cosine reads 0.9946 / 0.9257 / 0.5207; **seven of the nine centred readings sit between −0.004 and +0.037** — degenerate, and partly entailed by the centred rank itself being near 1 — and the centred cosine's own within-arm spread (up to **0.630**) exceeds any across-arm difference on it. So it cannot adjudicate between "rank is insensitive at the collapse floor" and "the difference lives in the mean-offset direction centring removes"; both readings survive. **And the question it was asked to settle has been answered from the other side**: the uncentred dissociation does not survive a floor either (across-arm 0.223 against within-arm 0.250, n = 3 per arm), so there is no dissociation left to explain. *This row said "Not measured" until 2026-08-05.* | §4.10, §6.2, S9 |
 | ~~**A like-for-like retraining floor for the momentum regime**~~ | **MEASURED, 2026-08-04, and it is T10.** Ten runs — five identical repeats of *each* of the two arms S4 compares, `programme_free`, m ∈ {0.999, 0}, seed 42, 500 steps, on the fixed held-out probe: **the same arm, duration and block as the reading**. Three further five-repeat sets followed at step 600 (m = 0.999 / m = 0, and m = 0.999 / m = 0.99) and at capacity 64. The n = 2 **pair** this row used to record (`ablate_decorr0.04` against `mseed_m0.999_s42`: 1.066× at step 400; draft §4.1a row 56) now sits **inside** the n = 5 step-400 floor of 1.570×, which is what an n = 2 draw from the same noise should do; it stays in the audit as `nuisance` and **may still not be quoted as a floor**. What has *not* closed: every probe floor is n = 5 per arm at one seed on one stack at `lr = 2e-4`, and it is **carried by the collapsed arm** by about a factor of two. | §5.4, §6.2 |
-| ~~**A labelled linear probe on every artifact**~~ | **CLOSED 2026-08-05, and it is drawable as a fourth panel of F1.** All 12 artifacts, all 3 co-trained views, plus the five same-seed retrains F1(a) plots. Two probes, both predeclared: **A**, cancer type over 21 lineages, out-of-fold logistic *and* LDA on the **raw** block (the literal analogue of RankMe's own linear probe); **B**, six confound-adjusted molecular/clinical endpoints, within-cancer AUROC. **The headline is unfavourable and the panel must print it first:** the labelled probe has *rank's* reproducibility failure, not the channel's — five-repeat floors of **1.380×** (logistic) and **1.511×** (LDA) on `wsi_biology` against **1.011×** / **1.012×** on `rna_biology` / `full_biology`, beside rank's 3.295× / 1.019× / 1.020× and the channel's 1.055× / 1.007× / 1.005×. **F1's repeat-2 callout must gain the probe column**: on that run the probe falls **27%** (0.7413–0.7535 → 0.5459) where the channel falls 5%, so the caption may no longer say one quantity moves and the other does not. Two further counts belong on the panel and neither may be drawn without the other: rank sides with the probe **14** times and with the channel **9** across all resolvable conflicts, and the molecular panel agrees with the channel **24 of 27** resolvable comparisons on the readout view. Do **not** draw the probe floor as an envelope: it is n = 5, one arm, one seed, one stack. `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md`; predeclared at `NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md`. | §2.5, §4.1, §4.1a, §4.1b, §4.5(c), §4.6a, §4.7, §6.2, §6.3 |
+| ~~**A labelled linear probe on every artifact**~~ | **CLOSED 2026-08-05, and it is drawable as a fourth panel of F1.** All 12 artifacts, all 3 co-trained views, plus the five same-seed retrains F1(a) plots. Two probes, both predeclared: **A**, cancer type over 21 lineages, out-of-fold logistic *and* LDA on the **raw** block (the literal analogue of RankMe's own linear probe); **B**, six confound-adjusted molecular/clinical endpoints, within-cancer AUROC. **The headline is unfavourable and the panel must print it first:** the labelled probe has *rank's* reproducibility failure, not the channel's — five-repeat floors of **1.380×** (logistic) and **1.511×** (LDA) on `wsi_biology` against **1.011×** / **1.012×** on `rna_biology` / `full_biology` — all four `programme_only` alone, since the probe has not been remeasured on `programme_free` — beside rank's `programme_only`-alone 3.295× / 1.019× / 1.020× (both-arm: 3.295× / 1.230× / 1.422×, 2026-08-05) and the channel's 1.055× / 1.007× / 1.005×. **F1's repeat-2 callout must gain the probe column**: on that run the probe falls **27%** (0.7413–0.7535 → 0.5459) where the channel falls 5%, so the caption may no longer say one quantity moves and the other does not. Two further counts belong on the panel and neither may be drawn without the other: rank sides with the probe **14** times and with the channel **9** across all resolvable conflicts, and the molecular panel agrees with the channel **24 of 27** resolvable comparisons on the readout view. Do **not** draw the probe floor as an envelope: it is n = 5, one arm, one seed, one stack. `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md`; predeclared at `NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md`. | §2.5, §4.1, §4.1a, §4.1b, §4.5(c), §4.6a, §4.7, §6.2, §6.3 |
 | Error bars on any dilution rank or channel value | Single seed, single donor draw; the source states there is no error bar on level-to-level differences. | §4.8, §6.2 |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run; "unchanged" means the point estimates differ by 0.002 and nothing more. | §4.9, §6.2 |
 | Instance 1 with per-seed values or a run artifact | The cited source file does not exist in the repository; only summary prose survives. See S7. | §4.9, §6.4 |

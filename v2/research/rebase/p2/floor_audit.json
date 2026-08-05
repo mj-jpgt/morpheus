@@ -588,38 +588,39 @@
    "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
   },
   "RankMe_published_raw_export": {
-   "value": 1.811,
+   "value": 3.5484,
    "statistic": "RankMe (raw, uncentred, ε = 1e-7)",
    "block": "raw",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. THIS IS THE PUBLISHED STATISTIC — uncentred, ε inside the normalisation — and it is markedly more reproducible across retrains than our centred R1 on the same five runs (1.811× against 3.111×)",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`, per `p2_probe_floors.combine()`) for THE PUBLISHED STATISTIC — uncentred, ε inside the normalisation. Carried by `programme_free`: five identical retrains at seed 42, exported, `--objective-profile programme_free` the only changed flag from the stable arm's chain script. On `programme_only` alone this floor is 1.811×, smaller and not the one that binds; against canonical R1's both-arm floor of 3.1110× the comparison REVERSES — RankMe's floor (3.5484×) is now the larger of the two, not the smaller. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.wsi_biology.raw.RankMe.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.wsi_biology.raw.RankMe.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
+    "outlier": "rep1",
     "outlier_is_low": true,
-    "rest_fold": 1.0196,
-    "separation": 1.776,
+    "rest_fold": 2.3302,
+    "separation": 1.523,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.wsi_biology.raw.RankMe.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this statistic and block is 1.811× and does not carry this floor.",
+   "floor_arm": "programme_free"
   },
   "RankMe_residualised_export": {
    "value": 3.295,
@@ -656,208 +657,214 @@
    "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
   },
   "LiDAR_residualised_export": {
-   "value": 1.06,
+   "value": 2.5588,
    "statistic": "LiDAR",
    "block": "residualised (wsi + rna as the positive pair)",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. LiDAR is computed over the `wsi_biology`/`rna_biology` pair at q = 2, δ = 1e-4, exactly as T1 scores it",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`) for LiDAR over the `wsi_biology`/`rna_biology` pair at q = 2, δ = 1e-4, exactly as T1 scores it. Carried by `programme_free`. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.wsi_rna_paired.residualised.LiDAR.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.wsi_rna_paired.residualised.LiDAR.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
+    "outlier": "rep1",
     "outlier_is_low": true,
-    "rest_fold": 1.0243,
-    "separation": 1.034,
+    "rest_fold": 1.7377,
+    "separation": 1.473,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.wsi_rna_paired.residualised.LiDAR.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this statistic and block is 1.060× and does not carry this floor.",
+   "floor_arm": "programme_free"
   },
   "LiDAR_raw_export": {
-   "value": 1.034,
+   "value": 2.1708,
    "statistic": "LiDAR",
    "block": "raw (wsi + rna as the positive pair)",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read under this statistic on this block; `p2_envelope_floors.py`. LiDAR is computed over the `wsi_biology`/`rna_biology` pair at q = 2, δ = 1e-4, exactly as T1 scores it",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`) for LiDAR over the `wsi_biology`/`rna_biology` pair at q = 2, δ = 1e-4, on the raw block. Carried by `programme_free`. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.wsi_rna_paired.raw.LiDAR.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.wsi_rna_paired.raw.LiDAR.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
+    "outlier": "rep1",
     "outlier_is_low": true,
-    "rest_fold": 1.0256,
-    "separation": 1.009,
+    "rest_fold": 1.6102,
+    "separation": 1.348,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.wsi_rna_paired.raw.LiDAR.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this statistic and block is 1.034× and does not carry this floor.",
+   "floor_arm": "programme_free"
   },
   "R1_residualised_rna_view": {
-   "value": 1.019,
+   "value": 1.2305,
    "statistic": "R1",
    "block": "residualised, `rna_biology` view",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `rna_biology` view of the same exports; `p2_envelope_floors.py`",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`) on the `rna_biology` view of the same five-retrain exports §4.1 measures R1 on, residualised block. Carried by `programme_free`. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.rna_biology.residualised.R1.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.rna_biology.residualised.R1.min"
     }
    },
    "shape": {
     "outlier": "rep2",
-    "outlier_is_low": true,
-    "rest_fold": 1.016,
-    "separation": 1.003,
+    "outlier_is_low": false,
+    "rest_fold": 1.1797,
+    "separation": 1.043,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.rna_biology.residualised.R1.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this view and block is 1.019× and does not carry this floor — its objective supervises the RNA view directly, which is why it is pinned there.",
+   "floor_arm": "programme_free"
   },
   "R1_raw_rna_view": {
-   "value": 1.023,
+   "value": 1.2376,
    "statistic": "R1",
    "block": "raw, `rna_biology` view",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `rna_biology` view of the same exports; `p2_envelope_floors.py`",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`) on the `rna_biology` view of the same five-retrain exports, raw block. Carried by `programme_free`. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.rna_biology.raw.R1.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.rna_biology.raw.R1.min"
     }
    },
    "shape": {
     "outlier": "rep2",
-    "outlier_is_low": true,
-    "rest_fold": 1.0172,
-    "separation": 1.005,
+    "outlier_is_low": false,
+    "rest_fold": 1.1799,
+    "separation": 1.049,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.rna_biology.raw.R1.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this view and block is 1.023× and does not carry this floor.",
+   "floor_arm": "programme_free"
   },
   "R1_residualised_full_view": {
-   "value": 1.02,
+   "value": 1.422,
    "statistic": "R1",
    "block": "residualised, `full_biology` view",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `full_biology` view of the same exports; `p2_envelope_floors.py`",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`) on the `full_biology` view of the same five-retrain exports §4.1 measures R1 on, residualised block. Carried by `programme_free`. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.full_biology.residualised.R1.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.full_biology.residualised.R1.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
-    "outlier_is_low": false,
-    "rest_fold": 1.0149,
-    "separation": 1.005,
+    "outlier": "rep1",
+    "outlier_is_low": true,
+    "rest_fold": 1.1604,
+    "separation": 1.225,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.full_biology.residualised.R1.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this view and block is 1.020× and does not carry this floor.",
+   "floor_arm": "programme_free"
   },
   "R1_raw_full_view": {
-   "value": 1.014,
+   "value": 1.4355,
    "statistic": "R1",
    "block": "raw, `full_biology` view",
    "n": 5,
-   "what": "the same five identical `programme_only` retrains at seed 42 that §4.1 measures R1 on, re-read on the `full_biology` view of the same exports; `p2_envelope_floors.py`",
+   "what": "the BOTH-ARM floor (max of `programme_only` and `programme_free`) on the `full_biology` view of the same five-retrain exports, raw block. Carried by `programme_free`. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
    "a": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.full_biology.raw.R1.max"
     }
    },
    "b": {
     "src": {
      "kind": "json",
-     "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+     "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
      "path": "floors.full_biology.raw.R1.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
-    "outlier_is_low": false,
-    "rest_fold": 1.009,
-    "separation": 1.005,
+    "outlier": "rep1",
+    "outlier_is_low": true,
+    "rest_fold": 1.1654,
+    "separation": 1.232,
     "bimodal": false
    },
    "shape_src": {
     "kind": "json",
-    "file": "ws_floor/out/P2_ENVELOPE_FLOORS.json",
+    "file": "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
     "path": "floors.full_biology.raw.R1.shape"
    },
-   "caveat": "a FLOOR twice over — measured on the stable arm (`programme_only`), and same-seed repeats exclude seed variation entirely. n = 5, one arm, one seed, one stack, no interval. Not an estimated distribution."
+   "caveat": "a FLOOR twice over — measured on the UNSTABLE arm (`programme_free`), which is the carrying arm of this both-arm max, and same-seed repeats exclude seed variation entirely. n = 5 per arm, one seed, one stack, no interval. Not an estimated distribution. `programme_only`'s own five-run fold on this view and block is 1.014× and does not carry this floor.",
+   "floor_arm": "programme_free"
   },
   "channel_residualised_export": {
    "value": 1.055,
@@ -2396,7 +2403,7 @@
    "clears": true,
    "values_label": "1.116× – 3.014× over 6",
    "value_digits": 3,
-   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **1.019×**, **6 of the 6** pairs are resolvable. **The floor is a property of the VIEW.** The same five retrains that spread 3.295× on `wsi_biology` spread 1.019× on `rna_biology` and 1.020× on `full_biology`: the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to within 2%. Every between-arm difference on this view is therefore resolvable, and none on `wsi_biology` is — on the same artifacts, the same statistic and the same runs."
+   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's BOTH-ARM floor of **1.2305×** (carried by `programme_free`; `programme_only` alone gives 1.019×), **4 of the 6** pairs are resolvable — H44/I44 and all three D1 pairs (P42/F42, P43/F43, P44/F44); H42/I42 and H43/I43 no longer clear. **The floor is a property of the VIEW, and now also of the ARM**: `programme_only`'s RNA view is pinned near-constant because its objective supervises that view directly, which is why its floor was so small; `programme_free`'s is not. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4."
   },
   {
    "id": "4.5c-full",
@@ -2439,7 +2446,7 @@
    "clears": true,
    "values_label": "1.042× – 5.250× over 6",
    "value_digits": 3,
-   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's own floor of **1.020×**, **6 of the 6** pairs are resolvable. **The floor is a property of the VIEW.** The same five retrains that spread 3.295× on `wsi_biology` spread 1.019× on `rna_biology` and 1.020× on `full_biology`: the one divergent repeat lost its WSI-view rank and kept its RNA-view rank to within 2%. Every between-arm difference on this view is therefore resolvable, and none on `wsi_biology` is — on the same artifacts, the same statistic and the same runs."
+   "rests_on": "the information ordering being identical under all three views for all six pairs while the rank ordering is not — a sign claim. Against this view's BOTH-ARM floor of **1.4220×** (carried by `programme_free`; `programme_only` alone gives 1.020×), **3 of the 6** pairs are resolvable — only the three D1 pairs (P42/F42, P43/F43, P44/F44); all three D2 pairs (H42/I42, H43/I43, H44/I44) no longer clear. **The floor is a property of the VIEW, and now also of the ARM**: `programme_only`'s objective stabilises this view too; `programme_free`'s does not. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4."
   },
   {
    "id": "4.6-six-pairs",
@@ -2510,8 +2517,8 @@
     ]
    },
    "ratio": 3.3817,
-   "rests_on": "**the one selection in this paper that clears a floor its own statistic and block licenses — and it is not ours.** RankMe as published has a retraining floor of **1.811×** on the raw exported block, against canonical R1's 3.111× on the same five runs, because its uncentred normalisation is dominated by the mean-offset direction, which is the stable part. Only **1 of the 3** D2 pairs clears it (s43, 3.382×; s42 is 1.677× and s44 is 1.248×), so the 3/3 count still rests on two unresolvable orderings — but the criterion no longer refuses the row, and the paper must say that the published metric is the more reproducible one on our own artifacts.",
-   "clears": true,
+   "rests_on": "**Was the one selection in this paper that cleared a floor its own statistic and block licensed — it no longer is.** RankMe as published had a retraining floor of 1.811× on the raw exported block *measured on the stable arm alone*. Measured on both arms (the same defect §4.1a exists to catch, applied to the paper's own instrument comparison), the floor is 3.5484×, carried by the unstable arm (`programme_free`) — and D2 s43's 3.382× fold no longer clears it. All three D2 pairs now fail (s42 1.677×, s43 3.382×, s44 1.248×, floor 3.5484×). RankMe as published is the LESS reproducible statistic on our own artifacts under the both-arm floor: 3.5484× against canonical R1's 3.1110×. See “NOTEBOOK_ENTRIES/unstable_arm_exported_floor_measured_20260805T0755Z.md” §3–4.",
+   "clears": false,
    "values_label": "1.248× – 3.382× over 3",
    "value_digits": 3
   },
