@@ -347,9 +347,20 @@ def main() -> None:
     certified_rows = [index_of[p["certified_axis"]] for p in matching["pairs"]]
     control_rows = [index_of[p["control_axis"]] for p in matching["pairs"]]
 
-    def _arm(axis_rows, adjacency, label):
+    def _arm(axis_rows, adjacency, label, adjacency_rows=None):
+        """``adjacency_rows`` lets an arm be scored against a DIFFERENT arm's names.
+
+        Needed because the predeclared A2 process-family map (§2.3) assigns a family only to
+        the 29 axes P3 certified -- an uncertified axis has no certified name, so its A2
+        adjacency is undefined and the matched control arm came back degenerate. The addition,
+        recorded here rather than quietly folded in: score the legibility-matched uncertified
+        axis against **its certified partner's** adjacency vector. If a name predicts readout
+        for the axis that earned it but not for a transplanted one of equal legibility, the
+        name is doing the work. A1 needs none of this -- every axis has its own top atoms and
+        therefore its own A1 adjacency, which is what §2.5 prescribes and what is used.
+        """
         sub_readout = readout[axis_rows]
-        sub_adjacency = adjacency[axis_rows]
+        sub_adjacency = adjacency[axis_rows if adjacency_rows is None else adjacency_rows]
         finite = np.isfinite(sub_adjacency).all(axis=0) & np.isfinite(sub_readout).all(axis=0)
         sub_readout, sub_adjacency = sub_readout[:, finite], sub_adjacency[:, finite]
         if sub_readout.shape[1] < 3 or np.nanstd(sub_adjacency) < 1e-12:
@@ -374,8 +385,13 @@ def main() -> None:
 
     results = {}
     for label, adjacency in (("A1", adjacency_a1), ("A2", adjacency_a2)):
+        # A1: the control axis carries its own (uncertified) name -- §2.5 verbatim.
+        # A2: the predeclared map names only certified axes, so the control carries its
+        #     partner's name (the transplant control documented in ``_arm``).
+        transplant = certified_rows if label == "A2" else None
         certified = _arm(certified_rows, adjacency, f"certified_{label}")
-        control = _arm(control_rows, adjacency, f"matched_uncertified_{label}")
+        control = _arm(control_rows, adjacency, f"matched_uncertified_{label}",
+                       adjacency_rows=transplant)
         difference = {"status": "not_scored"}
         if certified.get("status") == "scored" and control.get("status") == "scored":
             rng = np.random.default_rng(args.seed)
@@ -384,8 +400,9 @@ def main() -> None:
                 pick = rng.integers(0, len(certified_rows), size=len(certified_rows))
                 a_rows = [certified_rows[i] for i in pick]
                 b_rows = [control_rows[i] for i in pick]
+                b_adjacency_rows = a_rows if transplant is not None else b_rows
                 finite = np.isfinite(adjacency[a_rows]).all(axis=0) \
-                    & np.isfinite(adjacency[b_rows]).all(axis=0) \
+                    & np.isfinite(adjacency[b_adjacency_rows]).all(axis=0) \
                     & np.isfinite(readout[a_rows]).all(axis=0) \
                     & np.isfinite(readout[b_rows]).all(axis=0)
                 if finite.sum() < 3:
@@ -393,7 +410,7 @@ def main() -> None:
                 draws.append(_association(readout[a_rows][:, finite],
                                           adjacency[a_rows][:, finite])
                              - _association(readout[b_rows][:, finite],
-                                            adjacency[b_rows][:, finite]))
+                                            adjacency[b_adjacency_rows][:, finite]))
             draws = np.asarray(draws, dtype=float)
             draws = draws[np.isfinite(draws)]
             if draws.size:
@@ -423,7 +440,11 @@ def main() -> None:
     per_family = {k: {"n_axes": len(v), "mean_adjacent_minus_non_adjacent": float(np.mean(v))}
                   for k, v in per_family.items()}
 
-    n_significant = int(np.sum(np.asarray(adjacency_a1_lit)[np.isfinite(adjacency_a1_lit)] < 0.05))
+    # §2.3: the A1-lit power check is over the CERTIFIED axes x untrained targets, not all 128.
+    certified_index = [int(r["axis_index"]) for _, r in table.iterrows()
+                       if bool(r["causal_name_certified"])]
+    lit_certified = adjacency_a1_lit[certified_index]
+    n_significant = int(np.sum(lit_certified[np.isfinite(lit_certified)] < 0.05))
     out = {
         "artifact": str(Path(args.artifact).name), "state": args.state,
         "partition": args.partition, "n_patients": int(len(rows)),
@@ -440,9 +461,18 @@ def main() -> None:
         "self_readout_vs_published_legibility_spearman": _spearman(
             self_readout[[int(r["axis_index"]) for _, r in table.iterrows()]],
             table[LEGIBILITY].to_numpy(float)),
-        "a1_lit": {"n_pairs_scored": int(np.isfinite(adjacency_a1_lit).sum()),
+        "a1_lit": {"n_certified_pairs_scored": int(np.isfinite(lit_certified).sum()),
                    "n_pairs_significant_p_lt_0_05": n_significant,
-                   "underpowered": bool(n_significant < 10)},
+                   "underpowered": bool(n_significant < 10),
+                   "n_all_axis_pairs_scored": int(np.isfinite(adjacency_a1_lit).sum()),
+                   "n_all_axis_pairs_significant": int(np.sum(
+                       adjacency_a1_lit[np.isfinite(adjacency_a1_lit)] < 0.05))},
+        "a2_control_note": ("the predeclared A2 family map names only the 29 certified axes, so "
+                            "the matched uncertified arm is scored against its certified "
+                            "partner's adjacency vector -- a name-transplant control, added "
+                            "after the map was found not to cover the control arm and recorded "
+                            "as an addition. A1's control arm uses each control axis's OWN "
+                            "adjacency, which is §2.5 verbatim, and A1 is the primary."),
         "results": results,
         "per_axis_family_a2": per_family,
         "readout_matrix": readout.tolist(),
