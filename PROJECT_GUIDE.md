@@ -95,6 +95,10 @@ These are not style preferences. Every one of them exists because its absence al
 - `v2/research/rebase/nature/claim_evidence.json` — the machine-checked claim admissibility registry.
 - `v2/tests/` — includes several guard tests that exist specifically to catch the failure modes in §2 (statistic duplication, workspace drift, artifact provenance). Do not weaken or work around one of these; if it's blocking you, the block is very likely correct and the fix is elsewhere.
 
+**Two test-infrastructure hazards, both real incidents:**
+- `pytest v2/tests tests` from the repo root fails with ~70 collection errors — the repo must be importable **as the package `morpheus`**, which the checked-out directory name (`morpheus-rebase`) is not. Run from wherever your workspace convention puts `morpheus` on `PYTHONPATH`, not naively from the checkout root.
+- **A copied (not symlinked/junctioned) workspace silently reports a stale suite as current.** One agent's `scratchpad/ws/morpheus` was a stale *copy* rather than a link — 47 test files instead of 58 — and its "517 passed" was caught only because it happened to exactly match a count from the *previous day*. If a suite count looks suspiciously familiar, verify the workspace is actually current (file count, or better, blob-hash manifest) before trusting the number.
+
 ---
 
 ## 5. Keeping this document current — not optional
