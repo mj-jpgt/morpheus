@@ -291,6 +291,13 @@ STATISTICS = {
     "probeA_lda": ("probe_A_cancer_type_raw", "lda_balanced_accuracy"),
     "probeB_TP53_within_cancer": ("probe_B", "mut_TP53", "within_cancer_auroc"),
     "probeB_TP53_pooled": ("probe_B", "mut_TP53", "pooled_auroc"),
+    # the rest of the endpoint panel, so that no probe direction is reported without the
+    # five-repeat floor the predeclaration requires of every probe number
+    "probeB_grade_high": ("probe_B", "grade_high", "within_cancer_auroc"),
+    "probeB_stage_late": ("probe_B", "stage_late", "within_cancer_auroc"),
+    "probeB_ATM": ("probe_B", "mut_ATM", "within_cancer_auroc"),
+    "probeB_KMT2D": ("probe_B", "mut_KMT2D", "within_cancer_auroc"),
+    "probeB_ARID1A": ("probe_B", "mut_ARID1A", "within_cancer_auroc"),
 }
 
 
@@ -385,6 +392,34 @@ def summarise(data, views=VIEWS) -> dict:
             "channel_probe_conflicts": conflicts}
 
 
+def _absorb(into: dict, other: dict, label: str) -> None:
+    """Fold a second pass over the SAME artifact in, and refuse anything that is not additive.
+
+    A second pass exists only to add `probe_B` endpoints the first pass did not score (the five
+    same-seed retrains were first run with `mut_TP53` alone). Everything else in the entry is
+    recomputed identically by construction — same code, same seed, same cohort — so it is
+    ASSERTED equal rather than overwritten. Scoring the same endpoint twice, or getting a
+    different rank or channel out of the second pass, is a real inconsistency and raises here
+    rather than being silently resolved in favour of whichever shard was read last.
+    """
+    for view, block in other.get("views", {}).items():
+        if view not in into.get("views", {}):
+            into.setdefault("views", {})[view] = block
+            continue
+        target = into["views"][view]
+        for key, value in block.items():
+            if key == "probe_B":
+                for endpoint, record in value.items():
+                    if endpoint in target["probe_B"]:
+                        raise ValueError(f"{label}/{view}: endpoint {endpoint!r} scored twice")
+                    target["probe_B"][endpoint] = record
+            elif key in ("effective_rank_raw", "effective_rank_residualised",
+                         "channel_untrained40"):
+                if not np.isclose(target[key], value, rtol=0, atol=1e-9):
+                    raise ValueError(f"{label}/{view}: {key} differs between passes "
+                                     f"({target[key]!r} vs {value!r})")
+
+
 def merge(paths, views=VIEWS) -> dict:
     """Combine per-shard JSONs and summarise once over all of them.
 
@@ -402,8 +437,9 @@ def merge(paths, views=VIEWS) -> dict:
             if label.startswith("_"):
                 continue
             if label in merged:
-                raise ValueError(f"artifact {label!r} appears in more than one shard")
-            merged[label] = entry
+                _absorb(merged[label], entry, label)
+            else:
+                merged[label] = entry
     out = dict(merged)
     out["_config"] = {"merged_from": configs}
     out["_summary"] = summarise(merged, views=views)

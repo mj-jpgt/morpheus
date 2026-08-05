@@ -146,13 +146,20 @@ def test_summary_judges_every_statistic_against_its_own_five_repeat_floor(result
     summary = result["_summary"]
     floors = summary["floors"]["wsi_biology"]
     assert set(floors) == set(p2_labelled_probe.STATISTICS)
+    # only `mut_TP53` is scored on this synthetic cohort; the rest of the panel is absent, and
+    # an absent statistic must yield an EMPTY floor rather than a floor built from nothing
+    scored = ["effective_rank_residualised", "channel_untrained40", "probeA_logistic",
+              "probeA_lda", "probeB_TP53_within_cancer", "probeB_TP53_pooled"]
     for name, floor in floors.items():
-        assert floor["n"] == len(p2_labelled_probe.ENVELOPE), name
-        assert floor["spread"] >= 0.0 and floor["ratio"] >= 1.0 - 1e-12, name
+        if name in scored:
+            assert floor["n"] == len(p2_labelled_probe.ENVELOPE), name
+            assert floor["spread"] >= 0.0 and floor["ratio"] >= 1.0 - 1e-12, name
+        else:
+            assert floor["n"] == 0 and not np.isfinite(floor["spread"]), name
     rows = summary["pairs"]["wsi_biology"]
     assert len(rows) == len(p2_labelled_probe.PAIRS)
     for row in rows:
-        for name in p2_labelled_probe.STATISTICS:
+        for name in scored:
             cell = row["statistics"][name]
             assert cell["winner"] in (row["arm_a"], row["arm_b"], "tie")
             assert cell["delta"] == pytest.approx(cell["value_a"] - cell["value_b"])
@@ -225,8 +232,31 @@ def test_merge_of_shards_reproduces_the_single_process_summary(cohort, result, t
     assert set(merged) - {"_config", "_summary"} == set(LABELS)
     assert merged["_summary"] == result["_summary"]
 
-    with pytest.raises(ValueError, match="more than one shard"):
+    # A second pass over the same artifact may only ADD endpoints. Scoring one twice is an
+    # inconsistency, not a merge, and must raise rather than resolve silently.
+    with pytest.raises(ValueError, match="scored twice"):
         p2_labelled_probe.merge([shards[0], shards[0]], views=("wsi_biology",))
+
+    # ...and an additive second pass is folded in, leaving the first pass's values untouched.
+    label = next(k for k in json.loads(open(shards[0]).read()) if not k.startswith("_"))
+    first = json.loads(open(shards[0]).read())
+    extra = {label: {"views": {"wsi_biology": {
+        "effective_rank_residualised":
+            first[label]["views"]["wsi_biology"]["effective_rank_residualised"],
+        "probe_B": {"grade_high": {"status": "scored", "within_cancer_auroc": 0.7}}}}}}
+    path = tmp_path / "extra.json"
+    path.write_text(json.dumps(extra), encoding="utf-8")
+    folded = p2_labelled_probe.merge([shards[0], str(path)], views=("wsi_biology",))
+    probe_b = folded[label]["views"]["wsi_biology"]["probe_B"]
+    assert set(probe_b) == {"mut_TP53", "grade_high"}
+    assert probe_b["mut_TP53"] == first[label]["views"]["wsi_biology"]["probe_B"]["mut_TP53"]
+
+    # a second pass disagreeing on a recomputed quantity is a real inconsistency
+    extra[label]["views"]["wsi_biology"]["effective_rank_residualised"] += 1.0
+    extra[label]["views"]["wsi_biology"]["probe_B"] = {"stage_late": {"status": "scored"}}
+    path.write_text(json.dumps(extra), encoding="utf-8")
+    with pytest.raises(ValueError, match="differs between passes"):
+        p2_labelled_probe.merge([shards[0], str(path)], views=("wsi_biology",))
 
 
 def test_output_json_round_trips(cohort, result):
