@@ -1,0 +1,1021 @@
+{
+  "_config": {
+    "artifacts": [
+      "REP1=/home/ubuntu/e0_run/d1_envelope/rep1.npz",
+      "REP2=/home/ubuntu/e0_run/d1_envelope/rep2.npz",
+      "REP3=/home/ubuntu/e0_run/d1_envelope/rep3.npz",
+      "REP4=/home/ubuntu/e0_run/d1_envelope/rep4.npz",
+      "REP5=/home/ubuntu/e0_run/d1_envelope/rep5.npz"
+    ],
+    "merge": null,
+    "labels": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e1_endpoints/inputs/e1_endpoint_labels.parquet",
+    "targets": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/data/frozen_rna_targets.npz",
+    "output": "/home/ubuntu/ws_p2probe/out/shard_reps_panel.json",
+    "seed": 42,
+    "views": [
+      "wsi_biology"
+    ],
+    "endpoints": [
+      "grade_high",
+      "stage_late",
+      "mut_ATM",
+      "mut_KMT2D",
+      "mut_ARID1A"
+    ],
+    "wsi_only_endpoints": [],
+    "n_permutations_logistic": 0,
+    "null_views": [
+      "none"
+    ],
+    "n_permutations_lda": 0,
+    "n_boot": 1000,
+    "n_permutations_auroc": 1000
+  },
+  "REP1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_envelope/rep1.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 24.480598829953696,
+        "effective_rank_residualised": 28.320192535747157,
+        "channel_untrained40": 0.6182481894433667,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7413132310391665,
+          "logistic_seconds": 4.61,
+          "lda_balanced_accuracy": 0.6571255578822066,
+          "lda_seconds": 0.04
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.03441209893017384,
+          "logistic_seconds": 3.22,
+          "lda_balanced_accuracy": 0.037952066046698055,
+          "lda_seconds": 0.04
+        },
+        "probe_B": {
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6731795271816037,
+            "within_cancer_auroc_ci95": [
+              0.6361939823256585,
+              0.7103122836673346
+            ],
+            "pooled_auroc": 0.6232957568502261,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5368290273119573,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5556014646224726,
+            "within_cancer_auroc_ci95": [
+              0.5205929642269393,
+              0.5811595015922894
+            ],
+            "pooled_auroc": 0.5393810673726882,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5246405328858911,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.5888941128362212,
+            "within_cancer_auroc_ci95": [
+              0.5337288924717816,
+              0.6461190118059343
+            ],
+            "pooled_auroc": 0.5962977654369959,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5462161653621774,
+            "permutation_p": 0.004995004995004995,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.6069944231987978,
+            "within_cancer_auroc_ci95": [
+              0.5636978378481379,
+              0.6437998030015168
+            ],
+            "pooled_auroc": 0.595030713487702,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5353287746112921,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.602726944539835,
+            "within_cancer_auroc_ci95": [
+              0.5570103763142731,
+              0.652997839123121
+            ],
+            "pooled_auroc": 0.5889608169136982,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5396352620215976,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      }
+    }
+  },
+  "REP2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_envelope/rep2.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 8.032618061664198,
+        "effective_rank_residualised": 8.834019791708434,
+        "channel_untrained40": 0.5858690369050592,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.5459002380408254,
+          "logistic_seconds": 5.22,
+          "lda_balanced_accuracy": 0.4439605396422495,
+          "lda_seconds": 0.04
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.05290483590965731,
+          "logistic_seconds": 2.83,
+          "lda_balanced_accuracy": 0.05115967473684061,
+          "lda_seconds": 0.04
+        },
+        "probe_B": {
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.682836209660737,
+            "within_cancer_auroc_ci95": [
+              0.6472795463911544,
+              0.7190926141220573
+            ],
+            "pooled_auroc": 0.6332635009310987,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5378979391747076,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5053014313328756,
+            "within_cancer_auroc_ci95": [
+              0.4770598491421599,
+              0.5365524201146021
+            ],
+            "pooled_auroc": 0.5035155605985666,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5240542727750773,
+            "permutation_p": 0.37162837162837165,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.6136543802762148,
+            "within_cancer_auroc_ci95": [
+              0.5619236358985941,
+              0.6693503368600828
+            ],
+            "pooled_auroc": 0.6072890748019665,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5469769355662912,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5798538833682811,
+            "within_cancer_auroc_ci95": [
+              0.5355202660071395,
+              0.6169321715791399
+            ],
+            "pooled_auroc": 0.5852434108816162,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.533243517969829,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.6099589857762933,
+            "within_cancer_auroc_ci95": [
+              0.5614330218082956,
+              0.6574460159275746
+            ],
+            "pooled_auroc": 0.5914538725745347,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5390125182986535,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      }
+    }
+  },
+  "REP3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_envelope/rep3.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 24.5039826266076,
+        "effective_rank_residualised": 28.34824975026834,
+        "channel_untrained40": 0.6122558897195752,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7498044285734478,
+          "logistic_seconds": 4.29,
+          "lda_balanced_accuracy": 0.670929745456015,
+          "lda_seconds": 0.04
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.0356622605819228,
+          "logistic_seconds": 3.37,
+          "lda_balanced_accuracy": 0.0368037473547925,
+          "lda_seconds": 0.04
+        },
+        "probe_B": {
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6718125373856019,
+            "within_cancer_auroc_ci95": [
+              0.6327661423720604,
+              0.7100837249519536
+            ],
+            "pooled_auroc": 0.6227526159439567,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5371941801644616,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5577143528350763,
+            "within_cancer_auroc_ci95": [
+              0.5249951649441164,
+              0.5831035117958969
+            ],
+            "pooled_auroc": 0.5413468718784247,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5244952928580165,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.5901681025179636,
+            "within_cancer_auroc_ci95": [
+              0.530923839518377,
+              0.6473269940468156
+            ],
+            "pooled_auroc": 0.592605147067662,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5457670332230079,
+            "permutation_p": 0.003996003996003996,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5963316430626681,
+            "within_cancer_auroc_ci95": [
+              0.5513186950688945,
+              0.6334354762227212
+            ],
+            "pooled_auroc": 0.5843246028818613,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5356899961873236,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.60234531743707,
+            "within_cancer_auroc_ci95": [
+              0.5571126272522349,
+              0.6540976566335771
+            ],
+            "pooled_auroc": 0.5879753861288405,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.540104756276882,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      }
+    }
+  },
+  "REP4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_envelope/rep4.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 24.98954383309219,
+        "effective_rank_residualised": 29.105724390243214,
+        "channel_untrained40": 0.611046773704345,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7535025874789542,
+          "logistic_seconds": 4.69,
+          "lda_balanced_accuracy": 0.6675162941756055,
+          "lda_seconds": 0.04
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.03720564690948854,
+          "logistic_seconds": 3.34,
+          "lda_balanced_accuracy": 0.037505089937518665,
+          "lda_seconds": 0.04
+        },
+        "probe_B": {
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6712735174719835,
+            "within_cancer_auroc_ci95": [
+              0.6311672195546144,
+              0.7096844282777298
+            ],
+            "pooled_auroc": 0.6234315420767935,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5375245936104418,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5570651242097835,
+            "within_cancer_auroc_ci95": [
+              0.5238997981776269,
+              0.5834490687880961
+            ],
+            "pooled_auroc": 0.5412692870928011,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5240583218052043,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.5896132856715708,
+            "within_cancer_auroc_ci95": [
+              0.5316295514869108,
+              0.6462685618388109
+            ],
+            "pooled_auroc": 0.5934201194812063,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5459747965480567,
+            "permutation_p": 0.003996003996003996,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5984726274011589,
+            "within_cancer_auroc_ci95": [
+              0.5534645938347643,
+              0.6345927912872585
+            ],
+            "pooled_auroc": 0.5875484205157842,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5350870848879268,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.6003246618702677,
+            "within_cancer_auroc_ci95": [
+              0.5538209173375905,
+              0.6505924666397384
+            ],
+            "pooled_auroc": 0.5870455437472311,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.539231241297157,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      }
+    }
+  },
+  "REP5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_envelope/rep5.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 24.911592282503275,
+        "effective_rank_residualised": 28.95877133485445,
+        "channel_untrained40": 0.6097830740133625,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7441950274318442,
+          "logistic_seconds": 4.87,
+          "lda_balanced_accuracy": 0.6619596949465907,
+          "lda_seconds": 0.04
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.032084548345799956,
+          "logistic_seconds": 3.28,
+          "lda_balanced_accuracy": 0.03401717167959804,
+          "lda_seconds": 0.04
+        },
+        "probe_B": {
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.668996918275814,
+            "within_cancer_auroc_ci95": [
+              0.6299803392079879,
+              0.708243638659359
+            ],
+            "pooled_auroc": 0.619696062782655,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5373551693572854,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5561701421331272,
+            "within_cancer_auroc_ci95": [
+              0.5246939879797824,
+              0.5831280576237861
+            ],
+            "pooled_auroc": 0.541107328852812,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5248563501085795,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.5896207181262747,
+            "within_cancer_auroc_ci95": [
+              0.5309820980948987,
+              0.6477904860448813
+            ],
+            "pooled_auroc": 0.5931965429783755,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5453759103555005,
+            "permutation_p": 0.003996003996003996,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.6001269858615013,
+            "within_cancer_auroc_ci95": [
+              0.5550819077312634,
+              0.6362067361897715
+            ],
+            "pooled_auroc": 0.5881902545098159,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5354244179278971,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.5995313851168638,
+            "within_cancer_auroc_ci95": [
+              0.5555990716504274,
+              0.651686405803014
+            ],
+            "pooled_auroc": 0.5882449056597417,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5399001032563042,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      }
+    }
+  },
+  "_summary": {
+    "floors": {
+      "wsi_biology": {
+        "effective_rank_residualised": {
+          "n": 5,
+          "min": 8.834019791708434,
+          "max": 29.105724390243214,
+          "ratio": 3.2947316257500012,
+          "spread": 20.271704598534782
+        },
+        "channel_untrained40": {
+          "n": 5,
+          "min": 0.5858690369050592,
+          "max": 0.6182481894433667,
+          "ratio": 1.0552668779175551,
+          "spread": 0.032379152538307476
+        },
+        "probeA_logistic": {
+          "n": 5,
+          "min": 0.5459002380408254,
+          "max": 0.7535025874789542,
+          "ratio": 1.380293568259267,
+          "spread": 0.20760234943812872
+        },
+        "probeA_lda": {
+          "n": 5,
+          "min": 0.4439605396422495,
+          "max": 0.670929745456015,
+          "ratio": 1.5112373410408522,
+          "spread": 0.2269692058137655
+        },
+        "probeB_TP53_within_cancer": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_pooled": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_grade_high": {
+          "n": 5,
+          "min": 0.668996918275814,
+          "max": 0.682836209660737,
+          "ratio": 1.0206866294998647,
+          "spread": 0.013839291384923014
+        },
+        "probeB_stage_late": {
+          "n": 5,
+          "min": 0.5053014313328756,
+          "max": 0.5577143528350763,
+          "ratio": 1.1037260499420054,
+          "spread": 0.05241292150220067
+        },
+        "probeB_ATM": {
+          "n": 5,
+          "min": 0.5888941128362212,
+          "max": 0.6136543802762148,
+          "ratio": 1.042045364183968,
+          "spread": 0.0247602674399936
+        },
+        "probeB_KMT2D": {
+          "n": 5,
+          "min": 0.5798538833682811,
+          "max": 0.6069944231987978,
+          "ratio": 1.04680582575883,
+          "spread": 0.027140539830516675
+        },
+        "probeB_ARID1A": {
+          "n": 5,
+          "min": 0.5995313851168638,
+          "max": 0.6099589857762933,
+          "ratio": 1.0173929187333486,
+          "spread": 0.010427600659429492
+        }
+      }
+    },
+    "pairs": {
+      "wsi_biology": []
+    },
+    "agreement": {
+      "wsi_biology": {
+        "effective_rank_residualised": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeA_logistic": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeA_lda": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_TP53_within_cancer": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_TP53_pooled": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_grade_high": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_stage_late": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_ATM": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_KMT2D": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        },
+        "probeB_ARID1A": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 0,
+          "n_pairs": 0,
+          "n_unresolved_against_own_floor": 0,
+          "detail": []
+        }
+      }
+    },
+    "channel_probe_conflicts": []
+  }
+}

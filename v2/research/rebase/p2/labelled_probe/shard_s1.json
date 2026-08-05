@@ -1,0 +1,2445 @@
+{
+  "_config": {
+    "artifacts": [
+      "H42=/home/ubuntu/e0_run/d2_v3/d2_v3_s42/artifacts/d2_h_seed42.npz",
+      "I42=/home/ubuntu/e0_run/d2_v3/d2_v3_s42/artifacts/d2_i_seed42.npz",
+      "H43=/home/ubuntu/e0_run/d2_v3/d2_v3_s43/artifacts/d2_h_seed43.npz",
+      "I43=/home/ubuntu/e0_run/d2_v3/d2_v3_s43/artifacts/d2_i_seed43.npz"
+    ],
+    "merge": null,
+    "labels": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e1_endpoints/inputs/e1_endpoint_labels.parquet",
+    "targets": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/data/frozen_rna_targets.npz",
+    "output": "/home/ubuntu/ws_p2probe/out/shard_s1.json",
+    "seed": 42,
+    "views": [
+      "wsi_biology",
+      "rna_biology",
+      "full_biology"
+    ],
+    "endpoints": [
+      "mut_TP53"
+    ],
+    "wsi_only_endpoints": [
+      "grade_high",
+      "stage_late",
+      "mut_ATM",
+      "mut_KMT2D",
+      "mut_ARID1A"
+    ],
+    "n_permutations_logistic": 20,
+    "null_views": [
+      "wsi_biology"
+    ],
+    "n_permutations_lda": 200,
+    "n_boot": 1000,
+    "n_permutations_auroc": 1000
+  },
+  "H42": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s42/artifacts/d2_h_seed42.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 20.138974292485937,
+        "effective_rank_residualised": 23.38680302245344,
+        "channel_untrained40": 0.6125515560670497,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7412580316600502,
+          "logistic_seconds": 5.11,
+          "lda_balanced_accuracy": 0.6407197698531264,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.046980517974788936,
+            "null_p95": 0.060326673386965186,
+            "null_max": 0.07154832312705636,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          },
+          "logistic_null": {
+            "null_median": 0.0466124711446458,
+            "null_p95": 0.06053090570023566,
+            "null_max": 0.06214674069301042,
+            "n_permutations": 20,
+            "permutation_p": 0.047619047619047616,
+            "permutation_resolution": 0.047619047619047616
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.023203398294467676,
+          "logistic_seconds": 3.19,
+          "lda_balanced_accuracy": 0.038949128424015385,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04791313177620378,
+            "null_p95": 0.05907256854487472,
+            "null_max": 0.06260326331421613,
+            "n_permutations": 200,
+            "permutation_p": 0.9154228855721394,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.591244729943178,
+            "within_cancer_auroc_ci95": [
+              0.5617570790424076,
+              0.6273829936078128
+            ],
+            "pooled_auroc": 0.5776751570278593,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5310146429819117,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          },
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6776688774192593,
+            "within_cancer_auroc_ci95": [
+              0.642213819383914,
+              0.7145317352537325
+            ],
+            "pooled_auroc": 0.6284860778575863,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5363531577200925,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5469424739389116,
+            "within_cancer_auroc_ci95": [
+              0.5176879250648921,
+              0.5732503327979993
+            ],
+            "pooled_auroc": 0.5348025952110791,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5239214980287017,
+            "permutation_p": 0.002997002997002997,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.6135287387676326,
+            "within_cancer_auroc_ci95": [
+              0.5563386512752301,
+              0.6658754350308475
+            ],
+            "pooled_auroc": 0.6125443246426983,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5467900558262448,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5996557331288687,
+            "within_cancer_auroc_ci95": [
+              0.551558327184856,
+              0.6379792185779148
+            ],
+            "pooled_auroc": 0.5912689271118935,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5334313816319592,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.5981456996950373,
+            "within_cancer_auroc_ci95": [
+              0.5484806579917031,
+              0.6479574718109914
+            ],
+            "pooled_auroc": 0.585421688573551,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5411964243670505,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      },
+      "rna_biology": {
+        "effective_rank_raw": 20.617915770758646,
+        "effective_rank_residualised": 23.031218761248624,
+        "channel_untrained40": 0.8476190224737813,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7951438823248951,
+          "logistic_seconds": 7.97,
+          "lda_balanced_accuracy": 0.6848255990501408,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04724405789347899,
+            "null_p95": 0.05872637198984992,
+            "null_max": 0.06803038864905005,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.0696591734448838,
+          "logistic_seconds": 2.73,
+          "lda_balanced_accuracy": 0.05883387321006822,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04753842682472791,
+            "null_p95": 0.05882644115692457,
+            "null_max": 0.0677477144589072,
+            "n_permutations": 200,
+            "permutation_p": 0.05472636815920398,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6133702139286374,
+            "within_cancer_auroc_ci95": [
+              0.5786227619450256,
+              0.6511769253737896
+            ],
+            "pooled_auroc": 0.5870103282080555,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5304347232969788,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      },
+      "full_biology": {
+        "effective_rank_raw": 22.277865542366467,
+        "effective_rank_residualised": 25.16447033872885,
+        "channel_untrained40": 0.8515757529295551,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7945545241647174,
+          "logistic_seconds": 8.11,
+          "lda_balanced_accuracy": 0.693249657172119,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04737056992717454,
+            "null_p95": 0.058912824128496286,
+            "null_max": 0.06791336041113846,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.057936897215975156,
+          "logistic_seconds": 2.74,
+          "lda_balanced_accuracy": 0.05379549030463786,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04693772974025849,
+            "null_p95": 0.06027102626888244,
+            "null_max": 0.06752065505110132,
+            "n_permutations": 200,
+            "permutation_p": 0.19402985074626866,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6138878909675832,
+            "within_cancer_auroc_ci95": [
+              0.5796140183418083,
+              0.6516720681161342
+            ],
+            "pooled_auroc": 0.5872670188720724,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5305618971746835,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      }
+    }
+  },
+  "I42": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s42/artifacts/d2_i_seed42.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 13.710406921404056,
+        "effective_rank_residualised": 14.867530034943492,
+        "channel_untrained40": 0.4800258605072433,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.6874833542702902,
+          "logistic_seconds": 4.19,
+          "lda_balanced_accuracy": 0.5565839243713182,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047011629855737105,
+            "null_p95": 0.05996184782537702,
+            "null_max": 0.06850531053170136,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          },
+          "logistic_null": {
+            "null_median": 0.045062480216647785,
+            "null_p95": 0.053539505154528565,
+            "null_max": 0.054590700342782975,
+            "n_permutations": 20,
+            "permutation_p": 0.047619047619047616,
+            "permutation_resolution": 0.047619047619047616
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.04021266303541513,
+          "logistic_seconds": 3.1,
+          "lda_balanced_accuracy": 0.038168430925478114,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047719848391580916,
+            "null_p95": 0.058823387397829364,
+            "null_max": 0.06576915801951361,
+            "n_permutations": 200,
+            "permutation_p": 0.9154228855721394,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.5827432566774291,
+            "within_cancer_auroc_ci95": [
+              0.5565896767799171,
+              0.6307019354680953
+            ],
+            "pooled_auroc": 0.570998701557444,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5302534928394205,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          },
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6607723568501771,
+            "within_cancer_auroc_ci95": [
+              0.6183825906679344,
+              0.700022226644257
+            ],
+            "pooled_auroc": 0.6213753657887736,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5361664190788532,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5161847267059952,
+            "within_cancer_auroc_ci95": [
+              0.4877862970315912,
+              0.5463650372751125
+            ],
+            "pooled_auroc": 0.5104012103226557,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5251534139809013,
+            "permutation_p": 0.15584415584415584,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.5301778317621768,
+            "within_cancer_auroc_ci95": [
+              0.4818483458687004,
+              0.5899013960001552
+            ],
+            "pooled_auroc": 0.5308547594148546,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5475758321081925,
+            "permutation_p": 0.14285714285714285,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5324698886395516,
+            "within_cancer_auroc_ci95": [
+              0.48462351092523553,
+              0.5708453341263651
+            ],
+            "pooled_auroc": 0.5292134337719199,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5329048893176767,
+            "permutation_p": 0.052947052947052944,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.5984004054990155,
+            "within_cancer_auroc_ci95": [
+              0.555231780705294,
+              0.6454871158329284
+            ],
+            "pooled_auroc": 0.5775146593357354,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5408654655583095,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      },
+      "rna_biology": {
+        "effective_rank_raw": 24.3611793906079,
+        "effective_rank_residualised": 27.761219588916884,
+        "channel_untrained40": 0.8019261930869891,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.8271979397695937,
+          "logistic_seconds": 6.38,
+          "lda_balanced_accuracy": 0.7772766103722978,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047573789400367876,
+            "null_p95": 0.058338843511399736,
+            "null_max": 0.06517489390372205,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.07114076109860534,
+          "logistic_seconds": 2.67,
+          "lda_balanced_accuracy": 0.0642182267806538,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.0478457959297742,
+            "null_p95": 0.058199349748016785,
+            "null_max": 0.06115793164556845,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6109638291746394,
+            "within_cancer_auroc_ci95": [
+              0.5807719859512108,
+              0.6474054964507416
+            ],
+            "pooled_auroc": 0.5773528884569769,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5308798468533508,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      },
+      "full_biology": {
+        "effective_rank_raw": 26.775509387161364,
+        "effective_rank_residualised": 31.06616654388974,
+        "channel_untrained40": 0.7957922357594082,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.8282765265163781,
+          "logistic_seconds": 6.6,
+          "lda_balanced_accuracy": 0.7694860163034958,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047290467073660206,
+            "null_p95": 0.05973956315957392,
+            "null_max": 0.06458703647831816,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.07729382938105546,
+          "logistic_seconds": 2.73,
+          "lda_balanced_accuracy": 0.07120226257082661,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047200470092262616,
+            "null_p95": 0.057114443243207434,
+            "null_max": 0.07076857436762127,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6118743729315685,
+            "within_cancer_auroc_ci95": [
+              0.5809274583331262,
+              0.6461602588061673
+            ],
+            "pooled_auroc": 0.5771580283908618,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5321020099214795,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      }
+    }
+  },
+  "H43": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s43/artifacts/d2_h_seed43.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 24.673932196337365,
+        "effective_rank_residualised": 28.77147195466611,
+        "channel_untrained40": 0.5970180659703436,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7425887847482022,
+          "logistic_seconds": 4.69,
+          "lda_balanced_accuracy": 0.6521428060431551,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04711221683253625,
+            "null_p95": 0.058983911949158765,
+            "null_max": 0.0704751480772386,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          },
+          "logistic_null": {
+            "null_median": 0.049231748437651685,
+            "null_p95": 0.056322519344014485,
+            "null_max": 0.05787626746405735,
+            "n_permutations": 20,
+            "permutation_p": 0.047619047619047616,
+            "permutation_resolution": 0.047619047619047616
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.028131997749772625,
+          "logistic_seconds": 3.14,
+          "lda_balanced_accuracy": 0.0359862476101927,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.046776312573244924,
+            "null_p95": 0.05875435064758354,
+            "null_max": 0.06666113490991107,
+            "n_permutations": 200,
+            "permutation_p": 0.9701492537313433,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6017063226392494,
+            "within_cancer_auroc_ci95": [
+              0.5687440409296033,
+              0.6358462071533073
+            ],
+            "pooled_auroc": 0.5797099457951759,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.531764835064295,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          },
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6762465666832296,
+            "within_cancer_auroc_ci95": [
+              0.6304771210179864,
+              0.7229586806584571
+            ],
+            "pooled_auroc": 0.6389249135408354,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5370188699494667,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5818100885067116,
+            "within_cancer_auroc_ci95": [
+              0.5448714015949793,
+              0.6072071928534971
+            ],
+            "pooled_auroc": 0.5662351012966357,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5241296121750222,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.6220676754959718,
+            "within_cancer_auroc_ci95": [
+              0.5646070201864689,
+              0.6733188648093978
+            ],
+            "pooled_auroc": 0.625521378000553,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5459048082323346,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5947382887689341,
+            "within_cancer_auroc_ci95": [
+              0.5474825668496466,
+              0.6315556721406442
+            ],
+            "pooled_auroc": 0.5874205863592965,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.534408655501657,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.606495897560124,
+            "within_cancer_auroc_ci95": [
+              0.5560237688547218,
+              0.6547269303953126
+            ],
+            "pooled_auroc": 0.5911574010905434,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5391078898948053,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      },
+      "rna_biology": {
+        "effective_rank_raw": 23.231611024171684,
+        "effective_rank_residualised": 25.72073691828961,
+        "channel_untrained40": 0.84645610121296,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.8043879937990601,
+          "logistic_seconds": 7.63,
+          "lda_balanced_accuracy": 0.7082663173802155,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.046238717889298335,
+            "null_p95": 0.059856244928200596,
+            "null_max": 0.0684184761795465,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.06411944303509864,
+          "logistic_seconds": 2.72,
+          "lda_balanced_accuracy": 0.056825518588775256,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.0472010454284906,
+            "null_p95": 0.05961616124484353,
+            "null_max": 0.06430843294485958,
+            "n_permutations": 200,
+            "permutation_p": 0.07960199004975124,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6246526521537076,
+            "within_cancer_auroc_ci95": [
+              0.587904942734562,
+              0.6564373276080966
+            ],
+            "pooled_auroc": 0.5804712740663112,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5323409808954191,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      },
+      "full_biology": {
+        "effective_rank_raw": 24.822127127245512,
+        "effective_rank_residualised": 27.736285658292292,
+        "channel_untrained40": 0.8487162841217121,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.8135022028727847,
+          "logistic_seconds": 8.24,
+          "lda_balanced_accuracy": 0.709367290321296,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.046404383254566126,
+            "null_p95": 0.05935344347548732,
+            "null_max": 0.06944384098015569,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.05737644262445748,
+          "logistic_seconds": 2.73,
+          "lda_balanced_accuracy": 0.05053831864164615,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04695850924153704,
+            "null_p95": 0.05749191848444027,
+            "null_max": 0.06291059670660508,
+            "n_permutations": 200,
+            "permutation_p": 0.2736318407960199,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6246818269274772,
+            "within_cancer_auroc_ci95": [
+              0.5873548030997385,
+              0.6581745497977461
+            ],
+            "pooled_auroc": 0.582679688148948,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5316544632323174,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      }
+    }
+  },
+  "I43": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d2_v3/d2_v3_s43/artifacts/d2_i_seed43.npz",
+    "n_test": 2766,
+    "n_cancer_classes": 21,
+    "n_confound_columns": 108,
+    "views": {
+      "wsi_biology": {
+        "effective_rank_raw": 28.799801941890077,
+        "effective_rank_residualised": 34.11676100121169,
+        "channel_untrained40": 0.48815008139035565,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.7745023960667432,
+          "logistic_seconds": 3.99,
+          "lda_balanced_accuracy": 0.722454718238004,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047522258862656486,
+            "null_p95": 0.05824213917018657,
+            "null_max": 0.06888764086284896,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          },
+          "logistic_null": {
+            "null_median": 0.04575837584986414,
+            "null_p95": 0.05948911885695297,
+            "null_max": 0.06019367871746316,
+            "n_permutations": 20,
+            "permutation_p": 0.047619047619047616,
+            "permutation_resolution": 0.047619047619047616
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.02886868090692387,
+          "logistic_seconds": 3.33,
+          "lda_balanced_accuracy": 0.03893937550783357,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.0471006787142938,
+            "null_p95": 0.05961963396104635,
+            "null_max": 0.06759391184813389,
+            "n_permutations": 200,
+            "permutation_p": 0.9054726368159204,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.5666789938375849,
+            "within_cancer_auroc_ci95": [
+              0.5380156951437565,
+              0.6136538629593485
+            ],
+            "pooled_auroc": 0.5624154903759737,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5324110713522605,
+            "permutation_p": 0.001998001998001998,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          },
+          "grade_high": {
+            "status": "scored",
+            "covariate": "grade_high",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 1209,
+            "n_positive": 672,
+            "prevalence": 0.5558312655086849,
+            "within_cancer_auroc": 0.6591604521352532,
+            "within_cancer_auroc_ci95": [
+              0.6125295598808127,
+              0.7017622399404879
+            ],
+            "pooled_auroc": 0.6255930211935798,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5366277581798168,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 7,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "stage_late": {
+            "status": "scored",
+            "covariate": "stage_late",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2061,
+            "n_positive": 855,
+            "prevalence": 0.4148471615720524,
+            "within_cancer_auroc": 0.5294182653612174,
+            "within_cancer_auroc_ci95": [
+              0.4985663542056853,
+              0.5574387616204194
+            ],
+            "pooled_auroc": 0.5213125406107862,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5238358866622964,
+            "permutation_p": 0.01998001998001998,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ATM": {
+            "status": "scored",
+            "covariate": "mut_ATM",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 165,
+            "prevalence": 0.06142963514519732,
+            "within_cancer_auroc": 0.5824334236365151,
+            "within_cancer_auroc_ci95": [
+              0.5307809631065314,
+              0.6336231445029417
+            ],
+            "pooled_auroc": 0.5639368696885555,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.544321358484877,
+            "permutation_p": 0.002997002997002997,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 10,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_KMT2D": {
+            "status": "scored",
+            "covariate": "mut_KMT2D",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 317,
+            "prevalence": 0.11801935964259122,
+            "within_cancer_auroc": 0.5028355203898355,
+            "within_cancer_auroc_ci95": [
+              0.4570514744732529,
+              0.5430616078488594
+            ],
+            "pooled_auroc": 0.5054709024159324,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5339879216131599,
+            "permutation_p": 0.44155844155844154,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 13,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          },
+          "mut_ARID1A": {
+            "status": "scored",
+            "covariate": "mut_ARID1A",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 243,
+            "prevalence": 0.09046909903201787,
+            "within_cancer_auroc": 0.5892586389043512,
+            "within_cancer_auroc_ci95": [
+              0.5448652935056794,
+              0.6379088210710492
+            ],
+            "pooled_auroc": 0.5766943092635547,
+            "expected_interval": [
+              0.0,
+              1.0
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5398052416823993,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 9,
+            "passed": true,
+            "exploratory_no_preregistered_band": true
+          }
+        }
+      },
+      "rna_biology": {
+        "effective_rank_raw": 25.401762032921106,
+        "effective_rank_residualised": 28.705193513580138,
+        "channel_untrained40": 0.7898653524237407,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.8330638417280986,
+          "logistic_seconds": 6.42,
+          "lda_balanced_accuracy": 0.7724006197210636,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04661791078753733,
+            "null_p95": 0.05746057293279345,
+            "null_max": 0.07621413837764765,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.06966472663854305,
+          "logistic_seconds": 2.56,
+          "lda_balanced_accuracy": 0.07495001277199857,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.047623037466667455,
+            "null_p95": 0.057828358861044954,
+            "null_max": 0.06560557094498456,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.6190734036363982,
+            "within_cancer_auroc_ci95": [
+              0.5874293797627117,
+              0.6589082971995148
+            ],
+            "pooled_auroc": 0.5851703995068541,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5323501928153217,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      },
+      "full_biology": {
+        "effective_rank_raw": 25.564266876574866,
+        "effective_rank_residualised": 28.912488385406007,
+        "channel_untrained40": 0.7895645241614233,
+        "probe_A_cancer_type_raw": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.8362845934823372,
+          "logistic_seconds": 6.42,
+          "lda_balanced_accuracy": 0.7705612311524392,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04654167391434232,
+            "null_p95": 0.05797266455678615,
+            "null_max": 0.07444145543998995,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_A_cancer_type_adjusted": {
+          "n_classes": 21,
+          "chance_rate": 0.047619047619047616,
+          "logistic_balanced_accuracy": 0.0668350075980834,
+          "logistic_seconds": 2.66,
+          "lda_balanced_accuracy": 0.07335457648971011,
+          "lda_seconds": 0.04,
+          "lda_null": {
+            "null_median": 0.04766314509927155,
+            "null_p95": 0.05851025192706871,
+            "null_max": 0.0653570746360728,
+            "n_permutations": 200,
+            "permutation_p": 0.004975124378109453,
+            "permutation_resolution": 0.004975124378109453
+          }
+        },
+        "probe_B": {
+          "mut_TP53": {
+            "status": "scored",
+            "covariate": "mut_TP53",
+            "adjustment": "cancer+pooled_tss_cross_fitted",
+            "n_patients": 2686,
+            "n_positive": 893,
+            "prevalence": 0.3324646314221891,
+            "within_cancer_auroc": 0.619167054078245,
+            "within_cancer_auroc_ci95": [
+              0.588220651693042,
+              0.6593714714237141
+            ],
+            "pooled_auroc": 0.5852490929950929,
+            "expected_interval": [
+              0.6,
+              0.8
+            ],
+            "ci_overlaps_expected": true,
+            "below_expected": false,
+            "above_expected": false,
+            "null_p95": 0.5313991642477446,
+            "permutation_p": 0.000999000999000999,
+            "permutation_resolution": 0.000999000999000999,
+            "n_cancers_scored": 14,
+            "passed": true,
+            "exploratory_no_preregistered_band": false
+          }
+        }
+      }
+    }
+  },
+  "_summary": {
+    "floors": {
+      "wsi_biology": {
+        "effective_rank_residualised": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "channel_untrained40": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeA_logistic": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeA_lda": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_within_cancer": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_pooled": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        }
+      },
+      "rna_biology": {
+        "effective_rank_residualised": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "channel_untrained40": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeA_logistic": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeA_lda": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_within_cancer": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_pooled": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        }
+      },
+      "full_biology": {
+        "effective_rank_residualised": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "channel_untrained40": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeA_logistic": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeA_lda": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_within_cancer": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        },
+        "probeB_TP53_pooled": {
+          "n": 0,
+          "ratio": NaN,
+          "spread": NaN
+        }
+      }
+    },
+    "pairs": {
+      "wsi_biology": [
+        {
+          "experiment": "D2",
+          "seed": "s42",
+          "arm_a": "H42",
+          "arm_b": "I42",
+          "statistics": {
+            "effective_rank_residualised": {
+              "value_a": 23.38680302245344,
+              "value_b": 14.867530034943492,
+              "delta": 8.519272987509947,
+              "winner": "H42",
+              "between_arm_ratio": 1.573011991062867,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "channel_untrained40": {
+              "value_a": 0.6125515560670497,
+              "value_b": 0.4800258605072433,
+              "delta": 0.13252569555980642,
+              "winner": "H42",
+              "between_arm_ratio": 1.276080324963673,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_logistic": {
+              "value_a": 0.7412580316600502,
+              "value_b": 0.6874833542702902,
+              "delta": 0.05377467738976005,
+              "winner": "H42",
+              "between_arm_ratio": 1.0782196064177259,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_lda": {
+              "value_a": 0.6407197698531264,
+              "value_b": 0.5565839243713182,
+              "delta": 0.08413584548180819,
+              "winner": "H42",
+              "between_arm_ratio": 1.1511647063411734,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_within_cancer": {
+              "value_a": 0.591244729943178,
+              "value_b": 0.5827432566774291,
+              "delta": 0.008501473265748904,
+              "winner": "H42",
+              "between_arm_ratio": 1.014588711526618,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_pooled": {
+              "value_a": 0.5776751570278593,
+              "value_b": 0.570998701557444,
+              "delta": 0.006676455470415288,
+              "winner": "H42",
+              "between_arm_ratio": 1.0116925930868226,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            }
+          }
+        },
+        {
+          "experiment": "D2",
+          "seed": "s43",
+          "arm_a": "H43",
+          "arm_b": "I43",
+          "statistics": {
+            "effective_rank_residualised": {
+              "value_a": 28.77147195466611,
+              "value_b": 34.11676100121169,
+              "delta": -5.345289046545581,
+              "winner": "I43",
+              "between_arm_ratio": 1.185784344122814,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "channel_untrained40": {
+              "value_a": 0.5970180659703436,
+              "value_b": 0.48815008139035565,
+              "delta": 0.10886798457998792,
+              "winner": "H43",
+              "between_arm_ratio": 1.2230215434357987,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_logistic": {
+              "value_a": 0.7425887847482022,
+              "value_b": 0.7745023960667432,
+              "delta": -0.03191361131854098,
+              "winner": "I43",
+              "between_arm_ratio": 1.0429761558132908,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_lda": {
+              "value_a": 0.6521428060431551,
+              "value_b": 0.722454718238004,
+              "delta": -0.07031191219484889,
+              "winner": "I43",
+              "between_arm_ratio": 1.1078167412770572,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_within_cancer": {
+              "value_a": 0.6017063226392494,
+              "value_b": 0.5666789938375849,
+              "delta": 0.03502732880166448,
+              "winner": "H43",
+              "between_arm_ratio": 1.061811588540555,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_pooled": {
+              "value_a": 0.5797099457951759,
+              "value_b": 0.5624154903759737,
+              "delta": 0.01729445541920216,
+              "winner": "H43",
+              "between_arm_ratio": 1.0307503184303135,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            }
+          }
+        }
+      ],
+      "rna_biology": [
+        {
+          "experiment": "D2",
+          "seed": "s42",
+          "arm_a": "H42",
+          "arm_b": "I42",
+          "statistics": {
+            "effective_rank_residualised": {
+              "value_a": 23.031218761248624,
+              "value_b": 27.761219588916884,
+              "delta": -4.73000082766826,
+              "winner": "I42",
+              "between_arm_ratio": 1.2053734488261978,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "channel_untrained40": {
+              "value_a": 0.8476190224737813,
+              "value_b": 0.8019261930869891,
+              "delta": 0.0456928293867922,
+              "winner": "H42",
+              "between_arm_ratio": 1.0569788464084195,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_logistic": {
+              "value_a": 0.7951438823248951,
+              "value_b": 0.8271979397695937,
+              "delta": -0.03205405744469858,
+              "winner": "I42",
+              "between_arm_ratio": 1.0403122732340928,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_lda": {
+              "value_a": 0.6848255990501408,
+              "value_b": 0.7772766103722978,
+              "delta": -0.09245101132215694,
+              "winner": "I42",
+              "between_arm_ratio": 1.1349993508571925,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_within_cancer": {
+              "value_a": 0.6133702139286374,
+              "value_b": 0.6109638291746394,
+              "delta": 0.0024063847539980143,
+              "winner": "H42",
+              "between_arm_ratio": 1.0039386697527557,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_pooled": {
+              "value_a": 0.5870103282080555,
+              "value_b": 0.5773528884569769,
+              "delta": 0.009657439751078689,
+              "winner": "H42",
+              "between_arm_ratio": 1.016727100433998,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            }
+          }
+        },
+        {
+          "experiment": "D2",
+          "seed": "s43",
+          "arm_a": "H43",
+          "arm_b": "I43",
+          "statistics": {
+            "effective_rank_residualised": {
+              "value_a": 25.72073691828961,
+              "value_b": 28.705193513580138,
+              "delta": -2.9844565952905278,
+              "winner": "I43",
+              "between_arm_ratio": 1.1160330905281461,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "channel_untrained40": {
+              "value_a": 0.84645610121296,
+              "value_b": 0.7898653524237407,
+              "delta": 0.056590748789219325,
+              "winner": "H43",
+              "between_arm_ratio": 1.0716460705809767,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_logistic": {
+              "value_a": 0.8043879937990601,
+              "value_b": 0.8330638417280986,
+              "delta": -0.028675847929038434,
+              "winner": "I43",
+              "between_arm_ratio": 1.0356492739201697,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_lda": {
+              "value_a": 0.7082663173802155,
+              "value_b": 0.7724006197210636,
+              "delta": -0.06413430234084805,
+              "winner": "I43",
+              "between_arm_ratio": 1.0905511115904432,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_within_cancer": {
+              "value_a": 0.6246526521537076,
+              "value_b": 0.6190734036363982,
+              "delta": 0.005579248517309399,
+              "winner": "H43",
+              "between_arm_ratio": 1.0090122568414945,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_pooled": {
+              "value_a": 0.5804712740663112,
+              "value_b": 0.5851703995068541,
+              "delta": -0.004699125440542962,
+              "winner": "I43",
+              "between_arm_ratio": 1.0080953625967133,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            }
+          }
+        }
+      ],
+      "full_biology": [
+        {
+          "experiment": "D2",
+          "seed": "s42",
+          "arm_a": "H42",
+          "arm_b": "I42",
+          "statistics": {
+            "effective_rank_residualised": {
+              "value_a": 25.16447033872885,
+              "value_b": 31.06616654388974,
+              "delta": -5.9016962051608886,
+              "winner": "I42",
+              "between_arm_ratio": 1.2345249522728086,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "channel_untrained40": {
+              "value_a": 0.8515757529295551,
+              "value_b": 0.7957922357594082,
+              "delta": 0.05578351717014696,
+              "winner": "H42",
+              "between_arm_ratio": 1.0700980917675251,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_logistic": {
+              "value_a": 0.7945545241647174,
+              "value_b": 0.8282765265163781,
+              "delta": -0.033722002351660674,
+              "winner": "I42",
+              "between_arm_ratio": 1.0424413949276938,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_lda": {
+              "value_a": 0.693249657172119,
+              "value_b": 0.7694860163034958,
+              "delta": -0.07623635913137683,
+              "winner": "I42",
+              "between_arm_ratio": 1.1099695590797083,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_within_cancer": {
+              "value_a": 0.6138878909675832,
+              "value_b": 0.6118743729315685,
+              "delta": 0.002013518036014683,
+              "winner": "H42",
+              "between_arm_ratio": 1.0032907376498996,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_pooled": {
+              "value_a": 0.5872670188720724,
+              "value_b": 0.5771580283908618,
+              "delta": 0.010108990481210611,
+              "winner": "H42",
+              "between_arm_ratio": 1.017515117149795,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            }
+          }
+        },
+        {
+          "experiment": "D2",
+          "seed": "s43",
+          "arm_a": "H43",
+          "arm_b": "I43",
+          "statistics": {
+            "effective_rank_residualised": {
+              "value_a": 27.736285658292292,
+              "value_b": 28.912488385406007,
+              "delta": -1.176202727113715,
+              "winner": "I43",
+              "between_arm_ratio": 1.0424066416680442,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "channel_untrained40": {
+              "value_a": 0.8487162841217121,
+              "value_b": 0.7895645241614233,
+              "delta": 0.05915175996028876,
+              "winner": "H43",
+              "between_arm_ratio": 1.0749169423779676,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_logistic": {
+              "value_a": 0.8135022028727847,
+              "value_b": 0.8362845934823372,
+              "delta": -0.02278239060955245,
+              "winner": "I43",
+              "between_arm_ratio": 1.0280053213489764,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeA_lda": {
+              "value_a": 0.709367290321296,
+              "value_b": 0.7705612311524392,
+              "delta": -0.06119394083114327,
+              "winner": "I43",
+              "between_arm_ratio": 1.0862655237506462,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_within_cancer": {
+              "value_a": 0.6246818269274772,
+              "value_b": 0.619167054078245,
+              "delta": 0.005514772849232186,
+              "winner": "H43",
+              "between_arm_ratio": 1.0089067608053566,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            },
+            "probeB_TP53_pooled": {
+              "value_a": 0.582679688148948,
+              "value_b": 0.5852490929950929,
+              "delta": -0.0025694048461448737,
+              "winner": "I43",
+              "between_arm_ratio": 1.0044096351707528,
+              "floor_spread": NaN,
+              "floor_ratio": NaN,
+              "resolvable_by_spread": false,
+              "resolvable_by_ratio": false
+            }
+          }
+        }
+      ]
+    },
+    "agreement": {
+      "wsi_biology": {
+        "effective_rank_residualised": {
+          "agrees_with_channel": 1,
+          "disagrees_with_channel": 1,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeA_logistic": {
+          "agrees_with_channel": 1,
+          "disagrees_with_channel": 1,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeA_lda": {
+          "agrees_with_channel": 1,
+          "disagrees_with_channel": 1,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeB_TP53_within_cancer": {
+          "agrees_with_channel": 2,
+          "disagrees_with_channel": 0,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "H43",
+              "channel_winner": "H43",
+              "mark": "OK",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeB_TP53_pooled": {
+          "agrees_with_channel": 2,
+          "disagrees_with_channel": 0,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "H43",
+              "channel_winner": "H43",
+              "mark": "OK",
+              "resolvable": false
+            }
+          ]
+        }
+      },
+      "rna_biology": {
+        "effective_rank_residualised": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 2,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "I42",
+              "channel_winner": "H42",
+              "mark": "MISS",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeA_logistic": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 2,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "I42",
+              "channel_winner": "H42",
+              "mark": "MISS",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeA_lda": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 2,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "I42",
+              "channel_winner": "H42",
+              "mark": "MISS",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeB_TP53_within_cancer": {
+          "agrees_with_channel": 2,
+          "disagrees_with_channel": 0,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "H43",
+              "channel_winner": "H43",
+              "mark": "OK",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeB_TP53_pooled": {
+          "agrees_with_channel": 1,
+          "disagrees_with_channel": 1,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        }
+      },
+      "full_biology": {
+        "effective_rank_residualised": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 2,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "I42",
+              "channel_winner": "H42",
+              "mark": "MISS",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeA_logistic": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 2,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "I42",
+              "channel_winner": "H42",
+              "mark": "MISS",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeA_lda": {
+          "agrees_with_channel": 0,
+          "disagrees_with_channel": 2,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "I42",
+              "channel_winner": "H42",
+              "mark": "MISS",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeB_TP53_within_cancer": {
+          "agrees_with_channel": 2,
+          "disagrees_with_channel": 0,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "H43",
+              "channel_winner": "H43",
+              "mark": "OK",
+              "resolvable": false
+            }
+          ]
+        },
+        "probeB_TP53_pooled": {
+          "agrees_with_channel": 1,
+          "disagrees_with_channel": 1,
+          "n_pairs": 2,
+          "n_unresolved_against_own_floor": 2,
+          "detail": [
+            {
+              "pair": "D2 s42",
+              "winner": "H42",
+              "channel_winner": "H42",
+              "mark": "OK",
+              "resolvable": false
+            },
+            {
+              "pair": "D2 s43",
+              "winner": "I43",
+              "channel_winner": "H43",
+              "mark": "MISS",
+              "resolvable": false
+            }
+          ]
+        }
+      }
+    },
+    "channel_probe_conflicts": [
+      {
+        "view": "wsi_biology",
+        "pair": "D2 s43",
+        "probe": "probeA_logistic",
+        "probe_winner": "I43",
+        "channel_winner": "H43",
+        "rank_winner": "I43",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.03191361131854098,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "wsi_biology",
+        "pair": "D2 s43",
+        "probe": "probeA_lda",
+        "probe_winner": "I43",
+        "channel_winner": "H43",
+        "rank_winner": "I43",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.07031191219484889,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "rna_biology",
+        "pair": "D2 s42",
+        "probe": "probeA_logistic",
+        "probe_winner": "I42",
+        "channel_winner": "H42",
+        "rank_winner": "I42",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.03205405744469858,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "rna_biology",
+        "pair": "D2 s42",
+        "probe": "probeA_lda",
+        "probe_winner": "I42",
+        "channel_winner": "H42",
+        "rank_winner": "I42",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.09245101132215694,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "rna_biology",
+        "pair": "D2 s43",
+        "probe": "probeA_logistic",
+        "probe_winner": "I43",
+        "channel_winner": "H43",
+        "rank_winner": "I43",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.028675847929038434,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "rna_biology",
+        "pair": "D2 s43",
+        "probe": "probeA_lda",
+        "probe_winner": "I43",
+        "channel_winner": "H43",
+        "rank_winner": "I43",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.06413430234084805,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "full_biology",
+        "pair": "D2 s42",
+        "probe": "probeA_logistic",
+        "probe_winner": "I42",
+        "channel_winner": "H42",
+        "rank_winner": "I42",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.033722002351660674,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "full_biology",
+        "pair": "D2 s42",
+        "probe": "probeA_lda",
+        "probe_winner": "I42",
+        "channel_winner": "H42",
+        "rank_winner": "I42",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.07623635913137683,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "full_biology",
+        "pair": "D2 s43",
+        "probe": "probeA_logistic",
+        "probe_winner": "I43",
+        "channel_winner": "H43",
+        "rank_winner": "I43",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.02278239060955245,
+        "probe_floor_spread": NaN
+      },
+      {
+        "view": "full_biology",
+        "pair": "D2 s43",
+        "probe": "probeA_lda",
+        "probe_winner": "I43",
+        "channel_winner": "H43",
+        "rank_winner": "I43",
+        "rank_sides_with": "probe",
+        "probe_resolvable_by_spread": false,
+        "probe_delta": -0.06119394083114327,
+        "probe_floor_spread": NaN
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+# Vendored run output: byte-identical to the originals under ~/ws_p2probe/out on
+# ubuntu@150.136.45.194, sha256-verified against MANIFEST.json by
+# v2/tests/test_p2_labelled_probe.py::test_vendored_output_matches_its_manifest.
+# Line endings must NOT be converted on checkout or the digests stop matching and
+# the provenance claim this directory exists to support becomes false. Same rule,
+# and same reason, as v2/research/rebase/p2/figures/data/.gitattributes.
+* -text

@@ -268,3 +268,29 @@ def test_output_json_round_trips(cohort, result):
     on_disk = json.loads((root / "P2_LABELLED_PROBE.json").read_text(encoding="utf-8"))
     assert set(on_disk) == set(result)
     assert on_disk["_summary"]["floors"]["wsi_biology"]["probeA_lda"]["n"] == 5
+
+
+def test_vendored_output_matches_its_manifest():
+    """The vendored run output must be byte-identical to what came off the box.
+
+    Same rule and same reason as `test_p2_figures.py::test_vendored_data_matches_its_manifest`:
+    the notebook entry quotes these numbers, and a digest that stops matching is the signal
+    that a checkout converted line endings or that a file was edited in place. Skipped rather
+    than failed if the directory is absent, so the test does not block a checkout that has not
+    fetched it.
+    """
+    import hashlib
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1] / "research" / "rebase" / "p2" / "labelled_probe"
+    manifest_path = root / "MANIFEST.json"
+    if not manifest_path.exists():
+        pytest.skip("vendored labelled-probe output not present in this checkout")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest, "an empty manifest asserts nothing"
+    for name, record in manifest.items():
+        blob = (root / name).read_bytes()
+        assert len(blob) == record["bytes"], name
+        assert hashlib.sha256(blob).hexdigest() == record["sha256"], name
+    # the file the notebook entry quotes must be in the manifest, not merely on disk
+    assert "P2_LABELLED_PROBE.json" in manifest
