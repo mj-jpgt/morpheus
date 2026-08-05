@@ -76,11 +76,24 @@ def test_every_statistic_resolves_to_an_existing_definition():
 
 
 def test_the_module_computes_no_rank_inline():
+    """The tokens come from the tree-wide guard, not from a second list of them.
+
+    `RANK_SHAPED` is imported rather than restated for two reasons. It is the one
+    place this repository defines what an inline spectrum looks like, so a token
+    added there is enforced here for free. And writing the literals out would put
+    them in THIS file's source, which `test_no_second_definition_exists_in_the_tree`
+    scans -- a check for inline SVD that trips the check for inline SVD. That is
+    not hypothetical: it is what happened when this test was first written.
+    """
+    from morpheus.v2.tests.test_effective_rank_canonical import RANK_SHAPED
+
     src = (A.REPO / "v2" / "research" / "rebase" / "p2" / "p2_limit2_stress.py").read_text(
         encoding="utf-8")
     assert "from morpheus.v2.calibra.spectral import" in src
-    assert "np.linalg.svd" not in src and "svdvals" not in src, (
-        "a spectrum computed here is a second definition of effective rank")
+    for token in RANK_SHAPED:
+        assert token not in src, (
+            f"`{token}` in p2_limit2_stress.py -- a spectrum computed here would be a "
+            "second definition of effective rank")
 
 
 # --------------------------------------------------------------------------
