@@ -2950,7 +2950,7 @@
      "column": "CANONICAL"
     }
    },
-   "rests_on": "a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**.",
+   "rests_on": "a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. **The rank ratio clears its own floor by 2.4×**, and the route is why the pass is worth anything: against 3.295× — the exported-artifact floor of a *different arm* at 40 epochs, which never licensed this comparison — it once read as *failing by 0.3%*, then as *unjudgeable* once block-matching was enforced, and 1.367× is the first floor measured on its own block, statistic, step and arms. No threshold in this paper moved at any point.",
    "clears": true,
    "ratio": 3.2862,
    "value_digits": 3

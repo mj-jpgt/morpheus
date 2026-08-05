@@ -12,12 +12,22 @@ contradicting quantity is CO-MEASURED rather than inferred from a downstream
 readout in another table.
 
 WHAT THE PANEL MUST NOT BE READ AS. The rank change is 1.854x under R3 and
-1.940x under the canonical statistic, and BOTH ARE INSIDE draft 4.1's measured
-3.295x same-seed retraining floor - drawn on (a) and (b) as a shaded band
-anchored at each panel's own decorrelation = 0 value. The monotonicity and the
-cosine carry this observation; the magnitude of the rank change does not. There
-is ONE SEED PER LEVEL. Both statements are annotated inside the artwork, not
-left to a caption a reader may not have.
+1.940x under the canonical statistic. Both are inside draft 4.1's 3.295x figure -
+AND 3.295x NEVER LICENSED THEM, because it is canonical R1 on the residualised
+EXPORTED wsi_biology block of a DIFFERENT ARM at 40 epochs. The band drawn on (a)
+and (b) is therefore this block's own: five same-seed repeats per arm on the
+fixed held-out probe at STEP 400 give 1.4489x under R3 and 1.5702x under
+canonical R1, and against those the sweep CLEARS. Clearing is not the claim:
+at ONE SEED PER LEVEL a magnitude that clears an n = 5 floor is not evidence of
+a dose-response. The monotonicity and the co-measured cosine carry this
+observation; the magnitude of the rank change does not, before or after the floor
+existed. Both statements are annotated inside the artwork, not left to a caption
+a reader may not have.
+
+CHANGED 2026-08-05. This script previously drew 3.295x and printed "BOTH INSIDE",
+which is the block mismatch draft 4.1a exists to catch, applied to ourselves. See
+NOTEBOOK_ENTRIES/the_probe_block_has_a_floor_at_last_20260804T1620Z.md and draft
+4.1a rows 54-55.
 
 TWO RANK STATISTICS, TWO PANELS. Binding constraint 1 of paper/P2_FIGURES.md
 forbids putting two rank statistics on one axis, so (a) carries R3 - the column
@@ -44,7 +54,11 @@ Sources
       and the probe runs a constant learning rate with no schedule keyed to the
       step budget. n = 2 is a PAIR, not a floor (draft 4.1 says so in terms), and
       the panel labels it that way.
-  data/extracted/F1_RETRAINING_REPEAT.json   the 3.295x floor, from its own log
+  data/e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json
+      THIS BLOCK'S OWN floor, per statistic, at the reading step these runs are
+      read at (400): ten runs, five identical repeats of each of two arms, on the
+      same fixed held-out probe. Measured by
+      v2/research/rebase/p2/p2_probe_floors.py; nothing recomputed here.
 """
 from __future__ import annotations
 
@@ -142,14 +156,35 @@ def repeat_of_the_top_level() -> tuple[dict, dict[int, dict[str, float]]]:
     return meta, rows
 
 
-def floor() -> float:
-    """Draft 4.1's measured floor, from the readout log the paper quotes."""
-    band = P.load_json("extracted/F1_RETRAINING_REPEAT.json")["printed_spread"]["rank_residualised"]
-    recomputed = band["max"] / band["min"]
-    assert abs(recomputed - band["spread"]) < 0.002, (
-        f"F9: the envelope log prints a spread of {band['spread']} but its own min and max give "
-        f"{recomputed:.4f}. Refusing to draw either as the floor.")
-    return band["spread"]
+#: The reading step these three runs are quoted at, and therefore the only step
+#: whose probe floor may be drawn beside them. Written here rather than passed in
+#: so that a change of reading step has to change the floor too.
+FLOOR_STEP = "400"
+FLOOR_VIEW = "wsi_biology"
+
+
+def floor(statistic: str) -> float:
+    """THIS block's own same-seed retraining floor, at THIS reading step.
+
+    Not draft 4.1's 3.295x. That is canonical R1 on the residualised EXPORTED
+    `wsi_biology` block of a different arm at 40 epochs, and these runs are
+    `programme_free` on the fixed held-out probe - a different block, so it never
+    licensed this comparison. Drawing it here is exactly the mismatch draft 4.1a
+    was built to find, and this script used to commit it.
+
+    The floor is read per statistic, because draft 4.1a's own measurement is that
+    the floor is a property of the statistic (1.000x to 3.295x on one block), so
+    judging the R3 panel against R1's floor would be the second half of the same
+    error.
+    """
+    blob = P.load_json("e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json")
+    cell = blob["floors"][FLOOR_STEP][FLOOR_VIEW][statistic]
+    fold = cell["floor"]
+    recomputed = cell["floor_max"] / cell["floor_min"]
+    assert abs(recomputed - fold) < 0.002, (
+        f"F9: P2_PROBE_FLOORS records a {statistic} floor of {fold} at step {FLOOR_STEP} but its "
+        f"own min and max give {recomputed:.4f}. Refusing to draw either.")
+    return fold
 
 
 def _dissociation_panel(ax, arms, repeat, column, stat_key, floor_fold, ticks, *, letter, title):
@@ -168,9 +203,12 @@ def _dissociation_panel(ax, arms, repeat, column, stat_key, floor_fold, ticks, *
     # first, and as a BAND rather than a line, because what it bounds is a ratio.
     ax.axhspan(rank[0], rank[0] * floor_fold, color=C.ENVELOPE, alpha=0.38,
                linewidth=0, zorder=0)
-    ax.annotate(f"§4.1's measured same-seed retraining floor, ×{floor_fold:.3f}, anchored at this\n"
-                f"panel's own decorrelation = 0 value: {rank[0]:.2f} → {rank[0] * floor_fold:.2f}."
-                f"   The whole sweep is inside it.",
+    verdict = "clears it" if fold > floor_fold else "is inside it"
+    ax.annotate(f"THIS BLOCK'S OWN same-seed retraining floor, ×{floor_fold:.3f} — five repeats per "
+                f"arm on the\nfixed held-out probe at step {READ_AT}, anchored at this panel's own "
+                f"decorrelation = 0 value:\n{rank[0]:.2f} → {rank[0] * floor_fold:.2f}."
+                f"   The sweep's ×{fold:.3f} {verdict}   —   and at one seed per level "
+                f"that carries nothing.",
                 (len(LEVELS) - 1 + 0.44, rank[0]), xytext=(0, 4),
                 textcoords="offset points", ha="right", va="bottom", fontsize=6.3,
                 color=C.MUTED, linespacing=1.5, zorder=1)
@@ -183,13 +221,17 @@ def _dissociation_panel(ax, arms, repeat, column, stat_key, floor_fold, ticks, *
                     ha="right", va="bottom", fontsize=7.4, color=C.BLUE, fontweight="bold")
 
     ax.set_yscale("log")
-    lo, hi = min(rank) * 0.66, rank[0] * floor_fold * 1.30
+    # The top of the axis has to clear BOTH the band and the series. When the
+    # floor was 3.295x the band always won; on this block's own floor the sweep
+    # rises above it, which is the point, so the limit is taken over both.
+    lo, hi = min(rank) * 0.66, max(rank[0] * floor_fold, max(rank)) * 1.34
     ax.set_ylim(lo, hi)
     ax.set_ylabel(P.axis_label(stat_key, "probe"), fontsize=6.2, color=C.BLUE)
     ax.tick_params(axis="y", colors=C.BLUE)
     ax.minorticks_off()
-    ax.set_yticks(ticks)
-    ax.set_yticklabels([str(t) for t in ticks])
+    shown = [t for t in ticks if lo <= t <= hi]
+    ax.set_yticks(shown)
+    ax.set_yticklabels([str(t) for t in shown])
     ax.set_xticks(x)
     ax.set_xticklabels(LEVELS, fontsize=8.2)
     ax.set_xlim(-0.46, len(LEVELS) - 1 + 0.46)
@@ -258,7 +300,8 @@ def main() -> int:
     P.cli(__doc__)
     arms = ablation()
     repeat = repeat_of_the_top_level()
-    floor_fold = floor()
+    floor_r3 = floor("R3")
+    floor_r1 = floor("R1")
 
     fig = plt.figure(figsize=(7.9, 11.4))
     gs = fig.add_gridspec(3, 2, height_ratios=[1.0, 1.0, 0.78], hspace=0.60, wspace=0.42,
@@ -269,15 +312,15 @@ def main() -> int:
     ax_d = fig.add_subplot(gs[2, 1])
 
     fold_r3, _, _ = _dissociation_panel(
-        ax_a, arms, repeat, "R3-rank", "R3_short", floor_fold, [3, 4, 5, 6, 8, 10, 14, 18],
+        ax_a, arms, repeat, "R3-rank", "R3_short", floor_r3, [3, 4, 5, 6, 8, 10, 14, 18],
         letter="a",
         title=("Both quantities rise, monotonically, on the SAME three runs\n"
                "      rank statistic R3 — the column these logs' own `final_eff_rank=` line reports"))
     fold_r1, _, _ = _dissociation_panel(
-        ax_b, arms, repeat, "CANONICAL", "R1_short", floor_fold, [5, 7, 10, 14, 20, 26],
+        ax_b, arms, repeat, "CANONICAL", "R1_short", floor_r1, [5, 7, 10, 14, 20, 26],
         letter="b",
         title=("The direction survives the choice of rank statistic\n"
-               "      canonical R1 — the statistic §4.1's floor is measured in"))
+               "      canonical R1 — the statistic §4.1's exported-block floor is measured in"))
 
     _track_panel(ax_c, arms, repeat, "R3-rank", letter="c",
                  title="the rank track",
@@ -294,10 +337,12 @@ def main() -> int:
 
     fig.text(0.012, 0.176,
              f"ONE SEED PER LEVEL.  The rank change is ×{fold_r3:.3f} under R3 and "
-             f"×{fold_r1:.3f} under the canonical statistic — BOTH INSIDE §4.1's ×{floor_fold:.3f} "
-             "same-seed retraining floor, the grey band in (a) and (b).\n"
+             f"×{fold_r1:.3f} under the canonical statistic — both CLEAR this block's own step-{READ_AT} "
+             f"floors of ×{floor_r3:.3f} and ×{floor_r1:.3f},\nthe grey bands in (a) and (b). "
+             f"§4.1's ×3.295 is a DIFFERENT BLOCK and a different arm and is not drawn here.\n"
              "THE MONOTONICITY AND THE CO-MEASURED COSINE CARRY THIS RESULT, NOT THE MAGNITUDE OF "
-             "THE RANK CHANGE, and no sentence about it may be quoted as though they did.",
+             "THE RANK CHANGE, and no sentence about it may be quoted as though they did — "
+             "least of all the pass.",
              ha="left", va="top", fontsize=7.0, color=C.INK, linespacing=1.7,
              fontweight="bold")
 
@@ -308,9 +353,12 @@ def main() -> int:
         "the wrong way as that worsens. This is a stronger dissociation than draft section 4.9's instances for two reasons about the SHAPE of the evidence "
         "rather than its size: it is monotone across three levels rather than a single contrast, and the contradicting quantity is co-measured rather than "
         "inferred from a downstream readout in another table. "
-        "The floor drawn in (a) and (b) is measured on a different arm, a different duration and a different block - canonical R1 on the residualised "
-        "exported wsi_biology block, programme_only, 40 epochs - and NO floor has been measured on this held-out probe, so the band is indicative; draft "
-        "section 4.1a rows 48-50. "
+        "The floor drawn in (a) and (b) is THIS BLOCK'S OWN, per statistic, at the reading step these runs are quoted at: five same-seed repeats of each of "
+        "two arms on the fixed held-out probe at step 400 give 1.4489x under R3 and 1.5702x under canonical R1, and the sweep clears both. Draft section "
+        "4.1's 3.295x is canonical R1 on the residualised EXPORTED wsi_biology block of a DIFFERENT ARM at 40 epochs; it never licensed this comparison and "
+        "is deliberately not drawn - an earlier version of this figure drew it and printed BOTH INSIDE, which is the block mismatch draft section 4.1a "
+        "exists to catch. Clearing is not what the figure claims: at one seed per level a magnitude that clears an n = 5 floor is not evidence of a "
+        "dose-response, and the floor itself is n = 5 per arm at one seed on one stack. Draft section 4.1a rows 54-55. "
         "It also carries a correction: \"feature_decorrelation is defective\" was CONDITIONAL ON A QUERY-WRITTEN QUEUE. Without a momentum key encoder the "
         "same term aggravated the collapse (1.59 against 2.17 at step 250, draft section 5.1 instance 3); with one it raises rank. Every claim this project "
         "makes about that term needs \"in the absence of a momentum key encoder\" attached. "

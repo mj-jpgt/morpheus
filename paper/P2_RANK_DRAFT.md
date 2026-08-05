@@ -180,6 +180,22 @@ fabricated citations have previously contaminated this project; §2.6 is not a f
 > nine readings within 0.04 of zero) — it settles nothing, for a reason recorded at §6.2. Reported in
 > `NOTEBOOK_ENTRIES/three_floors_close_the_last_three_unjudgeable_rows_20260805T0000Z.md` and
 > `NOTEBOOK_ENTRIES/the_dissociation_does_not_survive_its_own_floor_20260804T1800Z.md`.
+>
+> **13. A consistency pass found seven places where a *closed* item was still written as open, and
+> the figure that carried the paper's own block-mismatch error was one of them.** Nothing was
+> measured. What was wrong: §4.1b still said **eight** further selections clear where the audit says
+> eleven; §4.9a still said the fixed held-out probe *"has no floor of its own"* and pointed at the
+> wrong two audit rows, when the probe's step-400 floors have been measured and both decorrelation
+> rows **clear** them; Appendix C still carried the pre-2026-08-05 counts (19 unjudgeable rows, four
+> floorless blocks) and still read the m = 0.999-over-m = 0.99 choice as *"not supported by
+> anything"*; and `floor_audit.json`'s own `rests_on` for §5.4 row 2 still ended *"It fails the floor
+> by 0.3%"* beside a printed verdict of **clears**. **`fig_f9_decorrelation.py` drew §4.1's 3.295×
+> band and printed BOTH INSIDE** — the exported-block floor of a different arm at 40 epochs, applied
+> to a probe reading. It now draws this block's own step-400 floors, per statistic (1.4489× R3 /
+> 1.5702× R1), and says that clearing them carries nothing at one seed per level. **Every one of the
+> seven was a stale *open* state, not a stale number**; no rank value in this draft moved.
+> Separately, §2.6's three remaining `[UNVERIFIED]` markers were retrieved and cleared, and all 13
+> arXiv identifiers in §2 were resolved in one batched query — **13 of 13, author lists matching**.
 
 ---
 
@@ -674,6 +690,17 @@ it is narrow, and the paper states it rather than implying novelty.**
 | **Yusupov et al.**, arXiv:2509.25359 | `[S2/abstract record only]` | geometric metrics' *"apparent discriminative power **collapses once length is controlled**"* — our confound/matched-arm argument, executed for LLMs | — |
 | **Adilova, Petzka, Fischer & Geiger**, arXiv:2606.21593 | `[S2/abstract record only]` | *"low MI does not reliably correspond to geometric compression … a negative and nonlinear relationship **that can reverse when varying training setup**"* | a sign reversal under a controlled training change — the same shape of claim as ours, one level up |
 
+**On the `[S2/abstract record only]` rows above — the identifiers are no longer only Semantic
+Scholar's.** On 2026-08-04 every arXiv identifier in this table and in §2.3 was resolved against the
+arXiv Atom API in one batched query: **13 of 13 resolve**, and every first-author surname and every
+spelled-out author list matches how this section attributes them. **No identifier in §2 is
+fabricated.** What is still abstract-level is the *content*: no body was read, and the marker is
+retained for that reason and not for the identifier. Five of these works turn out to carry
+peer-reviewed venues the prose does not state — Cheng 2607.13432 (ICML 2026, Spotlight), Adilova
+2606.21593 (ECML PKDD 2026), Dai 2510.17299 (NeurIPS 2025), Zhang/Deidda 2502.04591 (ICLR 2026) and
+Zhang/Jiang 2404.10947 (CVPR 2026) — which strengthens the prior art rather than weakening it, so it
+is recorded here (§2.6).
+
 **Cite defensively:** Zaiem, Kemiche, Parcollet, Essid & Ravanelli (Interspeech 2023, arXiv:2306.00452,
 DBLP `conf/interspeech/ZaiemKPER23`; and *Computer Speech and Language*, arXiv:2308.14456) report that
 *"altering the downstream architecture structure leads to significant fluctuations in the performance
@@ -756,9 +783,11 @@ that rank may separate genuinely different model families while failing to separ
 have not reimplemented their pipeline and make no claim about their numbers.
 
 **C3 — a matched-arm design in which rank tracks transfer, with a proof.** Ruan, Zhang, Wang & Zhang,
-"Muon Learns More Robust and Transferable Features than Adam", arXiv:**2606.09658** (S2
-CorpusId 289099544). `[NOT INDEPENDENTLY VERIFIED — Semantic Scholar record only; verify before
-submission.]` Reports *"we **prove** that Muon attains larger margins and **higher effective rank**
+"Muon Learns More Robust and Transferable Features than Adam", arXiv:**2606.09658v1**, submitted
+2026-06-08 (cs.LG; S2 CorpusId 289099544). **VERIFIED (metadata) 2026-08-04** from the arXiv Atom API
+and the `abs` page — title and all four author surnames match exactly; the record carries **no
+`journal_ref`, no venue comment and no DOI**, so it is cited as a preprint.
+`[FULL TEXT NOT RETRIEVED — the proof and the rank claim below are quoted from the abstract.]` Reports *"we **prove** that Muon attains larger margins and **higher effective rank**
 than Adam and SGD"*, with the same architecture and the optimiser varied. Our answer: an optimiser
 change is arguably a method change; and, more usefully, **their design is the one our §4.1 rule asks
 for a control on** — a proof about expectations says nothing about whether a single pair of runs is
@@ -816,9 +845,15 @@ Uniformity Metric in Self-Supervised Learning", **ICLR 2024**, arXiv:2403.00642 
 empirical and about **reproducibility**, which is a different and independent objection. `[Read Fang
 et al. at full text before submission — it is the paper a referee will say this one duplicates.]`
 
-`[UNVERIFIED]` Barlow Twins (Zbontar et al. 2021) — PMLR URL recorded in this repository, no quote
-retrieved. `[UNVERIFIED]` LDReg (Huang et al., arXiv:2401.10474) — *local* dimensionality, not the same
-construct. In pathology specifically, the Robustness Index (de Jong et al., 2025) and
+**VERIFIED (bibliographic; no quote retrieved).** Barlow Twins: Zbontar, Jing, Misra, LeCun & Deny,
+*Proceedings of the 38th International Conference on Machine Learning* (ICML 2021), **PMLR
+139:12310–12320**, arXiv:2103.03230 — agreed by the PMLR proceedings page and its BibTeX
+(`pmlr-v139-zbontar21a`), DBLP `conf/icml/ZbontarJMLD21` and the arXiv Atom API; PMLR mints no Crossref
+DOI, so **no DOI exists and none may be invented**. No sentence of it is quoted anywhere in this paper.
+**VERIFIED (bibliographic).** LDReg: Huang, Campello, Erfani, Ma, Houle & Bailey, **ICLR 2024
+(poster)**, arXiv:2401.10474v2 — DBLP `conf/iclr/HuangCEMH024`, OpenReview forum `oZyAqjAjJW`; *local*
+dimensionality, not the same construct. *Both carried `[UNVERIFIED]` in earlier drafts; the markers are
+cleared on retrieval, not on recollection.* In pathology specifically, the Robustness Index (de Jong et al., 2025) and
 representational-similarity analysis (Mishra & Lotter, 2025) are proposed as confound-aware
 representation diagnostics; both were spot-check verified in a 2026-07-29 literature audit and not
 re-verified in this pass.
@@ -885,10 +920,10 @@ comes to the claim being attributed to it, and state where it falls short.
 | **Deng, Sun, Dou & Xu, arXiv:2510.10948v1** | **VERIFIED** (metadata + abstract) | arXiv Atom | `[UNVERIFIED: peer-reviewed venue — none found]` |
 | **Awasthi, Mend Mend Arachchige & Zhu, *BMC Genomics* 26(1):710 (2025), DOI 10.1186/s12864-025-11913-2** | **VERIFIED** | Crossref | PMID/PMCID reported by the sweep, **not** independently verified |
 | Otero, Mateus & Balestriero, arXiv:2410.04289v1 | **PARTIALLY VERIFIED** | arXiv Atom (abstract) | body not read |
-| Zhang, Jiang, Gao, Willett & Maire, arXiv:2404.10947v5 | **PARTIALLY VERIFIED** | arXiv Atom (abstract) | **`[ABSTRACT-LEVEL ONLY — sign must be confirmed in the body]`** |
-| Ruan, Zhang, Wang & Zhang, arXiv:2606.09658 | `[NOT INDEPENDENTLY VERIFIED]` | S2 record only | verify before submission |
+| Zhang, Jiang, Gao, Willett & Maire, arXiv:2404.10947v5, **CVPR 2026** | **PARTIALLY VERIFIED** (metadata + abstract) | arXiv Atom (all five authors match; the record carries CVPR 2026) | **`[ABSTRACT-LEVEL ONLY — sign must be confirmed in the body]`**. The venue was **not** recorded before 2026-08-04 and is now; the sign is what still needs the body, because the abstract's direction is the *opposite* of the usual framing |
+| Ruan, Zhang, Wang & Zhang, arXiv:2606.09658v1 (2026-06-08) | **VERIFIED** (metadata) | arXiv Atom + `abs` page | **`[NOT INDEPENDENTLY VERIFIED]` cleared 2026-08-04**: title and all four authors match exactly; **v1 only, no `journal_ref`, no venue, no DOI** — cite as a preprint. Body not read |
 | Kulkarni et al. 2602.20433v2; Cheng 2607.13432v1 | **PARTIALLY VERIFIED** | abstracts | LLM / plasticity domains |
-| Zhuo et al. ICLR 2023 2303.02387; Kim et al. WACV 2026 10.1109/WACV61042.2026.00461; Sun et al. IEEE TIP 2026 10.1109/TIP.2026.3682105; Zhang/Deidda/Higham/Tudisco 2502.04591; Billa 2602.15997; Gupta 2606.24903; Dai et al. 2510.17299; Li et al. 2509.23024; Jamali et al. 2510.14217; Kokilepersaud et al. 2505.12576; Yusupov et al. 2509.25359; Adilova et al. 2606.21593 | `[S2 RECORD ONLY]` | Semantic Scholar | **must be verified against Crossref/arXiv before submission**; none is load-bearing for any number |
+| Zhuo et al. ICLR 2023 2303.02387; Kim et al. WACV 2026 10.1109/WACV61042.2026.00461; Sun et al. IEEE TIP 2026 10.1109/TIP.2026.3682105; Zhang/Deidda/Higham/Tudisco 2502.04591; Billa 2602.15997; Gupta 2606.24903; Dai et al. 2510.17299; Li et al. 2509.23024; Jamali et al. 2510.14217; Kokilepersaud et al. 2505.12576; Yusupov et al. 2509.25359; Adilova et al. 2606.21593 | **IDENTIFIERS VERIFIED** (metadata); content still `[S2 RECORD ONLY]` | arXiv Atom, batched `id_list` query 2026-08-04 | **All twelve arXiv identifiers resolve, and every first-author surname and every spelled-out author list matches how §2.2–§2.3 attribute them** — so none is a fabricated identifier. What remains unverified is the *content* attribution, which is still from Semantic Scholar abstracts; none is load-bearing for any number. **Five carry peer-reviewed venues the prose does not yet state**: Cheng 2607.13432 = ICML 2026 (Spotlight); Adilova 2606.21593 = ECML PKDD 2026; Dai 2510.17299 = NeurIPS 2025; Zhang/Deidda 2502.04591 = ICLR 2026; Zhang/Jiang 2404.10947 = CVPR 2026. Several have advanced past the version cited (2602.15997 v4, 2502.04591 v4, 2404.10947 v5) — **pin the version before quoting** |
 | Zaiem et al., Interspeech 2023 arXiv:2306.00452 (DBLP `conf/interspeech/ZaiemKPER23`) and arXiv:2308.14456 | **PARTIALLY VERIFIED** | DBLP + abstract | cited **against** us in §6 |
 | Jing, Vincent, LeCun & Tian, ICLR 2022, arXiv:2110.09348 | **VERIFIED** | full-text PDF | contains **no** rank→performance claim |
 | MoCo — He, Fan, Wu, Xie & Girshick, CVPR 2020, arXiv:1911.05722 | **VERIFIED** | full-text PDF | see §5.2 for the corrections it forced |
@@ -896,10 +931,22 @@ comes to the claim being attributed to it, and state where it falls short.
 | Wang & Isola, ICML 2020, PMLR 119, arXiv:2005.10242 | **VERIFIED** | full-text PDF + arXiv API | "strong agreement", correlational |
 | Fang, Li, Sun & Wang, ICLR 2024, arXiv:2403.00642 | **VERIFIED** (bibliographic) | DBLP | **full text NOT RETRIEVED**; nearest neighbour to this paper's genre |
 | Leavitt & Morcos, ICLR 2021, arXiv:2003.01262 | **VERIFIED** | OpenReview API + arXiv API | structural exemplar (§1.3, §4.4); the arXiv record carries no venue field |
-| Barlow Twins — Zbontar et al. 2021 | `[UNVERIFIED]` | — | PMLR URL only |
-| LDReg — Huang et al., arXiv:2401.10474 | `[UNVERIFIED]` | — | *local* dimensionality; different construct |
+| Barlow Twins — Zbontar, Jing, Misra, LeCun & Deny, **ICML 2021**, PMLR 139:12310–12320, arXiv:2103.03230 | **VERIFIED** (bibliographic) | PMLR proceedings page + BibTeX `pmlr-v139-zbontar21a`; DBLP `conf/icml/ZbontarJMLD21`; arXiv Atom | **`[UNVERIFIED]` cleared 2026-08-04.** **No DOI exists** (PMLR mints none) — do not invent one. **No sentence of it is quoted in this paper**; it is named only as a member of the anti-collapse family |
+| LDReg — Huang, Campello, Erfani, Ma, Houle & Bailey, **ICLR 2024 (poster)**, arXiv:2401.10474v2 | **VERIFIED** (bibliographic) | DBLP `conf/iclr/HuangCEMH024`; OpenReview forum `oZyAqjAjJW`; arXiv Atom | **`[UNVERIFIED]` cleared 2026-08-04**, and the venue is a conference, not a preprint. *local* dimensionality; different construct; full text not read |
 | de Jong et al. 2025; Mishra & Lotter 2025 | spot-check verified 2026-07-29 | — | not re-verified in this pass |
 | Prior-art census for §2.2 | **DOWNGRADED FROM INCOMPLETE** | S2 citation graph (453 works) + OpenAlex + Crossref + arXiv + DBLP | abstract-level only; 12/159 RankMe citers had no abstract; Luisto et al. arXiv:2604.14815 must be read at full text |
+
+**State of this table as of 2026-08-04, stated so the reader does not have to derive it.** **No
+reference in §2 now carries a bare `[UNVERIFIED]`.** The three that did — Barlow Twins, LDReg and Ruan
+et al. — were retrieved and are recorded above with the source that settled each; the twelve
+`[S2 RECORD ONLY]` items had every identifier resolved against arXiv in one batched query, 13 of 13,
+with author lists matching. **What remains open is content, never identity**: five references are
+verified bibliographically with the full text not read (Aldeneh, Fang, Barlow Twins, LDReg, Ruan), one
+carries an unresolved *sign* that must be confirmed in the body before it may be cited as a necessity
+violation (Zhang/Jiang 2404.10947), one item must be read at full text before submission (Luisto et
+al. arXiv:2604.14815, §2.2), and two pathology diagnostics were spot-checked in July and not
+re-verified. **Each of those is a named action, not an open flag**; a version of this table carrying a
+flag with no action attached is not submittable.
 
 **Could not retrieve, recorded rather than worked around:** Semantic Scholar `/paper/search` (HTTP 429
 throughout); OpenReview forum pages for LiDAR and α-ReQ (bot challenge); numeric δ and ε for LiDAR
@@ -1588,7 +1635,7 @@ statistic, of block, or of kind — and the note travels with the row in
 | 41 | §5.1, instance 2 | **the residual**: gate rank 5.81 (16 memorised patients, frozen 64-key queue) against ~1.8 at cohort scale (3,118 streaming patients, live 4,096-key queue) | 5.810 / 1.800 | **3.228×** | R3 | TWO different blocks — see the note | **none measured** | **exempt** | two things, neither of them a rank difference. (i) The gate's own **binary** pass criterion — contrastive 0.012–0.057 against a ≤ 0.10 bar with retrieval 16/16 on three seeds. (ii) The cohort-scale arm being independently **collapsed**: RNA-view mutual cosine 0.977 / 0.986, hard rank 9 / 11, against the supervised sibling at 7.38 / 7.35. The claim — *a gate that certifies memorisation of 16 does not certify learning at 3,118* — is a statement about what the gate's regime removes, not a selection between two configurations. |
 | 42 | §5.1, instance 3; S1 | the five-arm regulariser sweep — widest between-arm fold at a shared step (50) | 4.080 / 2.620 | **1.557×** | R3 | fixed 256-patient held-out probe | **none measured** | **unjudgeable** | an absolute-level claim, not a between-arm one: **all five** arms fall from a verified common initialisation of 67.55 to 1.59–3.43, i.e. ≥ 19.7×, including both regularisers at zero. The between-arm folds carry nothing and are not quoted. |
 | 43 | §5.4 row 1, §5.2 | m = 0.999 against m = 0, **one seed**, step 600 | 7.420 / 2.810 | **2.641×** | R3 | fixed held-out probe, step 600, arms m = 0.999 / m = 0 | 1.7491× | yes | the floor measured at its own step budget: five same-seed repeats of each of ITS OWN two arms at a 600-step budget give an R3 floor of 1.749×, carried by the m = 0 arm, and 2.641× clears it by 1.51×. One seed per arm in the comparison itself; the floor holds the seed fixed too, so it is a floor twice over. The same ten runs separate the arms by 2.98×–5.21× worst case at step 600 (R3 6.741 min at m = 0.999 against 2.265 max at m = 0), which is the same verdict from the other direction. |
-| 44 | §5.4 row 2 | m = 0.999 against m = 0, **worst case over three seeds**, 500 steps | 10.450 / 3.180 | **3.286×** | R1 | fixed held-out probe, step 500 | 1.3674× ‡ | yes | a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. It fails the floor by **0.3%**. |
+| 44 | §5.4 row 2 | m = 0.999 against m = 0, **worst case over three seeds**, 500 steps | 10.450 / 3.180 | **3.286×** | R1 | fixed held-out probe, step 500 | 1.3674× ‡ | yes | a **binary training outcome**: `programme_free` completed 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after, with a channel and paired bootstrap intervals where no export existed at all. **The rank ratio clears its own floor by 2.4×**, and the route is why the pass is worth anything: against 3.295× — the exported-artifact floor of a *different arm* at 40 epochs, which never licensed this comparison — it once read as *failing by 0.3%*, then as *unjudgeable* once block-matching was enforced, and 1.367× is the first floor measured on its own block, statistic, step and arms. No threshold in this paper moved at any point. |
 | 45 | §5.4 row 3 | the same replication under the tripwire statistic | 6.850 / 2.810 | **2.438×** | R3 | fixed held-out probe, step 500 | 1.5157× ‡ | yes | as row above. |
 | 46 | §5.4 limit 2, Appendix C | **the value the project actually runs** — m = 0.999 over m = 0.99, step 600 | 7.420 / 5.880 | **1.262×** | R3 | fixed held-out probe, step 600, arms m = 0.999 / m = 0.99 | 1.1947× | yes | **a pass by 5.6%, and the ten runs that measured the floor undercut it.** The floor built from its own two arms at step 600 is R3 1.195×, carried by the m = 0.999 arm, and the row's 1.262× clears it — computed by the checker, nothing predeclared. But the SAME ten runs separate the two arms by only **1.138×** worst case under R3 (m = 0.999 min 6.741 against m = 0.99 max 5.922), which is INSIDE that floor: the row passes on the particular single-seed draw §5.2's table records and would not pass on the worst draw of five. Under **canonical R1** the same ten runs separate them by **1.453×** worst case against a 1.155× floor, so the arms are cleanly ordered under R1 and marginally so under R3 — which is §4.5's statistic-conditionality applied to the one value this project actually runs. The binary training outcome still supports momentum against none, not this value over its neighbour. |
 | 47 | §5.2 prose | m = 0.999 against m = 0 at step 400 — the widest fold past step 150 | 7.840 / 2.180 | **3.596×** | R3 | fixed held-out probe, step 400 | 1.4489× ‡ | yes | nothing quotable. **§5.2's prose used to say the effect is “2.6–3.3× at every step past 150”, which disagreed with its own table**: the per-step folds are 3.363× (200), 2.208× (300), 3.596× (400), 3.132× (500), 2.641× (600), and **4.340×** at step 100 — both ends of the quoted range were wrong. **CORRECTED in §5.2 and in `paper/QUEUE_ANCHORING.md` on 2026-08-05**; the range now printed is 2.208×–3.596×, computed from the rows of that table and from nothing else. *A previous version of this note gave the step-100 fold as 4.343×; the only source in this repository is §5.2's own table, 7.03 / 1.62 = 4.3395, so **4.340×** is the number the source supports and 4.343× is withdrawn.* This single-seed fold does exceed 3.295× at one step, but it varies no seed, it is on a block with no floor, and the seed-varied worst case above does not. |
@@ -1763,8 +1810,12 @@ because that is where it belongs.**
 > measure with.** On the raw exported block, over the same five same-seed retrains, **RankMe as
 > published has a floor of 1.811× and our centred canonical statistic has a floor of 3.111×.** RankMe
 > is the **only** selection in this paper that clears a floor on the **exported artifact block** —
-> the block every between-arm comparison in §4 is measured on (§4.1a, row 30). Eight further
-> selections clear, and every one of them is §5's, on the fixed held-out probe.
+> the block every between-arm comparison in §4 is measured on (§4.1a, row 30). **Eleven** further
+> selections clear, and every one of them is §5's, on the fixed held-out probe. *(That count was eight
+> when only the step-500 probe floor existed; the three floors of 2026-08-05 — step 600, step 600 at
+> `m = 0.99`, and capacity 64 at step 150 — closed the last three unjudgeable selections and all three
+> cleared. §"Status" item 12;
+> `NOTEBOOK_ENTRIES/three_floors_close_the_last_three_unjudgeable_rows_20260805T0000Z.md`.)*
 
 The mechanism is not mysterious and it is the one §4.6 already names for RankMe's D2 advantage.
 RankMe does not centre; every row of every exported view has L2 norm exactly 1.000, so the
@@ -2743,11 +2794,17 @@ lines, rather than inferred from a downstream readout in another table — which
 §4.9's instances cannot answer.
 
 **And the paper's own criterion applies to it, which is why the magnitude is not what carries it.**
-The rank change is **1.854×** under R3 and **1.940×** under canonical R1, both **inside** §4.1's
-3.295× floor (and on a third block again — the fixed held-out probe, which has no floor of its own;
-§4.1a rows 48–49). **The monotonicity and the co-measured cosine carry this observation; the size of
-the rank change does not, and no sentence here may be quoted as though it did.** One seed per level,
-400 steps, one objective. **Figure F9.**
+The rank change is **1.854×** under R3 and **1.940×** under canonical R1. Both are inside §4.1's
+3.295× floor — **but that floor never licensed them**, because these runs are `programme_free` on the
+**fixed held-out probe at step 400** and 3.295× is canonical R1 on the residualised *exported*
+`wsi_biology` block of a different arm at 40 epochs. That block has since been measured, and against
+its own step-400 floors — **1.449× under R3 and 1.570× under canonical R1** — **both changes clear**
+(§4.1a rows 54–55; `NOTEBOOK_ENTRIES/the_probe_block_has_a_floor_at_last_20260804T1620Z.md`).
+**Clearing is not what carries this observation and the pass must not be quoted as though it were:**
+at one seed per level, a magnitude that clears an n = 5 floor is not evidence of a dose–response.
+**The monotonicity across three levels and the co-measured cosine carry it; the size of the rank
+change does not, before or after the floor existed.** One seed per level, 400 steps, one objective.
+**Figure F9.**
 
 ### 4.10 The use that survives, and where its boundary actually is
 
@@ -3762,8 +3819,9 @@ Over those same five retrains, on the raw exported block, **RankMe as published 
 floor of 1.811× and our centred canonical statistic has 3.111×.** RankMe does not centre; every exported
 row has L2 norm exactly 1.000, so the mean-offset direction it retains is both large and stable, and on
 the residualised block — where the mean is gone — the two floors coincide at 3.295×. **By this paper's own
-criterion the metric we criticise is more reproducible than the metric we criticise it with, and RankMe is
-The only selection in this paper that clears a floor on the **exported artifact block** — the block every between-arm comparison in §4 is measured on.**
+criterion the metric we criticise is more reproducible than the metric we criticise it with, and RankMe
+is the only selection in this paper that clears a floor on the exported artifact block — the block
+every between-arm comparison in §4 is measured on.**
 Our centring was adopted for a principled reason stated in §3.1. It made our statistic less usable. We
 found that out by applying our own rule to ourselves, which is the whole argument for having the rule.
 
@@ -3972,21 +4030,27 @@ Reproduced verbatim so that any future quotation can carry it.
   13 / 11 / 1 once block-matching was enforced; then 13 / 9 / 3 once the probe block was measured;
   then 13 / 12 / 0 once the last three selections had floors on their own settings (§"Status", item
   12). **The thirteen failures have never moved.***
-  19 of the 62 rows still sit on a block for which **no floor has been measured** — the in-run
-  training batch, the gate batch, a live checkpoint, and the probe at steps, momenta, capacities or
-  learning rates the repeats do not cover. **Unjudgeable is not a pass and not a failure**: the criterion has not been
+  **16** of the 62 rows still sit on a block for which **no floor has been measured** — the in-run
+  training batch, the gate batch, a live checkpoint, and the probe at momenta, capacities or
+  learning rates the repeats do not cover. *(That count was 19 before the three floors of 2026-08-05;
+  it is generated by `p2_floor_audit.summary()` and must not be typed by hand.)* **Unjudgeable is not
+  a pass and not a failure**: the criterion has not been
   applied to those rows, and the audit records `clears: null` for them rather than a verdict.
   Machine-checkable at `v2/research/rebase/p2/floor_audit.json`, enforced by
   `v2/tests/test_p2_floor_audit.py`. Any quotation of a rank comparison from this paper should be
   checked against that table first — including the floor it is being judged against, which for eight
-  of T1's twelve metric rows was measured only on 2026-08-04 and for four blocks does not exist.
+  of T1's twelve metric rows was measured only on 2026-08-04 and for **three** blocks does not exist.
 - **D1-A's 9.81 / 1.71 (§4.9).** **Statistic R3**, `[NOT RECOMPUTED]` under R1. *"Nothing about programme
   supervision may be concluded from it — the contrastive arm never trained, so the comparison measures a
   defect, not an ablation."*
 - **§5's momentum sweep (§5.2, §5.4).** The original sweep is **one seed per momentum value** — because
   the harness had its seed **hardcoded**, a defect rather than a judgement — centred R3, durability
-  established only to step 600 against a 583-step training duration; its m = 0 against m = 0.999 ratio
-  (2.64×) is **inside** §4.1's 3.295× disqualifying floor. **The seed replication has since run** (three
+  established only to step 600 against a 583-step training duration. Its m = 0 against m = 0.999 ratio
+  (2.64×) is inside §4.1's 3.295× floor — **and 3.295× was never that comparison's floor**, being
+  canonical R1 on the residualised *exported* block of a different arm at 40 epochs. Measured on its
+  own block, statistic, step **and arms** — five same-seed repeats of each of m = 0.999 and m = 0 at a
+  600-step budget — the R3 floor is **1.749×** and the 2.641× reading **clears it by 1.51×**
+  (§4.1a row 43, §5.4 row 3). **The seed replication has since run** (three
   seeds per momentum, 500 steps, canonical R1 and R3 on a **fixed held-out probe**, not §4.1's
   residualised exported block) and separates the two momenta 3/3 on both statistics, closing the
   single-seed defect — **and it CLEARS the floor measured on its own block, statistic and reading
@@ -3999,8 +4063,15 @@ Reproduced verbatim so that any future quotation can carry it.
   rest on any rank ratio and must never be quoted as though it did**: it rests on the binary outcome of
   §5.4 — `programme_free` completing 40 epochs uncollapsed 0 of 3 seeds before the fix and 3 of 3 after,
   with a channel and paired bootstrap intervals where there had been no exported readout at all. **The
-  choice of `m = 0.999` over `m = 0.99` (1.26×) is not supported by anything**; only momentum against
-  none is. The anchoring account is **not confirmed** and should not be cited as established; the
+  choice of `m = 0.999` over `m = 0.99` (1.26×) now clears a floor built from its own two arms at its
+  own step — R3 1.195× — but by only 5.6%, and the same ten runs that measured that floor separate the
+  two arms by just 1.138× worst case under R3, inside it. Under canonical R1 they separate cleanly,
+  1.453× against a 1.155× floor.** The pass is statistic-conditional at the exact value this project
+  ships, it is the narrowest in the paper, and **it does not change what the value rests on**: the
+  binary training outcome supports momentum against none, not this value over its neighbour, and
+  `m = 0.999` was selected in a sweep of one seed per cell (§5.4 limit 2, §4.1a row 46).
+  *An earlier version of this bullet read "is not supported by anything"; that was written before the
+  step-600 floors existed and is withdrawn.* The anchoring account is **not confirmed** and should not be cited as established; the
   turnover sharpening was predeclared, tested and **refuted**; and §5.2a's learning-rate test has since
   falsified the momentum threshold itself.
 - **§5.2a's learning-rate test (§5.2a).** **Six arms, ONE SEED PER CELL**, **200 steps** (the logs say

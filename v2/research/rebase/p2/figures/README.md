@@ -14,7 +14,7 @@ python fig_f2_variance.py     # or run any script on its own
 
 | item | script | carries |
 |---|---|---|
-| F1 | `fig_f1_envelope.py` | the **n = 1** retraining envelope and the seven arm ratios inside it |
+| F1 | `fig_f1_envelope.py` | the retraining floor **at n = 5** and the seven arm ratios inside it |
 | F2 | `fig_f2_variance.py` | the variance decomposition — the paper's most important display item |
 | F3 | `fig_f3_floor.py` | the per-arm reproducibility floor, **at n = 5** |
 | F4 | `fig_f4_defeaters.py` | the four-way defeater check |
@@ -22,6 +22,7 @@ python fig_f2_variance.py     # or run any script on its own
 | F6 | `fig_f6_necessity.py` | the necessity test, which went against us |
 | F7 | `fig_f7_dilution.py` | the dilution dose–response and its miscalibration factor |
 | F8 | `fig_f8_collapse.py` | the collapse boundary and the 16/16 withdrawal |
+| F9 | `fig_f9_decorrelation.py` | rank rises while a co-measured collapse measure rises with it |
 | T1 | `tab_t1_selection_rule.py` | the selection rule — with the underpowering inside the table body |
 
 ## Where the numbers come from
@@ -76,9 +77,10 @@ measurement, the path its data will arrive at, and its predeclaration — and
 records it so `make_all.py` reports it at the end. Under `--strict` it raises
 `PendingMeasurement` instead. It never silently plots nothing.
 
-One is open: **F1(d)**, the five same-seed retraining repeats under
-`~/e0_run/d1_envelope/`. F1 also refuses to draw the placeholder once those
-repeats report, so the figure cannot go stale unnoticed.
+**None is open.** F1(d)'s five same-seed retraining repeats under
+`~/e0_run/d1_envelope/` reported on 2026-08-04, and F1 refuses to draw the
+placeholder now that they have, so the figure cannot go stale unnoticed.
+`make_all.py --strict` returns 0.
 
 ## Conventions
 
@@ -93,4 +95,11 @@ repeats report, so the figure cannot go stale unnoticed.
   hatch, so identity never rests on hue and the figures survive greyscale
   printing.
 * **Binding statements are rendered into the artwork**, not left to a manuscript
-  caption — F8's withdrawal, T1's underpowering, F6's negative, F1's n = 1.
+  caption — F8's withdrawal, T1's underpowering, F6's negative, F1's floor-twice-over
+  caveat, F9's one-seed-per-level.
+* **A floor drawn beside a ratio is the floor of THAT ratio's own block,
+  statistic and reading step.** F9 draws the fixed held-out probe's step-400
+  floors (1.4489x R3, 1.5702x R1) and must not draw F1's 3.295x, which is
+  canonical R1 on the residualised exported block of a different arm at 40
+  epochs. Drawing the wrong floor is the error draft 4.1a exists to catch, and
+  F9 committed it until 2026-08-05.

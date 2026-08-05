@@ -360,6 +360,37 @@ def _synthetic_corpus(root: Path) -> dict:
         write(f"e0_run/d1_diag/ablate_decorr{decorr}.log", probe_log("0.999", decorr, 400, r3, rna))
     write("e0_run/d1_diag/mseed_m0.999_s42.log", probe_log("0.999", "0.04", 500, 7.46, 0.8300))
 
+    # ---- the probe block's own retraining floor ----------------------------
+    # F9 draws THIS floor and not draft 4.1's exported-block 3.295x, because the
+    # runs it plots are on the probe. The floor is per statistic and per reading
+    # step by construction, so the synthetic blob is shaped that way and the two
+    # statistics are given DIFFERENT folds - a script that read one and drew it on
+    # both panels would pass a corpus where they agreed.
+    def _floor_cell(lo, fold):
+        return {"floor": fold, "floor_arm": "m0", "floor_min": lo, "floor_max": lo * fold,
+                "why": None,
+                "arm_floor": {arm: {"fold": fold if arm == "m0" else 1.1,
+                                    "min": lo, "max": lo * fold,
+                                    "shape": {"bimodal": False, "defined": True}}
+                              for arm in ("m0999", "m0")}}
+
+    _probe_stats = {"R1": (2.0, 1.5702), "R3": (1.5, 1.4489), "R2": (1.5, 1.44),
+                    "PR": (1.2, 1.30), "PR_rownorm": (1.2, 1.30), "RankMe": (2.0, 1.30),
+                    "stable_rank": (1.4, 1.34), "alpha_req": (2.0, 1.20),
+                    "alpha_req_abs_dev": (1.0, 1.49), "hard_rank": (256.0, 1.0)}
+    write("e0_run/d1_probefloor/out/P2_PROBE_FLOORS.json",
+          {"_": "synthetic", "absent": [], "arms": {},
+           "config": {"arms": ["m0999", "m0"], "repeats_per_arm": 5, "seed": 42,
+                      "lr": 0.0002, "capacity": 4096, "decorrelation": 0.04,
+                      "objective_profile": "programme_free",
+                      "block": "fixed held-out probe, raw"},
+           "floor_rule": "max/min over five same-seed repeats, pooled across the two arms",
+           "shape_rule": "synthetic", "reps": {},
+           "floors": {str(step): {view: {stat: _floor_cell(lo, fold)
+                                         for stat, (lo, fold) in _probe_stats.items()}
+                                  for view in ("wsi_biology", "rna_biology", "wsi_rna_paired")}
+                      for step in (0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500)}})
+
     # ---- extracted ---------------------------------------------------------
     runs = {}
     for a, arm, base in (("p", "programme_only", 110.0), ("f", "programme_free", 8.0)):
