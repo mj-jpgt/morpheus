@@ -222,3 +222,75 @@ judged at all because no floor has been measured" reads as though a floor were m
 * `v2/research/rebase/p2/p2_probe_floors.py` — configuration is now arguments, `--arm-kind capacity`
   added; the default path is unchanged and `P2_PROBE_FLOORS.json` regenerates as it stands.
 * `v2/research/rebase/p2/floor_audit.json`, `v2/tests/test_p2_floor_audit.py`.
+
+---
+
+## CORRECTION APPENDED 2026-08-05 04:10 UTC — the middle row's pass does not survive ten repeats per arm, and this entry's illustrating example inverts
+
+This entry is append-only, so nothing above has been altered. Read this block as binding wherever it
+contradicts the text above. **Source:**
+`NOTEBOOK_ENTRIES/limit2_breaks_at_ten_repeats_20260805T0330Z.md`, predeclared in full at
+`NOTEBOOK_ENTRIES/PREDECLARED_probe_floor_n10_and_momentum_grid_20260805T0200Z.md` before any of the
+new runs started.
+
+**What is withdrawn.** Every clause below concerns **§5.4 limit 2 only**. §5.4 row 1 (2.641× against
+1.749×) and §5.2 measurement 3 (2.857× against 1.705×) are untouched, as is everything this entry
+says about the capacity floor, the reading step, and the two harnesses agreeing.
+
+| where | withdrawn text |
+|---|---|
+| 1 (title) | "One of them passes by 5.6%" — it does not pass at ten repeats per arm |
+| 45 (§1 table) | "§5.4 limit 2 … **1.195×** … carried by m = 0.999 … **clears by 1.06×**" |
+| 59 (§2 table) | the R3 entry "**1.195×** · m0.99: 1.152× · m0.999: 1.195×" for the m = 0.999 / m = 0.99 floor |
+| 66–69 (§2) | "its floor is the smallest of the sixteen probe floors at 1.195×, and it is carried by m = 0.999. The rule is not 'the collapsed arm is noisier'. It is 'measure both sides', and here that returns **the stable one**." |
+| 93–110 (§4, heading and items 1–2) | "The middle row passes narrowly" / "**It clears**: 1.262× against 1.195×" / "The rule now licenses it — **by 5.6%**" |
+| 8.3 | "It is larger than the floor measured on its own two arms at its own step (1.195×)" |
+| 8.5 | "It is twelve and eleven" — it is **eleven and ten** |
+
+**What replaces them.** Both arms were taken from five same-seed repeats to **ten**, everything else
+identical (seed 42, `~/ws_j2`, one A100, ten concurrent). At n = 10:
+
+| | n = 5 (this entry) | **n = 10** |
+|---|---:|---:|
+| the row's ratio — two specific published runs, fixed | 1.262× | 1.262× |
+| **R3 floor, its own two arms, its own step** | 1.195× | **1.326×** |
+| which arm carries it | m = 0.999 | **m = 0.99** |
+| verdict under `ratio > floor`, the paper's own rule | clears by 5.6% | **DOES NOT CLEAR** |
+
+**It is not one unlucky draw.** Repeats 6–10 scored alone, as an independent n = 5 never pooled with
+the first five, give **1.2791×**, also above 1.262×; on the `rna_biology` view the n = 10 floor is
+**1.2764×**, also above it. The entire increase is one m = 0.99 repeat reading R1 5.520 / R3 4.465
+where the other nine span 6.462–7.124 / 5.142–5.922, and every predeclared exclusion route was
+checked and none applies: it trained (`biology_contrastive` 7.575 against chance ln 80 = 4.382), it
+is not collapsed (R1 5.520 against the m = 0 arm's 1.564–2.738), `p2_envelope_floors._shape` does not
+call the arm bimodal, and repeats 6–10 overlap repeats 1–5, so it is not a batch effect. **Same-seed
+GPU non-determinism at m = 0.99 produces a run about 20% low roughly one time in ten, and five
+repeats did not see it.**
+
+**§2's rule is vindicated; the example this entry chose to illustrate it with inverts.** "Measure
+both sides" is exactly right, and this row is now the sharpest argument for it in the project — but
+not for the reason §2 gives. §2 says the comparison with no collapsed arm "returns the stable one".
+At ten repeats the **m = 0.99** arm is the noisier of the two and carries the floor, and it does so
+on the strength of a single repeat in ten. **The lesson is not that measuring both sides returns the
+stable arm. It is that which arm is "the stable one" is not a property you can read off five
+repeats.** The floor is `max/min` and therefore non-decreasing in the repeat count, so its growth is
+not itself a finding; that it grew *past the ratio of the row it governs* is.
+
+**What this entry got right and is not withdrawn — the ordering, which got stronger.** §4 item 3's
+"every m = 0.999 repeat above every m = 0.99 repeat" holds at ten per arm and under seven statistics
+(R1, R2, R3, R1_rownorm, R1_uncentred, RankMe, and α-ReQ |α−1| with its sign applied): exact
+one-sided permutation probability **1/184,756 = 5.4e-06**, up from 1/252 at five per arm. It remains
+a statement about GPU non-determinism at a fixed seed and **not** a p-value for the momentum effect.
+Canonical R1's worst-case separation of **1.453×** clears that statistic's own ten-repeat floor of
+**1.291×** — the one test that had ten repeats per arm to break it and did not. And a five-point
+momentum grid {0, 0.98, 0.99, 0.995, 0.999}, run afterwards, is **strictly monotone with complete
+separation at every adjacent pair** under canonical R1, so the shipped comparison is two rungs of a
+ladder rather than a step. **The trend and the ordering hold. The floor-clearing claim for exactly
+this pair does not.**
+
+**Applied to the paper.** `floor_audit.json`'s floor `R3_probe_step600_m0999_vs_m099` now reads
+1.3263× from the ten-repeat file (its R1 twin reads 1.2906× from the same runs), row
+`5.4-m0999-over-m099` records `clears: false`, §4.1a's generated table and counting sentence were
+regenerated to **14 fail / 11 clear / 0 unjudgeable** of 25 selections, §5.4 limit 2 and Appendix C
+were rewritten around §0–§1 and §5 of the source entry, and the draft's Status log gained **item 14**
+recording the reversal rather than editing item 12.

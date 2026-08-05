@@ -300,7 +300,17 @@ def test_every_floor_names_a_statistic_a_block_and_a_caveat(audit):
     """
     for name, floor in audit["floors"].items():
         assert floor["statistic"] and floor["block"] and floor["caveat"], name
-        assert floor.get("n") in (None, 5) or "low" in floor, name
+        # n = 5 everywhere except the one pair that was pushed to ten repeats per
+        # arm on 2026-08-05 (`limit2_breaks_at_ten_repeats_20260805T0330Z.md`).
+        # A floor at n = 10 is not a different KIND of floor -- it is the same
+        # `max/min` over more draws of the same noise -- but the count travels
+        # with it, because at n = 5 this one read 1.1947x and at n = 10 it reads
+        # 1.3263x, which is the difference between a pass and a failure for the
+        # row it governs.
+        assert floor.get("n") in (None, 5, 10) or "low" in floor, name
+        if floor.get("n") == 10:
+            assert name.endswith("_probe_step600_m0999_vs_m099"), name
+            assert "TEN REPEATS" in floor["caveat"], name
 
 
 def test_the_expanded_floor_set_covers_every_statistic_t1_scores(audit):
@@ -368,6 +378,11 @@ def test_the_selections_that_clear_are_exactly_these(audit):
     are the probe-block rows the five-repeat floor made judgeable, and they are
     listed by name because "all of them cleared" is the kind of result that has
     to be checkable rather than asserted.
+
+    `5.4-m0999-over-m099` was in this list and is NOT any longer: it cleared its
+    five-repeat floor by 5.6% and fails its ten-repeat one. That is the only row
+    this audit has ever recorded leaving the clearing column, and it left it
+    because the claim was pushed rather than because anything was reinterpreted.
     """
     clearing = sorted(r["id"] for r in audit["comparisons"]
                       if r["kind"] == "selection" and r["clears"] is True)
@@ -381,12 +396,12 @@ def test_the_selections_that_clear_are_exactly_these(audit):
         "5.2-turnover-momentum",
         "5.4-row2-seedvaried",
         "5.4-row3-r3",
-        # The three that were unjudgeable until a floor was measured at their own
-        # step budget, their own third arm and their own capacity. All three
-        # clear; nothing about the direction was predeclared and every verdict is
-        # `ratio > floor` computed by the checker.
+        # Two of the three that were unjudgeable until a floor was measured at
+        # their own step budget, their own third arm and their own capacity.
+        # Nothing about the direction was predeclared and every verdict is
+        # `ratio > floor` computed by the checker. The third, limit 2, cleared
+        # and then stopped clearing at ten repeats per arm.
         "5.4-row1-step600",
-        "5.4-m0999-over-m099",
         "5.2-capacity-64",
     ]), clearing
 
@@ -398,44 +413,64 @@ def test_the_last_three_unjudgeable_selections_were_closed_by_their_own_floors(a
     repeat was run at, and a capacity no repeat was run at. None was closed by
     stretching the floor: each was closed by running the same measurement at the
     setting the row sits on, and the block string carries that setting so
-    block-matching enforces it. `n` is 5 per arm in all three.
+    block-matching enforces it.
+
+    Two of the three cleared and still do, at n = 5 per arm. The third, limit 2,
+    cleared at n = 5 and does NOT at n = 10; what is asserted here is that it is
+    still JUDGED -- it has a floor on its own arms, its own step and its own
+    statistic, and the verdict against it is a failure rather than a silence.
     """
     expected = {
         "5.4-row1-step600": ("R3_probe_step600_m0999_vs_m0",
-                             "fixed held-out probe, step 600, arms m = 0.999 / m = 0"),
+                             "fixed held-out probe, step 600, arms m = 0.999 / m = 0",
+                             True, 5),
         "5.4-m0999-over-m099": ("R3_probe_step600_m0999_vs_m099",
-                                "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99"),
+                                "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99",
+                                False, 10),
         "5.2-capacity-64": ("R3_probe_step150_cap64_vs_cap4096",
                             "fixed held-out probe, step 150, "
-                            "arms capacity 64 / capacity 4,096"),
+                            "arms capacity 64 / capacity 4,096",
+                            True, 5),
     }
-    for rid, (floor_name, block) in expected.items():
+    for rid, (floor_name, block, clears, n) in expected.items():
         row = next(r for r in audit["comparisons"] if r["id"] == rid)
         assert row["floor"] == floor_name, rid
         assert row["block"] == block, rid
-        assert row["clears"] is True, rid
+        assert row["clears"] is clears, rid
         assert audit["floors"][floor_name]["block"] == block, rid
-        assert audit["floors"][floor_name]["n"] == 5, rid
+        assert audit["floors"][floor_name]["n"] == n, rid
     # No selection may be judged against a floor whose arms are not its own: the
     # two step-600 rows share a step and a statistic and must NOT share a floor.
     assert (audit["comparisons"] and
             expected["5.4-row1-step600"][0] != expected["5.4-m0999-over-m099"][0])
 
 
-def test_the_value_this_project_runs_passes_narrowly_and_the_row_says_so(audit):
-    """m = 0.999 over m = 0.99 clears its own floor by 5.6%, and that is fragile.
+def test_the_value_this_project_runs_does_not_clear_at_ten_repeats_and_the_row_says_so(audit):
+    """m = 0.999 over m = 0.99 cleared a five-repeat floor by 5.6% and fails a ten-repeat one.
 
-    The ten runs that measured the floor separate the two arms by only 1.138x
-    worst case under R3, which is INSIDE it -- the row passes on the particular
-    single-seed draw §5.2's table records. Under canonical R1 the same ten runs
-    separate them by 1.453x against a 1.155x floor. The row has to carry both or
-    the pass is being laundered, so the text is asserted rather than trusted.
+    The pass was recorded, flagged as the narrowest in the paper, and then pushed:
+    both arms went to ten same-seed repeats under a predeclaration whose primary
+    falsifier was "the n = 10 R3 floor reaches 1.262x". It fired -- 1.3263x -- so
+    `ratio > floor` returns False on the paper's own rule with no threshold moved.
+
+    What the row must ALSO carry is what survives, or the correction overshoots
+    into "the momentum finding is dead", which is not what was measured: the
+    ordering is exact across all 10x10 comparisons (one-sided permutation
+    probability 1/184,756), and the five-point momentum grid is monotone with
+    complete separation at every adjacent pair under canonical R1. Both halves are
+    asserted rather than trusted.
     """
     row = next(r for r in audit["comparisons"] if r["id"] == "5.4-m0999-over-m099")
     floor = audit["floors"][row["floor"]]
-    assert row["clears"] is True
-    assert row["ratio"] / floor["value"] < 1.10, "if this stops being narrow, rewrite the note"
-    assert "1.138" in row["rests_on"] and "1.453" in row["rests_on"]
+    assert row["clears"] is False
+    assert floor["n"] == 10
+    assert row["ratio"] < floor["value"], "the row's fixed ratio must sit under its own floor"
+    # The failure, with the numbers that make it not a one-draw artifact.
+    for token in ("1.3263", "1.2791", "1.2764"):
+        assert token in row["rests_on"], token
+    # And the ordering, which got stronger over the same twenty runs.
+    for token in ("1/184,756", "monotone", "1.453"):
+        assert token in row["rests_on"], token
 
 
 def test_the_probe_floor_is_carried_by_the_collapsed_arm_and_is_not_bimodal(audit):
@@ -459,11 +494,15 @@ def test_the_probe_floor_is_carried_by_the_collapsed_arm_and_is_not_bimodal(audi
     # of §5.2 measurement 3 -- carries that one.
     for name, floor in probe.items():
         if "m0999_vs_m099" in name:
-            # BOTH arms are healthy here, so there is no collapsed arm to carry it
-            # and the floor is the smallest of the sixteen. That is the property
-            # stated the other way round and it is asserted rather than excused.
-            assert floor["floor_arm"] == "m0999", name
-            assert floor["value"] < 1.20, name
+            # BOTH arms are healthy here, so there is no collapsed arm to carry
+            # it. At five repeats per arm the stable-looking m = 0.999 arm carried
+            # it and the floor was the smallest of the sixteen; at TEN repeats the
+            # m = 0.99 arm carries it, on the strength of one repeat in ten. The
+            # rule "measure both sides" is unaffected -- what inverts is the
+            # example, and pinning the arm here is what would catch it inverting
+            # again.
+            assert floor["floor_arm"] == "m099", name
+            assert floor["n"] == 10, name
         elif "cap64_vs_cap4096" in name:
             assert floor["floor_arm"] == "cap4096", name
         else:

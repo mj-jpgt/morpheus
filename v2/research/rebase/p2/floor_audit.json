@@ -1281,37 +1281,37 @@
   "R1_probe_step600_m0999_vs_m099": {
    "statistic": "R1",
    "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99",
-   "value": 1.1547,
-   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
+   "value": 1.2906,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and same-seed repeats exclude seed variation entirely. n = 10 per arm, no interval, one seed, one stack, one GPU. **RE-MEASURED AT TEN REPEATS PER ARM on 2026-08-05** alongside its R3 twin (`NOTEBOOK_ENTRIES/limit2_breaks_at_ten_repeats_20260805T0330Z.md`): at n = 5 it read 1.1547× carried by m = 0.999, and at n = 10 it reads 1.2906× carried by the **m = 0.99** arm, whose rep6 reads R1 5.520 against the other nine's 6.462–7.124. The two arms are STILL completely separated under this statistic at ten repeats — every m = 0.999 repeat (10.353–11.955) is above every m = 0.99 repeat (5.520–7.124), worst-case separation 1.453× against this 1.291× floor — so the R1 ratio test is the one thing about §5.4 limit 2 that had ten repeats per arm to break it and did not. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
    "a": {
-    "value": 11.954523975867632,
+    "value": 7.124056271899402,
     "src": {
      "kind": "json",
-     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
-     "path": "floors.600.wsi_biology.R1.floor_max"
+     "file": "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+     "path": "arm_floor.m099.R1.max"
     }
    },
    "b": {
-    "value": 10.353053898700356,
+    "value": 5.5201684270715985,
     "src": {
      "kind": "json",
-     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
-     "path": "floors.600.wsi_biology.R1.floor_min"
+     "file": "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+     "path": "arm_floor.m099.R1.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
-    "outlier_is_low": false,
+    "outlier": "rep6",
+    "outlier_is_low": true,
     "bimodal": false,
-    "rest_fold": 1.0599287785265923
+    "rest_fold": 1.102409056358124
    },
    "shape_src": {
     "kind": "json",
-    "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
-    "path": "floors.600.wsi_biology.R1.arm_floor.m0999.shape"
+    "file": "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+    "path": "arm_floor.m099.R1.shape"
    },
-   "floor_arm": "m0999",
-   "n": 5
+   "floor_arm": "m099",
+   "n": 10
   },
   "R1_probe_step150_cap64_vs_cap4096": {
    "statistic": "R1",
@@ -1386,37 +1386,37 @@
   "R3_probe_step600_m0999_vs_m099": {
    "statistic": "R3",
    "block": "fixed held-out probe, step 600, arms m = 0.999 / m = 0.99",
-   "value": 1.1947,
-   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and five same-seed repeats exclude seed variation entirely. n = 5 per arm, no interval, one seed, one stack, one GPU. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
+   "value": 1.3263,
+   "caveat": "A FLOOR TWICE OVER: `programme_free` at seed 42, and same-seed repeats exclude seed variation entirely. n = 10 per arm, no interval, one seed, one stack, one GPU. **RE-MEASURED AT TEN REPEATS PER ARM on 2026-08-05** (`NOTEBOOK_ENTRIES/limit2_breaks_at_ten_repeats_20260805T0330Z.md`): at n = 5 this floor read 1.1947× and was carried by the m = 0.999 arm; at n = 10 it reads 1.3263× and is carried by the **m = 0.99** arm, whose rep6 comes in at R3 4.465 where the other nine span 5.142–5.922. The floor is `max/min` and is therefore NON-DECREASING in the repeat count, so this move is not a finding in itself — but it moves past the 1.262× of the row it governs, which is. That run was checked against the predeclared exclusion rule and stays in: it trained (`biology_contrastive` 7.575 against chance ln 80 = 4.382), it is not collapsed (R1 5.520 against the m = 0 arm's 1.564–2.738), `p2_envelope_floors._shape` does not flag it as bimodal, and repeats 6–10 overlap repeats 1–5 (5.520–7.029 against 6.462–7.124), so it is not a batch effect. Repeats 6–10 scored alone as an independent n = 5 give 1.2791×, also above 1.262×; on the `rna_biology` view the n = 10 floor is 1.2764×, also above it. The floor is the LARGER of ITS OWN TWO ARMS' max/min at the SAME step and the SAME statistic — a three-arm run is scored once per pair, because §5.4's two step-600 rows do not share a second arm. Measured only at the steps `d1_momentum_probe.py` reads (0, 50, ... 600): a floor at one step licenses no verdict at another.",
    "a": {
-    "value": 8.053572410191407,
+    "value": 5.92163385541985,
     "src": {
      "kind": "json",
-     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
-     "path": "floors.600.wsi_biology.R3.floor_max"
+     "file": "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+     "path": "arm_floor.m099.R3.max"
     }
    },
    "b": {
-    "value": 6.741089600172154,
+    "value": 4.464891777759478,
     "src": {
      "kind": "json",
-     "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
-     "path": "floors.600.wsi_biology.R3.floor_min"
+     "file": "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+     "path": "arm_floor.m099.R3.min"
     }
    },
    "shape": {
-    "outlier": "rep2",
-    "outlier_is_low": false,
+    "outlier": "rep6",
+    "outlier_is_low": true,
     "bimodal": false,
-    "rest_fold": 1.0900036310254562
+    "rest_fold": 1.1515545377045124
    },
    "shape_src": {
     "kind": "json",
-    "file": "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m099.json",
-    "path": "floors.600.wsi_biology.R3.arm_floor.m0999.shape"
+    "file": "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+    "path": "arm_floor.m099.R3.shape"
    },
-   "floor_arm": "m0999",
-   "n": 5
+   "floor_arm": "m099",
+   "n": 10
   },
   "R3_probe_step150_cap64_vs_cap4096": {
    "statistic": "R3",
@@ -3013,8 +3013,8 @@
      "column": "eff-rank"
     }
    },
-   "rests_on": "**a pass by 5.6%, and the ten runs that measured the floor undercut it.** The floor built from its own two arms at step 600 is R3 1.195×, carried by the m = 0.999 arm, and the row's 1.262× clears it — computed by the checker, nothing predeclared. But the SAME ten runs separate the two arms by only **1.138×** worst case under R3 (m = 0.999 min 6.741 against m = 0.99 max 5.922), which is INSIDE that floor: the row passes on the particular single-seed draw §5.2's table records and would not pass on the worst draw of five. Under **canonical R1** the same ten runs separate them by **1.453×** worst case against a 1.155× floor, so the arms are cleanly ordered under R1 and marginally so under R3 — which is §4.5's statistic-conditionality applied to the one value this project actually runs. The binary training outcome still supports momentum against none, not this value over its neighbour.",
-   "clears": true,
+   "rests_on": "**nothing quotable as a magnitude: it does NOT clear once its floor is measured from ten repeats per arm rather than five, and the ordering is what survives.** At n = 5 this row cleared by 5.6% (1.262× against 1.195×) and was recorded as the narrowest pass in the paper. The arms were then taken to **n = 10** under a predeclaration written before the runs (`NOTEBOOK_ENTRIES/PREDECLARED_probe_floor_n10_and_momentum_grid_20260805T0200Z.md`), and its primary falsifier fired: the R3 floor is **1.3263×**, above the row's fixed 1.262×, so `ratio > floor` — the paper's own rule, same checker, same arms, same step, same statistic, same seed — now returns FALSE. No threshold moved and no criterion is new; the floor was measured from twice as many runs. **It is not one unlucky draw**: repeats 6–10 alone, an independent n = 5, give 1.2791×, and the `rna_biology` view gives 1.2764× at n = 10 — both above 1.262×. The whole increase is one m = 0.99 repeat reading R1 5.520 / R3 4.465 where the other nine span 6.462–7.124 / 5.142–5.922, and every predeclared exclusion route was checked and none applies (it trained, it is not collapsed, `_shape` does not call the arm bimodal, and the two batches overlap). **What survives, and survives more strongly than the ratio ever did: the ORDERING.** All ten m = 0.999 repeats are above all ten m = 0.99 repeats under R1, R2, R3, R1_rownorm, R1_uncentred, RankMe and α-ReQ with its sign applied — exact one-sided permutation probability **1/184,756 = 5.4e-06** under exchangeability of the twenty runs, which is a statement about GPU non-determinism at fixed seed and NOT a p-value for the momentum effect. Under canonical R1 the worst-case separation of 1.453× against a 1.291× floor still clears, and a five-point momentum grid {0, 0.98, 0.99, 0.995, 0.999} is strictly monotone with complete separation at every adjacent pair under R1 — though each individual rung is inside its own floor, so this row's gap is the sum of two increments neither of which clears. **A further limit specific to this row**: it can be judged only under R3, because the two runs it quotes predate the canonical column and the state export, so no R1 Test A exists for it at all. The binary training outcome still supports momentum against none, not this value over its neighbour.",
+   "clears": false,
    "ratio": 1.2619,
    "value_digits": 3
   },
