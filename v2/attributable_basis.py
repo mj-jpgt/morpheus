@@ -92,7 +92,10 @@ def _polar(matrix: np.ndarray) -> np.ndarray:
     ``U Vᵀ`` from ``M = U S Vᵀ``. This is an SVD used as a *projection*, not as a
     spectrum statistic: nothing is computed from ``S``, which is discarded.
     """
-    u, _, vt = np.linalg.svd(np.asarray(matrix, dtype=np.float64), full_matrices=False)
+    matrix = np.asarray(matrix, dtype=np.float64)
+    if not np.isfinite(matrix).all():
+        raise FloatingPointError("polar retraction received a non-finite matrix")
+    u, _, vt = np.linalg.svd(matrix, full_matrices=False)
     return u @ vt
 
 
@@ -159,13 +162,20 @@ def ica_rotation(loadings: np.ndarray, *, seed: int = 0, max_iter: int = 2000,
 
 
 def _orthogonal_ascent(objective, gradient, start: np.ndarray, *, max_iter: int = 500,
-                       step: float = 1.0, tol: float = 1e-12) -> dict:
+                       step: float = 0.5, max_step: float = 4.0, tol: float = 1e-12) -> dict:
     """Projected-gradient ascent on the orthogonal group with a polar retraction.
 
     The Riemannian gradient at ``R`` is ``R skew(Rᵀ G)``; the retraction is the
     nearest orthogonal matrix to ``R + η T``. Backtracking on ``η`` makes every
     accepted step a genuine increase, so the reported trajectory is monotone and a
     non-improving arm cannot be mistaken for a failed optimiser.
+
+    The tangent is **normalised to unit Frobenius norm** and the step is capped.
+    Without both, ``η`` doubles on every accepted step and the retraction is
+    eventually handed a matrix of order 1e300; the first real run of this
+    optimiser died in ``np.linalg.svd`` for exactly that reason. Normalising also
+    makes ``η`` mean the same thing for two objectives whose gradients differ by
+    orders of magnitude, so one shared step policy is defensible.
     """
     rotation = np.asarray(start, dtype=np.float64)
     value = float(objective(rotation))
@@ -174,15 +184,17 @@ def _orthogonal_ascent(objective, gradient, start: np.ndarray, *, max_iter: int 
         raw = gradient(rotation)
         skew = rotation.T @ raw
         tangent = rotation @ ((skew - skew.T) / 2.0)
-        if np.abs(tangent).max() < 1e-14:
+        norm = float(np.linalg.norm(tangent))
+        if not np.isfinite(norm) or norm < 1e-14:
             break
+        tangent = tangent / norm
         improved = False
         for _ in range(40):
             candidate = _polar(rotation + step * tangent)
             trial = float(objective(candidate))
-            if trial > value + tol:
+            if np.isfinite(trial) and trial > value + tol:
                 rotation, value, improved = candidate, trial, True
-                step *= 2.0
+                step = min(step * 2.0, max_step)
                 break
             step *= 0.5
         if not improved:
