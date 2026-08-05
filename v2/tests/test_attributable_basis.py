@@ -193,7 +193,7 @@ def test_the_count_objective_spreads_a_concentrated_agreement_over_more_axes():
 
 
 def test_the_registry_names_every_arm_that_was_predeclared():
-    assert set(ROTATIONS) == {"none", "varimax", "ica", "r2opt", "xline_mean", "xline"}
+    assert set(ROTATIONS) == {"none", "random", "varimax", "ica", "r2opt", "xline_mean", "xline"}
 
 
 # --- the guard that makes a basis-choice test a basis-choice test --------

@@ -99,7 +99,7 @@ def _stratified_draw(rng: np.random.Generator, strata: np.ndarray, target: np.nd
 def channel_share_report(*, pca_targets: str, attribution_table: str, artifacts: tuple[str, ...],
                          states: tuple[str, ...], output: str, partition: str = "test",
                          components: tuple[int, ...] = (4, 8, 16, 29), n_random: int = 200,
-                         seed: int = 42) -> dict:
+                         seed: int = 42, rotation: str = "") -> dict:
     table = pd.read_csv(attribution_table)
     certified = np.where(table["causal_name_certified"].to_numpy(bool))[0]
     variance = table["explained_variance_ratio"].to_numpy(float)
@@ -107,9 +107,22 @@ def channel_share_report(*, pca_targets: str, attribution_table: str, artifacts:
     patient_ids, scores, names = load_target_block(pca_targets)
     if scores.shape[1] != len(table):
         raise ValueError(f"block has {scores.shape[1]} columns, attribution table has {len(table)}")
+    # The subset size is the arm's OWN certified count, and the random null is
+    # matched to it. Comparing a 101-column certified set against a 29-column
+    # random draw would be a capacity comparison, not a selection comparison.
+    size = int(len(certified))
+    rotation_summary: dict = {"status": "identity"}
+    if rotation:
+        from .causal_attribution import validated_rotation
+        matrix, rotation_summary = validated_rotation(rotation, np.eye(scores.shape[1]))
+        # heldout_top_cca is invariant to an invertible reparametrisation of the
+        # WHOLE block, so `all_128` is unchanged by construction; only the column
+        # SUBSETS move, which is exactly the quantity in question.
+        scores = scores @ matrix
 
     rows: list[dict] = []
-    summary: dict = {"n_certified": int(len(certified)), "subset_size": SUBSET_SIZE,
+    summary: dict = {"n_certified": int(len(certified)), "subset_size": size,
+                     "rotation": rotation_summary,
                      "certified_axes": table.loc[table["causal_name_certified"], "axis"].tolist(),
                      "certified_axis_indices": certified.tolist(),
                      "median_certified_axis_index": float(np.median(certified)),
@@ -119,8 +132,9 @@ def channel_share_report(*, pca_targets: str, attribution_table: str, artifacts:
                      "n_random": int(n_random), "seed": int(seed), "partition": partition,
                      "statistic": f"heldout_top_cca(k=*,seed={seed}) on cancer+pooled-TSS residuals",
                      "equivalence_check": {}}
-    if len(certified) != SUBSET_SIZE:
-        summary["warning_subset_size"] = f"certified count is {len(certified)}, not {SUBSET_SIZE}"
+    if size != SUBSET_SIZE:
+        summary["note_subset_size"] = (f"certified count is {size}; the random null and the "
+                                       f"most-legible arm are matched to {size}, not to {SUBSET_SIZE}")
 
     index = {pid: i for i, pid in enumerate(patient_ids)}
     for artifact in artifacts:
@@ -143,10 +157,10 @@ def channel_share_report(*, pca_targets: str, attribution_table: str, artifacts:
         for state in states:
             x = cross_fitted_residuals(np.asarray(raw[state], dtype=np.float64)[mask], design, seed=seed)
             legibility_column = f"legibility__{Path(artifact).stem}__{state}"
-            legible = (np.argsort(-table[legibility_column].to_numpy(float))[:SUBSET_SIZE]
+            legible = (np.argsort(-table[legibility_column].to_numpy(float))[:size]
                        if legibility_column in table.columns else np.zeros(0, dtype=np.int64))
             rng = np.random.default_rng(seed)
-            uniform = [rng.choice(len(table), size=SUBSET_SIZE, replace=False) for _ in range(n_random)]
+            uniform = [rng.choice(len(table), size=size, replace=False) for _ in range(n_random)]
             stratified = [_stratified_draw(rng, strata, certified) for _ in range(n_random)]
             for k in components:
                 null = np.asarray([subset_channel(x, y, draw, n_components=k, seed=seed)
@@ -197,12 +211,13 @@ def main() -> None:
     parser.add_argument("--components", nargs="*", type=int, default=[4, 8, 16, 29])
     parser.add_argument("--n-random", type=int, default=200)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--rotation", default="", help="npz with an orthogonal [axis, axis] 'rotation'")
     args = parser.parse_args()
     summary = channel_share_report(
         pca_targets=args.pca_targets, attribution_table=args.attribution_table,
         artifacts=tuple(args.artifacts), states=tuple(args.states), output=args.output,
         partition=args.partition, components=tuple(args.components), n_random=args.n_random,
-        seed=args.seed)
+        seed=args.seed, rotation=args.rotation)
     print(json.dumps({k: v for k, v in summary.items() if k != "rows"}, indent=2, sort_keys=True,
                      default=float))
 

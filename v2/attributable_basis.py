@@ -14,8 +14,21 @@ the rotated loadings are ``loadings @ R`` and span **exactly** the same
 anything). Information content is therefore constant across arms and a difference
 in the certified count is a fact about basis choice alone.
 
-Four rotations, two of which never see a certificate quantity:
+Six rotations, two of which never see a certificate quantity and one of which sees
+nothing at all:
 
+``random``
+    A Haar-random orthogonal rotation, fitted to nothing. **Added after the first
+    round of results, and labelled as such wherever it is quoted.** It exists
+    because the cross-line-optimised arms certified ~100 of 128 and held that on
+    held-out atoms, and there is a mechanism that would produce exactly that
+    without any optimisation being involved: a rotated axis is a dense mixture of
+    PCA directions, and the cross-line correlation of a *mixture* of noisy
+    profiles rises with the number of components mixed, because independent noise
+    averages down while shared signal adds coherently (Spearman-Brown). If a
+    rotation fitted to nothing certifies as many axes as one fitted to maximise
+    exactly that quantity, the gain is a reliability artefact of mixing and not a
+    discovery about where the causal programmes point.
 ``varimax``
     Classical orthogonal varimax on the gene loadings. Seeks *simple structure* —
     each axis loading on few genes. It is the honest arm: sparsity is a plausible
@@ -45,19 +58,22 @@ Four rotations, two of which never see a certificate quantity:
     scored on the other half, which the report computes for every arm including
     the identity.
 
-    They differ in *what* they maximise, and the difference matters more than it
-    looks. ``xline_mean`` maximises the mean per-axis correlation between the two
-    lines — and that quantity is very nearly conserved under rotation for the same
-    reason the mean R² is: with ``p_k = q_k = 1`` the per-axis correlation is
-    ``r_kᵀ M r_k`` and its sum over an orthonormal basis is ``tr(M)``. A rotation
-    can move cross-line agreement *between* axes; it cannot manufacture more of
-    it. ``xline`` therefore maximises a smooth surrogate for the quantity the
-    certificate actually counts — **the number of axes whose agreement clears
-    0.30** — which under a conserved total is maximised by *spreading* the
-    agreement evenly rather than concentrating it. If a certified count can be
-    raised that way and the raise survives on held-out atoms, the 29/128 is a
-    statement about the PCA basis; if it collapses on held-out atoms, the
-    certificate was merely optimisable.
+    They differ in *what* they maximise. ``xline_mean`` maximises the mean per-axis
+    correlation between the two lines; ``xline`` maximises a smooth surrogate for
+    the quantity the certificate actually counts — the number of axes whose
+    agreement clears 0.30.
+
+    **A conservation argument was written here in advance and the data refuted it,
+    which is why it is left on the record rather than deleted.** The argument: with
+    ``p_k = q_k = 1`` the per-axis cross-line correlation is ``r_kᵀ M r_k`` and its
+    sum over an orthonormal basis is ``tr(M)``, so the mean is a budget a rotation
+    could only redistribute. Measured on the real profiles, ``xline_mean`` moved the
+    mean cross-line Spearman from **0.272 to 0.484**. The premise fails because the
+    per-axis normaliser ``sqrt(p_k q_k)`` is not constant across rotated directions,
+    and the conserved quantity is the unnormalised ``tr(M)``, not the mean
+    correlation. The prediction that ``xline_mean`` would be inert is recorded as
+    wrong in
+    ``NOTEBOOK_ENTRIES/PREDECLARED_attributable_basis_and_channel_share_20260805T0710Z.md``.
 
 Both iterative arms ascend on the orthogonal group with a polar retraction, from
 several starts, and report the spread across starts: a win smaller than the
@@ -79,7 +95,7 @@ __all__ = ["ROTATIONS", "varimax_rotation", "ica_rotation", "r2_optimising_rotat
 
 #: The named rotations. ``none`` is the identity and exists so the baseline arm is
 #: run through the identical driver rather than trusted from a previous entry.
-ROTATIONS = ("none", "varimax", "ica", "r2opt", "xline_mean", "xline")
+ROTATIONS = ("none", "random", "varimax", "ica", "r2opt", "xline_mean", "xline")
 
 #: The certificate's cross-line bar. `xline` maximises a smooth count of axes above
 #: it, so it is read from the certificate rather than chosen here.
@@ -95,7 +111,17 @@ def _polar(matrix: np.ndarray) -> np.ndarray:
     matrix = np.asarray(matrix, dtype=np.float64)
     if not np.isfinite(matrix).all():
         raise FloatingPointError("polar retraction received a non-finite matrix")
-    u, _, vt = np.linalg.svd(matrix, full_matrices=False)
+    try:
+        u, _, vt = np.linalg.svd(matrix, full_matrices=False)
+    except np.linalg.LinAlgError:
+        # numpy's divide-and-conquer driver intermittently reports non-convergence
+        # on a perfectly well-conditioned 128x128 matrix here (singular values all
+        # near 1, since the argument is an orthogonal matrix plus a bounded step).
+        # It is a driver failure, not a property of the input: the QR-based
+        # driver succeeds on the identical matrix. Falling back keeps the ascent
+        # deterministic rather than having an arm die on a shared, loaded box.
+        from scipy.linalg import svd as robust_svd
+        u, _, vt = robust_svd(matrix, full_matrices=False, lapack_driver="gesvd")
     return u @ vt
 
 
@@ -314,10 +340,12 @@ def cross_line_rotation(cosine_a: np.ndarray, cosine_b: np.ndarray, rows: np.nda
 
 def fit_rotation(*, method: str, pbs_targets: str, rna_table: str, perturbation: str, output: str,
                  secondary_perturbation: str = "", pca_targets: str = "", n_components: int = 0,
-                 seed: int = 0, max_iter: int = 500) -> dict:
+                 seed: int = 0, max_iter: int = 500, fold: str = "a") -> dict:
     """Fit one named rotation and write it, with its diagnostics, to ``output``."""
     if method not in ROTATIONS:
         raise ValueError(f"unknown rotation {method!r}; expected one of {ROTATIONS}")
+    if fold not in ("a", "b"):
+        raise ValueError(f"fitting fold must be 'a' or 'b', got {fold!r}")
     block = development_pca(pbs_targets, rna_table, n_components=n_components, pca_targets=pca_targets)
     loadings, width = block["loadings"], block["width"]
     diagnostics: dict = {"method": method, "width": int(width), "seed": int(seed),
@@ -325,6 +353,8 @@ def fit_rotation(*, method: str, pbs_targets: str, rna_table: str, perturbation:
 
     if method == "none":
         fitted = {"rotation": np.eye(width)}
+    elif method == "random":
+        fitted = {"rotation": _random_rotation(width, seed)}
     elif method == "varimax":
         fitted = varimax_rotation(loadings)
     elif method == "ica":
@@ -351,7 +381,13 @@ def fit_rotation(*, method: str, pbs_targets: str, rna_table: str, perturbation:
         diagnostics["n_shared_atoms"] = int(len(aligned["shared_atoms"]))
         diagnostics["n_atoms_fold_a"] = int(len(fold_a))
         diagnostics["n_atoms_fold_b"] = int(len(fold_b))
-        fitted = cross_line_rotation(cosine_a, cosine_b, fold_a, max_iter=max_iter,
+        # Which half is the fitting half is a free choice, so it is swept rather
+        # than fixed: `fold='b'` fits on B and leaves A held out, and the two runs
+        # answer the same question from opposite sides. A held-out count that only
+        # survives one assignment of the halves is fold luck.
+        diagnostics["fitting_fold"] = fold
+        fitted = cross_line_rotation(cosine_a, cosine_b, fold_a if fold == "a" else fold_b,
+                                     max_iter=max_iter,
                                      objective="mean" if method == "xline_mean" else "count")
 
     rotation = np.asarray(fitted.pop("rotation"), dtype=np.float64)
@@ -380,12 +416,14 @@ def main() -> None:
     parser.add_argument("--n-components", type=int, default=0)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--max-iter", type=int, default=500)
+    parser.add_argument("--fold", default="a", choices=["a", "b"],
+                        help="which half of the shared atoms the cross-line rotation is fitted on")
     args = parser.parse_args()
     print(json.dumps(fit_rotation(
         method=args.method, pbs_targets=args.pbs_targets, rna_table=args.rna_table,
         perturbation=args.perturbation, output=args.output,
         secondary_perturbation=args.secondary_perturbation, pca_targets=args.pca_targets,
-        n_components=args.n_components, seed=args.seed, max_iter=args.max_iter),
+        n_components=args.n_components, seed=args.seed, max_iter=args.max_iter, fold=args.fold),
         indent=2, sort_keys=True, default=float))
 
 
