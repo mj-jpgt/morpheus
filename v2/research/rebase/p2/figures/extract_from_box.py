@@ -242,6 +242,29 @@ VENDORED += [f"e0_run/d1_probefloor600/pf600_m{m}_rep{r}.log"
 VENDORED += [f"e0_run/d1_probefloor600/pf600_m{m}_rep{r}.log"
              for m in ("0.995", "0.98") for r in range(1, 6)]
 
+#: THE EXPORTED-BLOCK FLOOR ON THE UNSTABLE ARM. Every exported-block floor this
+#: paper quotes -- 3.295x included -- is five same-seed `programme_only` retrains,
+#: the STABLE arm, which is the configuration the paper's own block-matching
+#: argument says flatters a floor. `_PF` is the identical measurement on
+#: `programme_free`: the same chain script with `--objective-profile` as the only
+#: changed flag, same seed 42, same 40 epochs, same export. `_PO_RECHECK` is the
+#: stable arm re-scored through the same invocation in the same session, so the
+#: two arms are comparable by construction rather than by trust -- it reproduces
+#: 3.2947x / 3.1110x / 1.0193x / 1.0200x and every per-repeat value in draft 4.1.
+#: Predeclared in
+#: `NOTEBOOK_ENTRIES/PREDECLARED_unstable_arm_exported_floor_20260805T0045Z.md`.
+#:
+#: SEEDAXIS_{f,p} are the same module on the ten exported 40-epoch D1 artifacts at
+#: seeds 42-46. That is 4.2's axis, NOT a retraining floor, and it is vendored so
+#: the two quantities can be told apart in one place rather than confused.
+VENDORED += ["e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
+             "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PO_RECHECK.json",
+             "e0_run/d1_envelope_pf/out/d1_envelope_pf_readout.log",
+             "e0_run/d1_envelope_pf/out/floors_pf_run.log",
+             "e0_run/d1_envelope_pf/out/floors_po_recheck.log",
+             "e0_run/pf_seedaxis/out/SEEDAXIS_f.json",
+             "e0_run/pf_seedaxis/out/SEEDAXIS_p.json"]
+
 # --------------------------------------------------------------------------
 # Extractors: run on the box, print JSON on stdout, written under data/extracted/
 # --------------------------------------------------------------------------

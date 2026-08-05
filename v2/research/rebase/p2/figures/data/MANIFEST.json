@@ -1,6 +1,6 @@
 {
  "box": "ubuntu@150.136.45.194",
- "fetched_utc": "2026-08-05T05:35:49Z",
+ "fetched_utc": "2026-08-05T07:51:50Z",
  "files": {
   "e0_run/collapse_diag.log": {
    "box_path": "~/e0_run/collapse_diag.log",
@@ -319,6 +319,36 @@
    "bytes": 857,
    "produced_by": null,
    "sha256": "9cfb2993e188c5212a2385b5c1ba6f2c6b51033c692cfd6518c8bfbecf9bca6c"
+  },
+  "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json": {
+   "box_path": "~/e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PF.json",
+   "bytes": 50399,
+   "produced_by": null,
+   "sha256": "f6372bafe7d82c26adea84f7cd2f5e3438bfd147261b5175598754fccb97a79a"
+  },
+  "e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PO_RECHECK.json": {
+   "box_path": "~/e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PO_RECHECK.json",
+   "bytes": 50435,
+   "produced_by": null,
+   "sha256": "385086f6156e2fb734388baf21a4108564aec1a443c0fe36de0cf89c7c975d7c"
+  },
+  "e0_run/d1_envelope_pf/out/d1_envelope_pf_readout.log": {
+   "box_path": "~/e0_run/d1_envelope_pf/out/d1_envelope_pf_readout.log",
+   "bytes": 739,
+   "produced_by": null,
+   "sha256": "72580a87c45c08da1c47b044247ce92165219579cf02ac4635839b3f51d39290"
+  },
+  "e0_run/d1_envelope_pf/out/floors_pf_run.log": {
+   "box_path": "~/e0_run/d1_envelope_pf/out/floors_pf_run.log",
+   "bytes": 8991,
+   "produced_by": null,
+   "sha256": "9e6173fc96addbc6931a3ef4f966eb26f69deb3b5c714e446cbbf47c203c9e53"
+  },
+  "e0_run/d1_envelope_pf/out/floors_po_recheck.log": {
+   "box_path": "~/e0_run/d1_envelope_pf/out/floors_po_recheck.log",
+   "bytes": 8796,
+   "produced_by": null,
+   "sha256": "206d81981199b1eabc35f686e4458011c85defb860bb050a491a2a2843092717"
   },
   "e0_run/d1_envelope_readout.log": {
    "box_path": "~/e0_run/d1_envelope_readout.log",
@@ -757,6 +787,18 @@
    "bytes": 1434,
    "produced_by": null,
    "sha256": "9e17834c75c504896da49c704d1bffc5f13b175363fe122f2373eb22e824159a"
+  },
+  "e0_run/pf_seedaxis/out/SEEDAXIS_f.json": {
+   "box_path": "~/e0_run/pf_seedaxis/out/SEEDAXIS_f.json",
+   "bytes": 53193,
+   "produced_by": null,
+   "sha256": "48b68ccca08d97ec9d27da3af8cb15c3a1cd79707155d52536cdc390e83eadfb"
+  },
+  "e0_run/pf_seedaxis/out/SEEDAXIS_p.json": {
+   "box_path": "~/e0_run/pf_seedaxis/out/SEEDAXIS_p.json",
+   "bytes": 53227,
+   "produced_by": null,
+   "sha256": "62f474c7c0a50d0c022461e3adf25e4347452e2c48af087f0c4436f69b4cbf6f"
   },
   "extracted/F1_RETRAINING_REPEAT.json": {
    "box_path": null,

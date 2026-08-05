@@ -1,0 +1,73 @@
+  rep1  R1_raw=  24.481  R1_res=  28.320  R3_res=  14.177  RankMe_raw=   3.573  channel=0.6182
+  rep2  R1_raw=   8.033  R1_res=   8.834  R3_res=   6.366  RankMe_raw=   1.988  channel=0.5859
+  rep3  R1_raw=  24.504  R1_res=  28.348  R3_res=  14.261  RankMe_raw=   3.532  channel=0.6123
+  rep4  R1_raw=  24.990  R1_res=  29.106  R3_res=  14.580  RankMe_raw=   3.601  channel=0.6110
+  rep5  R1_raw=  24.912  R1_res=  28.959  R3_res=  14.356  RankMe_raw=   3.540  channel=0.6098
+
+floor (max/min over the five repeats)
+            view         block          statistic        min        max     fold  shape
+     wsi_biology           raw                 PR     2.5913     3.7480   1.446x  not bimodal (outlier=rep2, rest=1.047x, sep=1.38)
+     wsi_biology           raw         PR_rownorm     2.5913     3.7480   1.446x  not bimodal (outlier=rep2, rest=1.047x, sep=1.38)
+     wsi_biology           raw                 R1     8.0326    24.9895   3.111x  BIMODAL outlier=rep2
+     wsi_biology           raw                 R2     5.1004    10.9157   2.140x  BIMODAL outlier=rep2
+     wsi_biology           raw                 R3     5.1004    10.9157   2.140x  BIMODAL outlier=rep2
+     wsi_biology           raw             RankMe     1.9883     3.6011   1.811x  not bimodal (outlier=rep2, rest=1.020x, sep=1.78)
+     wsi_biology           raw          alpha_req     2.2291     3.6304   1.629x  not bimodal (outlier=rep2, rest=1.075x, sep=1.51)
+     wsi_biology           raw  alpha_req_abs_dev     1.2291     2.6304   2.140x  not bimodal (outlier=rep2, rest=1.137x, sep=1.88)
+     wsi_biology           raw          hard_rank   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     wsi_biology           raw        stable_rank     1.7729     2.2082   1.246x  not bimodal (outlier=rep2, rest=1.035x, sep=1.20)
+     wsi_biology  residualised                 PR     3.1643     4.4913   1.419x  not bimodal (outlier=rep2, rest=1.051x, sep=1.35)
+     wsi_biology  residualised         PR_rownorm     3.7152     5.4474   1.466x  not bimodal (outlier=rep2, rest=1.024x, sep=1.43)
+     wsi_biology  residualised                 R1     8.8340    29.1057   3.295x  BIMODAL outlier=rep2
+     wsi_biology  residualised                 R2     5.5972    12.4506   2.224x  BIMODAL outlier=rep2
+     wsi_biology  residualised                 R3     6.3663    14.5795   2.290x  BIMODAL outlier=rep2
+     wsi_biology  residualised             RankMe     8.8359    29.1105   3.295x  BIMODAL outlier=rep2
+     wsi_biology  residualised          alpha_req     2.1419     3.6247   1.692x  not bimodal (outlier=rep2, rest=1.064x, sep=1.59)
+     wsi_biology  residualised  alpha_req_abs_dev     1.1419     2.6247   2.299x  not bimodal (outlier=rep2, rest=1.121x, sep=2.05)
+     wsi_biology  residualised          hard_rank   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     wsi_biology  residualised        stable_rank     2.1977     2.6898   1.224x  not bimodal (outlier=rep2, rest=1.054x, sep=1.16)
+     rna_biology           raw                 PR     5.9758     6.1689   1.032x  not bimodal (outlier=rep2, rest=1.017x, sep=1.01)
+     rna_biology           raw         PR_rownorm     5.9758     6.1689   1.032x  not bimodal (outlier=rep2, rest=1.017x, sep=1.01)
+     rna_biology           raw                 R1    23.9832    24.5300   1.023x  not bimodal (outlier=rep2, rest=1.017x, sep=1.01)
+     rna_biology           raw                 R2    13.6213    14.0017   1.028x  not bimodal (outlier=rep2, rest=1.019x, sep=1.01)
+     rna_biology           raw                 R3    13.6213    14.0017   1.028x  not bimodal (outlier=rep2, rest=1.019x, sep=1.01)
+     rna_biology           raw             RankMe    22.3888    23.0588   1.030x  not bimodal (outlier=rep2, rest=1.021x, sep=1.01)
+     rna_biology           raw          alpha_req     4.6077     4.7007   1.020x  not bimodal (outlier=rep5, rest=1.011x, sep=1.01)
+     rna_biology           raw  alpha_req_abs_dev     3.6077     3.7007   1.026x  not bimodal (outlier=rep5, rest=1.014x, sep=1.01)
+     rna_biology           raw          hard_rank   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     rna_biology           raw        stable_rank     3.2693     3.3423   1.022x  not bimodal (outlier=rep3, rest=1.014x, sep=1.01)
+     rna_biology  residualised                 PR     6.7747     6.9832   1.031x  not bimodal (outlier=rep2, rest=1.017x, sep=1.01)
+     rna_biology  residualised         PR_rownorm     7.3563     7.5928   1.032x  not bimodal (outlier=rep2, rest=1.022x, sep=1.01)
+     rna_biology  residualised                 R1    27.2245    27.7497   1.019x  not bimodal (outlier=rep2, rest=1.016x, sep=1.00)
+     rna_biology  residualised                 R2    15.2687    15.6221   1.023x  not bimodal (outlier=rep2, rest=1.018x, sep=1.01)
+     rna_biology  residualised                 R3    16.1913    16.5713   1.023x  not bimodal (outlier=rep2, rest=1.020x, sep=1.00)
+     rna_biology  residualised             RankMe    27.2292    27.7545   1.019x  not bimodal (outlier=rep2, rest=1.016x, sep=1.00)
+     rna_biology  residualised          alpha_req     4.6362     4.7186   1.018x  not bimodal (outlier=rep3, rest=1.010x, sep=1.01)
+     rna_biology  residualised  alpha_req_abs_dev     3.6362     3.7186   1.023x  not bimodal (outlier=rep3, rest=1.013x, sep=1.01)
+     rna_biology  residualised          hard_rank   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+     rna_biology  residualised        stable_rank     3.8939     3.9985   1.027x  not bimodal (outlier=rep2, rest=1.013x, sep=1.01)
+    full_biology           raw                 PR     6.2446     6.3583   1.018x  not bimodal (outlier=rep5, rest=1.017x, sep=1.00)
+    full_biology           raw         PR_rownorm     6.2446     6.3583   1.018x  not bimodal (outlier=rep5, rest=1.017x, sep=1.00)
+    full_biology           raw                 R1    26.3285    26.6921   1.014x  not bimodal (outlier=rep2, rest=1.009x, sep=1.00)
+    full_biology           raw                 R2    14.5666    14.6569   1.006x  not bimodal (outlier=rep1, rest=1.002x, sep=1.00)
+    full_biology           raw                 R3    14.5666    14.6569   1.006x  not bimodal (outlier=rep1, rest=1.002x, sep=1.00)
+    full_biology           raw             RankMe    24.5954    24.7100   1.005x  not bimodal (outlier=rep5, rest=1.003x, sep=1.00)
+    full_biology           raw          alpha_req     4.2385     4.4256   1.044x  not bimodal (outlier=rep5, rest=1.027x, sep=1.02)
+    full_biology           raw  alpha_req_abs_dev     3.2385     3.4256   1.058x  not bimodal (outlier=rep5, rest=1.036x, sep=1.02)
+    full_biology           raw          hard_rank   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+    full_biology           raw        stable_rank     3.3532     3.4311   1.023x  not bimodal (outlier=rep3, rest=1.017x, sep=1.01)
+    full_biology  residualised                 PR     7.0640     7.1054   1.006x  not bimodal (outlier=rep1, rest=1.004x, sep=1.00)
+    full_biology  residualised         PR_rownorm     7.7093     7.7820   1.009x  not bimodal (outlier=rep2, rest=1.008x, sep=1.00)
+    full_biology  residualised                 R1    29.8042    30.3991   1.020x  not bimodal (outlier=rep2, rest=1.015x, sep=1.01)
+    full_biology  residualised                 R2    16.2918    16.3942   1.006x  not bimodal (outlier=rep2, rest=1.002x, sep=1.00)
+    full_biology  residualised                 R3    17.5516    17.8780   1.019x  not bimodal (outlier=rep3, rest=1.011x, sep=1.01)
+    full_biology  residualised             RankMe    29.8092    30.4042   1.020x  not bimodal (outlier=rep2, rest=1.015x, sep=1.01)
+    full_biology  residualised          alpha_req     4.2230     4.4113   1.045x  not bimodal (outlier=rep2, rest=1.027x, sep=1.02)
+    full_biology  residualised  alpha_req_abs_dev     3.2230     3.4113   1.058x  not bimodal (outlier=rep2, rest=1.035x, sep=1.02)
+    full_biology  residualised          hard_rank   256.0000   256.0000   1.000x  not bimodal (outlier=rep1, rest=1.000x, sep=1.00)
+    full_biology  residualised        stable_rank     4.0164     4.0846   1.017x  not bimodal (outlier=rep2, rest=1.014x, sep=1.00)
+  wsi_rna_paired           raw              LiDAR    39.6212    40.9816   1.034x  not bimodal (outlier=rep2, rest=1.026x, sep=1.01)
+  wsi_rna_paired  residualised              LiDAR    38.7877    41.1002   1.060x  not bimodal (outlier=rep2, rest=1.024x, sep=1.03)
+         channel  residualised         top_cca_16     0.5859     0.6182   1.055x  not bimodal (outlier=rep2, rest=1.014x, sep=1.04)
+
+wrote /home/ubuntu/e0_run/d1_envelope_pf/out/P2_ENVELOPE_FLOORS_PO_RECHECK.json
