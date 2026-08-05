@@ -180,6 +180,19 @@ None of tier 2 or 3 has been scoped for actual API access, rate limits, or relia
 this runs (local box vs. the Lambda instance). **That scoping is the first concrete task**, before
 any claim is made that the pipeline can tell novel from known — see §6.
 
+**UPDATE 2026-08-05** (`NOTEBOOK_ENTRIES/p5_novelty_filter_feasibility_scoping_20260805T0805Z.md`):
+scoped from one sandbox. Both PubMed E-utilities (tier 3) and Open Targets' GraphQL API (tier 2)
+are reachable and return real, usable data without a key; PubMed's ~3 req/s anonymous rate limit is
+enforced and signalled explicitly (`429`, never a silent empty-but-200 response), and a genuine
+zero-hit query returns a clean, checkable negative. That derisks the *mechanics*. It does not
+derisk what the checks actually prove: Open Targets covers gene-**disease** association, not
+gene-**morphology** association, and PubMed tier-3 as specified (`gene AND cancer-type AND
+(histology OR morphology OR imaging)`) is a generic co-occurrence search not shaped to find this
+pipeline's actual claim type. The honest judgment — not a computed number — is that tier-3's
+false-negative rate for *this pipeline's specific claim type* is non-trivial, plausibly double-digit
+percent. Every surfaced hypothesis must carry that caveat explicitly, every time, exactly as this
+paragraph already said before the scoping ran.
+
 ---
 
 ## 4. What already exists and plugs in directly — this is not starting from zero
@@ -264,10 +277,24 @@ flight:
   that — a first-draft stage-6/7 pass, to validate that the mechanistic cross-check and the
   experiment-proposal template actually produce something useful, not just that the statistics run.
 
-An agent is running the §5.3 novelty-filter feasibility scoping and a first draft of the stage 0–4
-pilot pipeline now (`NOTEBOOK_ENTRIES/` will carry the predeclaration and result, per standing
-convention). Its scope predates §1.1/§2.1's findings and should be revisited against them when it
-reports.
+**UPDATE 2026-08-05 — both ran; report bad news first.** §5.3's scoping is done (see the update
+attached to §3 above). The stage 0–4 pilot pipeline (`v2/p5_pilot_funnel.py`) is built and tested,
+but **found no reachable frozen artifact from its sandbox and ran entirely on synthetic data
+instead** — zero real candidates were tested; see
+`NOTEBOOK_ENTRIES/p5_pilot_funnel_synthetic_dry_run_20260805T0815Z.md` for exactly what was tried
+(four Lambda-box addresses, all either unreachable or lacking a matching credential) and why a
+stale, untracked local `frozen_rna_targets.npz` from an unrelated 2026-07-19 evaluation run was
+deliberately **not** substituted for the real one. On its own synthetic mechanics ladder (200 cells,
+20 with a planted signal, 180 pure null), the funnel's stage ordering and its BH-FDR wiring are
+correct, but its own predeclared must-pass bar failed — **0 of 20 planted cells survived FDR** —
+traced to a permutation-resolution/multiple-testing mismatch specific to this pilot's CPU-expedient
+`n_permutations=30` (needed roughly `m/q ≈ 800` for its own `m=80, q=0.10`), not to an absence of
+signal at real scale. **That pilot's scope predates §1.1's composition/§2.1's capacity-caveat
+findings — its stage 2 does not yet score candidates against a matched-random-control-at-capacity
+check, so even a real run of this exact code would be incomplete against the current plan and
+would need that control added first.** Net: the funnel's plumbing is validated; no data has been
+seen; the next agent needs either a reachable box with a matching key or the artifacts moved to a
+reachable environment, plus the §2.1 capacity control wired in, before a real pilot number exists.
 
 ---
 

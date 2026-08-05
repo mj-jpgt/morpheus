@@ -1,0 +1,21 @@
+{
+  "n_candidates_entered_stage0": 200,
+  "n_survived_stage1_coarse_filter": 80,
+  "n_reached_stage2_certify": 80,
+  "n_cleared_stage3_bh_fdr": 0,
+  "bh_q": 0.1,
+  "n_attempted_stage4_replication": 0,
+  "n_replicated_stage4": 0,
+  "stage1_keep_fraction": 0.4,
+  "data_provenance": "SYNTHETIC_DRY_RUN_NO_REAL_TCGA_DATA",
+  "funnel_mechanics_confusion": {
+    "n_planted": 20,
+    "n_null": 180,
+    "planted_stage1_survival_rate": 0.45,
+    "null_stage1_survival_rate": 0.39444444444444443,
+    "planted_stage3_survival_rate": 0.0,
+    "null_stage3_survival_rate": 0.0,
+    "planted_stage4_replication_rate_of_stage3_survivors": NaN,
+    "null_stage4_replication_rate_of_stage3_survivors": NaN
+  }
+}

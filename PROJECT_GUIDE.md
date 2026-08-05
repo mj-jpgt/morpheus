@@ -85,6 +85,40 @@ These are not style preferences. Every one of them exists because its absence al
 - SNV modality is built and shows structure after adjustment, but not yet distinguished from the lineage/cancer-type residual found elsewhere on this project — needs its own channel test before it's a claim.
 - CNV and RPPA proteomics are scoped (data located, coverage measured) but not built.
 
+### P5 — discovery engine (planning; first scoping + pilot done, 2026-08-05)
+**Solid:** the plan itself (`paper/P5_DISCOVERY_PLAN.md`) exists and identifies the hard problem
+correctly (novelty filtering, not certification, is the unbuilt part). §4.3's novelty-filter
+feasibility scoping is done: PubMed E-utilities and Open Targets' GraphQL API are both reachable
+and usable from at least this sandbox without a key, PubMed's ~3 req/s anonymous rate limit is
+signalled explicitly (`429`, never silent), and a genuine zero-hit PubMed query returns a clean,
+checkable negative. The stage-0-4 pilot pipeline (`v2/p5_pilot_funnel.py`) is built and tested (8
+tests pass), reusing `calibra.spectral` / `calibra.residualise` / `calibra.calibration` unchanged
+for every per-cell statistic and `scipy.stats.false_discovery_control` for BH-FDR.
+
+**Open:**
+- **No real pilot has run.** This checkout has no frozen artifacts (`frozen_rna_targets.npz`,
+  representation-state npz) at all, and the project's Lambda box was unreachable from this
+  sandbox at four different addresses (three timed out on port 22; the fourth is up but rejected
+  this checkout's default SSH identity). Whoever next runs this needs either a reachable box with
+  a matching key, or the artifacts copied into a reachable environment.
+- **Novelty filtering is usable only at tier 1** (already-a-training-target, free/built) and
+  tier 2 (Open Targets, gene-disease association — reachable, but says nothing about a
+  gene-*morphology* claim). Tier 3 (PubMed literature) is reachable but its false-negative rate
+  for this pipeline's actual claim type (a morphology-molecular correlation, not a generic
+  gene-disease mention) is judged non-trivial (double-digit percent order of magnitude, not
+  computed precisely) — every surfaced hypothesis must carry that caveat explicitly, per the
+  plan's own §1/§6.
+- **A concrete multiple-testing sizing rule, found by a synthetic dry run and not yet applied to
+  a real run:** BH-FDR at level `q` across `m` tested cells needs `n_permutations >~ m/q` in
+  `calibra.calibration.permutation_null`, or no cell can survive correction regardless of true
+  effect size. The pilot itself under-sized this (`n_permutations=30` against `m=80, q=0.10`,
+  needing ~800) and its predeclared must-pass bar (a nontrivial fraction of a planted synthetic
+  signal surviving FDR) failed as a direct result — diagnosed, not silently re-run with different
+  parameters. See `NOTEBOOK_ENTRIES/p5_pilot_funnel_synthetic_dry_run_20260805T0815Z.md`.
+- The candidate-space definition (curated non-training-target pathway signatures x largest cancer
+  strata) is fixed in the pilot's predeclaration but has never been evaluated against real target
+  or representation artifacts.
+
 ---
 
 ## 4. Where things live
