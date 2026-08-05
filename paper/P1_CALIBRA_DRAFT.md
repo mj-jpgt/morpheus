@@ -26,7 +26,7 @@ including the residualisation, and reports what came back. On 2,530–6,427 TCGA
 H-Optimus-0 whole-slide features and bulk expression targets we report four things. (i) The
 adjustment works on the first moment and is verified rather than assumed, twice and on two different
 confounders: raw cancer-type balanced accuracy falls 0.7339 → 0.0308 against a chance rate of 0.0476 (artifact `diagnostic_full_seed42.npz`, SHA-256 `72dcefcf05482288…`; §4.2 — this replaces a previously published 0.463 → 0.035 that **could not be reproduced**), and
-joint tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118 (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 21–45× drop
+joint tissue-source-site accuracy falls 0.3633 → 0.0118 against a chance rate of 0.0118 (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 26–45× drop
 with zero breaching axes in six representation states — while a nonlinear probe still recovers both
 confounds from the adjusted state at 3.15× and 3.45× chance, so what is certified is the class means
 and not every function of the representation. That residual is bounded: a saturated cancer × site cell
@@ -34,7 +34,14 @@ design, which upper-bounds any conditional-mean adjustment, moves the channel 0.
 confound labels alone account for 6.0–11.2% of the channel's excess over its own null when the labels
 are encoded in the same columns the adjustment residualises against — a construction choice, not a
 free-standing property of the cohort: re-encoded on the operator's own frozen design, the same
-comparison reads consistent with zero (−0.3% to 6.4%, none significant at *p* < 0.05). (ii) It does
+comparison reads consistent with zero (−0.3% to 6.4%, none significant at *p* < 0.05). **Every
+labels-only ceiling figure in this abstract is one partition's reading**: at fixed encoding and fixed
+*n*, twelve partitions of the same cohort move the additive/transductive share by 16.9× (§4.2), and
+the ceiling is quotable only as a direction, not as a percentage. The channel itself is not
+partition-fragile: fitting the nuisance model on a disjoint discovery fold and applying it to unseen
+patients — the first genuinely out-of-sample test of this claim — leaves retention at 0.987–1.052
+(`d2_h`) and 0.922–1.079 (`d2_i`) across those twelve partitions, every arm at the permutation floor.
+(ii) It does
 not destroy the signal it is meant to leave alone: injected-signal attenuation is 0.974–1.039 across
 six states and 1.07–1.12 across twelve design × sample-size cells. (iii) The floors themselves — a paired *transmission* floor censored at
 ≤ 0.01, and an unpaired *detection* floor of 0.25–0.40 that is the only quotable detection limit —
@@ -55,8 +62,8 @@ We report the instrument's failures as fully as its successes: a must-fail site 
 fail on raw representations, a per-axis certificate that would have issued a clean bill of health on
 a real leak, a predeclared estimator-robustness prediction that failed at 55.7% against a 25% bar,
 and the finding that 76–82% of the per-target channel is reproduced by covariate-matched random gene
-sets, invariant to contamination. No external cohort has been through the instrument; every number
-here is TCGA.
+sets, invariant to contamination. Every number here is TCGA, and **none of the instrument's floors
+has been measured on any external cohort** (§5.1).
 
 ### Short abstract (~200 words, for a length-capped methods venue)
 
@@ -77,7 +84,7 @@ our pipeline to 8.6 × 10⁻¹⁶ — which is 20–35× larger for a real confo
 matched-rank structureless one and does not shrink with n. We report a must-fail control that did not
 fail, a per-axis certificate that would have passed a real site leak, a failed predeclared robustness
 prediction, and the finding that covariate-matched random gene sets reach 76–82% of real ones. No
-external cohort.
+floor here has been measured outside TCGA.
 
 ---
 
@@ -87,9 +94,11 @@ external cohort.
 
 The claim that tumour morphology carries molecular information is now routine. Deep models predict
 point mutations, microsatellite instability and molecular subtype directly from haematoxylin-and-eosin
-slides (Kather et al., *Nature Cancer* 2020) `[UNVERIFIED]`; slide-level foundation models report
-molecular-profile and outcome prediction across cohorts (CHIEF, Wang et al., *Nature* 2024;
-Prov-GigaPath, Xu et al., *Nature* 2024) `[UNVERIFIED]`; and encoders are pretrained against paired
+slides (Kather et al., *Nature Cancer* 1(8):789–799, 2020, DOI 10.1038/s43018-020-0087-6);
+slide-level foundation models report
+molecular-profile and outcome prediction across cohorts (CHIEF, Wang et al., *Nature*
+634:970–978, 2024, DOI 10.1038/s41586-024-07894-z;
+Prov-GigaPath, Xu et al., *Nature* 630:181–188, 2024, DOI 10.1038/s41586-024-07441-w); and encoders are pretrained against paired
 genomic and transcriptomic profiles so that molecular meaning is internalised into the image
 representation (THREADS, Vaidya et al., arXiv:2501.16652, 2025). Benchmarks have followed, most
 prominently HEST-1k (Jaume et al., NeurIPS 2024, arXiv:2406.16192).
@@ -114,11 +123,13 @@ The confounding in this setting is documented and substantial. Howard et al. (*N
 12:4423, 2021) showed that the TCGA tissue-submitting site is detectable from the slide image,
 survives colour normalisation, and correlates with clinical and genomic labels. Subsequent work found
 that the problem is not solved by scale: hospital signatures persist in foundation-model embeddings
-(Kömen et al., arXiv:2411.05489, 2024) `[UNVERIFIED]`; across ten public pathology foundation models
+(Kömen, Marienwald, Dippel & Hense, "Do Histopathological Foundation Models Eliminate Batch
+Effects? A Comparative Study", arXiv:2411.05489, 2024); across ten public pathology foundation models
 medical-centre identity is encoded more strongly than tissue or cancer type (de Jong et al.,
 arXiv:2501.18055, 2025); representational-similarity analysis finds pronounced slide-dependence and
 weak disease-dependence (Mishra & Lotter, arXiv:2509.15482, 2025); scanner hardware is a separate
-axis again (Carloni et al., arXiv:2507.22092, 2025) `[UNVERIFIED]`.
+axis again (Carloni et al., "Pathology Foundation Models are Scanner Sensitive: Benchmark and
+Mitigation with Contrastive ScanGen Loss", arXiv:2507.22092, 2025; MedAGI workshop, MICCAI 2025).
 
 We reproduce this on our own representations rather than citing it. A joint linear discriminant over
 all 256 axes of a raw representation state recovers the pooled tissue source site at balanced
@@ -163,11 +174,21 @@ must-fail control that fails on one statistic and reaches 76–82% of the real s
 (§4.8.2).
 
 Second, the paper is careful about the difference between an instrument that is *demonstrated* and
-one that is *validated*. No external cohort has been through CALIBRA. Every number here is TCGA, with
-its documented site and scanner effects. The `no_external_cohort` blocker in
-`v2/calibra/claim_guards.py` is undischarged for every morphology result on this project, and it is
+one that is *validated*. **The instrument itself — the injection, the two floors, the attenuation
+measurement — has been run on TCGA and nowhere else, and every number in this paper is TCGA**, with
+its documented site and scanner effects. One of the quantities CALIBRA reports, the channel, has
+since been measured independently inside a second cohort (ALCHEMIST-ALCH, 1,106 paired NSCLC
+patients) and replicates there at R = 1.110 against the matched-*n* TCGA-NSCLC comparator with *p* at
+the 1/301 resolution floor; that result is reported elsewhere on this project and no number from it
+is used here, because it replicates the channel and not the floors. The `no_external_cohort` blocker in
+`v2/calibra/claim_guards.py` remains undischarged for every morphology result on this project, and
+that is a deliberate decision rather than an omission: the blocker gates only the two **per-axis**
+claim kinds, and an aggregate-channel replication is evidence at the wrong granularity to discharge
+it. It is
 enforced in code: `validate_claim` refuses to mark a `legible_axis` or `gene_attribution` claim
 publishable, and no such claim appears here.
+*Provenance: `NOTEBOOK_ENTRIES/alchemist_external_replication_RESULT_20260804T2115Z.md`;
+`NOTEBOOK_ENTRIES/decision_external_cohort_blocker_stays_20260804T2200Z.md`.*
 
 ### 1.4 Contributions
 
@@ -176,7 +197,7 @@ In descending order of how well evidenced they are.
 1. **A confound adjustment verified rather than asserted, on two different confounders, with the
    verification reported as a certificate — and with the certificate's own reach measured.**
    Cancer-type balanced accuracy 0.7339 → 0.0308 (chance 0.0476) (artifact `diagnostic_full_seed42.npz`, SHA-256 `72dcefcf05482288…`; §4.2 — replacing a withdrawn, **unreproducible** 0.463 → 0.035); joint tissue-source-site balanced
-   accuracy 0.3633 → 0.0118 (chance 0.0118) (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 21–45× drop with zero breaching axes across six
+   accuracy 0.3633 → 0.0118 (chance 0.0118) (artifact `runs/d2_final/artifacts/d2_h_seed42.npz`, SHA-256 `4a18b94f1017b85d…`; §4.2), a 26–45× drop with zero breaching axes across six
    states. What that certifies is the **first moment**: a nonlinear probe still recovers site at
    3.15× and cancer at 3.45× chance from the adjusted state, *p* at the floor, three probe families
    agreeing. The residual is bounded — a saturated cancer × site cell design, the upper bound on any
@@ -184,7 +205,14 @@ In descending order of how well evidenced they are.
    6.0–11.2% of its excess over null when encoded in the same columns the adjustment residualises
    against — a re-encoding on the operator's own frozen design instead reads consistent with zero
    (−0.3% to 6.4%, none significant) — so a mean-based certificate is sound for what it claims and
-   must not be read as "the confound is gone" (§4.2).
+   must not be read as "the confound is gone" (§4.2). **Both ceiling percentages are single-partition
+   readings and are quotable only as a direction**: twelve partitions of the same cohort, at fixed
+   encoding and fixed *n*, move the additive/transductive share by 16.9×.
+   **And the channel underneath them survives an inductive adjustment on every partition tested** —
+   nuisance model fit on a disjoint discovery fold and applied to unseen patients, retention
+   0.987–1.052 (`d2_h`, median 1.010) and 0.922–1.079 (`d2_i`, median 1.017) over twelve
+   partitions, 24 of 24 arms at the *p* ≤ 0.0005 permutation floor. `d2_i` breaks its own predeclared
+   ≤ 0.10 spread bar at 0.157, which is why this is reported as a range and not as a point estimate.
 2. **A demonstration that the same adjustment does not destroy signal.** Injected-signal attenuation
    0.974–1.039 across six states, 1.07–1.12 across twelve design × n cells, and 0.944–1.228 in the
    original 40-draw sweep — i.e. ≈ 1 in every measurement we have. This is the number that answers
@@ -243,7 +271,8 @@ apparent accuracy on survival, mutation and stage; they propose preserved-site c
 Notably, Howard et al. also run a synthetic manipulation — varying ER negativity of target slides
 from 0 to 100% and applying an artificial staining artifact to 0–100% of them — but to *demonstrate*
 confounding, not to certify a detection floor after adjustment. It is the nearest thing in this
-domain to what we do. Schmitt et al. (*JMIR* 2021) `[UNVERIFIED]` broadened the confounder list to
+domain to what we do. Schmitt et al. (*J. Med. Internet Res.* 23(2):e23436, 2021,
+DOI 10.2196/23436) broadened the confounder list to
 scanner type, institution and preparation date. Dawood et al. ("Buyer Beware", bioRxiv
 2024.06.23.600257) show that per-biomarker models predict a correlated bundle rather than an isolated
 biomarker.
@@ -333,9 +362,13 @@ contained a magnitude, our numeric residue would disappear entirely.*
 We must therefore cite, so that no reviewer can present them as omissions: (i) Yule/FWL for the
 identity; (ii) Winkler et al. 2020 for the inferential consequence and the remedy; (iii) **Muirhead
 (1982), *Aspects of Multivariate Statistical Theory* / Anderson (2003), *An Introduction to
-Multivariate Statistical Analysis***, for the classical result that rank-R residualisation leaves an
-effective sample size of N − R, which Winkler's own correction uses `[UNVERIFIED — edition, chapter
-and page not checked in this pass]`.
+Multivariate Statistical Analysis*, 3rd edn**, for the classical result that rank-R residualisation
+leaves an effective sample size of N − R, which Winkler's own correction uses. *(Both books verified
+2026-08-05: Muirhead, Wiley 1982, ISBN 978-0-471-09442-5, DOI 10.1002/9780470316559, the relevant
+chapter being **ch. 5, "Correlation Coefficients", pp. 144–195**, verified at the publisher's
+chapter-level record; Anderson, 3rd edn, Wiley 2003, ISBN 0-471-36091-0. `[UNVERIFIED — the
+section and page carrying the N − R statement have not been read in either book; the chapter is
+identified for Muirhead only.]`)*
 
 We must also concede, in the text and before a reviewer says it, that the identity is one line of
 algebra (§1.2), and that empirical cross-modal noise floors are an established sub-industry with a
@@ -350,16 +383,22 @@ cross-modal association studies.
 ### 2.5 Negative-control culture in genomics
 
 Genomics has a mature negative-control culture that computational pathology has partly not imported.
-Venet, Dhanasekaran & Sotiriou (*PLoS Comput. Biol.* 2011) showed that most random gene-expression
+Venet, Dumont & Detours (*PLoS Comput. Biol.* 7(10):e1002240, 2011,
+DOI 10.1371/journal.pcbi.1002240) showed that most random gene-expression
 signatures are significantly associated with breast-cancer outcome, establishing the random-signature
-null as a required control `[UNVERIFIED]`. Random and size-matched gene-set nulls are codified in
+null as a required control. *(Correction, 2026-08-05: earlier drafts attributed this paper to
+"Venet, Dhanasekaran & Sotiriou". Two of the three names were wrong — the authors are David Venet,
+Jacques E. Dumont and Vincent Detours. Title, journal and year were correct. Verified against
+Crossref record 10.1371/journal.pcbi.1002240.)* Random and size-matched gene-set nulls are codified in
 standard tooling. On the perturbation side, simple baselines beat deep models under held-out-
 perturbation splits (Wong, Hill & Moccia, *Bioinformatics* 41(6):btaf317, 2025). Covariate adjustment
-itself has a long literature — surrogate variable analysis (Leek & Storey 2007), ComBat (Johnson, Li
-& Rabinowitz 2007), removal of unwanted variation (Gagnon-Bartsch & Speed, *Biostatistics*
+itself has a long literature — surrogate variable analysis (Leek JT & Storey JD, *PLoS Genetics*
+3(9):e161, 2007, DOI 10.1371/journal.pgen.0030161), ComBat (Johnson WE, Li C
+& Rabinovic A, *Biostatistics* 8(1):118–127, 2007, DOI 10.1093/biostatistics/kxj037), removal of
+unwanted variation (Gagnon-Bartsch & Speed, *Biostatistics*
 13(3):539, 2012) — evaluated on whether the unwanted factor is removed and the factor of interest
-preserved `[UNVERIFIED for Leek & Storey and Johnson et al. — author initials and year not
-re-checked]`. Note that RUV-type methods use controls known **not** to change, a *negative*-control
+preserved. *(Correction, 2026-08-05: ComBat's third author is **Rabinovic**, not "Rabinowitz" as
+earlier drafts had it. Leek & Storey 2007 verified as written.)* Note that RUV-type methods use controls known **not** to change, a *negative*-control
 lineage; our positive-injection construction is a genuine and worth-stating distinction. Simulation-
 based calibration (Talts et al., arXiv:1804.06788; Cook, Gelman & Rubin, *JCGS* 15(3):675, 2006)
 measures uniformity of rank statistics with no injection into real data and no detection floor; the
@@ -412,9 +451,38 @@ Current status:
   Virchow, Phikon-v2, PLIP, CONCH, PathChat). Those audits record **0 fabrications detected** across
   the lanes checked, but they are spot-checks, not exhaustive, and venue/award labels were explicitly
   flagged as lower-confidence.
-* **Marked `[UNVERIFIED]` above** and not yet checked in any pass: Kather et al. 2020 (exact
-  journal/year), Kömen et al. 2024, Carloni et al. 2025, Schmitt et al. 2021, Venet et al. 2011, Leek
-  & Storey 2007, Johnson et al. 2007, Muirhead 1982 / Anderson 2003 chapter and page.
+* **Closed on 2026-08-05 by a dedicated verification pass** (`NOTEBOOK_ENTRIES/
+  p1_completeness_pass_*`; every field below read off a live Crossref record, an arXiv abstract page
+  or a publisher chapter record, never from recollection). Every item previously marked
+  `[UNVERIFIED]` is now resolved, and **two were wrong**:
+
+  | citation as it stood | verdict | record |
+  |---|---|---|
+  | Kather et al., *Nature Cancer* 2020 | **verified** | *Nature Cancer* 1(8):789–799, DOI 10.1038/s43018-020-0087-6 (an Author Correction also exists, DOI 10.1038/s43018-020-00149-6) |
+  | CHIEF, Wang et al., *Nature* 2024 | **verified** | *Nature* 634(8035):970–978, DOI 10.1038/s41586-024-07894-z |
+  | Prov-GigaPath, Xu et al., *Nature* 2024 | **verified** | *Nature* 630:181–188, DOI 10.1038/s41586-024-07441-w |
+  | Kömen et al., arXiv:2411.05489, 2024 | **verified** | "Do Histopathological Foundation Models Eliminate Batch Effects? A Comparative Study", Kömen, Marienwald, Dippel, Hense, 2024-11-08; content matches the use made of it in §1.2 |
+  | Carloni et al., arXiv:2507.22092, 2025 | **verified, venue gained** | "Pathology Foundation Models are Scanner Sensitive…", 2025-07-29, MedAGI workshop @ MICCAI 2025 (oral) |
+  | Schmitt et al., *JMIR* 2021 | **verified** | *J. Med. Internet Res.* 23(2):e23436, DOI 10.2196/23436 |
+  | Venet, **Dhanasekaran & Sotiriou**, 2011 | **WRONG — corrected** | the authors are Venet D, **Dumont JE, Detours V**; *PLoS Comput. Biol.* 7(10):e1002240, DOI 10.1371/journal.pcbi.1002240. Two of three names did not belong to this paper. |
+  | Leek & Storey 2007 | **verified** | *PLoS Genetics* 3(9):e161, DOI 10.1371/journal.pgen.0030161 |
+  | Johnson, Li & **Rabinowitz** 2007 | **WRONG — corrected** | ComBat's third author is **Rabinovic A**; *Biostatistics* 8(1):118–127, DOI 10.1093/biostatistics/kxj037 |
+  | Muirhead 1982 / Anderson 2003 | **books verified; page not** | Muirhead, Wiley 1982, ISBN 978-0-471-09442-5, DOI 10.1002/9780470316559, ch. 5 "Correlation Coefficients" pp. 144–195; Anderson, 3rd edn, Wiley 2003, ISBN 0-471-36091-0. The section and page carrying the N − R statement remain unread — the one residual `[UNVERIFIED]` in this paper. |
+  | the four ER-status papers of §3.9/§4.9 (previously `[CITATION NEEDED]`) | **all four verified as written** | Naik 10.1038/s41467-020-19334-3 (*Nat Commun* 11:5727); Rawat 10.1038/s41598-020-64156-4 (*Sci Rep* 10:7275); Shamai 10.1001/jamanetworkopen.2019.7700 (*JAMA Netw Open* 2:e197700); Couture 10.1038/s41523-018-0079-1 (*npj Breast Cancer* 4:30) |
+
+  Eight further DOI-carrying references were re-verified in the same pass and all eight match what
+  this paper says about them: Howard 10.1038/s41467-021-24698-1 (*Nat Commun* 12, art. 4423);
+  Murchan 10.1016/j.jpi.2024.100396; Winkler 10.1016/j.neuroimage.2020.117065 ("Permutation
+  inference for canonical correlation analysis"); Jiang 10.1101/gr.121095.111 (*Genome Res.*
+  21:1543–1551); Munro 10.1038/ncomms6125 (*Nat Commun* 5, art. 5125); Gerard 10.1186/s12859-020-3450-9
+  (*BMC Bioinformatics* 21, art. 206 — note the paper's own title is "Data-based RNA-seq simulations by
+  binomial thinning"; `seqgendiff` is its package name); Biwer 10.1103/PhysRevD.95.062002; Marek
+  10.1038/s41586-022-04492-9 (*Nature* 603:654–660).
+
+  **The two corrections matter beyond their own lines.** Both were author-name errors on real papers
+  with correct titles, venues and years — the failure mode a title-and-year spot-check cannot catch,
+  and the one closest to this project's three historical fabrications. Any future pass must check
+  author lists, not just identifiers.
 * **Closed in this pass:** the effective-rank-as-quality-proxy citation formerly marked
   `[CITATION NEEDED]` in §2.6 is now **RankMe** — Garrido, Balestriero, Najman & LeCun, ICML 2023,
   PMLR 202:10929–10974, arXiv:2210.02885, **VERIFIED at full text** — with the statistic itself
@@ -425,9 +493,9 @@ Current status:
 * **Corrected in this pass:** §2.6 previously grouped Jing et al. (ICLR 2022) among proposals of
   geometric proxies for representation quality. That paper contains no rank→performance claim; the
   grouping has been removed.
-* **Still marked `[CITATION NEEDED]`**: the four papers underlying the pre-registered ER-status band
-  (§3.9), recorded in `p1_evidence/inputs/PREREG_known_covariate.json` but not re-verified in this
-  pass; and the four positive-control references in §4.9.
+* **Nothing in this paper now carries a bare `[UNVERIFIED]` or `[CITATION NEEDED]` marker.** The
+  single residual flag is scoped and names its action: the section and page in Muirhead / Anderson
+  carrying the N − R result, which needs the books rather than a bibliographic API.
 
 ---
 
@@ -608,9 +676,13 @@ the seed alone; only paired differences within a run are quoted.**
 
 *Provenance: `v2/research/rebase/nature/D2_RESULT.md` §4, §5.*
 
-Test suite: **275 passed** in 44 s with thread caps
+Test suite, re-run 2026-08-05 with thread caps
 (`pytest v2/tests tests -q`, `OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
-NUMEXPR_NUM_THREADS=1`), verified at the time of writing.
+NUMEXPR_NUM_THREADS=1`): **694 passed, 1 skipped, 1 failed** in 118 s. The one failure is
+`test_attributable_basis.py::test_cross_line_rotation_recovers_a_planted_agreeing_direction`, in a
+module added to the tree the same hour and unrelated to anything in this paper; no test of any P1
+code path or of any number quoted here fails. *(This line previously read "275 passed in 44 s",
+which was the count at the time §3.10 was first written and had not been refreshed since.)*
 
 ---
 
@@ -788,7 +860,7 @@ be a required field of the certificate schema, not an optional extra.**
 
 **(3) The adjustment discharges the leak from the first moment, and a nonlinear probe still finds
 a bounded residual. This is a stronger statement than "the leak is gone", and it is the one the
-evidence supports.** Joint accuracy falls **21–45×** to at or below the chance rate, with **zero**
+evidence supports.** Joint accuracy falls **26–45×** to at or below the chance rate, with **zero**
 breaching axes in all six state × artifact combinations — so the confound is removed from the class
 means, which is exactly what this certificate, being built on LDA, is able to certify. It is not
 removed from every function of the representation. Probing the adjusted state with classifiers that
@@ -830,7 +902,15 @@ first genuinely out-of-sample test of this claim — leaves it essentially unmov
 against one discovery/exposure partition of the certification cohort, and does not depend on which
 one**: across **12** independently sampled partitions (pairwise exposure-set Jaccard 0.317–0.345, 0
 fold overlap, every arm at the *p* ≤ 0.0005 permutation floor), retention runs **0.987–1.052**
-(`d2_h`, median 1.010) and **0.922–1.079** (`d2_i`, median 1.017). The single partition first reported
+(`d2_h`, median 1.010) and **0.922–1.079** (`d2_i`, median 1.017). **A predeclared bar fired here and
+it is why these are ranges.** The split-stability predeclaration voided point-quotation of retention
+if `max − min` over the partitions exceeded 0.10; on `d2_i` it is **0.1573** (already 0.1573 on the
+predeclared eight, before the four-partition extension), against 0.0652 on `d2_h`, which clears.
+"Retention 0.9710" may therefore not be written as a number, and is not written as one anywhere in
+this paper. The spread is a small-denominator effect rather than `d2_i` behaving differently out of
+sample — `d2_i`'s excess is 0.262–0.345 against `d2_h`'s 0.364–0.426, so the same absolute wobble in
+numerator and denominator is a larger fraction of it — and is reported as a limit on how precisely
+retention can be quoted at this cohort size. The single partition first reported
 — 0.9966 and 0.9710 — is the **second-lowest of twelve on both artifacts**, not a representative or
 favourable draw; 17 of 24 partition-arms exceed 1.0 (retention above the transductive control), traced
 to a small, systematic, non-adversarial cause: the inductive arm's within-cancer null sits 0.3–2.8%
@@ -849,6 +929,12 @@ cohort it *anti-predicts* what survives. D1-B `programme_free` (`d1_f`) has the 
 site LDA of the twelve artifacts measured — 0.1071–0.1449, against `d1_p`'s 0.1778–0.3764 and
 `d2_i_seed43`'s 0.4735 — and the **highest** post-adjustment nonlinear reading of all twelve, at
 6.21–7.38× chance for site and 4.98–6.69× for cancer.
+
+*Arithmetic correction, 2026-08-05: this range read "21–45×" until today, inherited verbatim from
+`TRACK1_NEGATIVE_CONTROLS.md` §T1.3. Recomputed from the six rows of the table above — the same table
+both documents print — the raw ÷ adjusted ratios are 30.8, 26.0, 34.6, 45.2, 31.6 and 34.7, so the
+range is **26–45×**. No row produces 21×. The source file still says 21–45× and should be corrected
+there too; the paper does not wait for it.*
 
 *Provenance for (3): `NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b
 (the 3.15/3.45 figures, as excess over the regenerated-null median in × chance) and §8 (the
@@ -1310,8 +1396,12 @@ pre-registration `p1_evidence/inputs/PREREG_known_covariate.json`, written 01:45
 run. Band [0.78, 0.92], point estimate 0.86, from four published papers recorded in that file: Naik et
 al. *Nat Commun* 2020;11:5727 (0.92 internal, 0.86 TCGA external); Rawat et al. *Sci Rep*
 2020;10:7275; Shamai et al. *JAMA Netw Open* 2019;2:e197700; Couture et al. *npj Breast Cancer*
-2018;4:30. `[CITATION NEEDED: these four have not been re-verified against a live bibliographic API in
-this drafting pass.]`*
+2018;4:30. **All four verified against Crossref on 2026-08-05, exactly as written**: Naik et al.,
+DOI 10.1038/s41467-020-19334-3 (*Nat Commun* 11, art. 5727); Rawat et al.,
+DOI 10.1038/s41598-020-64156-4 (*Sci Rep* 10, art. 7275); Shamai et al.,
+DOI 10.1001/jamanetworkopen.2019.7700 (*JAMA Netw Open* 2(7):e197700); Couture et al.,
+DOI 10.1038/s41523-018-0079-1 (*npj Breast Cancer* 4, art. 30). Volume, article number, journal and
+year match the pre-registration in every case.*
 
 The image-only numbers sit essentially on the literature point estimate. Two observations matter more
 than the pass itself:
@@ -1504,8 +1594,14 @@ that is a property of the split, recorded as such, and the comparison is meaning
 ### 4.14 The ledger
 
 `v2/calibra/track1_battery_ledger.py` assembles every row above into
-`v2/research/rebase/nature/GATE_LOG.md`. Current contents: **101 rows — 62 gates, 39 observations, 7
-failed gates** (the six raw site certificates, and gene-label-shuffle seed 3's containment test). The
+`v2/research/rebase/nature/GATE_LOG.md` under the experiment tag
+`P1_track1_negative_control_battery`: **101 rows — 62 gates (55 pass, 7 fail) and 39 observations**;
+the seven failures are the six raw site certificates and gene-label-shuffle seed 3's containment test.
+*The file is append-only and shared with the rest of the project, so it is larger than this paper's
+contribution to it: as of 2026-08-05 it holds **126 rows**, the other 25 written by `D3_purity_
+sensitivity`, `D2_proliferation_deflation`, `E0_proliferation_stratification` and
+`D2_3_per_axis_proliferation`, none of which is reported here. Quote the 101 with its tag, never the
+file's line count.* The
 39 observations include the entire baseline table of §4.13, so the PCA loss is recorded in the same
 append-only file as the gates **without ever having been able to quarantine the run**. That is the
 whole point of the separation: registering a scientific outcome as a pass/fail gate would mark the run
@@ -1518,11 +1614,30 @@ pipeline.
 
 Stated in descending order of how much they constrain the paper.
 
-1. **No external cohort.** Every measurement here is TCGA, which carries documented site and scanner
+1. **No external cohort has been through the instrument.** Every measurement here is TCGA, which
+   carries documented site and scanner
    effects. This is a deliberate scope decision, not an oversight, but it means the instrument is
    **demonstrated, not validated**. `claim_guards.no_external_cohort` is undischarged for every
    morphology result on this project; `legible_axis` and `gene_attribution` claims are inadmissible
-   and none is made. A related hard constraint we measured: a logistic classifier on frozen
+   and none is made.
+   **What has since happened outside TCGA, and why it does not change this limitation.** On
+   2026-08-04 the *channel* — one of the several quantities CALIBRA reports — was measured
+   independently inside ALCHEMIST-ALCH (1,106 paired resected stage IB–IIIA NSCLC patients, GDC),
+   with each cohort adjusted and scored entirely within itself and never pooled. It replicates:
+   R = 1.110 at matched *n* against the 841-patient TCGA-NSCLC comparator, *p* = 0.0033 at the 1/301
+   resolution floor, on the primary 59-target block. **None of that is a number in this paper**, for
+   three reasons that are all binding. (i) It is a *replication*, not a transfer: no TCGA-fitted
+   model was run on ALCHEMIST. (ii) It replicated the **channel**, not the floors — no injection, no
+   transmission or detection floor and no attenuation slope has ever been computed outside TCGA, and
+   the floors are what this paper is about. (iii) The blocker deliberately stays up: it gates the two
+   **per-axis** claim kinds, and an aggregate-channel result is evidence at the wrong granularity to
+   discharge a per-axis claim — `_is_discharged` cannot tell the difference, which is itself recorded
+   as a latent defect in the guard. The line that must travel with any external figure is the cohort
+   classifier: TCGA vs ALCHEMIST separates at **AUC 0.99906** against a within-TCGA control of
+   0.50016.
+   *Provenance: `NOTEBOOK_ENTRIES/alchemist_external_replication_RESULT_20260804T2115Z.md`;
+   `NOTEBOOK_ENTRIES/decision_external_cohort_blocker_stays_20260804T2200Z.md`.*
+   A related hard constraint we measured: a logistic classifier on frozen
    H-Optimus-0 embeddings separates TCGA from an external spatial cohort (HEST) at **AUC 0.99999**,
    while a within-TCGA split of the same size and classifier gives **0.5012**. Any cross-cohort
    transfer must declare that number.
@@ -1602,10 +1717,14 @@ Stated in descending order of how much they constrain the paper.
     verification over 270 cells *is* reproducible from repository code. The scratchpad scripts must be
     reproduced into the repo before the identity is quoted in a submitted manuscript.
 
-15. **Reference verification is incomplete** (§2.7). Three fabricated citations have previously
-    contaminated this project; every reference must be verified against a live bibliographic API
-    before submission, and the `[UNVERIFIED]` / `[CITATION NEEDED]` markers resolved or the
-    corresponding sentences removed.
+15. **Two citations in this paper were wrong until 2026-08-05, and both were author-name errors on
+    real papers** (§2.7). The random-signature control was attributed to "Venet, Dhanasekaran &
+    Sotiriou" (the authors are Venet, Dumont & Detours) and ComBat to "Johnson, Li & Rabinowitz" (the
+    third author is Rabinovic). Title, venue and year were correct in both, which is precisely why a
+    title-and-year spot-check had passed them. Three fabricated citations have previously
+    contaminated this project; every `[UNVERIFIED]` / `[CITATION NEEDED]` marker in this draft is now
+    resolved, with one scoped exception — the section and page of Muirhead / Anderson carrying the
+    N − R result, which needs the books rather than an API.
 
 ---
 

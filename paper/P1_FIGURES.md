@@ -45,11 +45,12 @@ keep the text.
 ### F2 — The adjustment is verified, not assumed
 
 **Claim.** The confound adjustment removes what it claims to remove **from the first moment**, on two
-different confounders; a per-axis certificate would have missed the leak; and a nonlinear probe still
-recovers a bounded residual that the mean-based certificate cannot see.
+different confounders; a per-axis certificate would have missed the leak; a nonlinear probe still
+recovers a residual that the mean-based certificate cannot see; and the channel underneath survives
+an out-of-sample (inductive) form of the same adjustment on every partition tested.
 
-**Artifacts, by content hash.** Panels (a), (b), (c) and (e) are computed from the first two files
-below; panel (d) is a different cohort and comes from the third. All are on the box, under
+**Artifacts, by content hash.** Panels (a), (b), (c), (e) and (f) are computed from the first two
+files below; panel (d) is a different cohort and comes from the third. All are on the box, under
 `/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/`. The filename alone is
 **not** an identifier — three copies of `d2_h_seed42.npz` exist and give raw joint LDA 0.3633, 0.1782
 and 0.3785 respectively, and three copies of `diagnostic_full_seed42.npz` exist of which two are
@@ -93,18 +94,56 @@ reproduce them — see P1 §4.2. Do not plot the withdrawn pair. Values for (d) 
   every function of the confound labels and upper-bounds any conditional-mean adjustment, moves the
   channel **0.6052 → 0.6051**, and the labels alone account for **6.0–11.2%** of the channel's excess
   over its own null. The panel's caption is the paper's replacement for "the confound is gone".
+  **Two corrections to this annotation, both required, both post-dating the version of this row that
+  said only "6.0–11.2%":**
+  (1) That 6.0–11.2% holds **only when the labels are encoded in the same design columns the
+  adjustment residualises against** — a construction coincidence. Re-encoded on the adjustment
+  operator's own frozen design, the same three-arm comparison reads **−0.3% (*p* = 0.605), 6.4%
+  (*p* = 0.086), −19.3% (*p* = 1.000)**, none distinguishable from zero. Both encodings must appear
+  in the panel or in its caption; the shared-column figure alone overstates what was measured.
+  (2) **These are single-partition readings and may not be drawn as a fixed bound.** At identical
+  encoding and identical *n*, twelve discovery/exposure partitions of the same cohort move the
+  additive/transductive share from **+0.0223 to +0.3777 — a 16.9× spread** — and the saturated-cell
+  share from 0.0243 to 0.1920 (7.9×); the inductive arm is the stable one (2.3×). If a bound is drawn
+  at all it must be drawn as the twelve-partition range with the number of partitions stated, never
+  as the pair 6.0% / 11.2%.
+  *Source for both: `NOTEBOOK_ENTRIES/inductive_channel_and_ceiling_result_20260804T2345Z.md` and
+  `NOTEBOOK_ENTRIES/inductive_channel_split_stability_20260805T0110Z.md` §"Bad news first" item 4;
+  P1 §4.2.*
+- (f) **The channel survives an inductive adjustment, on twelve partitions.** The out-of-sample test
+  the whole §4.2 story rests on: nuisance model fit on a disjoint discovery fold, applied to unseen
+  exposure-fold patients. Strip plot of retention of excess over null, twelve partitions × two
+  artifacts (24 points), with 1.0 marked: `d2_h` 0.9872–1.0524 (median 1.0102), `d2_i` 0.9221–1.0794
+  (median 1.0165). Mark the published seed-42 partition on both — it is **rank 2 of 12** on each,
+  i.e. near the bottom of its own distribution, which is the panel's second message. Overlay the
+  `none` (unadjusted) arm for scale: `d2_h` median 0.2602, `d2_i` median 0.3521, so every inductive
+  partition sits 3–4× above the best unadjusted one. **Caption must state that `d2_i` breaks the
+  predeclared ≤ 0.10 spread bar at 0.157**, that this is why retention is a range and not a point
+  estimate, and that all 24 arms sit at the *p* ≤ 0.0005 permutation floor.
+  *Data: `NOTEBOOK_ENTRIES/inductive_channel_split_stability_20260805T0110Z.md` §3, the two
+  twelve-row tables; driver
+  `v2/research/rebase/nature/p1_evidence/inductive_channel.py`.*
 
 **Data.** `p1_evidence/track1/certificate_raw/{confound_certificate.json,task_rows.csv}` and
 `certificate_adjusted/` (same filenames); tabulated in
 `v2/research/rebase/nature/TRACK1_NEGATIVE_CONTROLS.md` §T1.3 and
 `NOTEBOOK_ENTRIES/t13_confound_certificate_20260803T0152Z.md`. Panel (d) from
-`v2/research/rebase/nature/PHASE1_RESULT.md`. Panel (e) from
-`NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b and
-`NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md` §3–§5, run outputs
-`p1_evidence/nonlinear_adjustment/{channel_main,regenerated_null}.json`.
+`v2/research/rebase/nature/p1_cancer_type/out/P1_CANCER_TYPE_CERTIFICATE.json`, produced by
+`v2/research/rebase/nature/p1_cancer_type_certificate.py`. **Not from `PHASE1_RESULT.md`** — that
+file is the source of the *withdrawn* 0.463 → 0.035 pair and must not be used for this panel; it is
+cited only where the withdrawal itself is described. Panel (e) from
+`NOTEBOOK_ENTRIES/tcga_nonlinear_confound_probe_result_20260804T2100Z.md` §7b,
+`NOTEBOOK_ENTRIES/nonlinear_adjustment_channel_result_20260804T2130Z.md` §3–§5 and
+`NOTEBOOK_ENTRIES/inductive_channel_split_stability_20260805T0110Z.md` (the partition spread), run
+outputs `p1_evidence/nonlinear_adjustment/{channel_main,regenerated_null}.json`. Panel (f) from
+`NOTEBOOK_ENTRIES/inductive_channel_split_stability_20260805T0110Z.md` §3.
 
 **Status.** (a), (c), (d) `PLOTTABLE`. (b) `NEEDS EXTRACTION` — needs the per-axis vector from
-`task_rows.csv` on the box. (e) `PLOTTABLE` from the two JSON outputs named above.
+`task_rows.csv` on the box. (e) `PLOTTABLE` from the two JSON outputs named above, **provided both
+encodings and the twelve-partition spread are drawn** — the shared-column figure alone is not a
+plottable bound. (f) `NEEDS EXTRACTION` — the twenty-four retention values are tabulated in the
+notebook entry but not yet in a plot-ready file; the per-run JSONs are on the box under the
+`inductive_channel.py` output tree.
 
 ---
 
@@ -265,7 +304,9 @@ measured, and the chance level had to be measured rather than assumed.
 `p1_evidence/inputs/PREREG_known_covariate.json`; `TRACK1_NEGATIVE_CONTROLS.md` §T1.7(b).
 
 **Status.** `PLOTTABLE`. Caption must record that BRCA is a *development* cancer, so this ran on
-`--partition all` and is in-distribution.
+`--partition all` and is in-distribution. The four papers behind the band were verified against
+Crossref on 2026-08-05 and all four match the pre-registration exactly (P1 §2.7); the
+`[CITATION NEEDED]` that used to travel with this row is closed.
 
 ---
 
@@ -404,8 +445,13 @@ The three tables of §4.12 (untrained-40 readout, negative control, effective ra
 
 ### S7 — Gate ledger summary
 
-101 rows: 62 gates, 39 observations, 7 failed gates, with the test that plants a baseline beating us
+101 rows: 62 gates (55 pass, 7 fail), 39 observations, with the test that plants a baseline beating us
 0.95 to 0.40 and asserts the verdict does not move.
+
+**Filter before counting.** `GATE_LOG.md` is append-only and shared across the project — 126 rows as
+of 2026-08-05. This table is the **101 rows tagged `P1_track1_negative_control_battery`** and no
+others; the remaining 25 belong to D2/D3/E0 experiments this paper does not report. A figure drawn
+from the file's line count would be wrong.
 
 **Provenance.** `GATE_LOG.md`;
 `v2/tests/test_track1_battery_ledger.py::test_a_losing_baseline_is_an_observation_and_cannot_move_the_verdict`.
@@ -427,7 +473,7 @@ window/assay area ratio 5.28× rather than 6.90×.
 
 | would-be figure | why it cannot be drawn | where the draft says so |
 |---|---|---|
-| Both floors on an **external cohort** | No external cohort has been through the instrument. Deliberate scope decision. | §1.3, §5.1 |
+| Both floors on an **external cohort** | No injection, transmission floor, detection floor or attenuation slope has ever been computed outside TCGA. Deliberate scope decision. The *channel* has since been replicated inside ALCHEMIST (R = 1.110 at matched *n*, *p* = 0.0033) — that is a different quantity, it is reported elsewhere on the project, and **it must not be drawn as a floor figure here**. | §1.3, §5.1 |
 | Induced correlation at a **second design rank on a second artifact** | The `d2_i` Track 2 sweep was queued and did not complete; the rank/n ladders are one artifact, one state. The magnitude alone replicates on `d2_i` via S5. | §4.6.7, §5.9 |
 | Detection floor as a **continuous function of dilution** | Censored: the dilution level grid tops out at 0.40 and the floor reads 0.40 from d = 0.09 onward. | §4.10, §5.8 |
 | Transmission floor as a **function of anything** | Censored from below at the finest grid level in every cell (≤ 0.01, ≤ 0.05 in the dilution grid). | §4.5, §5.8 |
