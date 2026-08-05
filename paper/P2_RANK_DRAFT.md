@@ -898,9 +898,36 @@ number**; the index range must **not** be attributed to the paper. All 12 of our
 α between 2.6 and 4.8, far outside α-ReQ's "Goldilocks zone", so on its own terms it declines to
 distinguish them and the `|α − 1|` rule we scored is **ours**, not theirs.
 
-`[STILL NOT MEASURED]` — a labelled linear probe on every artifact, which is the ground truth LiDAR and
-RankMe were validated against. Ours is a held-out canonical correlation against unsupervised molecular
-targets (§3.2), which is a different reference standard and is the one Zaiem et al. would attack.
+**The `[STILL NOT MEASURED]` this subsection carried until 2026-08-05 — a labelled linear probe on
+every artifact, the ground truth LiDAR and RankMe were validated against — is now a result rather than
+a gap, and three of the four things it says cut against this paper's text.** Two probes, both fixed in
+advance, were fitted on all twelve artifacts, on all three co-trained views, and on the five same-seed
+retrains §4.1's floor is measured on. **Probe A** — cancer type over 21 held-out lineages, out-of-fold
+logistic regression *and* LDA on the **raw** block, balanced accuracy — is the literal analogue of
+RankMe's own ImageNet linear probe. **Probe B** — six molecular/clinical endpoints from E1's
+MC3-derived label table, confound-adjusted, size-weighted within-cancer AUROC — is matched instead to
+the construct this paper argues about. Neither is nominated the winner over the other; where they
+disagree, that disagreement is §4.6a's lesson restated on the labelled side.
+
+**The headline is unfavourable and is stated first: the labelled probe has rank's reproducibility
+failure, not the channel's.** On `wsi_biology` Probe A's own five-repeat floor is **1.380×**
+(logistic) and **1.511×** (LDA), against **1.011×** and **1.012×** on `rna_biology` and
+`full_biology` — the same view-conditional pattern, in the same direction, on the same runs that give
+rank a 3.295× floor on the first view and 1.019×/1.020× on the other two. **That conditionality is
+therefore a property of the view and not of the rank metric, and §4.1b's attribution is corrected
+there.** Ours is still a held-out canonical correlation against unsupervised molecular targets (§3.2),
+and it is still the standard Zaiem et al. would attack; what has changed is that the standard they
+would prefer has now been measured beside it, and it **corroborates the channel on the molecular
+panel** (24 of 27 resolvable comparisons, §4.7) while **contradicting it wherever the cancer-type
+probe can resolve at all** (§4.5(c), §4.6a). Both halves are reported, in §6.3 as well as here.
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md`, predeclared in
+`NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md` and committed before any
+probe statistic existed. Runner `v2/research/rebase/p2/p2_labelled_probe.py`, vendored and tested
+(`v2/tests/test_p2_labelled_probe.py`) before it was run; CPU only, no retraining, every probe fitted
+on frozen exported embeddings and every statistic imported from `v2/calibra/`. The must-fail control —
+cancer type must collapse to chance under cancer + pooled-TSS adjustment — **passes 17/17**, and the
+run reproduces every published rank and channel figure it recomputes to every published digit.*
 
 ### 2.6 Reference verification status
 
@@ -1270,11 +1297,39 @@ of the time, on identical inputs.** *On the fixed held-out probe, ten same-seed 
 divergence there is graded across all five runs. The eighty/twenty sentence is about the exported
 artifact and must not be quoted without it (§4.1a).*
 
-**Repeat 2 is the cleanest single observation this project has produced.** Same seed, same
-configuration: **effective rank falls 3.3×; the channel falls 5%.** One quantity moves by a factor, the
-other barely moves at all, and there is no difference between the two runs to attribute either move to.
-That single row is this paper's argument without any arm contrast in it, and it is why it appears in the
-abstract.
+**Repeat 2 was called here "the cleanest single observation this project has produced", and the
+description of it was wrong.** The row is real and the numbers are unchanged — same seed, same
+configuration, **effective rank falls 3.3×; the channel falls 5%** — but until 2026-08-05 this
+paragraph read that as *"one quantity moves by a factor, the other
+barely moves at all"*. **That sentence is false as written.** The measurement it was missing was the
+one §2.5 recorded as never taken: a labelled linear probe, the reference standard RankMe and LiDAR
+were validated against. Fitted on these same five runs, **it falls 27% on repeat 2** — cancer-type
+balanced accuracy 0.7413/0.7498/0.7535/0.7442 on the four concordant repeats against **0.5459** on
+repeat 2, a fold of **1.380×**; under LDA on the identical folds, 0.6571–0.6709 against **0.4440**,
+**1.511×**. **Two quantities move by a factor — effective rank and the labelled linear probe — and the
+molecular channel is the one thing that does not.**
+
+**The corrected version is more interesting than the one it replaces, because it locates a mechanism
+where the old one had only an absence.** What the probe loses on repeat 2 is *cancer type*, and cancer
+type is precisely the direction §3.2's channel residualises **out** by construction. The two readings
+are therefore not in contradiction: on `wsi_biology`, canonical R1 and an unadjusted labelled probe
+both partly track the lineage confound, and the channel does not, because it is built not to. The rank
+collapse on that run corresponds to a real, large, measurable loss of **linearly decodable content**,
+which our own ground truth is designed not to see. **"Rank moved and nothing else did" is not a
+sentence this paper can keep. "Rank moved with the confound the channel removes, and the channel did
+not move" is a sentence it can keep, and it is the better one**, because it says what rank is tracking
+instead of only what it is not. That row is still this paper's argument without any arm contrast in it,
+and it is still why it appears in the abstract — but it may not be quoted anywhere without its probe
+column.
+
+*Provenance for the probe column:
+`NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md` §1, §1a, predeclared in
+`NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md` before any probe statistic
+existed. Probe A is out-of-fold on the **raw** block, folds, class encoding and balanced accuracy all
+imported from `calibra.confound_certificate`, run by `v2/research/rebase/p2/p2_labelled_probe.py` on a
+workspace verified byte-equal to HEAD (753/753 tracked files by git blob SHA-1). The same run
+re-derives the rank and channel columns of the table above and reproduces them to every published
+digit.*
 
 **The number is a FLOOR, twice over**, as predeclared before it existed. First, `programme_only` is this
 project's *stable* arm — its channel varies 1.018–1.026× across seeds where `programme_free` varies
@@ -1502,6 +1557,42 @@ repeat 2, four others within 2.8%, separation 3.21×.
    single pair of concordant repeats would have been 1.028× and would have licensed every comparison
    in this paper; a statistic whose measured floor is exactly 1 is the same failure with five repeats
    instead of two. Nothing in the audit is judged against it.
+
+#### And the labelled reference standard has a floor on the same five runs, with the same view shape
+
+**Finding 3 above says the floor is a property of the view. The measurement that decides whether that
+is a property of *rank* is a labelled linear probe on the same runs, and it now exists.** The five
+`programme_only` retrains were re-read with the reference standard RankMe and LiDAR were validated
+against — out-of-fold cancer type on the raw block — and with one confound-adjusted molecular
+endpoint, on each of the three views:
+
+| statistic, five same-seed retrains, per view | `wsi_biology` | `rna_biology` | `full_biology` |
+|---|---:|---:|---:|
+| canonical R1, residualised — the rows above, restated | **3.295×** | 1.019× | 1.020× |
+| held-out channel, untrained-40 targets | 1.055× | 1.007× | 1.005× |
+| **Probe A — cancer type, out-of-fold logistic, balanced accuracy** | **1.380×** (Δ 0.2076) | 1.011× | 1.012× |
+| **Probe A — cancer type, LDA on the identical folds** | **1.511×** (Δ 0.2270) | 1.010× | 1.012× |
+| Probe B — `mut_TP53`, size-weighted within-cancer AUROC | 1.007× (Δ 0.0040) | 1.015× | 1.011× |
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md` §1, predeclared in
+`NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md`; runner
+`v2/research/rebase/p2/p2_labelled_probe.py`, output `P2_LABELLED_PROBE.json`, tested at
+`v2/tests/test_p2_labelled_probe.py`. Same five `~/e0_run/d1_envelope/rep{1..5}.npz`, same cohort rule,
+same folds; the run reproduces the R1 and channel rows above to every published digit, which is what
+licenses the two rows it adds. **These rows are deliberately printed as a separate table.** The table
+above them is rendered by `v2/research/rebase/p2/p2_floor_audit.py` and asserted verbatim by
+`v2/tests/test_p2_floor_audit.py`, and folding probe floors into it requires giving that generator
+`P2_LABELLED_PROBE.json` as an input — a change to the generator, not to this draft, and it is
+recorded as outstanding rather than done by hand here.*
+
+**This is the row that costs finding 3 its attribution, and it is the reason §4.1b is now written the
+way it is.** The view where rank is irreproducible is the view where a **labelled linear probe** is
+irreproducible; the two views where rank reproduces to 1.02× are the two where the probe reproduces to
+1.01×. Whatever repeat 2's WSI encoder did, it was not visible only to an entropy-based summary of the
+spectrum — it cost 0.21 of balanced accuracy on 21 lineages. Finding 4's tail reading survives as a
+description of *how the spectrum moved*; it does **not** survive as a claim that nothing decodable
+moved with it. **The probe's floor is a floor twice over on exactly the terms §4.1 states of rank's:**
+five repeats, one arm (`programme_only`, the stable one), one seed, one configuration, one stack.
 
 #### The fixed held-out probe now has a floor too, and it is a different shape from the exported one
 
@@ -1788,6 +1879,11 @@ this project had measured exactly **one** floor — canonical R1 on the exported
 > differences are resolvable. The difference between "unusable" and "usable" is a choice of
 > co-trained view — and, to a smaller degree, of statistic — that no paper we have read reports
 > making.**
+>
+> **And the view condition is a property of the view, not of the rank metric.** A labelled linear
+> probe on the same five runs is unstable on `wsi_biology` — **1.380×** under logistic regression,
+> **1.511×** under LDA — and stable on the other two, **1.011×** and **1.012×**. The reference
+> standard the field validates these metrics against fails on exactly the view rank fails on.
 
 Three measurements fix it, all on the five same-seed retrains of §4.1 and all in §4.1a's table.
 
@@ -1802,6 +1898,43 @@ difference is choosing an arm, a statistic and a view, and each choice is worth 
 than the between-arm difference being adjudicated. The stronger sentence — "rank is unusable" — is
 both less accurate and less actionable than the conditional one, because the conditional one tells
 you what to check.
+
+**The first of those three axes is not rank's, and this subsection said it was.** Until 2026-08-05 the
+view result was written here as a fact about the metric under criticism — the sentence above,
+*"a choice of co-trained view … that no paper we have read reports making"*, sitting in a subsection
+about what effective rank can and cannot do. **The measurement that decides this has since been taken
+and it goes the other way.** On the same five retrains, the **labelled linear probe** — cancer type,
+out-of-fold, on the raw block, the literal reference standard RankMe and LiDAR were validated against
+— has a floor of **1.380×** (logistic) and **1.511×** (LDA) on `wsi_biology` and **1.011×** /
+**1.012×** on `rna_biology` and `full_biology` (§4.1a, §2.5). Same runs, same views, same direction,
+and it is not a rank statistic at all. **So the correct attribution is: the view-conditional
+reproducibility failure is a property of what the WSI encoder retrains to, seen by the metric under
+criticism and by the reference standard alike — not a property of effective rank.**
+
+**Three things follow, and only the first is comfortable for the criticism this paper makes.**
+
+1. **The practitioner rule of §4.1 gets stronger, not weaker.** *Measure the floor on the view and
+   with the statistic you are actually going to compare with* now applies verbatim to a labelled
+   linear probe: on `wsi_biology`, **0 of 6** between-arm probe differences clear the probe's own
+   five-repeat floor, which is exactly rank's record on that view. The reference standard a referee
+   would send us to substitute for the proxy **cannot adjudicate the readout view either.** That is
+   not a caveat on the rule; it is its strongest support, and it is the one thing in this subsection
+   the measurement does for us.
+2. **Rank is still unusable on `wsi_biology` by its own floor, and nothing here rescues it.** The
+   3.295× floor stands, 0 of 6 differences clear it, and none of the seven historical comparisons in
+   §4.1 clears its own block's. What changes is the *explanation*: the paper's original account —
+   that the conditionality belonged to the rank metric — was too narrow, and the corrected account
+   attributes it to the view. A metric that fails where the ground truth also fails is not thereby a
+   good metric; it is a metric whose failure has been mislocalised by us.
+3. **§4.1a's finding 4 loses its strongest reading.** "The divergence is a redistribution of spectral
+   mass in the tail, which the entropy ranks see and the dominant-subspace statistics do not" survives
+   as a description of the *spectrum*. It does not survive as an argument that the divergent run lost
+   nothing usable: repeat 2 lost **0.21 of balanced accuracy** over 21 lineages, which no reading of a
+   tail effect makes small.
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md` §1, §2, predeclared
+in `NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md` before any probe
+statistic existed — including the reading of the outcome that occurred.*
 
 **What is now the paper's most damaging single fact, stated here rather than in the limitations
 because that is where it belongs.**
@@ -1835,8 +1968,12 @@ residualised RankMe — the entropy-based statistics — and not under stable ra
 or the hard rank (1.00×). A divergence that the entropy of the spectrum sees at a factor of three and
 the dominant-subspace statistics see at a fifth of that is a **redistribution of spectral mass in the
 tail**, not a loss of leading directions. That reading is narrower than "rank is unreliable", it is
-what the data actually shows, and it explains the view result: the divergent run's **WSI encoder**
-redistributed its tail, its RNA encoder did not, and the two are co-trained in the same run.
+what the data actually shows, and it locates the view result in the right encoder: the divergent run's
+**WSI encoder** redistributed its tail, its RNA encoder did not, and the two are co-trained in the
+same run. **What it may no longer do is imply that the redistribution was harmless.** A labelled
+linear probe on the same block loses 0.2076 of balanced accuracy on that run (§4.1a), so the tail
+carried decodable lineage structure; "a tail effect" describes where the change lives in the
+spectrum, not how much was lost.
 
 **What this claim does and does not license.**
 
@@ -1852,9 +1989,18 @@ redistributed its tail, its RNA encoder did not, and the two are co-trained in t
   are resolvable, the rank ordering agrees with the information ordering on **5 of 6** pairs. On
   `rna_biology` and on `full_biology`, where **6 of 6** are resolvable, it agrees on **3 of 6** —
   all three D2 pairs go the wrong way (§4.5(c)). **The view that makes rank usable is the view on
-  which it is most often wrong.** A resolvable wrong answer is worse than an unresolvable one, and
-  these two views deliver the first. Six pairs cannot support a rate and this is not quoted as one
-  (§4.6); it is quoted as a reason not to read the view result as a repair.
+  which it is most often wrong *against our own unsupervised readout*.** Those five words are not a
+  hedge; they are the scope, and they were added on 2026-08-05 because the labelled reference standard
+  scores the same pairs differently. **On the six (D2 pair × view) comparisons across those two
+  views, rank is right 6 of 6 against a labelled cancer-type probe and 0 of 6 against the channel** —
+  all three D2 pairs go to arm **I** under the probe, which is the arm rank picks and the one §4.5(c)
+  scores as rank's *wrong* answer. Aggregated over every
+  (probe × view × pair) conflict between a probe and the channel, **rank sides with the probe 14 times
+  and with the channel 9**. Both counts are stated, and neither is quoted as a rate: six pairs cannot
+  support one (§4.6, §3.6 rule 3). A resolvable wrong answer is still worse than an unresolvable one
+  and these two views still deliver the first — but "wrong" here means *wrong relative to the
+  readout this paper chose*, and the standard with the stronger external warrant more often says
+  otherwise. §4.6a treats the reference standard as the coordinate system it is.
 - It does **not** weaken §4.2, which decomposes variance across twelve artifacts without using any
   floor, and which remains the contribution the paper rests on.
 
@@ -2163,16 +2309,50 @@ against each view's own floor, **0 of the 6** pairs on `wsi_biology` are resolva
 each of the other two — **twelve of twelve**, on the same artifacts, with the same statistic, from the
 same runs. Read the two facts in this subsection together and they point the same way rather than
 opposite ways: **the view on which every difference is resolvable is the view on which the ordering is
-most often wrong.** On `wsi_biology` the rank ordering matches the information ordering on **5 of 6**
-pairs and none of those differences can be seen; on each of the other two views it matches on **3 of
-6** and all of them can. Six pairs cannot support a rate (§4.6) and none of these counts is quoted as
-one — they are quoted as the reason the view result is not a repair.
+most often wrong *against our unsupervised readout*.** On `wsi_biology` the rank ordering matches the
+information ordering on **5 of 6** pairs and none of those differences can be seen; on each of the
+other two views it matches on **3 of 6** and all of them can. Six pairs cannot support a rate (§4.6)
+and none of these counts is quoted as one — they are quoted as the reason the view result is not a
+repair.
+
+**"Wrong" in the counts above means "disagreeing with our unsupervised molecular channel", and since
+2026-08-05 a second standard scores the same pairs and does not agree with it.** The row is added
+rather than substituted, because neither standard is nominated the winner:
+
+| standard the rank ordering is scored against | the six D2 (pair × view) comparisons on `rna_biology` + `full_biology` | `wsi_biology`, all six pairs |
+|---|:--:|:--:|
+| held-out molecular channel (§3.2) — the counts above | **0/6** (the D2 half of the 2/9) | 5/6, none resolvable |
+| **labelled linear probe on cancer type, out-of-fold, raw block** | **6/6** | **0 of 6 resolvable** — it scores nothing |
+
+**Where the labelled reference standard can adjudicate, it picks rank's arm rather than the
+channel's.** All three D2 pairs go to arm **I** under Probe A on `rna_biology` and on `full_biology` —
+the pairs the 2/9 count scores as rank's wrong answers — so on those six comparisons rank is right
+6 of 6 against the probe and 0 of 6 against the channel. On `wsi_biology` the probe resolves **0 of 6**
+against its own five-repeat floor (1.380× logistic, 1.511× LDA; §4.1a), so those six are `UNRESOLVED`
+and are scored as neither agreement nor disagreement, exactly as predeclared. Aggregated over every
+(probe × view × pair) conflict between a probe and the channel, **rank sides with the probe 14 times
+and with the channel 9** — both numbers stated, neither quoted as a rate. **This does not withdraw the
+2/9; it scopes it.** Rank's D2 record is 2/9 against our readout and 6/6 against a labelled
+cancer-type probe on the two views where that probe resolves anything, and a reader told only one of
+those has been told the wrong thing. The two probe estimators are not unanimous elsewhere and that is
+reported rather than averaged away: logistic and LDA disagree on the winner in 2/6 pairs on
+`wsi_biology`, **3/6** on `rna_biology` and 0/6 on `full_biology` (§6.3). The molecular half of the
+same probe runs the other way and is reported in §4.7 and §6.3.
+
+*Provenance for the added row: `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md`
+§2, predeclared in `NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md` — which
+fixed this outcome, and the requirement that it be reported first, before any probe statistic existed.*
 
 *Caveat, stated plainly:* `rna_biology` → RNA-derived pathway targets is partly circular, and its
 absolute CCA (0.79–0.85) must not be read as a clean image→molecular channel. That is why the canonical
 readout is `wsi_biology`. The **rank** measurements on the other views are unaffected by that
 circularity, and the instability of the rank *verdict* across views stands on its own — but the 2/9
-count inherits the caveat and is not quoted as a rate.
+count inherits the caveat and is not quoted as a rate. **The probe row inherits it in the same way and
+on the same terms**: the 6/6 is read on `rna_biology` and `full_biology`, the two views this
+subsection already declines to treat as the readout, and it is not quoted as a rate either. What the
+probe row cannot be answered with is "the probe is a worse standard" — its estimator, folds,
+permutation null and five-repeat floor were all fixed in the predeclaration before any number existed,
+precisely so that this retreat would be unavailable to us.
 
 *Provenance for (a)–(c): `NOTEBOOK_ENTRIES/p2_competing_metrics_and_necessity_test_20260803T2326Z.md`
 §4.2, §4.3 and `NOTEBOOK_ENTRIES/effective_rank_canonicalised_and_every_instance_recomputed_20260804T0005Z.md`
@@ -2257,11 +2437,15 @@ and `|α − 1|` is our operationalisation, not theirs. **Both halves of the Ran
 reported**, because "you evaluated a centred variant and the published metric does better" is true on
 D2 and false on D1.
 
-**Fourth, and largest: all of the above is scored against one target block.** See §4.6a. The 3/3-versus-
-2/3 comparison just made between RankMe and canonical effective rank **reverses** if the ground truth is
-taken on the perturbation dictionary's own codes or on a plain PCA basis, and canonical effective rank
-then reaches a nominally significant 6/6. Neither reading is quotable. The sentences above stand as a
-description of what happens on the gene-set block and on no wider domain than that.
+**Fourth, and largest: all of the above is scored against one target block — and, since 2026-08-05,
+against one *kind* of standard as well.** See §4.6a. The 3/3-versus-2/3 comparison just made between
+RankMe and canonical effective rank **reverses** if the ground truth is taken on the perturbation
+dictionary's own codes or on a plain PCA basis, and canonical effective rank then reaches a nominally
+significant 6/6. Neither reading is quotable. §4.6a now also carries the counterfactual in which the
+*reference standard itself* is swapped for the labelled linear probe RankMe and LiDAR were validated
+against — a seventh coordinate system, and the one with the strongest external warrant. The sentences
+above stand as a description of what happens on the gene-set block, under one unsupervised readout,
+and on no wider domain than that.
 
 ### 4.6a The ground truth §4.6 scores against is itself a coordinate choice, and every count in that table moves when it changes
 
@@ -2305,7 +2489,8 @@ count under each truth, for the two rows §4.6 quotes against one another:
 reproduces §4.6's published table exactly, in all twelve rows, which is what licenses the other five.
 Tested in `v2/tests/test_p2_analysis_scripts.py`.*
 
-Three things follow, and the first two are against us.
+Four things follow, and the first two are against us. The fourth was added on 2026-08-05 and is
+against us in one direction and for us in the other.
 
 **First, every one of the twelve metric rows changes its D2 count.** Not one is stable across the six
 blocks. §4.6 already refused to let a 5/6 against a 4/6 carry weight on power grounds; this is a second,
@@ -2327,11 +2512,42 @@ but the gene sets. So the D1 column is held fixed in every row above, and the AL
 **This is not evidence that the D1 half is block-stable — it is the absence of the measurement**, and it
 is named in §6.3 alongside the ground truth's other weaknesses.
 
+**Fourth, added 2026-08-05: the six blocks above are six coordinate systems for one *kind* of standard,
+and there is a seventh that is not of that kind.** Every row of the table above rotates the basis of an
+unsupervised molecular exam. A **labelled linear probe** — cancer type, out-of-fold, on the raw block —
+is a different standard altogether, and it is the one RankMe and LiDAR were themselves validated
+against, so it carries the strongest external warrant of anything in this subsection. It has now been
+run on the same twelve artifacts (§2.5). **The counts move again, and this time they move against the
+channel rather than merely between metrics.** On `rna_biology` and `full_biology`, where the probe
+resolves every pair against its own five-repeat floor, all three D2 pairs go to arm **I** — which is
+the arm canonical effective rank picks on those same two views (§4.5(c)). So the six (D2 pair × view)
+comparisons that §4.5(c) scores **0/6 for rank against the channel** are **6/6 for rank against the
+labelled probe**, on identical artifacts, and the channel is the standard that disagrees. Aggregated
+over every (probe × view × pair) conflict between a probe and the channel,
+**rank sides with the probe 14 times and with the channel 9.** On `wsi_biology` — the readout view —
+the probe resolves **0 of 6** and therefore rescores nothing at all, which is its own result and is
+§4.1b's. **The molecular half of the same probe runs the other way**: on `wsi_biology`, over a
+six-endpoint confound-adjusted panel × six pairs, **24 of the 27 comparisons that clear their own
+endpoint's floor agree with the channel** and 3 disagree (all three are TP53 on D1; §4.7). **Both
+counts belong in any quotation of this subsection**, and neither is quoted as a rate — six pairs cannot
+support one (§3.6 rule 3). The lesson §4.6a was written to teach is unchanged and is now demonstrated
+on a second axis: **an OK/MISS count is a joint property of the metric, the target block *and* the kind
+of standard**, and swapping any of the three moves it.
+
+*Provenance: `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md` §2, §3, predeclared
+in `NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md`, whose outcome table
+fixed this reading — *"§4.6a showed every OK/MISS count moves when the target block changes; this
+would show it also moves when the reference standard changes, and moves against the standard with the
+strongest external warrant"* — before any probe statistic existed. The probe rows are **not** folded
+into the six-block table above: that table swaps the exam's basis with the standard held fixed, and
+mixing a different kind of standard into its rows would misrepresent what it varies.*
+
 **What survives §4.6, and it is less than it was.** The direction — arm H is never behind on any block
 tested — is stable across all six. What is not stable is any *count*, any *ranking between metrics*, and
-any *p*. §4.6 is therefore reported as a descriptive record of one coordinate system, and the paper's
-argument continues to rest on §4.2's variance decomposition, which uses magnitudes rather than a
-verdict and does not consult a ground truth at all.
+any *p* — and, on the two views where a labelled probe resolves anything, not the *winner* either. §4.6
+is therefore reported as a descriptive record of one coordinate system under one kind of standard, and
+the paper's argument continues to rest on §4.2's variance decomposition, which uses magnitudes rather
+than a verdict and does not consult a ground truth at all.
 
 ### 4.7 The necessity test, which went against us — and which §4.1's floor has made unresolvable rather than refuted
 
@@ -2483,6 +2699,27 @@ the ones that failed.
   claimed, not more: the higher-rank arm wins in all three seeds under every canonical statistic we
   compute. The only surviving qualification on D1 is the interval one — 3/3 on the patient bootstrap,
   **2/3 on the cancer-cluster bootstrap** (§4.7.2).
+- **"A labelled molecular endpoint contradicts D1's ordering."** ***It does, on one endpoint of six,
+  and it is reported before the five that do not.*** The labelled probe of §2.5 scored a
+  six-endpoint confound-adjusted panel on the three D1 pairs. **`mut_TP53` picks `programme_free` over
+  `programme_only` in all three D1 seeds — −0.0107 / −0.0212 / −0.0262 in within-cancer AUROC against
+  the endpoint's own five-repeat floor of 0.0040, so all three are resolvable** — where the channel,
+  effective rank and every other statistic in this section pick `programme_only`. Taken alone that row
+  says §4.7 is scored against a ground truth the labelled standard contradicts 3/3, and it is stated
+  in those words rather than as a footnote. **It does not survive the rest of the panel, and the check
+  that says so was predeclared for exactly this case.** On the same three D1 pairs, `mut_ATM` picks
+  `programme_only` **3/3**, `mut_KMT2D` **3/3**, `grade_high` 2/3 and `mut_ARID1A` 2/3; `stage_late`
+  resolves nothing (0/6 against its own 0.0524 floor). Across the whole panel on the readout view,
+  **24 of the 27 comparisons that clear their own endpoint's floor agree with the channel and 3 do
+  not — and all three disagreements are TP53's.** *One endpoint out of six is a coordinate choice*,
+  which is §4.6a's finding restated on the labelled side and is distrust check 4 of the
+  predeclaration firing as designed. **So: the TP53 row is reported, it is not omitted, and it is not
+  evidence that D1's ordering is wrong.** *Provenance:
+  `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md` §3, predeclared in
+  `NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md` §5 check 4. The panel was
+  scored on `wsi_biology` only; its `rna_biology` and `full_biology` columns are absent by design, not
+  null, because an RNA-derived view predicting a molecular endpoint is not an image → molecular
+  measurement.*
 - **"The rank gap is ~9×, so this is a large-gap regime."** *Rejected; the 9× figure was ours and it was
   wrong.* The "12 versus 111" numbers are the **in-run tripwire** (R3, training batches, step 200), not
   the quantity the channel is computed on. Measured where the channel is measured — held-out patients,
@@ -3660,7 +3897,7 @@ should be withdrawn to a replication.
 | **A reproducibility floor on the in-run training batch, the 16-patient gate batch or a live checkpoint** | **Not measured and not recoverable from the exports**, for the same reason as before: the `d1_envelope` repeats were exported, not probed, and carry no training-batch activations, no gate batch and no live checkpoint. §4.3's headline and §4.9's two historical instances sit on these. What each would cost is recorded per block in `P2_ENVELOPE_FLOORS.json`'s `absent_blocks`. |
 | **The RNA-view mutual cosine recomputed on the CENTRED representation, for §5.2a's three high-learning-rate arms** | **Measured, and it settles nothing, for a reason that is itself informative.** At `lr = 1e-3` centred R3 reads 1.06 / 1.05 / 1.05 across m = 0 / 0.9 / 0.999 while the uncentred RNA-view mutual cosine reads 0.9946 / 0.9257 / 0.5207. Seven of nine centred readings sit between −0.004 and +0.037 — degenerate, and partly entailed by the centred rank itself being near 1 — and the centred cosine's own within-arm spread (up to 0.630) exceeds any across-arm difference on it. So it cannot adjudicate whether rank is insensitive to a real difference or the difference lives entirely in the mean-offset direction centring removes; both readings are consistent with a statistic too flat and too noisy at once to carry a verdict either way. **§4.10's boundary is stated with the ambiguity attached rather than resolved in our favour.** |
 | **A per-block ground truth for the D1 arms** | **Not run.** §4.6a re-scores the *D2* arms on six target blocks and finds the selection verdict unstable on all twelve metric rows. The D1 arms were never scored on any block but the gene sets, so §4.6a's D1 column is held fixed in every row and is **not** evidence that the D1 half is block-stable. |
-| **A labelled linear probe on every artifact** | Not run. It is the reference standard RankMe and LiDAR were validated against; ours is a held-out canonical correlation against unsupervised molecular targets (§3.2), which is a different standard. |
+| ~~**A labelled linear probe on every artifact**~~ | **CLOSED, on all 12 artifacts, all 3 views and the 5 same-seed retrains — and three of the four things it says cut against this draft.** The completeness pass of 2026-08-04 called this the single most valuable missing measurement in the paper; it was predeclared (`NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md`, committed before any statistic existed) and reported at `NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md`. **(1) The labelled probe has rank's reproducibility failure, not the channel's**: five-repeat floors of **1.380×** (logistic) and **1.511×** (LDA) on `wsi_biology` against **1.011×** and **1.012×** on `rna_biology` and `full_biology`, so the view-conditional instability §4.1b attributed to the rank metric belongs to the view (§4.1b). **(2) On the readout view it resolves nothing** — **0 of 6** between-arm differences clear its own floor, exactly rank's record there — so the reference standard cannot adjudicate `wsi_biology` either. **(3) Where it does resolve, it sides with rank against our channel**: 6/6 on the D2 pairs across `rna_biology` and `full_biology`, and **14 conflicts to 9** in favour of rank aggregated over every (probe × view × pair) conflict. **(4) The molecular half corroborates the channel**, 24 of 27 resolvable comparisons on the readout view, with all three disagreements being TP53 on D1 and the rest of the panel contradicting them (§4.7). **What is still absent, and named rather than implied:** a **paired bootstrap on the between-arm probe difference** — the predeclared criterion was the five-repeat floor and that is what was used; the bootstrap CIs reported are on the *level*, the same level-versus-paired-difference asymmetry §3.5 already forces on the channel — and **any probe on a second cohort**, which `claim_guards.no_external_cohort` still governs. The probe floor is a floor twice over on §4.1's own terms: five repeats, one arm (`programme_only`, the stable one), one seed, one configuration, one stack. |
 | ~~The D1 paired bootstrap~~ | **CLOSED.** It existed all along and was hidden by the audit chain's stale absolute path. §4.7.2 now carries both estimators: decisive 3/3 on the patient bootstrap, **2/3 on the cancer-cluster bootstrap** with seed 43 at +0.0006. The stale path is still unfixed in the chain and should be. |
 | An error bar on any dilution rank or channel value | Single seed, single donor draw; bootstrapping donor assignments is CPU-only and unrun. |
 | An equivalence test on Phase 1b's channel difference | The paired bootstrap its own source says "is still required" was never run. §4.9 states that "unchanged" means the point estimates differ by 0.002 and nothing more. |
@@ -3676,7 +3913,20 @@ should be withdrawn to a replication.
 
 Conceded, and the citation that makes the objection sharpest is ours to supply: Zaiem et al.
 (Interspeech 2023; *Computer Speech and Language*) report that *"altering the downstream architecture
-structure leads to significant fluctuations in the performance ranking of the evaluated models"*. Our
+structure leads to significant fluctuations in the performance ranking of the evaluated models"*.
+
+**Since 2026-08-05 that concession is made twice over, and the second time with our own numbers.** The
+labelled linear probe of §2.5 was run with two linear estimators on identical out-of-fold splits —
+multinomial logistic regression and LDA — precisely so that a single estimator could not be trusted to
+carry an ordering. **They disagree on the winner in 2 of 6 pairs on `wsi_biology`, 3 of 6 on
+`rna_biology` and 0 of 6 on `full_biology`.** Two *linear* probes on the *same* features and the
+*same* folds, differing only in the classifier, reorder up to half the pairs. **We have therefore
+reproduced Zaiem et al.'s critique against ourselves, on our own probe**, and it was distrust check 5
+of the predeclaration, written before any number existed, that required us to look. It cuts both ways
+and is stated as such: it weakens any single-estimator probe result, including the ones in §4.5(c) and
+§4.6a that go against our channel.
+
+Our
 reference standard is a 16-component held-out canonical correlation against confound-residualised
 molecular targets, with a measured permutation null of 0.140 (D2 row-shuffle) or 0.145–0.147 (dilution
 within-cancer) depending on the readout — §3.2's footnote, which also records that we got this wrong
@@ -3693,6 +3943,28 @@ single-stack limitation.**
 ground truth moves, §4.6's counts move with it — but §4.1–§4.3 do not, because they are statements about
 rank's own variance and require the ground truth only to establish that the information ordering is
 stable, which it is under every perturbation we applied.**
+
+**That exposure is now partly answered and partly worsened, and both halves are stated because the
+measurement that produced them was predeclared to report whichever occurred.** A different downstream
+task has since been run — the labelled linear probe of §2.5, on all twelve artifacts and all three
+views. **Partly answered:** its confound-adjusted molecular panel corroborates our readout on the
+readout view, **24 of the 27 comparisons that clear their own endpoint's floor**, with the three
+disagreements all being `mut_TP53` on D1 and `mut_ATM` and `mut_KMT2D` picking the channel's arm 3/3
+on those same pairs (§4.7). **Partly worsened:** its cancer-type probe — the literal reference
+standard RankMe and LiDAR were validated against, and therefore the one with the strongest external
+warrant — **contradicts our readout wherever it can resolve anything**, sending all three D2 pairs to
+the arm the channel scores as poorer on both `rna_biology` and `full_biology`, and siding with rank
+over the channel **14 conflicts to 9** aggregated over every (probe × view × pair) conflict. **Neither
+half cancels the other and neither is quoted as a rate.** The two probes measure different constructs
+— one is confound-adjusted and matched to what this paper argues about, the other is raw and matched
+to what the metrics literature validates against — and the disagreement between them is §4.6a's lesson
+arriving on the labelled side: an ordering is a joint property of the standard and of the construct it
+is scored on. **What the probe does *not* do is retire the objection**, because on `wsi_biology` — the
+readout view — it resolves **0 of 6** pairs against its own five-repeat floor and adjudicates nothing
+at all (§4.1b). *Provenance:
+`NOTEBOOK_ENTRIES/p2_labelled_linear_probe_result_20260805T0150Z.md`, predeclared in
+`NOTEBOOK_ENTRIES/PREDECLARED_p2_labelled_linear_probe_20260805T0040Z.md`, which fixed in advance that
+a probe disagreement may not be answered with "the probe is a worse standard".*
 
 *Second — and stated because §4.1 holds rank to this standard, so the paper must hold itself to it.*
 **The margins we work with are not comfortably above the instrument's own floor.** The `random_control`
