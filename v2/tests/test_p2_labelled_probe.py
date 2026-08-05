@@ -200,6 +200,35 @@ def test_the_logistic_wrapper_is_the_canonical_fold_loop_not_a_reimplementation(
         features, class_index, 4, folds=folds, seed=42) == pytest.approx(expected)
 
 
+def test_merge_of_shards_reproduces_the_single_process_summary(cohort, result, tmp_path):
+    """Sharding the seventeen artifacts must not change one number of the summary.
+
+    The run is shardable only because artifacts are independent until `summarise`; the floors
+    and the agreement table are not, since a floor built from a subset of the five retrains is
+    not the floor. This pins that the merge path produces the identical summary rather than a
+    subtly different one -- the failure a hand-rolled merge snippet would introduce.
+    """
+    root, _ = cohort
+    whole = json.loads((root / "P2_LABELLED_PROBE.json").read_text(encoding="utf-8"))
+    entries = [(k, v) for k, v in whole.items() if not k.startswith("_")]
+    shards = []
+    for index in range(3):
+        part = {k: v for j, (k, v) in enumerate(entries) if j % 3 == index}
+        part["_config"] = {"shard": index}
+        path = tmp_path / f"shard{index}.json"
+        path.write_text(json.dumps(part), encoding="utf-8")
+        shards.append(str(path))
+
+    merged = p2_labelled_probe.main(
+        ["--merge"] + shards + ["--output", str(tmp_path / "merged.json"),
+                                "--views", "wsi_biology"])
+    assert set(merged) - {"_config", "_summary"} == set(LABELS)
+    assert merged["_summary"] == result["_summary"]
+
+    with pytest.raises(ValueError, match="more than one shard"):
+        p2_labelled_probe.merge([shards[0], shards[0]], views=("wsi_biology",))
+
+
 def test_output_json_round_trips(cohort, result):
     root, _ = cohort
     on_disk = json.loads((root / "P2_LABELLED_PROBE.json").read_text(encoding="utf-8"))

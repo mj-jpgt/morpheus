@@ -385,11 +385,38 @@ def summarise(data, views=VIEWS) -> dict:
             "channel_probe_conflicts": conflicts}
 
 
+def merge(paths, views=VIEWS) -> dict:
+    """Combine per-shard JSONs and summarise once over all of them.
+
+    The seventeen artifacts are independent of one another until `summarise` runs, so the run
+    is shardable; the floors and the agreement table are NOT, because a floor built from a
+    subset of the five retrains is not the floor. This entry point exists so that sharding
+    cannot be done with an ad-hoc snippet that computes either of them differently: the merged
+    file is produced by the same `summarise` the single-process run uses.
+    """
+    merged, configs = {}, []
+    for path in paths:
+        shard = json.loads(Path(path).read_text(encoding="utf-8"))
+        configs.append({"shard": str(Path(path).resolve()), "config": shard.get("_config")})
+        for label, entry in shard.items():
+            if label.startswith("_"):
+                continue
+            if label in merged:
+                raise ValueError(f"artifact {label!r} appears in more than one shard")
+            merged[label] = entry
+    out = dict(merged)
+    out["_config"] = {"merged_from": configs}
+    out["_summary"] = summarise(merged, views=views)
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--artifacts", nargs="+", required=True, help="LABEL=path")
-    ap.add_argument("--labels", required=True, help="E1 endpoint label parquet")
-    ap.add_argument("--targets", required=True, help="frozen_rna_targets.npz")
+    ap.add_argument("--artifacts", nargs="+", help="LABEL=path")
+    ap.add_argument("--merge", nargs="+", default=None,
+                    help="shard JSONs to combine and summarise once, instead of scoring")
+    ap.add_argument("--labels", help="E1 endpoint label parquet")
+    ap.add_argument("--targets", help="frozen_rna_targets.npz")
     ap.add_argument("--output", required=True)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--views", nargs="+", default=list(VIEWS))
@@ -404,6 +431,15 @@ def main(argv=None):
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--n-permutations-auroc", type=int, default=1000)
     a = ap.parse_args(argv)
+
+    if a.merge:
+        out = merge(a.merge, views=a.views)
+        Path(a.output).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.output).write_text(json.dumps(out, indent=2), encoding="utf-8")
+        print("merged", len(a.merge), "shards ->", a.output)
+        return out
+    if not (a.artifacts and a.labels and a.targets):
+        ap.error("--artifacts, --labels and --targets are required unless --merge is given")
 
     labels_table = (pd.read_parquet(a.labels) if str(a.labels).lower().endswith(".parquet")
                     else pd.read_csv(a.labels))
