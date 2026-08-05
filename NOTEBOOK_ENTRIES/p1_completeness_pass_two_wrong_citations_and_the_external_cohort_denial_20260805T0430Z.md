@@ -135,9 +135,11 @@ the number of partitions stated.
 
 ## 1. Citation verification — every marker, individually
 
-Eleven markers were found by `grep -n "\[UNVERIFIED\]\|\[CITATION NEEDED\]"` (the brief predicted
-"roughly 11"; the count was exact, but the marker at §1.1 covers *two* references and the §4.9 marker
-covers *four*, so sixteen distinct works were checked). Every field below was read off a live
+Eleven markers were found by `grep -n "\[UNVERIFIED\]\|\[CITATION NEEDED\]"`; three of the eleven are
+the draft's own policy sentences rather than citations, leaving eight marked citation sites. Those
+eight expand to **fifteen distinct works**, because the §1.1 marker covers two references (CHIEF and
+Prov-GigaPath), the §2.4 marker covers two books (Muirhead and Anderson), the §2.5 marker covers two
+methods papers (Leek & Storey, Johnson et al.) and the §4.9 marker covers four. Every field below was read off a live
 Crossref record, an arXiv abstract page or a publisher chapter-level record in this pass. **Nothing
 below is from recollection.**
 
@@ -393,6 +395,17 @@ was a QA pass regardless):*
 * `PROJECT_GUIDE.md` §3 — P1's open list, per that file's §5. *(Untracked and authored by another
   agent as of this writing; edited in place, deliberately **not** staged, so its author commits it.)*
 * This entry.
+
+---
+
+## CORRECTION APPENDED, 2026-08-05 04:45 UTC
+
+The commit message for `9d0b7c6` says "**sixteen** distinct works" were verified. It is **fifteen**
+— the table in §1 has fifteen rows and always did; the count in the prose was wrong, and the eight
+opportunistically re-verified DOIs are separate from it and additional. §1 above is corrected; the
+commit message cannot be, since it is pushed. Recorded here rather than force-pushed over.
+
+---
 
 Related: [[p2_completeness_pass_stale_open_states_and_the_figure_that_drew_the_wrong_floor_20260804T2030Z]],
 [[alchemist_external_replication_RESULT_20260804T2115Z]],
