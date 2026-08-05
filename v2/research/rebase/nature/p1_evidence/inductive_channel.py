@@ -47,6 +47,7 @@ channel's -- rather than through retention alone.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -102,6 +103,17 @@ def fit_inductive_adjuster(full_matrix, fit_rows, score_rows, cancers, patient_i
     return adjust, operator
 
 
+def resolve_split_seed(seed: int, split_seed: int) -> int:
+    """Which seed carves the discovery/exposure partition.
+
+    ``-1`` means "the published command", i.e. reuse ``--seed`` for the split as
+    ``p4_certify.prepare_state`` does. Any other value isolates the partition: it moves which
+    patients land in which fold and moves **nothing else**, because the ridge ``KFold``, the
+    operator fit, the S2 held-out split and the permutation RNG all stay on ``--seed``.
+    """
+    return int(seed) if int(split_seed) < 0 else int(split_seed)
+
+
 def _channel(x, y, adjust, cancers, args, *, adjust_y=None, with_global: bool = True) -> dict:
     """One arm: the within-cancer pairing null, and the global one beside it."""
     started = time.time()
@@ -132,6 +144,11 @@ def main() -> None:
     parser.add_argument("--n-permutations", type=int, default=2000)
     parser.add_argument("--discovery-fraction", type=float, default=0.5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--split-seed", type=int, default=-1,
+                        help="seed for the discovery/exposure PARTITION only; -1 (default) reuses "
+                             "--seed, which is the published command. Set it to isolate a change "
+                             "of partition from a change of the ridge KFold, the S2 held-out split "
+                             "and the permutation RNG, all of which stay on --seed.")
     parser.add_argument("--n-jobs", type=int, default=1)
     parser.add_argument("--skip-full", action="store_true",
                         help="skip the n = 2,766 reproduction gate (for smoke runs only)")
@@ -149,7 +166,8 @@ def main() -> None:
     x_all, y_all = block["x"], block["y"]
     cancers, patient_ids = block["cancers"], block["patient_ids"]
 
-    discovery = exposure_split(cancers, discovery_fraction=args.discovery_fraction, seed=args.seed)
+    split_seed = resolve_split_seed(args.seed, args.split_seed)
+    discovery = exposure_split(cancers, discovery_fraction=args.discovery_fraction, seed=split_seed)
     fit_rows = np.flatnonzero(discovery)
     score_rows = np.flatnonzero(~discovery)
     overlap = sorted(set(patient_ids[fit_rows].tolist()) & set(patient_ids[score_rows].tolist()))
@@ -166,6 +184,11 @@ def main() -> None:
             "design_rank": int(np.linalg.matrix_rank(block["design"])),
             "n_cells": int(len(block["cell_levels"])), "n_sites_kept": block["n_sites_kept"],
             "n_discovery": int(len(fit_rows)), "n_exposure": int(len(score_rows)),
+            "split_seed": int(split_seed),
+            "n_cancers_discovery": int(len(set(cancers[fit_rows].tolist()))),
+            "n_cancers_exposure": int(len(set(cancers[score_rows].tolist()))),
+            "exposure_patient_digest": hashlib.sha256(
+                "\x1f".join(sorted(patient_ids[score_rows].tolist())).encode()).hexdigest(),
             "n_patients_in_both_folds": 0,
             "duplicate_patient_ids": int(len(patient_ids) - len(set(patient_ids.tolist()))),
         },
@@ -194,11 +217,10 @@ def main() -> None:
         n_splits=args.n_splits, seed=args.seed, cohort_name="d2_test_discovery_fold_targets")
 
     # ---- provenance: is this P4's state, bit for bit? ------------------------------------
-    p4_block = load_state(path, args.state, args.partition)
-    p4_state = prepare_state(p4_block["features"], y_all, p4_block["patient_ids"],
-                             p4_block["cancers"], adjustment="inductive",
-                             discovery_fraction=args.discovery_fraction, seed=args.seed,
-                             min_site_count=args.min_site_count)
+    # The comparison is only defined when the partition is the one ``prepare_state`` builds --
+    # ``prepare_state`` derives its own split from its single ``seed``, so on a run whose
+    # ``--split-seed`` differs it would be comparing two different sets of patients. Skipping is
+    # recorded as a skip rather than reported as a False.
     provenance = {
         "operator_x_reference_digest": operator_x.provenance["reference_digest"],
         "p4_recorded_digest": P4_REFERENCE_OPERATOR_DIGEST,
@@ -209,13 +231,39 @@ def main() -> None:
         "operator_y_n_design_columns": int(operator_y.provenance["n_design_columns"]),
         "n_frequent_sites_in_discovery_fold": len(operator_x.site_pooling.frequent),
         "n_exposure_design_columns": int(design_e.shape[1]),
-        "adjusted_features_equal_p4_prepare_state": bool(
-            np.array_equal(inductive_x(x_e), p4_state["adjusted_features"])),
-        "adjusted_targets_equal_p4_prepare_state": bool(
-            np.array_equal(inductive_y(y_e), p4_state["adjusted_targets"])),
-        "exposure_rows_equal_p4_prepare_state": bool(
-            np.array_equal(ids_e, p4_state["patient_ids"])),
     }
+    # Site coverage of the exposure fold by the discovery fold's frozen pooling rule: the
+    # 43.8% of `p4_inductive_adjustment_measured_20260804T2300Z.md` §4. Read from
+    # SitePooling.apply's own report -- nothing is counted here that the operator does not
+    # already count when it adjusts a row.
+    _, pooling_report = operator_x.site_pooling.apply(ids_e)
+    n_covered = int(len(ids_e) - pooling_report["n_pooled_to_other"])
+    provenance["site_coverage"] = {
+        "n_exposure_rows": int(len(ids_e)),
+        "n_exposure_rows_site_adjustable": n_covered,
+        "fraction_exposure_rows_site_adjustable": float(n_covered / max(len(ids_e), 1)),
+        "n_frequent_sites_in_discovery_fold": len(operator_x.site_pooling.frequent),
+        "n_exposure_sites_unknown_to_discovery_fold":
+            int(pooling_report["n_sites_unknown_to_reference"]),
+    }
+    if split_seed == args.seed:
+        p4_block = load_state(path, args.state, args.partition)
+        p4_state = prepare_state(p4_block["features"], y_all, p4_block["patient_ids"],
+                                 p4_block["cancers"], adjustment="inductive",
+                                 discovery_fraction=args.discovery_fraction, seed=args.seed,
+                                 min_site_count=args.min_site_count)
+        provenance.update({
+            "adjusted_features_equal_p4_prepare_state": bool(
+                np.array_equal(inductive_x(x_e), p4_state["adjusted_features"])),
+            "adjusted_targets_equal_p4_prepare_state": bool(
+                np.array_equal(inductive_y(y_e), p4_state["adjusted_targets"])),
+            "exposure_rows_equal_p4_prepare_state": bool(
+                np.array_equal(ids_e, p4_state["patient_ids"])),
+        })
+    else:
+        provenance["p4_prepare_state_comparison"] = (
+            f"skipped: --split-seed {split_seed} != --seed {args.seed}, so prepare_state's own "
+            f"partition is a different set of patients and the comparison is undefined")
     results["provenance"] = provenance
     print(f"[provenance] {json.dumps(provenance)}", flush=True)
     _flush()
