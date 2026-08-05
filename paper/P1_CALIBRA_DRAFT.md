@@ -816,18 +816,31 @@ same three-arm comparison reads **−0.3% (*p* = 0.605), 6.4% (*p* = 0.086), −
 none distinguishable from zero. Third, the residual is therefore not a conditional mean of any shape.
 The surviving confound is real, it is bounded at roughly a tenth of the effect on the construction
 that first measured it, and under the construction that avoids the coincidence it is not
-distinguishable from no effect at all; either way it cannot explain the channel.
+distinguishable from no effect at all; either way it cannot explain the channel. The shared-column
+coincidence is not the only source of imprecision in this share: at fixed encoding and fixed *n*, the
+twelve-partition sweep above moves the additive/transductive ceiling's absolute share by **16.9×**
+(+0.0223 to +0.3777 on `d2_h`) and the inductive one by 2.3×; every ceiling figure in this section is a
+single partition's reading, not a stable property of the cohort, and should be read as such.
 
 **The channel itself, independent of the ceiling question, has now been validated out of sample.**
 Every number above is transductive — the nuisance model is fit on the rows it scores, which is true
 of every "adjusted" quantity on this project. Repeating the channel measurement with the
 nuisance model fit on a disjoint discovery fold and applied to unseen exposure-fold patients — the
-first genuinely out-of-sample test of this claim — leaves it essentially unmoved: retention **0.9966**
-(`d2_h`) and **0.9710** (`d2_i`) against the transductive reading, on the identical 1,382 patients, at
-*p* ≤ 0.0005. The inductive adjustment is doing real work, not merely reproducing the transductive one
-under a different name (raw-vs-adjusted correlation 0.75, variance ratio 0.59, 0 of 256 axes moved by
-&lt;1%) — it simply leaves more site information behind than the transductive fit does, and that
-residue does not turn out to be what drives the channel.
+first genuinely out-of-sample test of this claim — leaves it essentially unmoved. **This was checked
+against one discovery/exposure partition of the certification cohort, and does not depend on which
+one**: across **12** independently sampled partitions (pairwise exposure-set Jaccard 0.317–0.345, 0
+fold overlap, every arm at the *p* ≤ 0.0005 permutation floor), retention runs **0.987–1.052**
+(`d2_h`, median 1.010) and **0.922–1.079** (`d2_i`, median 1.017). The single partition first reported
+— 0.9966 and 0.9710 — is the **second-lowest of twelve on both artifacts**, not a representative or
+favourable draw; 17 of 24 partition-arms exceed 1.0 (retention above the transductive control), traced
+to a small, systematic, non-adversarial cause: the inductive arm's within-cancer null sits 0.3–2.8%
+below its matched control's own null. The inductive adjustment is doing real work throughout, not
+reproducing the transductive one under a different name — raw-vs-adjusted per-axis correlation runs
+0.753–0.818 and residual variance ratio 0.580–0.697 across all 24 partition-arms, 0 of 256 axes above
+a 0.99 correlation in any of them, and a direct check against the transductive adjustment itself
+(`is_relabelled_incumbent`) reads False in 24 of 24 — it simply leaves more site information behind
+than the transductive fit does, and that residue does not turn out to be what drives the channel, on
+any partition tested.
 
 Two consequences for certification, neither optional. An LDA-based certificate must state that it
 certifies the **first moment**, and must not be read as "the confound is gone"; and the certificate's
@@ -852,10 +865,15 @@ interchangeable and the figures quoted above are the difference form.*
 gap on TCGA site recoverability that motivated re-testing the ceiling and the channel) and
 `NOTEBOOK_ENTRIES/inductive_channel_and_ceiling_result_20260804T2345Z.md` (the corrected ceiling
 arms, the channel retention figures, and the raw-vs-adjusted correlation and variance-ratio checks
-that rule out the inductive operator being a relabelled transductive one). The within-cancer and
-global permutation nulls agree to within 0.003 on every transductive arm above but diverge 46% on the
-inductive arm (0.2067 vs 0.3028) — retention reads 0.997 under this paper's convention and 0.757
-under a global-permutation convention; both are reported rather than one chosen silently.*
+that rule out the inductive operator being a relabelled transductive one) and
+`NOTEBOOK_ENTRIES/inductive_channel_split_stability_20260805T0110Z.md` (the twelve-partition sweep
+that turned each single-partition figure above into a range). The within-cancer and global
+permutation nulls agree to within 0.003 on every transductive arm above but diverge on the inductive
+one; the first-reported partition's divergence (0.2067 vs 0.3028, retention 0.997 vs 0.757) is **not
+representative** — across twelve partitions the global-convention retention runs 0.757–1.013, median
+**0.964**, and 0.757 is the sole outlier, sitting 0.165 below the next-lowest partition. Both
+conventions' full ranges are reported rather than either single number standing in for its
+distribution.*
 
 ### 4.3 …and the adjustment does not destroy signal
 
