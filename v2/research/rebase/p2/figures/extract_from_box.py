@@ -210,6 +210,38 @@ VENDORED += [f"e0_run/d1_probefloor600/pf600_m{m}_rep{r}.log"
 VENDORED += [f"e0_run/d1_capfloor/cap_cap{c}_rep{r}.log"
              for c in ("64", "4096") for r in range(1, 6)]
 
+#: §5.4 LIMIT 2 PUSHED UNTIL IT BROKE OR HELD. The row above closed the last
+#: unjudgeable selection and closed it fragile: it clears its own floor by 5.6%
+#: under R3 while the same ten runs separate the arms by only 1.138x worst case
+#: under that statistic, and by 1.453x under canonical R1. It is the one selection
+#: this paper makes at the hyperparameter the project actually ships, so it was
+#: pushed on three axes rather than restated -- predeclared in
+#: `NOTEBOOK_ENTRIES/PREDECLARED_probe_floor_n10_and_momentum_grid_20260805T0200Z.md`
+#: before anything ran.
+#:
+#: * **repeats**, 5 -> 10 per arm at the shipped setting (`_N10`), with repeats
+#:   6-10 also scored ALONE (`_LATE5`) as an independent five, because a floor
+#:   that only widens because the batches differ is a batch effect wearing a
+#:   floor's clothes;
+#: * **statistic**, every key of `RANK_VARIANTS` beside the published
+#:   alternatives, with duplicates detected numerically rather than assumed;
+#: * **momentum**, a five-point grid {0, 0.98, 0.99, 0.995, 0.999} at the same
+#:   step and seed (`_GRID`), so the shipped comparison is placed against its
+#:   neighbours instead of being read as a two-point contrast.
+#:
+#: Each file also carries the same pair scored at every step the probe states
+#: were exported at, which cost no GPU and is where the sharpest result is.
+VENDORED += ["e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N5.json",
+             "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+             "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_LATE5.json",
+             "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10_RNA.json",
+             "e0_run/d1_probefloor600/out/P2_MOMENTUM_GRID.json",
+             "e0_run/d1_probefloor600/out/limit2_stress_run.log"]
+VENDORED += [f"e0_run/d1_probefloor600/pf600_m{m}_rep{r}.log"
+             for m in ("0.999", "0.99") for r in range(6, 11)]
+VENDORED += [f"e0_run/d1_probefloor600/pf600_m{m}_rep{r}.log"
+             for m in ("0.995", "0.98") for r in range(1, 6)]
+
 # --------------------------------------------------------------------------
 # Extractors: run on the box, print JSON on stdout, written under data/extracted/
 # --------------------------------------------------------------------------

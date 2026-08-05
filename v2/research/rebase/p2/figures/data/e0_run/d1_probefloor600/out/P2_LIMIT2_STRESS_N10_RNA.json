@@ -1,0 +1,2003 @@
+{
+ "_": "\u00a75.4 limit 2 under stress. 10 same-seed repeats per arm (offset 0) at step 600 on `rna_biology`, arms ['0.999', '0.99']. Ranges, not distributions: seed 42 throughout, one stack.",
+ "absent": {
+  "Test A under any statistic but R3": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs.",
+  "a seed-varied floor": "Every repeat here is seed 42. The floor excludes seed variation entirely and is smaller than one a reader varying the seed would measure -- a floor twice over, exactly as `p2_probe_floors.py` says of its own.",
+  "an interval on any number here": "n = 5 or n = 10 same-seed repeats on one stack. These are ranges, not estimated distributions, and no confidence statement is made from them."
+ },
+ "arm_floor": {
+  "m099": {
+   "PR": {
+    "fold": 1.307174424999372,
+    "max": 4.376006969693911,
+    "min": 3.347684047364998,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.1445817844670552,
+     "separation": 1.14205419196674
+    },
+    "values": {
+     "rep1": 3.4812657962537976,
+     "rep10": 3.47401007811601,
+     "rep2": 3.661849183216074,
+     "rep3": 3.670123273023906,
+     "rep4": 4.376006969693911,
+     "rep5": 3.472594313378298,
+     "rep6": 3.347684047364998,
+     "rep7": 3.51269244285153,
+     "rep8": 3.7294479014594546,
+     "rep9": 3.831698180764923
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.307174426050648,
+    "max": 4.376006969257933,
+    "min": 3.3476840443391445,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.1445817811581986,
+     "separation": 1.1420541961867698
+    },
+    "values": {
+     "rep1": 3.4812657947884107,
+     "rep10": 3.474010075516441,
+     "rep2": 3.6618491751866564,
+     "rep3": 3.670123261225888,
+     "rep4": 4.376006969257933,
+     "rep5": 3.472594314266411,
+     "rep6": 3.3476840443391445,
+     "rep7": 3.512692436281919,
+     "rep8": 3.7294478908936086,
+     "rep9": 3.8316981662245797
+    }
+   },
+   "R1": {
+    "fold": 1.275547077680329,
+    "max": 7.919313898595889,
+    "min": 6.208562613774877,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.0810332419806252,
+     "separation": 1.1799332602791412
+    },
+    "values": {
+     "rep1": 7.517676555846244,
+     "rep10": 7.493394378103386,
+     "rep2": 7.506715248390978,
+     "rep3": 7.8021457366489315,
+     "rep4": 7.919313898595889,
+     "rep5": 7.325689526518578,
+     "rep6": 6.208562613774877,
+     "rep7": 7.774400876775322,
+     "rep8": 7.734404973562365,
+     "rep9": 7.644701191560021
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.2755470870676642,
+    "max": 7.919313834947696,
+    "min": 6.208562518184481,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.0810332318869356,
+     "separation": 1.1799332799799374
+    },
+    "values": {
+     "rep1": 7.517676500346925,
+     "rep10": 7.493394398674968,
+     "rep2": 7.506715173204248,
+     "rep3": 7.8021457055512,
+     "rep4": 7.919313834947696,
+     "rep5": 7.325689536041914,
+     "rep6": 6.208562518184481,
+     "rep7": 7.774400800591583,
+     "rep8": 7.734404849960271,
+     "rep9": 7.644701078464345
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.2199070711142836,
+    "max": 3.789331397221707,
+    "min": 3.106245948521692,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.107219650983622,
+     "separation": 1.1017751265799458
+    },
+    "values": {
+     "rep1": 3.428461968948877,
+     "rep10": 3.6073644453181726,
+     "rep2": 3.5462806483206717,
+     "rep3": 3.765802562269453,
+     "rep4": 3.789331397221707,
+     "rep5": 3.442683288973593,
+     "rep6": 3.106245948521692,
+     "rep7": 3.731355916590835,
+     "rep8": 3.6740519375105696,
+     "rep9": 3.4223845231209307
+    }
+   },
+   "R2": {
+    "fold": 1.276384705648955,
+    "max": 6.005665456360401,
+    "min": 4.705215778425461,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.1309693336608302,
+     "separation": 1.1285758752780948
+    },
+    "values": {
+     "rep1": 5.471206960811847,
+     "rep10": 5.336846893079823,
+     "rep2": 5.466888883354403,
+     "rep3": 5.588772405359965,
+     "rep4": 6.005665456360401,
+     "rep5": 5.310193015508816,
+     "rep6": 4.705215778425461,
+     "rep7": 5.58577558021838,
+     "rep8": 5.636622555642171,
+     "rep9": 5.60313365275683
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.133164392979528,
+    "max": 2.1970835570501936,
+    "min": 1.9388921595684894,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.0939433492171815,
+     "separation": 1.0358529020633591
+    },
+    "values": {
+     "rep1": 2.023517707934457,
+     "rep10": 2.1189615908661885,
+     "rep2": 2.0867391554039556,
+     "rep3": 2.1865548143499014,
+     "rep4": 2.1970835570501936,
+     "rep5": 2.042187180117237,
+     "rep6": 1.9388921595684894,
+     "rep7": 2.1667731492166302,
+     "rep8": 2.1406046253294466,
+     "rep9": 2.0084070702769132
+    }
+   },
+   "R3": {
+    "fold": 1.2763847114365463,
+    "max": 6.005665410940986,
+    "min": 4.705215721505882,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.130969326737984,
+     "separation": 1.1285758873036629
+    },
+    "values": {
+     "rep1": 5.471206938560424,
+     "rep10": 5.3368468934206055,
+     "rep2": 5.466888860065538,
+     "rep3": 5.58877238594709,
+     "rep4": 6.005665410940986,
+     "rep5": 5.310193007853644,
+     "rep6": 4.705215721505882,
+     "rep7": 5.585775541525846,
+     "rep8": 5.6366224822676,
+     "rep9": 5.603133588912162
+    }
+   },
+   "RankMe": {
+    "fold": 1.219892517500979,
+    "max": 3.790298368940805,
+    "min": 3.1070756763927467,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep6",
+     "outlier_is_low": true,
+     "rest_fold": 1.107216552699786,
+     "separation": 1.1017650653130584
+    },
+    "values": {
+     "rep1": 3.429346485496639,
+     "rep10": 3.608285010870778,
+     "rep2": 3.5471949896730623,
+     "rep3": 3.766760160997204,
+     "rep4": 3.790298368940805,
+     "rep5": 3.4435765645370933,
+     "rep6": 3.1070756763927467,
+     "rep7": 3.7323031764170245,
+     "rep8": 3.674988739047189,
+     "rep9": 3.42326743553347
+    }
+   },
+   "alpha_req": {
+    "fold": 1.1595547573412228,
+    "max": 3.1332926297770154,
+    "min": 2.7021515024969016,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": false,
+     "rest_fold": 1.0755988017077798,
+     "separation": 1.078055084758501
+    },
+    "values": {
+     "rep1": 2.7188129852056258,
+     "rep10": 2.806067914257356,
+     "rep2": 2.906410530610456,
+     "rep3": 3.1332926297770154,
+     "rep4": 2.805423313603619,
+     "rep5": 2.906430918118544,
+     "rep6": 2.8842963060676943,
+     "rep7": 2.7021515024969016,
+     "rep8": 2.8330769381368133,
+     "rep9": 2.8231430576770933
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.253291864236332,
+    "max": 2.1332926297770154,
+    "min": 1.7021515024969016,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": false,
+     "rest_fold": 1.1200124755769292,
+     "separation": 1.1189981286509771
+    },
+    "values": {
+     "rep1": 1.7188129852056258,
+     "rep10": 1.8060679142573561,
+     "rep2": 1.9064105306104562,
+     "rep3": 2.1332926297770154,
+     "rep4": 1.8054233136036189,
+     "rep5": 1.9064309181185441,
+     "rep6": 1.8842963060676943,
+     "rep7": 1.7021515024969016,
+     "rep8": 1.8330769381368133,
+     "rep9": 1.8231430576770933
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep10": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0,
+     "rep6": 256.0,
+     "rep7": 256.0,
+     "rep8": 256.0,
+     "rep9": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.3561282516234354,
+    "max": 3.185204064515646,
+    "min": 2.3487484024483707,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.2130244955635043,
+     "separation": 1.1179726844621163
+    },
+    "values": {
+     "rep1": 2.350534789241038,
+     "rep10": 2.6362796701623767,
+     "rep2": 2.7414797822143266,
+     "rep3": 2.426389999610732,
+     "rep4": 3.185204064515646,
+     "rep5": 2.7534183312361793,
+     "rep6": 2.399466991730352,
+     "rep7": 2.3487484024483707,
+     "rep8": 2.639069898876198,
+     "rep9": 2.8490893460855213
+    }
+   }
+  },
+  "m0999": {
+   "PR": {
+    "fold": 1.2288441708162736,
+    "max": 4.806601308311301,
+    "min": 3.9114815551580158,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1942308562483182,
+     "separation": 1.0289837717614276
+    },
+    "values": {
+     "rep1": 4.152330136842167,
+     "rep10": 4.02485104380175,
+     "rep2": 4.5253585613334115,
+     "rep3": 4.232079766041329,
+     "rep4": 3.9114815551580158,
+     "rep5": 4.598413317574959,
+     "rep6": 4.383717508522099,
+     "rep7": 4.399520425402766,
+     "rep8": 4.806601308311301,
+     "rep9": 4.794547728325742
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.2288441708159505,
+    "max": 4.806601320049536,
+    "min": 3.911481564711301,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1942308579720011,
+     "separation": 1.028983770275982
+    },
+    "values": {
+     "rep1": 4.152330123842125,
+     "rep10": 4.024851047821633,
+     "rep2": 4.525358571753317,
+     "rep3": 4.232079768957421,
+     "rep4": 3.911481564711301,
+     "rep5": 4.598413315735822,
+     "rep6": 4.38371750168499,
+     "rep7": 4.399520415367245,
+     "rep8": 4.806601320049536,
+     "rep9": 4.794547710650724
+    }
+   },
+   "R1": {
+    "fold": 1.1036846299543324,
+    "max": 12.709160286079065,
+    "min": 11.515209998534578,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0728269518922608,
+     "separation": 1.0287629594014622
+    },
+    "values": {
+     "rep1": 12.436668340327495,
+     "rep10": 12.020836038587865,
+     "rep2": 12.709160286079065,
+     "rep3": 11.84642151622174,
+     "rep4": 11.515209998534578,
+     "rep5": 12.108921054920973,
+     "rep6": 12.335078690640664,
+     "rep7": 11.991799754686383,
+     "rep8": 12.06431819886888,
+     "rep9": 12.112156665819962
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.1036846320913731,
+    "max": 12.70916031418067,
+    "min": 11.515210001699552,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0728269522557976,
+     "separation": 1.0287629610448283
+    },
+    "values": {
+     "rep1": 12.436668330598462,
+     "rep10": 12.020836061814942,
+     "rep2": 12.70916031418067,
+     "rep3": 11.846421538401454,
+     "rep4": 11.515210001699552,
+     "rep5": 12.108920997550193,
+     "rep6": 12.33507867689909,
+     "rep7": 11.991799734583923,
+     "rep8": 12.064318212510175,
+     "rep9": 12.11215661639392
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.2311558823850384,
+    "max": 7.545220441905149,
+    "min": 6.128566292749447,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1678977995600468,
+     "separation": 1.054164056862528
+    },
+    "values": {
+     "rep1": 6.566117188102326,
+     "rep10": 6.460514305915701,
+     "rep2": 7.2055548315959514,
+     "rep3": 6.6465108192608735,
+     "rep4": 6.128566292749447,
+     "rep5": 6.866383648049719,
+     "rep6": 7.242290043593319,
+     "rep7": 6.484071503368252,
+     "rep8": 7.545220441905149,
+     "rep9": 6.623570621341471
+    }
+   },
+   "R2": {
+    "fold": 1.121651710224149,
+    "max": 7.9304448582082365,
+    "min": 7.070327434015528,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0755788036205596,
+     "separation": 1.0428354542210214
+    },
+    "values": {
+     "rep1": 7.587854933695098,
+     "rep10": 7.38819701935559,
+     "rep2": 7.9304448582082365,
+     "rep3": 7.373188121142933,
+     "rep4": 7.070327434015528,
+     "rep5": 7.686297060333073,
+     "rep6": 7.821615597447712,
+     "rep7": 7.575371420452419,
+     "rep8": 7.733307718826261,
+     "rep9": 7.737125366269927
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.2726895375604963,
+    "max": 4.018718525458999,
+    "min": 3.157658177313312,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep8",
+     "outlier_is_low": false,
+     "rest_fold": 1.1880116853614837,
+     "separation": 1.0712769522744612
+    },
+    "values": {
+     "rep1": 3.297546258756481,
+     "rep10": 3.2874105743658992,
+     "rep2": 3.6660184711103794,
+     "rep3": 3.4342829978906417,
+     "rep4": 3.157658177313312,
+     "rep5": 3.544421585289965,
+     "rep6": 3.7513348130254585,
+     "rep7": 3.3158769433521282,
+     "rep8": 4.018718525458999,
+     "rep9": 3.389701201947391
+    }
+   },
+   "R3": {
+    "fold": 1.1216517103910078,
+    "max": 7.9304448756566,
+    "min": 7.07032744851969,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0755788067890864,
+     "separation": 1.0428354513040865
+    },
+    "values": {
+     "rep1": 7.5878549131766855,
+     "rep10": 7.388197037612181,
+     "rep2": 7.9304448756566,
+     "rep3": 7.373188115644702,
+     "rep4": 7.07032744851969,
+     "rep5": 7.686297051929697,
+     "rep6": 7.821615577707406,
+     "rep7": 7.575371401390879,
+     "rep8": 7.733307726861455,
+     "rep9": 7.737125311118585
+    }
+   },
+   "RankMe": {
+    "fold": 1.2311508905176862,
+    "max": 7.546877113042025,
+    "min": 6.129936769869565,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1678958029425013,
+     "separation": 1.054161584805609
+    },
+    "values": {
+     "rep1": 6.567570665454399,
+     "rep10": 6.461943860083877,
+     "rep2": 7.207135422186927,
+     "rep3": 6.6479855040770275,
+     "rep4": 6.129936769869565,
+     "rep5": 6.867904596326074,
+     "rep6": 7.24388866215089,
+     "rep7": 6.4855118178477955,
+     "rep8": 7.546877113042025,
+     "rep9": 6.625040506451598
+    }
+   },
+   "alpha_req": {
+    "fold": 1.056741307890941,
+    "max": 2.3747901893435386,
+    "min": 2.2472767664237314,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0453162486506506,
+     "separation": 1.010929763365908
+    },
+    "values": {
+     "rep1": 2.316147698047835,
+     "rep10": 2.3747901893435386,
+     "rep2": 2.3180628173296682,
+     "rep3": 2.2472767664237314,
+     "rep4": 2.3579984140382875,
+     "rep5": 2.3066007052413853,
+     "rep6": 2.2733791419982032,
+     "rep7": 2.271838969698446,
+     "rep8": 2.338850262819979,
+     "rep9": 2.3531006555677743
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.10223346281469,
+    "max": 1.3747901893435386,
+    "min": 1.2472767664237314,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0809467409773603,
+     "separation": 1.0196926648005644
+    },
+    "values": {
+     "rep1": 1.316147698047835,
+     "rep10": 1.3747901893435386,
+     "rep2": 1.3180628173296682,
+     "rep3": 1.2472767664237314,
+     "rep4": 1.3579984140382875,
+     "rep5": 1.3066007052413853,
+     "rep6": 1.2733791419982032,
+     "rep7": 1.2718389696984458,
+     "rep8": 1.338850262819979,
+     "rep9": 1.3531006555677743
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep10": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0,
+     "rep6": 256.0,
+     "rep7": 256.0,
+     "rep8": 256.0,
+     "rep9": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.414820365964179,
+    "max": 3.503714063012269,
+    "min": 2.47643739608211,
+    "n": 10,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep8",
+     "outlier_is_low": false,
+     "rest_fold": 1.2803876252902608,
+     "separation": 1.1049937831470704
+    },
+    "values": {
+     "rep1": 2.9437675213357153,
+     "rep10": 2.47643739608211,
+     "rep2": 3.0248587162067664,
+     "rep3": 3.1455869167612485,
+     "rep4": 2.6135177793940105,
+     "rep5": 3.11157168804836,
+     "rep6": 2.68376284842829,
+     "rep7": 2.840507979566871,
+     "rep8": 3.503714063012269,
+     "rep9": 3.17079979674957
+    }
+   }
+  }
+ },
+ "config": {
+  "arms": [
+   "0.999",
+   "0.99"
+  ],
+  "rep_offset": 0,
+  "reps": 10,
+  "root": "/home/ubuntu/e0_run/d1_probefloor600",
+  "statistic_sites": {
+   "PR/PR_rownorm/RankMe/stable_rank/alpha_req/LiDAR": "v2/research/rebase/p2/p2_competing_metrics.py",
+   "R1/R2/R3/R1_uncentred/R1_rownorm/R2_uncentred": "v2/calibra/spectral.py RANK_VARIANTS -- one implementation",
+   "STATISTICS/_fold/_sha256": "v2/research/rebase/p2/p2_envelope_floors.py -- imported, not restated",
+   "hard_rank": "numpy.linalg.matrix_rank -- NOT an effective rank"
+  },
+  "step": 600,
+  "view": "rna_biology"
+ },
+ "duplicates_on_this_block": {
+  "duplicate_of": {
+   "PR_rownorm": "PR",
+   "R1_rownorm": "R1",
+   "R1_uncentred": "RankMe",
+   "R3": "R2"
+  },
+  "near_duplicates": {
+   "R1_uncentred ~= RankMe": 0.00026711596081109817
+  },
+  "thresholds": {
+   "duplicate": 1e-06,
+   "near_duplicate": 0.001
+  },
+  "why": "`z_biology` is L2-normalised at the model's output, so on this block `normalise_rows` is a no-op. A duplicate is NOT independent corroboration and is excluded from any count of agreeing statistics; a near-duplicate is excluded too and its relative difference is printed so the exclusion can be argued with.",
+  "worst_relative_difference": {
+   "PR_rownorm == PR": 3.7947517056290895e-09,
+   "R1_rownorm == R1": 1.5980815110023287e-08,
+   "R3 == R2": 1.3017471285077063e-08
+  }
+ },
+ "reps": {
+  "m099": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep1/probe_step600.npz",
+    "sha256": "c1d09dacf772e430ff05822cb53cd30ee392e148f660847da204bc9820cb3baa",
+    "views": {
+     "rna_biology": {
+      "PR": 3.4812657962537976,
+      "PR_rownorm": 3.4812657947884107,
+      "R1": 7.517676555846244,
+      "R1_rownorm": 7.517676500346925,
+      "R1_uncentred": 3.428461968948877,
+      "R2": 5.471206960811847,
+      "R2_uncentred": 2.023517707934457,
+      "R3": 5.471206938560424,
+      "RankMe": 3.429346485496639,
+      "alpha_req": 2.7188129852056258,
+      "alpha_req_abs_dev": 1.7188129852056258,
+      "hard_rank": 256.0,
+      "stable_rank": 2.350534789241038
+     },
+     "wsi_biology": {
+      "PR": 4.070740526717119,
+      "PR_rownorm": 4.070740518282696,
+      "R1": 6.935204377395353,
+      "R1_rownorm": 6.935204364150566,
+      "R1_uncentred": 2.346853613692709,
+      "R2": 5.630610394304518,
+      "R2_uncentred": 1.514051324448711,
+      "R3": 5.630610381784487,
+      "RankMe": 2.3475191354490526,
+      "alpha_req": 3.336844456528874,
+      "alpha_req_abs_dev": 2.336844456528874,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6912567466200565
+     }
+    }
+   },
+   "rep10": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep10/probe_step600.npz",
+    "sha256": "9c39ed8fc009780faf654ba42f62e1332ee6a9748097f92445764ea0a273f9c7",
+    "views": {
+     "rna_biology": {
+      "PR": 3.47401007811601,
+      "PR_rownorm": 3.474010075516441,
+      "R1": 7.493394378103386,
+      "R1_rownorm": 7.493394398674968,
+      "R1_uncentred": 3.6073644453181726,
+      "R2": 5.336846893079823,
+      "R2_uncentred": 2.1189615908661885,
+      "R3": 5.3368468934206055,
+      "RankMe": 3.608285010870778,
+      "alpha_req": 2.806067914257356,
+      "alpha_req_abs_dev": 1.8060679142573561,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6362796701623767
+     },
+     "wsi_biology": {
+      "PR": 3.3147216118671903,
+      "PR_rownorm": 3.3147216253690766,
+      "R1": 6.675937852378873,
+      "R1_rownorm": 6.675938122938141,
+      "R1_uncentred": 2.627863773716817,
+      "R2": 5.155421584770422,
+      "R2_uncentred": 1.6544702500093627,
+      "R3": 5.155421730243515,
+      "RankMe": 2.628598606453125,
+      "alpha_req": 3.40303085256607,
+      "alpha_req_abs_dev": 2.40303085256607,
+      "hard_rank": 256.0,
+      "stable_rank": 2.228571219826444
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep2/probe_step600.npz",
+    "sha256": "fc5f67f9fe113a837317ba280a3b03ccc89f9505514d71626549b9b73f5bfdbd",
+    "views": {
+     "rna_biology": {
+      "PR": 3.661849183216074,
+      "PR_rownorm": 3.6618491751866564,
+      "R1": 7.506715248390978,
+      "R1_rownorm": 7.506715173204248,
+      "R1_uncentred": 3.5462806483206717,
+      "R2": 5.466888883354403,
+      "R2_uncentred": 2.0867391554039556,
+      "R3": 5.466888860065538,
+      "RankMe": 3.5471949896730623,
+      "alpha_req": 2.906410530610456,
+      "alpha_req_abs_dev": 1.9064105306104562,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7414797822143266
+     },
+     "wsi_biology": {
+      "PR": 3.4861207371348737,
+      "PR_rownorm": 3.486120741485074,
+      "R1": 6.913216715637349,
+      "R1_rownorm": 6.913216881581926,
+      "R1_uncentred": 2.4872254216257854,
+      "R2": 5.406754812763371,
+      "R2_uncentred": 1.578755276689415,
+      "R3": 5.406754907034655,
+      "RankMe": 2.4879258932076924,
+      "alpha_req": 3.4065902289301384,
+      "alpha_req_abs_dev": 2.4065902289301384,
+      "hard_rank": 256.0,
+      "stable_rank": 2.2217758526694484
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep3/probe_step600.npz",
+    "sha256": "4ae4da96bb451660092ca21a07376acb4825ad0517d002efc6b741a0b4d7565f",
+    "views": {
+     "rna_biology": {
+      "PR": 3.670123273023906,
+      "PR_rownorm": 3.670123261225888,
+      "R1": 7.8021457366489315,
+      "R1_rownorm": 7.8021457055512,
+      "R1_uncentred": 3.765802562269453,
+      "R2": 5.588772405359965,
+      "R2_uncentred": 2.1865548143499014,
+      "R3": 5.58877238594709,
+      "RankMe": 3.766760160997204,
+      "alpha_req": 3.1332926297770154,
+      "alpha_req_abs_dev": 2.1332926297770154,
+      "hard_rank": 256.0,
+      "stable_rank": 2.426389999610732
+     },
+     "wsi_biology": {
+      "PR": 3.4455770824350216,
+      "PR_rownorm": 3.4455770871511646,
+      "R1": 6.4622621075285425,
+      "R1_rownorm": 6.462262167329215,
+      "R1_uncentred": 2.2168889515769963,
+      "R2": 5.142295580485148,
+      "R2_uncentred": 1.4666938569014887,
+      "R3": 5.14229561999202,
+      "RankMe": 2.217535976003733,
+      "alpha_req": 3.596157418225851,
+      "alpha_req_abs_dev": 2.596157418225851,
+      "hard_rank": 256.0,
+      "stable_rank": 2.4748019028715995
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep4/probe_step600.npz",
+    "sha256": "46c7715c12801deaffb6391e2508da54e1b9ef27f5d66aa44dbaa530329ac571",
+    "views": {
+     "rna_biology": {
+      "PR": 4.376006969693911,
+      "PR_rownorm": 4.376006969257933,
+      "R1": 7.919313898595889,
+      "R1_rownorm": 7.919313834947696,
+      "R1_uncentred": 3.789331397221707,
+      "R2": 6.005665456360401,
+      "R2_uncentred": 2.1970835570501936,
+      "R3": 6.005665410940986,
+      "RankMe": 3.790298368940805,
+      "alpha_req": 2.805423313603619,
+      "alpha_req_abs_dev": 1.8054233136036189,
+      "hard_rank": 256.0,
+      "stable_rank": 3.185204064515646
+     },
+     "wsi_biology": {
+      "PR": 4.4547098992773195,
+      "PR_rownorm": 4.454709895149889,
+      "R1": 7.124056271899402,
+      "R1_rownorm": 7.124056180947778,
+      "R1_uncentred": 2.455185192433369,
+      "R2": 5.921633903434204,
+      "R2_uncentred": 1.5573875255779663,
+      "R3": 5.92163385541985,
+      "RankMe": 2.455879272263121,
+      "alpha_req": 3.266702240352273,
+      "alpha_req_abs_dev": 2.266702240352273,
+      "hard_rank": 256.0,
+      "stable_rank": 2.827746030541351
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep5/probe_step600.npz",
+    "sha256": "c664d2bd84f0048fde6b3bfc65c4bcd06655a90696bca61ed528d58c8824bcf7",
+    "views": {
+     "rna_biology": {
+      "PR": 3.472594313378298,
+      "PR_rownorm": 3.472594314266411,
+      "R1": 7.325689526518578,
+      "R1_rownorm": 7.325689536041914,
+      "R1_uncentred": 3.442683288973593,
+      "R2": 5.310193015508816,
+      "R2_uncentred": 2.042187180117237,
+      "R3": 5.310193007853644,
+      "RankMe": 3.4435765645370933,
+      "alpha_req": 2.906430918118544,
+      "alpha_req_abs_dev": 1.9064309181185441,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7534183312361793
+     },
+     "wsi_biology": {
+      "PR": 3.900187346572455,
+      "PR_rownorm": 3.9001873230516613,
+      "R1": 6.804758556914178,
+      "R1_rownorm": 6.804758158234207,
+      "R1_uncentred": 2.28651464529549,
+      "R2": 5.531764038002345,
+      "R2_uncentred": 1.4898429351426732,
+      "R3": 5.531763827101498,
+      "RankMe": 2.2871712600320873,
+      "alpha_req": 3.4150879368077316,
+      "alpha_req_abs_dev": 2.4150879368077316,
+      "hard_rank": 256.0,
+      "stable_rank": 2.5935954810227506
+     }
+    }
+   },
+   "rep6": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep6/probe_step600.npz",
+    "sha256": "d6a1c12dac0bdfc917bbddb0328ac6802ba449f3262a5486cb049af8420e751c",
+    "views": {
+     "rna_biology": {
+      "PR": 3.347684047364998,
+      "PR_rownorm": 3.3476840443391445,
+      "R1": 6.208562613774877,
+      "R1_rownorm": 6.208562518184481,
+      "R1_uncentred": 3.106245948521692,
+      "R2": 4.705215778425461,
+      "R2_uncentred": 1.9388921595684894,
+      "R3": 4.705215721505882,
+      "RankMe": 3.1070756763927467,
+      "alpha_req": 2.8842963060676943,
+      "alpha_req_abs_dev": 1.8842963060676943,
+      "hard_rank": 256.0,
+      "stable_rank": 2.399466991730352
+     },
+     "wsi_biology": {
+      "PR": 3.0406736341022116,
+      "PR_rownorm": 3.0406736226522972,
+      "R1": 5.5201684270715985,
+      "R1_rownorm": 5.520168134254706,
+      "R1_uncentred": 2.1730767087485665,
+      "R2": 4.464891948459454,
+      "R2_uncentred": 1.4745941147357675,
+      "R3": 4.464891777759478,
+      "RankMe": 2.1737220103209633,
+      "alpha_req": 3.5768649318229575,
+      "alpha_req_abs_dev": 2.5768649318229575,
+      "hard_rank": 256.0,
+      "stable_rank": 2.0873635123068186
+     }
+    }
+   },
+   "rep7": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep7/probe_step600.npz",
+    "sha256": "92fbc9ebf22c5e5b43954fc4da32b79289497271449d381f5a50d8c60c3cd5c8",
+    "views": {
+     "rna_biology": {
+      "PR": 3.51269244285153,
+      "PR_rownorm": 3.512692436281919,
+      "R1": 7.774400876775322,
+      "R1_rownorm": 7.774400800591583,
+      "R1_uncentred": 3.731355916590835,
+      "R2": 5.58577558021838,
+      "R2_uncentred": 2.1667731492166302,
+      "R3": 5.585775541525846,
+      "RankMe": 3.7323031764170245,
+      "alpha_req": 2.7021515024969016,
+      "alpha_req_abs_dev": 1.7021515024969016,
+      "hard_rank": 256.0,
+      "stable_rank": 2.3487484024483707
+     },
+     "wsi_biology": {
+      "PR": 3.911986357390924,
+      "PR_rownorm": 3.911986354779409,
+      "R1": 6.9083817637519,
+      "R1_rownorm": 6.908381817245628,
+      "R1_uncentred": 2.2793540996821227,
+      "R2": 5.57243196057377,
+      "R2_uncentred": 1.4841031664962991,
+      "R3": 5.572431991374269,
+      "RankMe": 2.2800037976988157,
+      "alpha_req": 3.3212722478448757,
+      "alpha_req_abs_dev": 2.3212722478448757,
+      "hard_rank": 256.0,
+      "stable_rank": 2.560070568691848
+     }
+    }
+   },
+   "rep8": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep8/probe_step600.npz",
+    "sha256": "95ec24af950deda10cf2251e1cf091b7376e75e6d1e6b6646d5deb42371cc8df",
+    "views": {
+     "rna_biology": {
+      "PR": 3.7294479014594546,
+      "PR_rownorm": 3.7294478908936086,
+      "R1": 7.734404973562365,
+      "R1_rownorm": 7.734404849960271,
+      "R1_uncentred": 3.6740519375105696,
+      "R2": 5.636622555642171,
+      "R2_uncentred": 2.1406046253294466,
+      "R3": 5.6366224822676,
+      "RankMe": 3.674988739047189,
+      "alpha_req": 2.8330769381368133,
+      "alpha_req_abs_dev": 1.8330769381368133,
+      "hard_rank": 256.0,
+      "stable_rank": 2.639069898876198
+     },
+     "wsi_biology": {
+      "PR": 4.168097404828837,
+      "PR_rownorm": 4.1680974088108185,
+      "R1": 7.029311352663419,
+      "R1_rownorm": 7.0293114216228725,
+      "R1_uncentred": 2.6087210634730162,
+      "R2": 5.71123602071327,
+      "R2_uncentred": 1.6330085713076086,
+      "R3": 5.711236063839969,
+      "RankMe": 2.6094515832645495,
+      "alpha_req": 3.298641657553518,
+      "alpha_req_abs_dev": 2.298641657553518,
+      "hard_rank": 256.0,
+      "stable_rank": 2.8889451320235917
+     }
+    }
+   },
+   "rep9": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep9/probe_step600.npz",
+    "sha256": "e55c198739fa8b0863eb4ccda9f7f2c5d8594863b38dc48a7e9381ce9466c811",
+    "views": {
+     "rna_biology": {
+      "PR": 3.831698180764923,
+      "PR_rownorm": 3.8316981662245797,
+      "R1": 7.644701191560021,
+      "R1_rownorm": 7.644701078464345,
+      "R1_uncentred": 3.4223845231209307,
+      "R2": 5.60313365275683,
+      "R2_uncentred": 2.0084070702769132,
+      "R3": 5.603133588912162,
+      "RankMe": 3.42326743553347,
+      "alpha_req": 2.8231430576770933,
+      "alpha_req_abs_dev": 1.8231430576770933,
+      "hard_rank": 256.0,
+      "stable_rank": 2.8490893460855213
+     },
+     "wsi_biology": {
+      "PR": 4.0150263969814555,
+      "PR_rownorm": 4.015026388542755,
+      "R1": 6.902503358141112,
+      "R1_rownorm": 6.902503336077409,
+      "R1_uncentred": 2.4340638369784617,
+      "R2": 5.5157324677053206,
+      "R2_uncentred": 1.5535033515829548,
+      "R3": 5.515732435822641,
+      "RankMe": 2.4347490064010384,
+      "alpha_req": 3.3337066966217646,
+      "alpha_req_abs_dev": 2.3337066966217646,
+      "hard_rank": 256.0,
+      "stable_rank": 2.9252204375532505
+     }
+    }
+   }
+  },
+  "m0999": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep1/probe_step600.npz",
+    "sha256": "333abe899e3afeaf590de0a45b547a4ca7594a2927dc394e3b261c7c8a280636",
+    "views": {
+     "rna_biology": {
+      "PR": 4.152330136842167,
+      "PR_rownorm": 4.152330123842125,
+      "R1": 12.436668340327495,
+      "R1_rownorm": 12.436668330598462,
+      "R1_uncentred": 6.566117188102326,
+      "R2": 7.587854933695098,
+      "R2_uncentred": 3.297546258756481,
+      "R3": 7.5878549131766855,
+      "RankMe": 6.567570665454399,
+      "alpha_req": 2.316147698047835,
+      "alpha_req_abs_dev": 1.316147698047835,
+      "hard_rank": 256.0,
+      "stable_rank": 2.9437675213357153
+     },
+     "wsi_biology": {
+      "PR": 3.3607837044209377,
+      "PR_rownorm": 3.360783694010584,
+      "R1": 10.93866668332793,
+      "R1_rownorm": 10.93866662345326,
+      "R1_uncentred": 3.012465134658713,
+      "R2": 6.971177995335019,
+      "R2_uncentred": 1.6857909349349236,
+      "R3": 6.971177983163769,
+      "RankMe": 3.013206576020344,
+      "alpha_req": 3.157423901014488,
+      "alpha_req_abs_dev": 2.157423901014488,
+      "hard_rank": 256.0,
+      "stable_rank": 2.1307675034500337
+     }
+    }
+   },
+   "rep10": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep10/probe_step600.npz",
+    "sha256": "416af2a327f57f5cf6c5eb86da0562e88e69055d9e3b18a780ceee7bff2b3c1a",
+    "views": {
+     "rna_biology": {
+      "PR": 4.02485104380175,
+      "PR_rownorm": 4.024851047821633,
+      "R1": 12.020836038587865,
+      "R1_rownorm": 12.020836061814942,
+      "R1_uncentred": 6.460514305915701,
+      "R2": 7.38819701935559,
+      "R2_uncentred": 3.2874105743658992,
+      "R3": 7.388197037612181,
+      "RankMe": 6.461943860083877,
+      "alpha_req": 2.3747901893435386,
+      "alpha_req_abs_dev": 1.3747901893435386,
+      "hard_rank": 256.0,
+      "stable_rank": 2.47643739608211
+     },
+     "wsi_biology": {
+      "PR": 4.629803334237254,
+      "PR_rownorm": 4.629803343536929,
+      "R1": 10.977458948012185,
+      "R1_rownorm": 10.977458905625458,
+      "R1_uncentred": 3.3969044326514863,
+      "R2": 7.42452701596168,
+      "R2_uncentred": 1.8407077287558222,
+      "R3": 7.424527061230168,
+      "RankMe": 3.39772122807852,
+      "alpha_req": 2.78162141027559,
+      "alpha_req_abs_dev": 1.7816214102755898,
+      "hard_rank": 256.0,
+      "stable_rank": 2.9224862312313564
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep2/probe_step600.npz",
+    "sha256": "f7c135fd1e617c30a1255096fff47317b4ba50f150ea1438b02e34e07e51cac7",
+    "views": {
+     "rna_biology": {
+      "PR": 4.5253585613334115,
+      "PR_rownorm": 4.525358571753317,
+      "R1": 12.709160286079065,
+      "R1_rownorm": 12.70916031418067,
+      "R1_uncentred": 7.2055548315959514,
+      "R2": 7.9304448582082365,
+      "R2_uncentred": 3.6660184711103794,
+      "R3": 7.9304448756566,
+      "RankMe": 7.207135422186927,
+      "alpha_req": 2.3180628173296682,
+      "alpha_req_abs_dev": 1.3180628173296682,
+      "hard_rank": 256.0,
+      "stable_rank": 3.0248587162067664
+     },
+     "wsi_biology": {
+      "PR": 4.813011411635812,
+      "PR_rownorm": 4.813011410866994,
+      "R1": 11.954523975867632,
+      "R1_rownorm": 11.95452377222049,
+      "R1_uncentred": 3.3894553105532435,
+      "R2": 8.053572498703037,
+      "R2_uncentred": 1.8086254493926242,
+      "R3": 8.053572410191407,
+      "RankMe": 3.3902689232675067,
+      "alpha_req": 3.0090043323115157,
+      "alpha_req_abs_dev": 2.0090043323115157,
+      "hard_rank": 256.0,
+      "stable_rank": 2.904021004705074
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep3/probe_step600.npz",
+    "sha256": "a907950e6c98924f1394d622e3cd1057fde7e354fcaace2f1aafe701a84ae9b9",
+    "views": {
+     "rna_biology": {
+      "PR": 4.232079766041329,
+      "PR_rownorm": 4.232079768957421,
+      "R1": 11.84642151622174,
+      "R1_rownorm": 11.846421538401454,
+      "R1_uncentred": 6.6465108192608735,
+      "R2": 7.373188121142933,
+      "R2_uncentred": 3.4342829978906417,
+      "R3": 7.373188115644702,
+      "RankMe": 6.6479855040770275,
+      "alpha_req": 2.2472767664237314,
+      "alpha_req_abs_dev": 1.2472767664237314,
+      "hard_rank": 256.0,
+      "stable_rank": 3.1455869167612485
+     },
+     "wsi_biology": {
+      "PR": 4.459240043683346,
+      "PR_rownorm": 4.459240065301067,
+      "R1": 10.695832870420565,
+      "R1_rownorm": 10.695832925686867,
+      "R1_uncentred": 3.032216787659799,
+      "R2": 7.20454848797257,
+      "R2_uncentred": 1.700489872648057,
+      "R3": 7.204548582523358,
+      "RankMe": 3.032960150367147,
+      "alpha_req": 3.1080211702649456,
+      "alpha_req_abs_dev": 2.1080211702649456,
+      "hard_rank": 256.0,
+      "stable_rank": 2.8520362368366805
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep4/probe_step600.npz",
+    "sha256": "6b62cac2b1d2f5ba9f82207abd695b81afea7199fa46adf3446c2c36008d0948",
+    "views": {
+     "rna_biology": {
+      "PR": 3.9114815551580158,
+      "PR_rownorm": 3.911481564711301,
+      "R1": 11.515209998534578,
+      "R1_rownorm": 11.515210001699552,
+      "R1_uncentred": 6.128566292749447,
+      "R2": 7.070327434015528,
+      "R2_uncentred": 3.157658177313312,
+      "R3": 7.07032744851969,
+      "RankMe": 6.129936769869565,
+      "alpha_req": 2.3579984140382875,
+      "alpha_req_abs_dev": 1.3579984140382875,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6135177793940105
+     },
+     "wsi_biology": {
+      "PR": 3.4607092929815115,
+      "PR_rownorm": 3.4607092982260994,
+      "R1": 10.353053898700356,
+      "R1_rownorm": 10.353053774877592,
+      "R1_uncentred": 2.9335658750518805,
+      "R2": 6.741089597410748,
+      "R2_uncentred": 1.669406189496626,
+      "R3": 6.741089600172154,
+      "RankMe": 2.93428863990152,
+      "alpha_req": 3.0321914528484855,
+      "alpha_req_abs_dev": 2.0321914528484855,
+      "hard_rank": 256.0,
+      "stable_rank": 2.117984416680568
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep5/probe_step600.npz",
+    "sha256": "9b175c1b8f877bf9e5ed19df7e0802896bbd85cd718333d6e63cf9eb26d27feb",
+    "views": {
+     "rna_biology": {
+      "PR": 4.598413317574959,
+      "PR_rownorm": 4.598413315735822,
+      "R1": 12.108921054920973,
+      "R1_rownorm": 12.108920997550193,
+      "R1_uncentred": 6.866383648049719,
+      "R2": 7.686297060333073,
+      "R2_uncentred": 3.544421585289965,
+      "R3": 7.686297051929697,
+      "RankMe": 6.867904596326074,
+      "alpha_req": 2.3066007052413853,
+      "alpha_req_abs_dev": 1.3066007052413853,
+      "hard_rank": 256.0,
+      "stable_rank": 3.11157168804836
+     },
+     "wsi_biology": {
+      "PR": 4.229209360619513,
+      "PR_rownorm": 4.229209349673269,
+      "R1": 10.973499772869442,
+      "R1_rownorm": 10.97349991014277,
+      "R1_uncentred": 2.985868052764039,
+      "R2": 7.3478121405950025,
+      "R2_uncentred": 1.6757068584098587,
+      "R3": 7.347812141255589,
+      "RankMe": 2.9866041632107794,
+      "alpha_req": 3.143537326161937,
+      "alpha_req_abs_dev": 2.143537326161937,
+      "hard_rank": 256.0,
+      "stable_rank": 2.623846183721045
+     }
+    }
+   },
+   "rep6": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep6/probe_step600.npz",
+    "sha256": "74de2b08215a98af3c059c40b0ddf63bf65bf75cd7657b4eccf50a1793bfacf4",
+    "views": {
+     "rna_biology": {
+      "PR": 4.383717508522099,
+      "PR_rownorm": 4.38371750168499,
+      "R1": 12.335078690640664,
+      "R1_rownorm": 12.33507867689909,
+      "R1_uncentred": 7.242290043593319,
+      "R2": 7.821615597447712,
+      "R2_uncentred": 3.7513348130254585,
+      "R3": 7.821615577707406,
+      "RankMe": 7.24388866215089,
+      "alpha_req": 2.2733791419982032,
+      "alpha_req_abs_dev": 1.2733791419982032,
+      "hard_rank": 256.0,
+      "stable_rank": 2.68376284842829
+     },
+     "wsi_biology": {
+      "PR": 5.053917379961037,
+      "PR_rownorm": 5.053917386267035,
+      "R1": 11.551943257981163,
+      "R1_rownorm": 11.551943138879551,
+      "R1_uncentred": 3.0910198938838684,
+      "R2": 7.991174338008337,
+      "R2_uncentred": 1.7032009984949212,
+      "R3": 7.991174333655243,
+      "RankMe": 3.0917802245607326,
+      "alpha_req": 3.2034618591099178,
+      "alpha_req_abs_dev": 2.2034618591099178,
+      "hard_rank": 256.0,
+      "stable_rank": 3.2641379034420046
+     }
+    }
+   },
+   "rep7": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep7/probe_step600.npz",
+    "sha256": "cf48a09d30ace84c2866a44ba955441d842ff0b99b3a27291f6e1dcce69bac3d",
+    "views": {
+     "rna_biology": {
+      "PR": 4.399520425402766,
+      "PR_rownorm": 4.399520415367245,
+      "R1": 11.991799754686383,
+      "R1_rownorm": 11.991799734583923,
+      "R1_uncentred": 6.484071503368252,
+      "R2": 7.575371420452419,
+      "R2_uncentred": 3.3158769433521282,
+      "R3": 7.575371401390879,
+      "RankMe": 6.4855118178477955,
+      "alpha_req": 2.271838969698446,
+      "alpha_req_abs_dev": 1.2718389696984458,
+      "hard_rank": 256.0,
+      "stable_rank": 2.840507979566871
+     },
+     "wsi_biology": {
+      "PR": 4.861087035753586,
+      "PR_rownorm": 4.861087016930261,
+      "R1": 10.782222942202957,
+      "R1_rownorm": 10.782223269991146,
+      "R1_uncentred": 2.8511297985792012,
+      "R2": 7.477351518497343,
+      "R2_uncentred": 1.6281710861145005,
+      "R3": 7.477351574466907,
+      "RankMe": 2.851834810208651,
+      "alpha_req": 3.031030571128488,
+      "alpha_req_abs_dev": 2.031030571128488,
+      "hard_rank": 256.0,
+      "stable_rank": 3.1099619456926444
+     }
+    }
+   },
+   "rep8": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep8/probe_step600.npz",
+    "sha256": "b7ad3cd1473c854eebc0afc5be946e9a9638616f014fd521b89a20b1eb0b7c03",
+    "views": {
+     "rna_biology": {
+      "PR": 4.806601308311301,
+      "PR_rownorm": 4.806601320049536,
+      "R1": 12.06431819886888,
+      "R1_rownorm": 12.064318212510175,
+      "R1_uncentred": 7.545220441905149,
+      "R2": 7.733307718826261,
+      "R2_uncentred": 4.018718525458999,
+      "R3": 7.733307726861455,
+      "RankMe": 7.546877113042025,
+      "alpha_req": 2.338850262819979,
+      "alpha_req_abs_dev": 1.338850262819979,
+      "hard_rank": 256.0,
+      "stable_rank": 3.503714063012269
+     },
+     "wsi_biology": {
+      "PR": 4.219247591531433,
+      "PR_rownorm": 4.219247561710393,
+      "R1": 10.831828299997467,
+      "R1_rownorm": 10.831828517121947,
+      "R1_uncentred": 3.2494612433133883,
+      "R2": 7.292561121588966,
+      "R2_uncentred": 1.7841335860422096,
+      "R3": 7.292561172580743,
+      "RankMe": 3.250251655044939,
+      "alpha_req": 2.9855564085630344,
+      "alpha_req_abs_dev": 1.9855564085630344,
+      "hard_rank": 256.0,
+      "stable_rank": 2.5607535179509004
+     }
+    }
+   },
+   "rep9": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep9/probe_step600.npz",
+    "sha256": "b28fdb903c5de3223da39358335d1577a66b8347d62aec703279f56fcdc7d77b",
+    "views": {
+     "rna_biology": {
+      "PR": 4.794547728325742,
+      "PR_rownorm": 4.794547710650724,
+      "R1": 12.112156665819962,
+      "R1_rownorm": 12.11215661639392,
+      "R1_uncentred": 6.623570621341471,
+      "R2": 7.737125366269927,
+      "R2_uncentred": 3.389701201947391,
+      "R3": 7.737125311118585,
+      "RankMe": 6.625040506451598,
+      "alpha_req": 2.3531006555677743,
+      "alpha_req_abs_dev": 1.3531006555677743,
+      "hard_rank": 256.0,
+      "stable_rank": 3.17079979674957
+     },
+     "wsi_biology": {
+      "PR": 4.338501118480947,
+      "PR_rownorm": 4.338501139977178,
+      "R1": 10.84095713409848,
+      "R1_rownorm": 10.840957542887704,
+      "R1_uncentred": 3.1251582533002864,
+      "R2": 7.270671200665853,
+      "R2_uncentred": 1.733981385193278,
+      "R3": 7.270671389027252,
+      "RankMe": 3.1259194437485927,
+      "alpha_req": 2.9684382349127754,
+      "alpha_req_abs_dev": 1.9684382349127754,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6643580679738563
+     }
+    }
+   }
+  }
+ },
+ "tests": {
+  "PR": {
+   "arm_fold": {
+    "m099": 1.307174424999372,
+    "m0999": 1.2288441708162736
+   },
+   "direction": 1,
+   "floor": 1.307174424999372,
+   "floor_arm": "m099",
+   "high_min": 3.9114815551580158,
+   "low_max": 4.376006969693911,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.307174424999372,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.6838010122479767,
+    "passes": false,
+    "separation": 0.8938471949992375
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": null,
+    "gap": -0.46452541453589546,
+    "high_range": [
+     3.9114815551580158,
+     4.806601308311301
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     3.347684047364998,
+     4.376006969693911
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": false
+   }
+  },
+  "PR_rownorm": {
+   "arm_fold": {
+    "m099": 1.307174426050648,
+    "m0999": 1.2288441708159505
+   },
+   "direction": 1,
+   "floor": 1.307174426050648,
+   "floor_arm": "m099",
+   "high_min": 3.911481564711301,
+   "low_max": 4.376006969257933,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.307174426050648,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.6838010134362614,
+    "passes": false,
+    "separation": 0.8938471972713964
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": null,
+    "gap": -0.4645254045466318,
+    "high_range": [
+     3.911481564711301,
+     4.806601320049536
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     3.3476840443391445,
+     4.376006969257933
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": false
+   }
+  },
+  "R1": {
+   "arm_fold": {
+    "m099": 1.275547077680329,
+    "m0999": 1.1036846299543324
+   },
+   "direction": 1,
+   "floor": 1.275547077680329,
+   "floor_arm": "m099",
+   "high_min": 11.515209998534578,
+   "low_max": 7.919313898595889,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.275547077680329,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.139955275748489,
+    "passes": true,
+    "separation": 1.4540666206672588
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 3.595896099938689,
+    "high_range": [
+     11.515209998534578,
+     12.709160286079065
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     6.208562613774877,
+     7.919313898595889
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R1_rownorm": {
+   "arm_fold": {
+    "m099": 1.2755470870676642,
+    "m0999": 1.1036846320913731
+   },
+   "direction": 1,
+   "floor": 1.2755470870676642,
+   "floor_arm": "m099",
+   "high_min": 11.515210001699552,
+   "low_max": 7.919313834947696,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.2755470870676642,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.1399552768342711,
+    "passes": true,
+    "separation": 1.4540666327533673
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 3.5958961667518565,
+    "high_range": [
+     11.515210001699552,
+     12.70916031418067
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     6.208562518184481,
+     7.919313834947696
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R1_uncentred": {
+   "arm_fold": {
+    "m099": 1.2199070711142836,
+    "m0999": 1.2311558823850384
+   },
+   "direction": 1,
+   "floor": 1.2311558823850384,
+   "floor_arm": "m0999",
+   "high_min": 6.128566292749447,
+   "low_max": 3.789331397221707,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.2311558823850384,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.3136608448392009,
+    "passes": true,
+    "separation": 1.6173212765826814
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 2.33923489552774,
+    "high_range": [
+     6.128566292749447,
+     7.545220441905149
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     3.106245948521692,
+     3.789331397221707
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R2": {
+   "arm_fold": {
+    "m099": 1.276384705648955,
+    "m0999": 1.121651710224149
+   },
+   "direction": 1,
+   "floor": 1.276384705648955,
+   "floor_arm": "m099",
+   "high_min": 7.070327434015528,
+   "low_max": 6.005665456360401,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.276384705648955,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9223522233559948,
+    "passes": false,
+    "separation": 1.1772762711129006
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 1.0646619776551276,
+    "high_range": [
+     7.070327434015528,
+     7.9304448582082365
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     4.705215778425461,
+     6.005665456360401
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R2_uncentred": {
+   "arm_fold": {
+    "m099": 1.133164392979528,
+    "m0999": 1.2726895375604963
+   },
+   "direction": 1,
+   "floor": 1.2726895375604963,
+   "floor_arm": "m0999",
+   "high_min": 3.157658177313312,
+   "low_max": 2.1970835570501936,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.2726895375604963,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.1292655180828983,
+    "passes": true,
+    "separation": 1.437204409991938
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 0.9605746202631185,
+    "high_range": [
+     3.157658177313312,
+     4.018718525458999
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     1.9388921595684894,
+     2.1970835570501936
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R3": {
+   "arm_fold": {
+    "m099": 1.2763847114365463,
+    "m0999": 1.1216517103910078
+   },
+   "direction": 1,
+   "floor": 1.2763847114365463,
+   "floor_arm": "m099",
+   "high_min": 7.07032744851969,
+   "low_max": 6.005665410940986,
+   "test_A_published_single_draw": {
+    "floor": 1.2763847114365463,
+    "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+    "margin": 0.9886554975141566,
+    "passes": false,
+    "published_high": 7.42,
+    "published_low": 5.88,
+    "separation": 1.2619047619047619,
+    "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.2763847114365463,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9223522280413703,
+    "passes": false,
+    "separation": 1.17727628243144
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 1.064662037578704,
+    "high_range": [
+     7.07032744851969,
+     7.9304448756566
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     4.705215721505882,
+     6.005665410940986
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "RankMe": {
+   "arm_fold": {
+    "m099": 1.219892517500979,
+    "m0999": 1.2311508905176862
+   },
+   "direction": 1,
+   "floor": 1.2311508905176862,
+   "floor_arm": "m0999",
+   "high_min": 6.129936769869565,
+   "low_max": 3.790298368940805,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.2311508905176862,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.3136247205419307,
+    "passes": true,
+    "separation": 1.6172702445012448
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 2.3396384009287603,
+    "high_range": [
+     6.129936769869565,
+     7.546877113042025
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     3.1070756763927467,
+     3.790298368940805
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "alpha_req": {
+   "arm_fold": {
+    "m099": 1.1595547573412228,
+    "m0999": 1.056741307890941
+   },
+   "direction": 0,
+   "floor": 1.1595547573412228,
+   "floor_arm": "m099",
+   "high_min": null,
+   "low_max": null,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "passes": null,
+    "why": "a non-finite value on one side"
+   },
+   "test_C_complete_separation": {
+    "direction": 0,
+    "high_range": [
+     2.2472767664237314,
+     2.3747901893435386
+    ],
+    "low_range": [
+     2.7021515024969016,
+     3.1332926297770154
+    ],
+    "separated": null,
+    "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+   }
+  },
+  "alpha_req_abs_dev": {
+   "arm_fold": {
+    "m099": 1.253291864236332,
+    "m0999": 1.10223346281469
+   },
+   "direction": -1,
+   "floor": 1.253291864236332,
+   "floor_arm": "m099",
+   "high_min": 1.7021515024969016,
+   "low_max": 1.3747901893435386,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.253291864236332,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9878922257182503,
+    "passes": false,
+    "separation": 1.2381172892350052
+   },
+   "test_C_complete_separation": {
+    "direction": -1,
+    "exact_one_sided_permutation_p": 5.412544112234515e-06,
+    "gap": 0.32736131315336303,
+    "high_range": [
+     1.2472767664237314,
+     1.3747901893435386
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     1.7021515024969016,
+     2.1332926297770154
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "hard_rank": {
+   "arm_fold": {
+    "m099": 1.0,
+    "m0999": 1.0
+   },
+   "direction": 1,
+   "floor": 1.0,
+   "floor_arm": "m0999",
+   "high_min": 256.0,
+   "low_max": 256.0,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.0,
+    "informative": "neither outcome is available from this statistic",
+    "margin": 1.0,
+    "passes": null,
+    "separation": 1.0,
+    "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+   },
+   "test_C_complete_separation": {
+    "constant": true,
+    "direction": 1,
+    "n_high": 10,
+    "n_low": 10,
+    "separated": null,
+    "value": 256.0,
+    "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+   }
+  },
+  "stable_rank": {
+   "arm_fold": {
+    "m099": 1.3561282516234354,
+    "m0999": 1.414820365964179
+   },
+   "direction": 1,
+   "floor": 1.414820365964179,
+   "floor_arm": "m0999",
+   "high_min": 2.47643739608211,
+   "low_max": 3.185204064515646,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.414820365964179,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.5495266887764781,
+    "passes": false,
+    "separation": 0.7774815509218203
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": null,
+    "gap": -0.7087666684335359,
+    "high_range": [
+     2.47643739608211,
+     3.503714063012269
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     2.3487484024483707,
+     3.185204064515646
+    ],
+    "n_high": 10,
+    "n_low": 10,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": false
+   }
+  }
+ }
+}

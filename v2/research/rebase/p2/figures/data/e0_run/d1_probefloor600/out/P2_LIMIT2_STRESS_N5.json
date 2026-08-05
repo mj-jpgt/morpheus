@@ -1,0 +1,4654 @@
+{
+ "_": "\u00a75.4 limit 2 under stress. 5 same-seed repeats per arm (offset 0) at step 600 on `wsi_biology`, arms ['0.999', '0.99']. Ranges, not distributions: seed 42 throughout, one stack.",
+ "absent": {
+  "Test A under any statistic but R3": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs.",
+  "a seed-varied floor": "Every repeat here is seed 42. The floor excludes seed variation entirely and is smaller than one a reader varying the seed would measure -- a floor twice over, exactly as `p2_probe_floors.py` says of its own.",
+  "an interval on any number here": "n = 5 or n = 10 same-seed repeats on one stack. These are ranges, not estimated distributions, and no confidence statement is made from them."
+ },
+ "arm_floor": {
+  "m099": {
+   "PR": {
+    "fold": 1.2928777365007125,
+    "max": 4.4547098992773195,
+    "min": 3.4455770824350216,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.181439401680803,
+     "separation": 1.0943242071166486
+    },
+    "values": {
+     "rep1": 4.070740526717119,
+     "rep2": 3.4861207371348737,
+     "rep3": 3.4455770824350216,
+     "rep4": 4.4547098992773195,
+     "rep5": 3.900187346572455
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.29287773353319,
+    "max": 4.454709895149889,
+    "min": 3.4455770871511646,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.181439397615806,
+     "separation": 1.0943242083701215
+    },
+    "values": {
+     "rep1": 4.070740518282696,
+     "rep2": 3.486120741485074,
+     "rep3": 3.4455770871511646,
+     "rep4": 4.454709895149889,
+     "rep5": 3.9001873230516613
+    }
+   },
+   "R1": {
+    "fold": 1.102409056358124,
+    "max": 7.124056271899402,
+    "min": 6.4622621075285425,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0469227103819565,
+     "separation": 1.052999467320681
+    },
+    "values": {
+     "rep1": 6.935204377395353,
+     "rep2": 6.913216715637349,
+     "rep3": 6.4622621075285425,
+     "rep4": 7.124056271899402,
+     "rep5": 6.804758556914178
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.1024090320823483,
+    "max": 7.124056180947778,
+    "min": 6.462262167329215,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0469227583536087,
+     "separation": 1.0529993958828419
+    },
+    "values": {
+     "rep1": 6.935204364150566,
+     "rep2": 6.913216881581926,
+     "rep3": 6.462262167329215,
+     "rep4": 7.124056180947778,
+     "rep5": 6.804758158234207
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.121944073859218,
+    "max": 2.4872254216257854,
+    "min": 2.2168889515769963,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0877802277554873,
+     "separation": 1.0314069379383957
+    },
+    "values": {
+     "rep1": 2.346853613692709,
+     "rep2": 2.4872254216257854,
+     "rep3": 2.2168889515769963,
+     "rep4": 2.455185192433369,
+     "rep5": 2.28651464529549
+    }
+   },
+   "R2": {
+    "fold": 1.15155455588874,
+    "max": 5.921633903434204,
+    "min": 5.142295580485148,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.094960471675823,
+     "separation": 1.0516859609793041
+    },
+    "values": {
+     "rep1": 5.630610394304518,
+     "rep2": 5.406754812763371,
+     "rep3": 5.142295580485148,
+     "rep4": 5.921633903434204,
+     "rep5": 5.531764038002345
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.0764040970517632,
+    "max": 1.578755276689415,
+    "min": 1.4666938569014887,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0596790033697259,
+     "separation": 1.0157831698361979
+    },
+    "values": {
+     "rep1": 1.514051324448711,
+     "rep2": 1.578755276689415,
+     "rep3": 1.4666938569014887,
+     "rep4": 1.5573875255779663,
+     "rep5": 1.4898429351426732
+    }
+   },
+   "R3": {
+    "fold": 1.1515545377045124,
+    "max": 5.92163385541985,
+    "min": 5.14229561999202,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.0949604608288204,
+     "separation": 1.0516859547904165
+    },
+    "values": {
+     "rep1": 5.630610381784487,
+     "rep2": 5.406754907034655,
+     "rep3": 5.14229561999202,
+     "rep4": 5.92163385541985,
+     "rep5": 5.531763827101498
+    }
+   },
+   "RankMe": {
+    "fold": 1.1219325955158728,
+    "max": 2.4879258932076924,
+    "min": 2.217535976003733,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0877742024323918,
+     "separation": 1.0314020988980055
+    },
+    "values": {
+     "rep1": 2.3475191354490526,
+     "rep2": 2.4879258932076924,
+     "rep3": 2.217535976003733,
+     "rep4": 2.455879272263121,
+     "rep5": 2.2871712600320873
+    }
+   },
+   "alpha_req": {
+    "fold": 1.1008525276053474,
+    "max": 3.596157418225851,
+    "min": 3.266702240352273,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": false,
+     "rest_fold": 1.0454236981327862,
+     "separation": 1.0530204447933997
+    },
+    "values": {
+     "rep1": 3.336844456528874,
+     "rep2": 3.4065902289301384,
+     "rep3": 3.596157418225851,
+     "rep4": 3.266702240352273,
+     "rep5": 3.4150879368077316
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.1453455914978832,
+    "max": 2.596157418225851,
+    "min": 2.266702240352273,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": false,
+     "rest_fold": 1.0654632504498682,
+     "separation": 1.0749742809189209
+    },
+    "values": {
+     "rep1": 2.336844456528874,
+     "rep2": 2.4065902289301384,
+     "rep3": 2.596157418225851,
+     "rep4": 2.266702240352273,
+     "rep5": 2.4150879368077316
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.272741364590777,
+    "max": 2.827746030541351,
+    "min": 2.2217758526694484,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.1426151027523528,
+     "separation": 1.1138845981686867
+    },
+    "values": {
+     "rep1": 2.6912567466200565,
+     "rep2": 2.2217758526694484,
+     "rep3": 2.4748019028715995,
+     "rep4": 2.827746030541351,
+     "rep5": 2.5935954810227506
+    }
+   }
+  },
+  "m0999": {
+   "PR": {
+    "fold": 1.432109839530745,
+    "max": 4.813011411635812,
+    "min": 3.3607837044209377,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.3268452943929256,
+     "separation": 1.0793344526167847
+    },
+    "values": {
+     "rep1": 3.3607837044209377,
+     "rep2": 4.813011411635812,
+     "rep3": 4.459240043683346,
+     "rep4": 3.4607092929815115,
+     "rep5": 4.229209360619513
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.4321098437380828,
+    "max": 4.813011410866994,
+    "min": 3.360783694010584,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.3268453049353028,
+     "separation": 1.0793344472119248
+    },
+    "values": {
+     "rep1": 3.360783694010584,
+     "rep2": 4.813011410866994,
+     "rep3": 4.459240065301067,
+     "rep4": 3.4607092982260994,
+     "rep5": 4.229209349673269
+    }
+   },
+   "R1": {
+    "fold": 1.1546857664257222,
+    "max": 11.954523975867632,
+    "min": 10.353053898700356,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0599287785265923,
+     "separation": 1.08939939156181
+    },
+    "values": {
+     "rep1": 10.93866668332793,
+     "rep2": 11.954523975867632,
+     "rep3": 10.695832870420565,
+     "rep4": 10.353053898700356,
+     "rep5": 10.973499772869442
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.1546857605655423,
+    "max": 11.95452377222049,
+    "min": 10.353053774877592,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0599288044625765,
+     "separation": 1.0893993593758509
+    },
+    "values": {
+     "rep1": 10.93866662345326,
+     "rep2": 11.95452377222049,
+     "rep3": 10.695832925686867,
+     "rep4": 10.353053774877592,
+     "rep5": 10.97349991014277
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.1554045332264102,
+    "max": 3.3894553105532435,
+    "min": 2.9335658750518805,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0336283270291908,
+     "separation": 1.1178143081152034
+    },
+    "values": {
+     "rep1": 3.012465134658713,
+     "rep2": 3.3894553105532435,
+     "rep3": 3.032216787659799,
+     "rep4": 2.9335658750518805,
+     "rep5": 2.985868052764039
+    }
+   },
+   "R2": {
+    "fold": 1.194698925496616,
+    "max": 8.053572498703037,
+    "min": 6.741089597410748,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0900036313739692,
+     "separation": 1.096050408557517
+    },
+    "values": {
+     "rep1": 6.971177995335019,
+     "rep2": 8.053572498703037,
+     "rep3": 7.20454848797257,
+     "rep4": 6.741089597410748,
+     "rep5": 7.3478121405950025
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.083394479289655,
+    "max": 1.8086254493926242,
+    "min": 1.669406189496626,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0186196045917404,
+     "separation": 1.0635908384306783
+    },
+    "values": {
+     "rep1": 1.6857909349349236,
+     "rep2": 1.8086254493926242,
+     "rep3": 1.700489872648057,
+     "rep4": 1.669406189496626,
+     "rep5": 1.6757068584098587
+    }
+   },
+   "R3": {
+    "fold": 1.1946989118770555,
+    "max": 8.053572410191407,
+    "min": 6.741089600172154,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0900036310254562,
+     "separation": 1.0960503964129953
+    },
+    "values": {
+     "rep1": 6.971177983163769,
+     "rep2": 8.053572410191407,
+     "rep3": 7.204548582523358,
+     "rep4": 6.741089600172154,
+     "rep5": 7.347812141255589
+    }
+   },
+   "RankMe": {
+    "fold": 1.155397215245086,
+    "max": 3.3902689232675067,
+    "min": 2.93428863990152,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0336270635151077,
+     "separation": 1.1178085946355434
+    },
+    "values": {
+     "rep1": 3.013206576020344,
+     "rep2": 3.3902689232675067,
+     "rep3": 3.032960150367147,
+     "rep4": 2.93428863990152,
+     "rep5": 2.9866041632107794
+    }
+   },
+   "alpha_req": {
+    "fold": 1.0493251429083044,
+    "max": 3.157423901014488,
+    "min": 3.0090043323115157,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.0413009699794376,
+     "separation": 1.0077059113169031
+    },
+    "values": {
+     "rep1": 3.157423901014488,
+     "rep2": 3.0090043323115157,
+     "rep3": 3.1080211702649456,
+     "rep4": 3.0321914528484855,
+     "rep5": 3.143537326161937
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.0738771770253994,
+    "max": 2.157423901014488,
+    "min": 2.0090043323115157,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.061624335635536,
+     "separation": 1.0115415980762426
+    },
+    "values": {
+     "rep1": 2.157423901014488,
+     "rep2": 2.0090043323115157,
+     "rep3": 2.1080211702649456,
+     "rep4": 2.0321914528484855,
+     "rep5": 2.143537326161937
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.3711248212375562,
+    "max": 2.904021004705074,
+    "min": 2.117984416680568,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.3465803687576523,
+     "separation": 1.0182272466236446
+    },
+    "values": {
+     "rep1": 2.1307675034500337,
+     "rep2": 2.904021004705074,
+     "rep3": 2.8520362368366805,
+     "rep4": 2.117984416680568,
+     "rep5": 2.623846183721045
+    }
+   }
+  }
+ },
+ "by_step": {
+  "100": {
+   "PR": {
+    "arm_fold": {
+     "m099": 1.1126457436031363,
+     "m0999": 1.0995537948299723
+    },
+    "direction": 1,
+    "floor": 1.1126457436031363,
+    "floor_arm": "m099",
+    "high_min": 3.000399795382695,
+    "low_max": 3.1268482581415857,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1126457436031363,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8624132300245523,
+     "passes": false,
+     "separation": 0.9595604096138506
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.12644846275889066,
+     "high_range": [
+      3.000399795382695,
+      3.2991009810201146
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.810281957324311,
+      3.1268482581415857
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "arm_fold": {
+     "m099": 1.1126457407776837,
+     "m0999": 1.0995537987669932
+    },
+    "direction": 1,
+    "floor": 1.1126457407776837,
+    "floor_arm": "m099",
+    "high_min": 3.000399792789608,
+    "low_max": 3.1268482534019926,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1126457407776837,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8624132327764491,
+     "passes": false,
+     "separation": 0.9595604102390293
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.12644846061238457,
+     "high_range": [
+      3.000399792789608,
+      3.2991009899815125
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.810281960200991,
+      3.1268482534019926
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "arm_fold": {
+     "m099": 1.0479630152208783,
+     "m0999": 1.0773494462458122
+    },
+    "direction": 1,
+    "floor": 1.0773494462458122,
+    "floor_arm": "m0999",
+    "high_min": 12.715923460222704,
+    "low_max": 11.87739675930944,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0773494462458122,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9937337689986692,
+     "passes": false,
+     "separation": 1.07059852574648
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.8385267009132651,
+     "high_range": [
+      12.715923460222704,
+      13.699493098375061
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      11.333793833178406,
+      11.87739675930944
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "arm_fold": {
+     "m099": 1.0479630341630735,
+     "m0999": 1.0773493970314938
+    },
+    "direction": 1,
+    "floor": 1.0773493970314938,
+    "floor_arm": "m0999",
+    "high_min": 12.715923533639504,
+    "low_max": 11.877397074224719,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0773493970314938,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9937337937830919,
+     "passes": false,
+     "separation": 1.070598503542033
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.8385264594147852,
+     "high_range": [
+      12.715923533639504,
+      13.6994925516651
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      11.333793928819514,
+      11.877397074224719
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "arm_fold": {
+     "m099": 1.0189069217430773,
+     "m0999": 1.0638972327655076
+    },
+    "direction": 1,
+    "floor": 1.0638972327655076,
+    "floor_arm": "m0999",
+    "high_min": 2.9206271926889644,
+    "low_max": 2.3391268225698627,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0638972327655076,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.1736069593452874,
+     "passes": true,
+     "separation": 1.2485971964017928
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.5815003701191017,
+     "high_range": [
+      2.9206271926889644,
+      3.107247188241482
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.295721790336101,
+      2.3391268225698627
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "arm_fold": {
+     "m099": 1.0432051575197345,
+     "m0999": 1.0721633650752855
+    },
+    "direction": 1,
+    "floor": 1.0721633650752855,
+    "floor_arm": "m0999",
+    "high_min": 6.6423640353306475,
+    "low_max": 6.385189251401628,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0721633650752855,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9702595719493117,
+     "passes": false,
+     "separation": 1.04027676765768
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.2571747839290195,
+     "high_range": [
+      6.6423640353306475,
+      7.12169937617516
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.120741644512852,
+      6.385189251401628
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "arm_fold": {
+     "m099": 1.0090317726546842,
+     "m0999": 1.0301869786915179
+    },
+    "direction": 1,
+    "floor": 1.0301869786915179,
+    "floor_arm": "m0999",
+    "high_min": 1.6130237094357955,
+    "low_max": 1.4250972139906932,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0301869786915179,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0987027303430497,
+     "passes": true,
+     "separation": 1.1318692462522277
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.18792649544510232,
+     "high_range": [
+      1.6130237094357955,
+      1.6617160217814468
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.4123412687405998,
+      1.4250972139906932
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "arm_fold": {
+     "m099": 1.043205165436066,
+     "m0999": 1.0721633289050265
+    },
+    "direction": 1,
+    "floor": 1.0721633289050265,
+    "floor_arm": "m0999",
+    "high_min": 6.642364068724719,
+    "low_max": 6.385189324496552,
+    "test_A_published_single_draw": {
+     "floor": 1.0721633289050265,
+     "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+     "margin": 1.1769706423306918,
+     "passes": true,
+     "published_high": 7.42,
+     "published_low": 5.88,
+     "separation": 1.2619047619047619,
+     "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0721633289050265,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9702595984525703,
+     "passes": false,
+     "separation": 1.040276760978962
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.2571747442281671,
+     "high_range": [
+      6.642364068724719,
+      7.121699171723032
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.120741668133425,
+      6.385189324496552
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "arm_fold": {
+     "m099": 1.018904802795569,
+     "m0999": 1.063892821212533
+    },
+    "direction": 1,
+    "floor": 1.063892821212533,
+    "floor_arm": "m0999",
+    "high_min": 2.9213070440654816,
+    "low_max": 2.3396904580572886,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.063892821212533,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.1736022233552958,
+     "passes": true,
+     "separation": 1.2485869803867669
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.581616586008193,
+     "high_range": [
+      2.9213070440654816,
+      3.1079575927388703
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.296279742364429,
+      2.3396904580572886
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "arm_fold": {
+     "m099": 1.014147266471488,
+     "m0999": 1.0407938581466492
+    },
+    "direction": 0,
+    "floor": 1.0407938581466492,
+    "floor_arm": "m0999",
+    "high_min": null,
+    "low_max": null,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      2.4746351702991007,
+      2.5755850864009915
+     ],
+     "low_range": [
+      2.1119397055194593,
+      2.1418178793051585
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "arm_fold": {
+     "m099": 1.0268703182712062,
+     "m0999": 1.0684575535258765
+    },
+    "direction": -1,
+    "floor": 1.0684575535258765,
+    "floor_arm": "m0999",
+    "high_min": 1.1119397055194593,
+    "low_max": 1.5755850864009915,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0684575535258765,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.6605141158962554,
+     "passes": false,
+     "separation": 0.7057312963398202
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.4636453808815322,
+     "high_range": [
+      1.4746351702991007,
+      1.5755850864009915
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": true,
+     "low_range": [
+      1.1119397055194593,
+      1.1418178793051585
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "hard_rank": {
+    "arm_fold": {
+     "m099": 1.0,
+     "m0999": 1.0
+    },
+    "direction": 1,
+    "floor": 1.0,
+    "floor_arm": "m0999",
+    "high_min": 256.0,
+    "low_max": 256.0,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "arm_fold": {
+     "m099": 1.078152703768568,
+     "m0999": 1.175769126180244
+    },
+    "direction": 1,
+    "floor": 1.175769126180244,
+    "floor_arm": "m0999",
+    "high_min": 2.209361300163773,
+    "low_max": 2.009930339546276,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.175769126180244,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.934896824279163,
+     "passes": false,
+     "separation": 1.0992228221513967
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.19943096061749666,
+     "high_range": [
+      2.209361300163773,
+      2.597698805310007
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.8642353096372883,
+      2.009930339546276
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   }
+  },
+  "200": {
+   "PR": {
+    "arm_fold": {
+     "m099": 1.6556678921386947,
+     "m0999": 1.3294015948993603
+    },
+    "direction": 1,
+    "floor": 1.6556678921386947,
+    "floor_arm": "m099",
+    "high_min": 3.5272466724344764,
+    "low_max": 4.334947815785373,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.6556678921386947,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.4914493125543398,
+     "passes": false,
+     "separation": 0.8136768474098544
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.8077011433508967,
+     "high_range": [
+      3.5272466724344764,
+      4.689127351937854
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.6182471958103517,
+      4.334947815785373
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "arm_fold": {
+     "m099": 1.6556678930950042,
+     "m0999": 1.3294016036621217
+    },
+    "direction": 1,
+    "floor": 1.6556678930950042,
+    "floor_arm": "m099",
+    "high_min": 3.527246649127509,
+    "low_max": 4.334947801218163,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.6556678930950042,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.4914493106746053,
+     "passes": false,
+     "separation": 0.8136768447676159
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.8077011520906536,
+     "high_range": [
+      3.527246649127509,
+      4.689127351861956
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.6182471854996696,
+      4.334947801218163
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "arm_fold": {
+     "m099": 1.3368142321518555,
+     "m0999": 1.0910782071291218
+    },
+    "direction": 1,
+    "floor": 1.3368142321518555,
+    "floor_arm": "m099",
+    "high_min": 11.319743820023888,
+    "low_max": 9.607625338633099,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3368142321518555,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8813521715894926,
+     "passes": false,
+     "separation": 1.178204126518778
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 1.7121184813907888,
+     "high_range": [
+      11.319743820023888,
+      12.350725792312621
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      7.186956203456787,
+      9.607625338633099
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "arm_fold": {
+     "m099": 1.3368141151748703,
+     "m0999": 1.0910782126743526
+    },
+    "direction": 1,
+    "floor": 1.3368141151748703,
+    "floor_arm": "m099",
+    "high_min": 11.319743701053406,
+    "low_max": 9.607625461427316,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3368141151748703,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.881352228184103,
+     "passes": false,
+     "separation": 1.178204099077332
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 1.7121182396260899,
+     "high_range": [
+      11.319743701053406,
+      12.350725725277112
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      7.186956924202234,
+      9.607625461427316
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "arm_fold": {
+     "m099": 1.145359398449413,
+     "m0999": 1.3028081162024179
+    },
+    "direction": 1,
+    "floor": 1.3028081162024179,
+    "floor_arm": "m0999",
+    "high_min": 3.024985942251803,
+    "low_max": 2.447419626040861,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3028081162024179,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9487121595415521,
+     "passes": false,
+     "separation": 1.2359899013906572
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.5775663162109419,
+     "high_range": [
+      3.024985942251803,
+      3.9409762369638672
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.136813675562602,
+      2.447419626040861
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "arm_fold": {
+     "m099": 1.3601176068540413,
+     "m0999": 1.125050001450834
+    },
+    "direction": 1,
+    "floor": 1.3601176068540413,
+    "floor_arm": "m099",
+    "high_min": 6.704212959292538,
+    "low_max": 6.465695455364208,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3601176068540413,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7623529650894635,
+     "passes": false,
+     "separation": 1.0368896904555636
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.23851750392833004,
+     "high_range": [
+      6.704212959292538,
+      7.54257479957877
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      4.7537767489970175,
+      6.465695455364208
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "arm_fold": {
+     "m099": 1.103603521252686,
+     "m0999": 1.2360250683012532
+    },
+    "direction": 1,
+    "floor": 1.2360250683012532,
+    "floor_arm": "m0999",
+    "high_min": 1.659643622528284,
+    "low_max": 1.5279659933480514,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2360250683012532,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8787672715548075,
+     "passes": false,
+     "separation": 1.0861783768444369
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.13167762918023262,
+     "high_range": [
+      1.659643622528284,
+      2.0513611218912615
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.384524391163302,
+      1.5279659933480514
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "arm_fold": {
+     "m099": 1.360117551311269,
+     "m0999": 1.1250500094542053
+    },
+    "direction": 1,
+    "floor": 1.360117551311269,
+    "floor_arm": "m099",
+    "high_min": 6.704212884176427,
+    "low_max": 6.46569551537717,
+    "test_A_published_single_draw": {
+     "floor": 1.360117551311269,
+     "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+     "margin": 0.9277909550451564,
+     "passes": false,
+     "published_high": 7.42,
+     "published_low": 5.88,
+     "separation": 1.2619047619047619,
+     "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.360117551311269,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7623529806038647,
+     "passes": false,
+     "separation": 1.036889669213776
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.23851736879925767,
+     "high_range": [
+      6.704212884176427,
+      7.542574768725695
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      4.753776987249145,
+      6.46569551537717
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "arm_fold": {
+     "m099": 1.1453489198146314,
+     "m0999": 1.3028025831523402
+    },
+    "direction": 1,
+    "floor": 1.3028025831523402,
+    "floor_arm": "m0999",
+    "high_min": 3.0256955319609076,
+    "low_max": 2.4480386753860626,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3028025831523402,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9486987715063447,
+     "passes": false,
+     "separation": 1.2359672101519177
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.577656856574845,
+     "high_range": [
+      3.0256955319609076,
+      3.9418839548711646
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.1373737147124254,
+      2.4480386753860626
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "arm_fold": {
+     "m099": 1.1823893861509862,
+     "m0999": 1.035058903937101
+    },
+    "direction": 0,
+    "floor": 1.1823893861509862,
+    "floor_arm": "m099",
+    "high_min": null,
+    "low_max": null,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      2.6578941682024926,
+      2.7510770245204847
+     ],
+     "low_range": [
+      2.434797971724215,
+      2.8788792791886606
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "arm_fold": {
+     "m099": 1.30950790021733,
+     "m0999": 1.0562055516601654
+    },
+    "direction": -1,
+    "floor": 1.30950790021733,
+    "floor_arm": "m099",
+    "high_min": 1.434797971724215,
+    "low_max": 1.7510770245204847,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.30950790021733,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.6257161744673262,
+     "passes": false,
+     "separation": 0.8193802737587288
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.3162790527962698,
+     "high_range": [
+      1.6578941682024926,
+      1.7510770245204847
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.434797971724215,
+      1.8788792791886606
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "hard_rank": {
+    "arm_fold": {
+     "m099": 1.0,
+     "m0999": 1.0
+    },
+    "direction": 1,
+    "floor": 1.0,
+    "floor_arm": "m0999",
+    "high_min": 256.0,
+    "low_max": 256.0,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "arm_fold": {
+     "m099": 1.5976242153310831,
+     "m0999": 1.482323599737083
+    },
+    "direction": 1,
+    "floor": 1.5976242153310831,
+    "floor_arm": "m099",
+    "high_min": 2.1875850776577934,
+    "low_max": 2.870098191504529,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.5976242153310831,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.4770825837921307,
+     "passes": false,
+     "separation": 0.7621986885790285
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.6825131138467357,
+     "high_range": [
+      2.1875850776577934,
+      3.2427089870448262
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.7964788990818754,
+      2.870098191504529
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  },
+  "300": {
+   "PR": {
+    "arm_fold": {
+     "m099": 1.176149226805757,
+     "m0999": 1.297403308680872
+    },
+    "direction": 1,
+    "floor": 1.297403308680872,
+    "floor_arm": "m0999",
+    "high_min": 3.535442754558364,
+    "low_max": 3.608749860230217,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.297403308680872,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7551131412670303,
+     "passes": false,
+     "separation": 0.9796862879082519
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.07330710567185283,
+     "high_range": [
+      3.535442754558364,
+      4.586895127415838
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.0682755027872055,
+      3.608749860230217
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "arm_fold": {
+     "m099": 1.1761492225497145,
+     "m0999": 1.2974033017981514
+    },
+    "direction": 1,
+    "floor": 1.2974033017981514,
+    "floor_arm": "m0999",
+    "high_min": 3.535442755367534,
+    "low_max": 3.608749824999003,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2974033017981514,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.755113152817687,
+     "passes": false,
+     "separation": 0.9796862976968792
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.07330706963146882,
+     "high_range": [
+      3.535442755367534,
+      4.586895104132193
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.068275483935428,
+      3.608749824999003
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "arm_fold": {
+     "m099": 1.1280596137959484,
+     "m0999": 1.1031945413623825
+    },
+    "direction": 1,
+    "floor": 1.1280596137959484,
+    "floor_arm": "m099",
+    "high_min": 10.885211771353864,
+    "low_max": 7.943693443250433,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1280596137959484,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.2147372676227568,
+     "passes": true,
+     "separation": 1.3702960529780728
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 2.941518328103431,
+     "high_range": [
+      10.885211771353864,
+      12.008506207731132
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      7.041909262684894,
+      7.943693443250433
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "arm_fold": {
+     "m099": 1.1280595794330484,
+     "m0999": 1.1031945553762341
+    },
+    "direction": 1,
+    "floor": 1.1280595794330484,
+    "floor_arm": "m099",
+    "high_min": 10.885211893247114,
+    "low_max": 7.943693153562022,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1280595794330484,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.214737362527435,
+     "passes": true,
+     "separation": 1.3702961182943085
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 2.9415187396850913,
+     "high_range": [
+      10.885211893247114,
+      12.008506494746845
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      7.041909220392813,
+      7.943693153562022
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "arm_fold": {
+     "m099": 1.082602820182255,
+     "m0999": 1.3297105576772876
+    },
+    "direction": 1,
+    "floor": 1.3297105576772876,
+    "floor_arm": "m0999",
+    "high_min": 3.221540371766343,
+    "low_max": 2.3214955027507784,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3297105576772876,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0436109194664158,
+     "passes": true,
+     "separation": 1.3877004577217946
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9000448690155647,
+     "high_range": [
+      3.221540371766343,
+      4.283716244321321
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.1443649134037512,
+      2.3214955027507784
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "arm_fold": {
+     "m099": 1.1269970179973625,
+     "m0999": 1.1454614877376557
+    },
+    "direction": 1,
+    "floor": 1.1454614877376557,
+    "floor_arm": "m0999",
+    "high_min": 6.601499839686438,
+    "low_max": 5.6370001999531425,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1454614877376557,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0223840717215262,
+     "passes": true,
+     "separation": 1.1711015798334214
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9644996397332957,
+     "high_range": [
+      6.601499839686438,
+      7.561763827667122
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.001788034869791,
+      5.6370001999531425
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "arm_fold": {
+     "m099": 1.0489922916160235,
+     "m0999": 1.2636239054734588
+    },
+    "direction": 1,
+    "floor": 1.2636239054734588,
+    "floor_arm": "m0999",
+    "high_min": 1.7520325167759265,
+    "low_max": 1.4900614086665391,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2636239054734588,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.930508108184646,
+     "passes": false,
+     "separation": 1.1758122897390022
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.2619711081093874,
+     "high_range": [
+      1.7520325167759265,
+      2.2139101713648897
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.4204693595708193,
+      1.4900614086665391
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "arm_fold": {
+     "m099": 1.1269969990090847,
+     "m0999": 1.145461496451724
+    },
+    "direction": 1,
+    "floor": 1.145461496451724,
+    "floor_arm": "m0999",
+    "high_min": 6.601499858175177,
+    "low_max": 5.637000053310814,
+    "test_A_published_single_draw": {
+     "floor": 1.145461496451724,
+     "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+     "margin": 1.101656202162833,
+     "passes": true,
+     "published_high": 7.42,
+     "published_low": 5.88,
+     "separation": 1.2619047619047619,
+     "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.145461496451724,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0223840934036992,
+     "passes": true,
+     "separation": 1.1711016135786405
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9644998048643627,
+     "high_range": [
+      6.601499858175177,
+      7.561763906371182
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.00178798902496,
+      5.637000053310814
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "arm_fold": {
+     "m099": 1.0825952392671498,
+     "m0999": 1.3297007601021147
+    },
+    "direction": 1,
+    "floor": 1.3297007601021147,
+    "floor_arm": "m0999",
+    "high_min": 3.222308002764035,
+    "low_max": 2.322106392405078,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3297007601021147,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.043592667197865,
+     "passes": true,
+     "separation": 1.3876659628099943
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9002016103589572,
+     "high_range": [
+      3.222308002764035,
+      4.284705400558464
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.144944212000231,
+      2.322106392405078
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "arm_fold": {
+     "m099": 1.1139189316295288,
+     "m0999": 1.0870826137773129
+    },
+    "direction": 0,
+    "floor": 1.1139189316295288,
+    "floor_arm": "m099",
+    "high_min": null,
+    "low_max": null,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      2.7018917236483673,
+      2.937179517086956
+     ],
+     "low_range": [
+      2.7362087581867534,
+      3.0479147366347483
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "arm_fold": {
+     "m099": 1.1795325458290693,
+     "m0999": 1.138250741906306
+    },
+    "direction": -1,
+    "floor": 1.1795325458290693,
+    "floor_arm": "m099",
+    "high_min": 1.7362087581867534,
+    "low_max": 1.937179517086956,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1795325458290693,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7598399887435769,
+     "passes": false,
+     "separation": 0.8962559963454427
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.20097075890020255,
+     "high_range": [
+      1.7018917236483673,
+      1.937179517086956
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.7362087581867534,
+      2.0479147366347483
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "hard_rank": {
+    "arm_fold": {
+     "m099": 1.0,
+     "m0999": 1.0
+    },
+    "direction": 1,
+    "floor": 1.0,
+    "floor_arm": "m0999",
+    "high_min": 256.0,
+    "low_max": 256.0,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "arm_fold": {
+     "m099": 1.2509274812166338,
+     "m0999": 1.2971354203051113
+    },
+    "direction": 1,
+    "floor": 1.2971354203051113,
+    "floor_arm": "m0999",
+    "high_min": 2.551648961959243,
+    "low_max": 2.5093098659814244,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2971354203051113,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.78393727366626,
+     "passes": false,
+     "separation": 1.0168728049699272
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.04233909597781871,
+     "high_range": [
+      2.551648961959243,
+      3.3098342487421037
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.005959500978351,
+      2.5093098659814244
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   }
+  },
+  "400": {
+   "PR": {
+    "arm_fold": {
+     "m099": 1.3735358928166326,
+     "m0999": 1.222211204571059
+    },
+    "direction": 1,
+    "floor": 1.3735358928166326,
+    "floor_arm": "m099",
+    "high_min": 4.049585478090384,
+    "low_max": 4.581767401464823,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3735358928166326,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.6434836546300158,
+     "passes": false,
+     "separation": 0.8838478960751484
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.5321819233744396,
+     "high_range": [
+      4.049585478090384,
+      4.949448745190315
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.335746393979739,
+      4.581767401464823
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "arm_fold": {
+     "m099": 1.3735358921420089,
+     "m0999": 1.2222112159512017
+    },
+    "direction": 1,
+    "floor": 1.3735358921420089,
+    "floor_arm": "m099",
+    "high_min": 4.04958545203679,
+    "low_max": 4.581767413390353,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3735358921420089,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.6434836491312489,
+     "passes": false,
+     "separation": 0.8838478880882854
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.5321819613535634,
+     "high_range": [
+      4.04958545203679,
+      4.949448759432181
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.3357464043004765,
+      4.581767413390353
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "arm_fold": {
+     "m099": 1.1976739821952174,
+     "m0999": 1.1243272176961727
+    },
+    "direction": 1,
+    "floor": 1.1976739821952174,
+    "floor_arm": "m099",
+    "high_min": 10.982007489106726,
+    "low_max": 7.776792486966296,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1976739821952174,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.179078200013883,
+     "passes": true,
+     "separation": 1.4121512831301963
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 3.20521500214043,
+     "high_range": [
+      10.982007489106726,
+      12.347369924945898
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.493246578432144,
+      7.776792486966296
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "arm_fold": {
+     "m099": 1.1976739582719174,
+     "m0999": 1.1243272029247167
+    },
+    "direction": 1,
+    "floor": 1.1976739582719174,
+    "floor_arm": "m099",
+    "high_min": 10.982007574227328,
+    "low_max": 7.776792412455773,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1976739582719174,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.1790782440015826,
+     "passes": true,
+     "separation": 1.412151307605677
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 3.205215161771555,
+     "high_range": [
+      10.982007574227328,
+      12.347369858429063
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.493246645920764,
+      7.776792412455773
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "arm_fold": {
+     "m099": 1.1183502424481668,
+     "m0999": 1.2938944413917561
+    },
+    "direction": 1,
+    "floor": 1.2938944413917561,
+    "floor_arm": "m0999",
+    "high_min": 3.1145952879291126,
+    "low_max": 2.4833026943941796,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2938944413917561,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9693332616394494,
+     "passes": false,
+     "separation": 1.2542149190914245
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.6312925935349329,
+     "high_range": [
+      3.1145952879291126,
+      4.029957530236435
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.220505348090248,
+      2.4833026943941796
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "arm_fold": {
+     "m099": 1.2497160895214645,
+     "m0999": 1.1495256683519883
+    },
+    "direction": 1,
+    "floor": 1.2497160895214645,
+    "floor_arm": "m099",
+    "high_min": 7.0414839636327935,
+    "low_max": 6.0640838210259345,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2497160895214645,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9291538647155819,
+     "passes": false,
+     "separation": 1.161178534376113
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.977400142606859,
+     "high_range": [
+      7.0414839636327935,
+      8.094366559484795
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      4.852369167582667,
+      6.0640838210259345
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "arm_fold": {
+     "m099": 1.07977208806782,
+     "m0999": 1.2333393425523203
+    },
+    "direction": 1,
+    "floor": 1.2333393425523203,
+    "floor_arm": "m0999",
+    "high_min": 1.71045737522957,
+    "low_max": 1.5628107528114177,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2333393425523203,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8874078781229322,
+     "passes": false,
+     "separation": 1.0944750489798867
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.1476466224181523,
+     "high_range": [
+      1.71045737522957,
+      2.109574374629405
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.4473524274997356,
+      1.5628107528114177
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "arm_fold": {
+     "m099": 1.2497160738302187,
+     "m0999": 1.1495256539166905
+    },
+    "direction": 1,
+    "floor": 1.2497160738302187,
+    "floor_arm": "m099",
+    "high_min": 7.041484018124886,
+    "low_max": 6.064083801593735,
+    "test_A_published_single_draw": {
+     "floor": 1.2497160738302187,
+     "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+     "margin": 1.0097531658028422,
+     "passes": true,
+     "published_high": 7.42,
+     "published_low": 5.88,
+     "separation": 1.2619047619047619,
+     "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2497160738302187,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9291538865498111,
+     "passes": false,
+     "separation": 1.1611785470831184
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9774002165311515,
+     "high_range": [
+      7.041484018124886,
+      8.094366520478935
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      4.852369212958988,
+      6.064083801593735
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "arm_fold": {
+     "m099": 1.1183452949582828,
+     "m0999": 1.2938861900044203
+    },
+    "direction": 1,
+    "floor": 1.2938861900044203,
+    "floor_arm": "m0999",
+    "high_min": 3.1153457705398613,
+    "low_max": 2.4839743323237387,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2938861900044203,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9693108507914864,
+     "passes": false,
+     "separation": 1.2541779236605395
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.6313714382161226,
+     "high_range": [
+      3.1153457705398613,
+      4.030902869590206
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2211157354727344,
+      2.4839743323237387
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "arm_fold": {
+     "m099": 1.1680820837862589,
+     "m0999": 1.0557155306641286
+    },
+    "direction": 0,
+    "floor": 1.1680820837862589,
+    "floor_arm": "m099",
+    "high_min": null,
+    "low_max": null,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      2.7862166689266528,
+      2.941452209181142
+     ],
+     "low_range": [
+      2.9810287931132495,
+      3.482086324486561
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "arm_fold": {
+     "m099": 1.252927939823572,
+     "m0999": 1.08690745246923
+    },
+    "direction": -1,
+    "floor": 1.252927939823572,
+    "floor_arm": "m099",
+    "high_min": 1.9810287931132495,
+    "low_max": 1.9414522091811421,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.252927939823572,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8144004208922788,
+     "passes": false,
+     "separation": 1.0203850415400129
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.03957658393210739,
+     "high_range": [
+      1.7862166689266528,
+      1.9414522091811421
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.9810287931132495,
+      2.482086324486561
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "hard_rank": {
+    "arm_fold": {
+     "m099": 1.0,
+     "m0999": 1.0
+    },
+    "direction": 1,
+    "floor": 1.0,
+    "floor_arm": "m0999",
+    "high_min": 256.0,
+    "low_max": 256.0,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "arm_fold": {
+     "m099": 1.3955246571172382,
+     "m0999": 1.233000307964287
+    },
+    "direction": 1,
+    "floor": 1.3955246571172382,
+    "floor_arm": "m099",
+    "high_min": 2.5734349083132497,
+    "low_max": 3.1969305231178087,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3955246571172382,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5768228757320362,
+     "passes": false,
+     "separation": 0.8049705458733291
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.623495614804559,
+     "high_range": [
+      2.5734349083132497,
+      3.173046034476284
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2908448853363645,
+      3.1969305231178087
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  },
+  "500": {
+   "PR": {
+    "arm_fold": {
+     "m099": 1.1582573591421972,
+     "m0999": 1.1491688687795176
+    },
+    "direction": 1,
+    "floor": 1.1582573591421972,
+    "floor_arm": "m099",
+    "high_min": 3.979904566122044,
+    "low_max": 4.487728735251359,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1582573591421972,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7656688736900403,
+     "passes": false,
+     "separation": 0.8868416076176067
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.5078241691293153,
+     "high_range": [
+      3.979904566122044,
+      4.573582428100906
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.874552317608378,
+      4.487728735251359
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "arm_fold": {
+     "m099": 1.1582573557765012,
+     "m0999": 1.1491688646180462
+    },
+    "direction": 1,
+    "floor": 1.1582573557765012,
+    "floor_arm": "m099",
+    "high_min": 3.9799045893825893,
+    "low_max": 4.487728733075552,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1582573557765012,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7656688807611152,
+     "passes": false,
+     "separation": 0.8868416132307225
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.5078241436929627,
+     "high_range": [
+      3.9799045893825893,
+      4.573582438268942
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.8745523269886397,
+      4.487728733075552
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "arm_fold": {
+     "m099": 1.0831004722166573,
+     "m0999": 1.0877181699295833
+    },
+    "direction": 1,
+    "floor": 1.0877181699295833,
+    "floor_arm": "m0999",
+    "high_min": 10.73501428254739,
+    "low_max": 7.266021866988833,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0877181699295833,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.3582807404920259,
+     "passes": true,
+     "separation": 1.4774266412985855
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 3.4689924155585565,
+     "high_range": [
+      10.73501428254739,
+      11.676670089580385
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.7085390999029855,
+      7.266021866988833
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "arm_fold": {
+     "m099": 1.0831004188212894,
+     "m0999": 1.0877181780098637
+    },
+    "direction": 1,
+    "floor": 1.0877181780098637,
+    "floor_arm": "m0999",
+    "high_min": 10.735014368081067,
+    "low_max": 7.2660216722742375,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0877181780098637,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.358280777623402,
+     "passes": true,
+     "separation": 1.4774266926623476
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 3.46899269580683,
+     "high_range": [
+      10.735014368081067,
+      11.676670269358848
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.7085392508495785,
+      7.2660216722742375
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "arm_fold": {
+     "m099": 1.112427428220871,
+     "m0999": 1.250735526861532
+    },
+    "direction": 1,
+    "floor": 1.250735526861532,
+    "floor_arm": "m0999",
+    "high_min": 2.900548379043024,
+    "low_max": 2.4313473586862395,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.250735526861532,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9538226209873891,
+     "passes": false,
+     "separation": 1.1929798383931096
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.4692010203567847,
+     "high_range": [
+      2.900548379043024,
+      3.6278189050497396
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.185623346751478,
+      2.4313473586862395
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "arm_fold": {
+     "m099": 1.1066379705014857,
+     "m0999": 1.1045004424376565
+    },
+    "direction": 1,
+    "floor": 1.1066379705014857,
+    "floor_arm": "m099",
+    "high_min": 6.946070189225599,
+    "low_max": 5.879798018665052,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1066379705014857,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0675081330225138,
+     "passes": true,
+     "separation": 1.1813450338218647
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 1.0662721705605476,
+     "high_range": [
+      6.946070189225599,
+      7.6719375972026915
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.313208271717402,
+      5.879798018665052
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "arm_fold": {
+     "m099": 1.068557332801775,
+     "m0999": 1.1726617259552992
+    },
+    "direction": 1,
+    "floor": 1.1726617259552992,
+    "floor_arm": "m0999",
+    "high_min": 1.6300293239156558,
+    "low_max": 1.5453408889843032,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1726617259552992,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8994942070931202,
+     "passes": false,
+     "separation": 1.0548024293766116
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.08468843493135259,
+     "high_range": [
+      1.6300293239156558,
+      1.9114730003406823
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.446193705799944,
+      1.5453408889843032
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "arm_fold": {
+     "m099": 1.106637944416466,
+     "m0999": 1.1045004316241003
+    },
+    "direction": 1,
+    "floor": 1.106637944416466,
+    "floor_arm": "m099",
+    "high_min": 6.94607019234508,
+    "low_max": 5.879797955594692,
+    "test_A_published_single_draw": {
+     "floor": 1.106637944416466,
+     "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+     "margin": 1.1403049825570264,
+     "passes": true,
+     "published_high": 7.42,
+     "published_low": 5.88,
+     "separation": 1.2619047619047619,
+     "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.106637944416466,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0675081701153613,
+     "passes": true,
+     "separation": 1.1813450470242466
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 1.0662722367503878,
+     "high_range": [
+      6.94607019234508,
+      7.671937525536438
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.313208339964459,
+      5.879797955594692
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "arm_fold": {
+     "m099": 1.1124211115890195,
+     "m0999": 1.250725737097205
+    },
+    "direction": 1,
+    "floor": 1.250725737097205,
+    "floor_arm": "m0999",
+    "high_min": 2.901258830524661,
+    "low_max": 2.4320242175098477,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.250725737097205,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9537981887254602,
+     "passes": false,
+     "separation": 1.1929399426356302
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.4692346130148133,
+     "high_range": [
+      2.901258830524661,
+      3.6286790893177314
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.186244212891522,
+      2.4320242175098477
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "arm_fold": {
+     "m099": 1.1085173973455231,
+     "m0999": 1.0733460443168006
+    },
+    "direction": 0,
+    "floor": 1.1085173973455231,
+    "floor_arm": "m099",
+    "high_min": null,
+    "low_max": null,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      2.800521662193527,
+      3.0059288481389337
+     ],
+     "low_range": [
+      3.0595155931542766,
+      3.391526262461423
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "arm_fold": {
+     "m099": 1.1612081357435373,
+     "m0999": 1.1140820409209433
+    },
+    "direction": -1,
+    "floor": 1.1612081357435373,
+    "floor_arm": "m099",
+    "high_min": 2.0595155931542766,
+    "low_max": 2.0059288481389337,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1612081357435373,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8841775636467027,
+     "passes": false,
+     "separation": 1.0267141803484505
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.053586745015342885,
+     "high_range": [
+      1.800521662193527,
+      2.0059288481389337
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.0595155931542766,
+      2.391526262461423
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "hard_rank": {
+    "arm_fold": {
+     "m099": 1.0,
+     "m0999": 1.0
+    },
+    "direction": 1,
+    "floor": 1.0,
+    "floor_arm": "m0999",
+    "high_min": 256.0,
+    "low_max": 256.0,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "arm_fold": {
+     "m099": 1.283003527790649,
+     "m0999": 1.1187850724823951
+    },
+    "direction": 1,
+    "floor": 1.283003527790649,
+    "floor_arm": "m099",
+    "high_min": 2.5857613584948203,
+    "low_max": 3.2759136576106,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.283003527790649,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.6152167397642169,
+     "passes": false,
+     "separation": 0.789325247473352
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.6901522991157796,
+     "high_range": [
+      2.5857613584948203,
+      2.892911208885804
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.553316173067561,
+      3.2759136576106
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  },
+  "600": {
+   "PR": {
+    "arm_fold": {
+     "m099": 1.2928777365007125,
+     "m0999": 1.432109839530745
+    },
+    "direction": 1,
+    "floor": 1.432109839530745,
+    "floor_arm": "m0999",
+    "high_min": 3.3607837044209377,
+    "low_max": 4.4547098992773195,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.432109839530745,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5267988364470901,
+     "passes": false,
+     "separation": 0.7544337971292254
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -1.0939261948563819,
+     "high_range": [
+      3.3607837044209377,
+      4.813011411635812
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.4455770824350216,
+      4.4547098992773195
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "arm_fold": {
+     "m099": 1.29287773353319,
+     "m0999": 1.4321098437380828
+    },
+    "direction": 1,
+    "floor": 1.4321098437380828,
+    "floor_arm": "m0999",
+    "high_min": 3.360783694010584,
+    "low_max": 4.454709895149889,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.4321098437380828,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5267988337557146,
+     "passes": false,
+     "separation": 0.7544337954913006
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -1.0939262011393045,
+     "high_range": [
+      3.360783694010584,
+      4.813011410866994
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.4455770871511646,
+      4.454709895149889
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "arm_fold": {
+     "m099": 1.102409056358124,
+     "m0999": 1.1546857664257222
+    },
+    "direction": 1,
+    "floor": 1.1546857664257222,
+    "floor_arm": "m0999",
+    "high_min": 10.353053898700356,
+    "low_max": 7.124056271899402,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1546857664257222,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.2585698432761239,
+     "passes": true,
+     "separation": 1.4532526840835922
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 3.228997626800954,
+     "high_range": [
+      10.353053898700356,
+      11.954523975867632
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.4622621075285425,
+      7.124056271899402
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "arm_fold": {
+     "m099": 1.1024090320823483,
+     "m0999": 1.1546857605655423
+    },
+    "direction": 1,
+    "floor": 1.1546857605655423,
+    "floor_arm": "m0999",
+    "high_min": 10.353053774877592,
+    "low_max": 7.124056180947778,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1546857605655423,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.2585698506789533,
+     "passes": true,
+     "separation": 1.4532526852560883
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 3.2289975939298143,
+     "high_range": [
+      10.353053774877592,
+      11.95452377222049
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.462262167329215,
+      7.124056180947778
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "arm_fold": {
+     "m099": 1.121944073859218,
+     "m0999": 1.1554045332264102
+    },
+    "direction": 1,
+    "floor": 1.1554045332264102,
+    "floor_arm": "m0999",
+    "high_min": 2.9335658750518805,
+    "low_max": 2.4872254216257854,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1554045332264102,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0208140290422487,
+     "passes": true,
+     "separation": 1.1794531567365305
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.4463404534260951,
+     "high_range": [
+      2.9335658750518805,
+      3.3894553105532435
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2168889515769963,
+      2.4872254216257854
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "arm_fold": {
+     "m099": 1.15155455588874,
+     "m0999": 1.194698925496616
+    },
+    "direction": 1,
+    "floor": 1.194698925496616,
+    "floor_arm": "m0999",
+    "high_min": 6.741089597410748,
+    "low_max": 5.921633903434204,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.194698925496616,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9528621414224372,
+     "passes": false,
+     "separation": 1.1383833765037903
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.8194556939765443,
+     "high_range": [
+      6.741089597410748,
+      8.053572498703037
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.142295580485148,
+      5.921633903434204
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "arm_fold": {
+     "m099": 1.0764040970517632,
+     "m0999": 1.083394479289655
+    },
+    "direction": 1,
+    "floor": 1.083394479289655,
+    "floor_arm": "m0999",
+    "high_min": 1.669406189496626,
+    "low_max": 1.578755276689415,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.083394479289655,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9760242003314301,
+     "passes": false,
+     "separation": 1.0574192302921717
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.09065091280721083,
+     "high_range": [
+      1.669406189496626,
+      1.8086254493926242
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.4666938569014887,
+      1.578755276689415
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "arm_fold": {
+     "m099": 1.1515545377045124,
+     "m0999": 1.1946989118770555
+    },
+    "direction": 1,
+    "floor": 1.1946989118770555,
+    "floor_arm": "m0999",
+    "high_min": 6.741089600172154,
+    "low_max": 5.92163385541985,
+    "test_A_published_single_draw": {
+     "floor": 1.1946989118770555,
+     "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+     "margin": 1.0562533784534178,
+     "passes": true,
+     "published_high": 7.42,
+     "published_low": 5.88,
+     "separation": 1.2619047619047619,
+     "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1946989118770555,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9528621604014758,
+     "passes": false,
+     "separation": 1.1383833862004633
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.8194557447523039,
+     "high_range": [
+      6.741089600172154,
+      8.053572410191407
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.14229561999202,
+      5.92163385541985
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "arm_fold": {
+     "m099": 1.1219325955158728,
+     "m0999": 1.155397215245086
+    },
+    "direction": 1,
+    "floor": 1.155397215245086,
+    "floor_arm": "m0999",
+    "high_min": 2.93428863990152,
+    "low_max": 2.4879258932076924,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.155397215245086,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0207845206886128,
+     "passes": true,
+     "separation": 1.179411592568913
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.44636274669382736,
+     "high_range": [
+      2.93428863990152,
+      3.3902689232675067
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.217535976003733,
+      2.4879258932076924
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "arm_fold": {
+     "m099": 1.1008525276053474,
+     "m0999": 1.0493251429083044
+    },
+    "direction": 0,
+    "floor": 1.1008525276053474,
+    "floor_arm": "m099",
+    "high_min": null,
+    "low_max": null,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      3.0090043323115157,
+      3.157423901014488
+     ],
+     "low_range": [
+      3.266702240352273,
+      3.596157418225851
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "arm_fold": {
+     "m099": 1.1453455914978832,
+     "m0999": 1.0738771770253994
+    },
+    "direction": -1,
+    "floor": 1.1453455914978832,
+    "floor_arm": "m099",
+    "high_min": 2.266702240352273,
+    "low_max": 2.157423901014488,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1453455914978832,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9173233313739145,
+     "passes": false,
+     "separation": 1.0506522335672648
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.10927833933778519,
+     "high_range": [
+      2.0090043323115157,
+      2.157423901014488
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.266702240352273,
+      2.596157418225851
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "hard_rank": {
+    "arm_fold": {
+     "m099": 1.0,
+     "m0999": 1.0
+    },
+    "direction": 1,
+    "floor": 1.0,
+    "floor_arm": "m0999",
+    "high_min": 256.0,
+    "low_max": 256.0,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "arm_fold": {
+     "m099": 1.272741364590777,
+     "m0999": 1.3711248212375562
+    },
+    "direction": 1,
+    "floor": 1.3711248212375562,
+    "floor_arm": "m0999",
+    "high_min": 2.117984416680568,
+    "low_max": 2.827746030541351,
+    "test_A_published_single_draw": {
+     "passes": null,
+     "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+    },
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3711248212375562,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5462675038300335,
+     "passes": false,
+     "separation": 0.7490009335368408
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.709761613860783,
+     "high_range": [
+      2.117984416680568,
+      2.904021004705074
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2217758526694484,
+      2.827746030541351
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  }
+ },
+ "by_step_note": "The same two arms, the same repeats, the same three tests, at every step the probe states were exported. A verdict that changes with the reading step is a fact about the reading step. Test C is the one to watch: it is the only one of the three that does not depend on a ratio.",
+ "config": {
+  "arms": [
+   "0.999",
+   "0.99"
+  ],
+  "rep_offset": 0,
+  "reps": 5,
+  "root": "/home/ubuntu/e0_run/d1_probefloor600",
+  "statistic_sites": {
+   "PR/PR_rownorm/RankMe/stable_rank/alpha_req/LiDAR": "v2/research/rebase/p2/p2_competing_metrics.py",
+   "R1/R2/R3/R1_uncentred/R1_rownorm/R2_uncentred": "v2/calibra/spectral.py RANK_VARIANTS -- one implementation",
+   "STATISTICS/_fold/_sha256": "v2/research/rebase/p2/p2_envelope_floors.py -- imported, not restated",
+   "hard_rank": "numpy.linalg.matrix_rank -- NOT an effective rank"
+  },
+  "step": 600,
+  "view": "wsi_biology"
+ },
+ "duplicates_on_this_block": {
+  "duplicate_of": {
+   "PR_rownorm": "PR",
+   "R1_rownorm": "R1",
+   "R1_uncentred": "RankMe",
+   "R3": "R2"
+  },
+  "near_duplicates": {
+   "R1_uncentred ~= RankMe": 0.00029186145128138024
+  },
+  "thresholds": {
+   "duplicate": 1e-06,
+   "near_duplicate": 0.001
+  },
+  "why": "`z_biology` is L2-normalised at the model's output, so on this block `normalise_rows` is a no-op. A duplicate is NOT independent corroboration and is excluded from any count of agreeing statistics; a near-duplicate is excluded too and its relative difference is printed so the exclusion can be argued with.",
+  "worst_relative_difference": {
+   "PR_rownorm == PR": 6.030683095167615e-09,
+   "R1_rownorm == R1": 5.8588411583766727e-08,
+   "R3 == R2": 3.812542501820705e-08
+  }
+ },
+ "reps": {
+  "m099": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep1/probe_step600.npz",
+    "sha256": "c1d09dacf772e430ff05822cb53cd30ee392e148f660847da204bc9820cb3baa",
+    "views": {
+     "rna_biology": {
+      "PR": 3.4812657962537976,
+      "PR_rownorm": 3.4812657947884107,
+      "R1": 7.517676555846244,
+      "R1_rownorm": 7.517676500346925,
+      "R1_uncentred": 3.428461968948877,
+      "R2": 5.471206960811847,
+      "R2_uncentred": 2.023517707934457,
+      "R3": 5.471206938560424,
+      "RankMe": 3.429346485496639,
+      "alpha_req": 2.7188129852056258,
+      "alpha_req_abs_dev": 1.7188129852056258,
+      "hard_rank": 256.0,
+      "stable_rank": 2.350534789241038
+     },
+     "wsi_biology": {
+      "PR": 4.070740526717119,
+      "PR_rownorm": 4.070740518282696,
+      "R1": 6.935204377395353,
+      "R1_rownorm": 6.935204364150566,
+      "R1_uncentred": 2.346853613692709,
+      "R2": 5.630610394304518,
+      "R2_uncentred": 1.514051324448711,
+      "R3": 5.630610381784487,
+      "RankMe": 2.3475191354490526,
+      "alpha_req": 3.336844456528874,
+      "alpha_req_abs_dev": 2.336844456528874,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6912567466200565
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep2/probe_step600.npz",
+    "sha256": "fc5f67f9fe113a837317ba280a3b03ccc89f9505514d71626549b9b73f5bfdbd",
+    "views": {
+     "rna_biology": {
+      "PR": 3.661849183216074,
+      "PR_rownorm": 3.6618491751866564,
+      "R1": 7.506715248390978,
+      "R1_rownorm": 7.506715173204248,
+      "R1_uncentred": 3.5462806483206717,
+      "R2": 5.466888883354403,
+      "R2_uncentred": 2.0867391554039556,
+      "R3": 5.466888860065538,
+      "RankMe": 3.5471949896730623,
+      "alpha_req": 2.906410530610456,
+      "alpha_req_abs_dev": 1.9064105306104562,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7414797822143266
+     },
+     "wsi_biology": {
+      "PR": 3.4861207371348737,
+      "PR_rownorm": 3.486120741485074,
+      "R1": 6.913216715637349,
+      "R1_rownorm": 6.913216881581926,
+      "R1_uncentred": 2.4872254216257854,
+      "R2": 5.406754812763371,
+      "R2_uncentred": 1.578755276689415,
+      "R3": 5.406754907034655,
+      "RankMe": 2.4879258932076924,
+      "alpha_req": 3.4065902289301384,
+      "alpha_req_abs_dev": 2.4065902289301384,
+      "hard_rank": 256.0,
+      "stable_rank": 2.2217758526694484
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep3/probe_step600.npz",
+    "sha256": "4ae4da96bb451660092ca21a07376acb4825ad0517d002efc6b741a0b4d7565f",
+    "views": {
+     "rna_biology": {
+      "PR": 3.670123273023906,
+      "PR_rownorm": 3.670123261225888,
+      "R1": 7.8021457366489315,
+      "R1_rownorm": 7.8021457055512,
+      "R1_uncentred": 3.765802562269453,
+      "R2": 5.588772405359965,
+      "R2_uncentred": 2.1865548143499014,
+      "R3": 5.58877238594709,
+      "RankMe": 3.766760160997204,
+      "alpha_req": 3.1332926297770154,
+      "alpha_req_abs_dev": 2.1332926297770154,
+      "hard_rank": 256.0,
+      "stable_rank": 2.426389999610732
+     },
+     "wsi_biology": {
+      "PR": 3.4455770824350216,
+      "PR_rownorm": 3.4455770871511646,
+      "R1": 6.4622621075285425,
+      "R1_rownorm": 6.462262167329215,
+      "R1_uncentred": 2.2168889515769963,
+      "R2": 5.142295580485148,
+      "R2_uncentred": 1.4666938569014887,
+      "R3": 5.14229561999202,
+      "RankMe": 2.217535976003733,
+      "alpha_req": 3.596157418225851,
+      "alpha_req_abs_dev": 2.596157418225851,
+      "hard_rank": 256.0,
+      "stable_rank": 2.4748019028715995
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep4/probe_step600.npz",
+    "sha256": "46c7715c12801deaffb6391e2508da54e1b9ef27f5d66aa44dbaa530329ac571",
+    "views": {
+     "rna_biology": {
+      "PR": 4.376006969693911,
+      "PR_rownorm": 4.376006969257933,
+      "R1": 7.919313898595889,
+      "R1_rownorm": 7.919313834947696,
+      "R1_uncentred": 3.789331397221707,
+      "R2": 6.005665456360401,
+      "R2_uncentred": 2.1970835570501936,
+      "R3": 6.005665410940986,
+      "RankMe": 3.790298368940805,
+      "alpha_req": 2.805423313603619,
+      "alpha_req_abs_dev": 1.8054233136036189,
+      "hard_rank": 256.0,
+      "stable_rank": 3.185204064515646
+     },
+     "wsi_biology": {
+      "PR": 4.4547098992773195,
+      "PR_rownorm": 4.454709895149889,
+      "R1": 7.124056271899402,
+      "R1_rownorm": 7.124056180947778,
+      "R1_uncentred": 2.455185192433369,
+      "R2": 5.921633903434204,
+      "R2_uncentred": 1.5573875255779663,
+      "R3": 5.92163385541985,
+      "RankMe": 2.455879272263121,
+      "alpha_req": 3.266702240352273,
+      "alpha_req_abs_dev": 2.266702240352273,
+      "hard_rank": 256.0,
+      "stable_rank": 2.827746030541351
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep5/probe_step600.npz",
+    "sha256": "c664d2bd84f0048fde6b3bfc65c4bcd06655a90696bca61ed528d58c8824bcf7",
+    "views": {
+     "rna_biology": {
+      "PR": 3.472594313378298,
+      "PR_rownorm": 3.472594314266411,
+      "R1": 7.325689526518578,
+      "R1_rownorm": 7.325689536041914,
+      "R1_uncentred": 3.442683288973593,
+      "R2": 5.310193015508816,
+      "R2_uncentred": 2.042187180117237,
+      "R3": 5.310193007853644,
+      "RankMe": 3.4435765645370933,
+      "alpha_req": 2.906430918118544,
+      "alpha_req_abs_dev": 1.9064309181185441,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7534183312361793
+     },
+     "wsi_biology": {
+      "PR": 3.900187346572455,
+      "PR_rownorm": 3.9001873230516613,
+      "R1": 6.804758556914178,
+      "R1_rownorm": 6.804758158234207,
+      "R1_uncentred": 2.28651464529549,
+      "R2": 5.531764038002345,
+      "R2_uncentred": 1.4898429351426732,
+      "R3": 5.531763827101498,
+      "RankMe": 2.2871712600320873,
+      "alpha_req": 3.4150879368077316,
+      "alpha_req_abs_dev": 2.4150879368077316,
+      "hard_rank": 256.0,
+      "stable_rank": 2.5935954810227506
+     }
+    }
+   }
+  },
+  "m0999": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep1/probe_step600.npz",
+    "sha256": "333abe899e3afeaf590de0a45b547a4ca7594a2927dc394e3b261c7c8a280636",
+    "views": {
+     "rna_biology": {
+      "PR": 4.152330136842167,
+      "PR_rownorm": 4.152330123842125,
+      "R1": 12.436668340327495,
+      "R1_rownorm": 12.436668330598462,
+      "R1_uncentred": 6.566117188102326,
+      "R2": 7.587854933695098,
+      "R2_uncentred": 3.297546258756481,
+      "R3": 7.5878549131766855,
+      "RankMe": 6.567570665454399,
+      "alpha_req": 2.316147698047835,
+      "alpha_req_abs_dev": 1.316147698047835,
+      "hard_rank": 256.0,
+      "stable_rank": 2.9437675213357153
+     },
+     "wsi_biology": {
+      "PR": 3.3607837044209377,
+      "PR_rownorm": 3.360783694010584,
+      "R1": 10.93866668332793,
+      "R1_rownorm": 10.93866662345326,
+      "R1_uncentred": 3.012465134658713,
+      "R2": 6.971177995335019,
+      "R2_uncentred": 1.6857909349349236,
+      "R3": 6.971177983163769,
+      "RankMe": 3.013206576020344,
+      "alpha_req": 3.157423901014488,
+      "alpha_req_abs_dev": 2.157423901014488,
+      "hard_rank": 256.0,
+      "stable_rank": 2.1307675034500337
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep2/probe_step600.npz",
+    "sha256": "f7c135fd1e617c30a1255096fff47317b4ba50f150ea1438b02e34e07e51cac7",
+    "views": {
+     "rna_biology": {
+      "PR": 4.5253585613334115,
+      "PR_rownorm": 4.525358571753317,
+      "R1": 12.709160286079065,
+      "R1_rownorm": 12.70916031418067,
+      "R1_uncentred": 7.2055548315959514,
+      "R2": 7.9304448582082365,
+      "R2_uncentred": 3.6660184711103794,
+      "R3": 7.9304448756566,
+      "RankMe": 7.207135422186927,
+      "alpha_req": 2.3180628173296682,
+      "alpha_req_abs_dev": 1.3180628173296682,
+      "hard_rank": 256.0,
+      "stable_rank": 3.0248587162067664
+     },
+     "wsi_biology": {
+      "PR": 4.813011411635812,
+      "PR_rownorm": 4.813011410866994,
+      "R1": 11.954523975867632,
+      "R1_rownorm": 11.95452377222049,
+      "R1_uncentred": 3.3894553105532435,
+      "R2": 8.053572498703037,
+      "R2_uncentred": 1.8086254493926242,
+      "R3": 8.053572410191407,
+      "RankMe": 3.3902689232675067,
+      "alpha_req": 3.0090043323115157,
+      "alpha_req_abs_dev": 2.0090043323115157,
+      "hard_rank": 256.0,
+      "stable_rank": 2.904021004705074
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep3/probe_step600.npz",
+    "sha256": "a907950e6c98924f1394d622e3cd1057fde7e354fcaace2f1aafe701a84ae9b9",
+    "views": {
+     "rna_biology": {
+      "PR": 4.232079766041329,
+      "PR_rownorm": 4.232079768957421,
+      "R1": 11.84642151622174,
+      "R1_rownorm": 11.846421538401454,
+      "R1_uncentred": 6.6465108192608735,
+      "R2": 7.373188121142933,
+      "R2_uncentred": 3.4342829978906417,
+      "R3": 7.373188115644702,
+      "RankMe": 6.6479855040770275,
+      "alpha_req": 2.2472767664237314,
+      "alpha_req_abs_dev": 1.2472767664237314,
+      "hard_rank": 256.0,
+      "stable_rank": 3.1455869167612485
+     },
+     "wsi_biology": {
+      "PR": 4.459240043683346,
+      "PR_rownorm": 4.459240065301067,
+      "R1": 10.695832870420565,
+      "R1_rownorm": 10.695832925686867,
+      "R1_uncentred": 3.032216787659799,
+      "R2": 7.20454848797257,
+      "R2_uncentred": 1.700489872648057,
+      "R3": 7.204548582523358,
+      "RankMe": 3.032960150367147,
+      "alpha_req": 3.1080211702649456,
+      "alpha_req_abs_dev": 2.1080211702649456,
+      "hard_rank": 256.0,
+      "stable_rank": 2.8520362368366805
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep4/probe_step600.npz",
+    "sha256": "6b62cac2b1d2f5ba9f82207abd695b81afea7199fa46adf3446c2c36008d0948",
+    "views": {
+     "rna_biology": {
+      "PR": 3.9114815551580158,
+      "PR_rownorm": 3.911481564711301,
+      "R1": 11.515209998534578,
+      "R1_rownorm": 11.515210001699552,
+      "R1_uncentred": 6.128566292749447,
+      "R2": 7.070327434015528,
+      "R2_uncentred": 3.157658177313312,
+      "R3": 7.07032744851969,
+      "RankMe": 6.129936769869565,
+      "alpha_req": 2.3579984140382875,
+      "alpha_req_abs_dev": 1.3579984140382875,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6135177793940105
+     },
+     "wsi_biology": {
+      "PR": 3.4607092929815115,
+      "PR_rownorm": 3.4607092982260994,
+      "R1": 10.353053898700356,
+      "R1_rownorm": 10.353053774877592,
+      "R1_uncentred": 2.9335658750518805,
+      "R2": 6.741089597410748,
+      "R2_uncentred": 1.669406189496626,
+      "R3": 6.741089600172154,
+      "RankMe": 2.93428863990152,
+      "alpha_req": 3.0321914528484855,
+      "alpha_req_abs_dev": 2.0321914528484855,
+      "hard_rank": 256.0,
+      "stable_rank": 2.117984416680568
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep5/probe_step600.npz",
+    "sha256": "9b175c1b8f877bf9e5ed19df7e0802896bbd85cd718333d6e63cf9eb26d27feb",
+    "views": {
+     "rna_biology": {
+      "PR": 4.598413317574959,
+      "PR_rownorm": 4.598413315735822,
+      "R1": 12.108921054920973,
+      "R1_rownorm": 12.108920997550193,
+      "R1_uncentred": 6.866383648049719,
+      "R2": 7.686297060333073,
+      "R2_uncentred": 3.544421585289965,
+      "R3": 7.686297051929697,
+      "RankMe": 6.867904596326074,
+      "alpha_req": 2.3066007052413853,
+      "alpha_req_abs_dev": 1.3066007052413853,
+      "hard_rank": 256.0,
+      "stable_rank": 3.11157168804836
+     },
+     "wsi_biology": {
+      "PR": 4.229209360619513,
+      "PR_rownorm": 4.229209349673269,
+      "R1": 10.973499772869442,
+      "R1_rownorm": 10.97349991014277,
+      "R1_uncentred": 2.985868052764039,
+      "R2": 7.3478121405950025,
+      "R2_uncentred": 1.6757068584098587,
+      "R3": 7.347812141255589,
+      "RankMe": 2.9866041632107794,
+      "alpha_req": 3.143537326161937,
+      "alpha_req_abs_dev": 2.143537326161937,
+      "hard_rank": 256.0,
+      "stable_rank": 2.623846183721045
+     }
+    }
+   }
+  }
+ },
+ "tests": {
+  "PR": {
+   "arm_fold": {
+    "m099": 1.2928777365007125,
+    "m0999": 1.432109839530745
+   },
+   "direction": 1,
+   "floor": 1.432109839530745,
+   "floor_arm": "m0999",
+   "high_min": 3.3607837044209377,
+   "low_max": 4.4547098992773195,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.432109839530745,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.5267988364470901,
+    "passes": false,
+    "separation": 0.7544337971292254
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": null,
+    "gap": -1.0939261948563819,
+    "high_range": [
+     3.3607837044209377,
+     4.813011411635812
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     3.4455770824350216,
+     4.4547098992773195
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": false
+   }
+  },
+  "PR_rownorm": {
+   "arm_fold": {
+    "m099": 1.29287773353319,
+    "m0999": 1.4321098437380828
+   },
+   "direction": 1,
+   "floor": 1.4321098437380828,
+   "floor_arm": "m0999",
+   "high_min": 3.360783694010584,
+   "low_max": 4.454709895149889,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.4321098437380828,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.5267988337557146,
+    "passes": false,
+    "separation": 0.7544337954913006
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": null,
+    "gap": -1.0939262011393045,
+    "high_range": [
+     3.360783694010584,
+     4.813011410866994
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     3.4455770871511646,
+     4.454709895149889
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": false
+   }
+  },
+  "R1": {
+   "arm_fold": {
+    "m099": 1.102409056358124,
+    "m0999": 1.1546857664257222
+   },
+   "direction": 1,
+   "floor": 1.1546857664257222,
+   "floor_arm": "m0999",
+   "high_min": 10.353053898700356,
+   "low_max": 7.124056271899402,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.1546857664257222,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.2585698432761239,
+    "passes": true,
+    "separation": 1.4532526840835922
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 3.228997626800954,
+    "high_range": [
+     10.353053898700356,
+     11.954523975867632
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     6.4622621075285425,
+     7.124056271899402
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R1_rownorm": {
+   "arm_fold": {
+    "m099": 1.1024090320823483,
+    "m0999": 1.1546857605655423
+   },
+   "direction": 1,
+   "floor": 1.1546857605655423,
+   "floor_arm": "m0999",
+   "high_min": 10.353053774877592,
+   "low_max": 7.124056180947778,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.1546857605655423,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.2585698506789533,
+    "passes": true,
+    "separation": 1.4532526852560883
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 3.2289975939298143,
+    "high_range": [
+     10.353053774877592,
+     11.95452377222049
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     6.462262167329215,
+     7.124056180947778
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R1_uncentred": {
+   "arm_fold": {
+    "m099": 1.121944073859218,
+    "m0999": 1.1554045332264102
+   },
+   "direction": 1,
+   "floor": 1.1554045332264102,
+   "floor_arm": "m0999",
+   "high_min": 2.9335658750518805,
+   "low_max": 2.4872254216257854,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.1554045332264102,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.0208140290422487,
+    "passes": true,
+    "separation": 1.1794531567365305
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 0.4463404534260951,
+    "high_range": [
+     2.9335658750518805,
+     3.3894553105532435
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     2.2168889515769963,
+     2.4872254216257854
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R2": {
+   "arm_fold": {
+    "m099": 1.15155455588874,
+    "m0999": 1.194698925496616
+   },
+   "direction": 1,
+   "floor": 1.194698925496616,
+   "floor_arm": "m0999",
+   "high_min": 6.741089597410748,
+   "low_max": 5.921633903434204,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.194698925496616,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9528621414224372,
+    "passes": false,
+    "separation": 1.1383833765037903
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 0.8194556939765443,
+    "high_range": [
+     6.741089597410748,
+     8.053572498703037
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     5.142295580485148,
+     5.921633903434204
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R2_uncentred": {
+   "arm_fold": {
+    "m099": 1.0764040970517632,
+    "m0999": 1.083394479289655
+   },
+   "direction": 1,
+   "floor": 1.083394479289655,
+   "floor_arm": "m0999",
+   "high_min": 1.669406189496626,
+   "low_max": 1.578755276689415,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.083394479289655,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9760242003314301,
+    "passes": false,
+    "separation": 1.0574192302921717
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 0.09065091280721083,
+    "high_range": [
+     1.669406189496626,
+     1.8086254493926242
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     1.4666938569014887,
+     1.578755276689415
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "R3": {
+   "arm_fold": {
+    "m099": 1.1515545377045124,
+    "m0999": 1.1946989118770555
+   },
+   "direction": 1,
+   "floor": 1.1946989118770555,
+   "floor_arm": "m0999",
+   "high_min": 6.741089600172154,
+   "low_max": 5.92163385541985,
+   "test_A_published_single_draw": {
+    "floor": 1.1946989118770555,
+    "informative": "EITHER outcome is informative: the ratio is fixed (it is a property of two specific published runs) while the floor grows with repeats, so a crossing is a real change of verdict.",
+    "margin": 1.0562533784534178,
+    "passes": true,
+    "published_high": 7.42,
+    "published_low": 5.88,
+    "separation": 1.2619047619047619,
+    "src": "e0_run/d1_diag/long_m0.999.log and long_m0.99.log, step 600, column `eff-rank` -- the two runs `floor_audit.json`'s `5.4-m0999-over-m099` resolves its `a` and `b` from"
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.1946989118770555,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9528621604014758,
+    "passes": false,
+    "separation": 1.1383833862004633
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 0.8194557447523039,
+    "high_range": [
+     6.741089600172154,
+     8.053572410191407
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     5.14229561999202,
+     5.92163385541985
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "RankMe": {
+   "arm_fold": {
+    "m099": 1.1219325955158728,
+    "m0999": 1.155397215245086
+   },
+   "direction": 1,
+   "floor": 1.155397215245086,
+   "floor_arm": "m0999",
+   "high_min": 2.93428863990152,
+   "low_max": 2.4879258932076924,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.155397215245086,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 1.0207845206886128,
+    "passes": true,
+    "separation": 1.179411592568913
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 0.44636274669382736,
+    "high_range": [
+     2.93428863990152,
+     3.3902689232675067
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     2.217535976003733,
+     2.4879258932076924
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "alpha_req": {
+   "arm_fold": {
+    "m099": 1.1008525276053474,
+    "m0999": 1.0493251429083044
+   },
+   "direction": 0,
+   "floor": 1.1008525276053474,
+   "floor_arm": "m099",
+   "high_min": null,
+   "low_max": null,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "passes": null,
+    "why": "a non-finite value on one side"
+   },
+   "test_C_complete_separation": {
+    "direction": 0,
+    "high_range": [
+     3.0090043323115157,
+     3.157423901014488
+    ],
+    "low_range": [
+     3.266702240352273,
+     3.596157418225851
+    ],
+    "separated": null,
+    "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+   }
+  },
+  "alpha_req_abs_dev": {
+   "arm_fold": {
+    "m099": 1.1453455914978832,
+    "m0999": 1.0738771770253994
+   },
+   "direction": -1,
+   "floor": 1.1453455914978832,
+   "floor_arm": "m099",
+   "high_min": 2.266702240352273,
+   "low_max": 2.157423901014488,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.1453455914978832,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.9173233313739145,
+    "passes": false,
+    "separation": 1.0506522335672648
+   },
+   "test_C_complete_separation": {
+    "direction": -1,
+    "exact_one_sided_permutation_p": 0.003968253968253968,
+    "gap": 0.10927833933778519,
+    "high_range": [
+     2.0090043323115157,
+     2.157423901014488
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     2.266702240352273,
+     2.596157418225851
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": true
+   }
+  },
+  "hard_rank": {
+   "arm_fold": {
+    "m099": 1.0,
+    "m0999": 1.0
+   },
+   "direction": 1,
+   "floor": 1.0,
+   "floor_arm": "m0999",
+   "high_min": 256.0,
+   "low_max": 256.0,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.0,
+    "informative": "neither outcome is available from this statistic",
+    "margin": 1.0,
+    "passes": null,
+    "separation": 1.0,
+    "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+   },
+   "test_C_complete_separation": {
+    "constant": true,
+    "direction": 1,
+    "n_high": 5,
+    "n_low": 5,
+    "separated": null,
+    "value": 256.0,
+    "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+   }
+  },
+  "stable_rank": {
+   "arm_fold": {
+    "m099": 1.272741364590777,
+    "m0999": 1.3711248212375562
+   },
+   "direction": 1,
+   "floor": 1.3711248212375562,
+   "floor_arm": "m0999",
+   "high_min": 2.117984416680568,
+   "low_max": 2.827746030541351,
+   "test_A_published_single_draw": {
+    "passes": null,
+    "why": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs."
+   },
+   "test_B_worst_case_over_repeats": {
+    "floor": 1.3711248212375562,
+    "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+    "margin": 0.5462675038300335,
+    "passes": false,
+    "separation": 0.7490009335368408
+   },
+   "test_C_complete_separation": {
+    "direction": 1,
+    "exact_one_sided_permutation_p": null,
+    "gap": -0.709761613860783,
+    "high_range": [
+     2.117984416680568,
+     2.904021004705074
+    ],
+    "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+    "inverted": false,
+    "low_range": [
+     2.2217758526694484,
+     2.827746030541351
+    ],
+    "n_high": 5,
+    "n_low": 5,
+    "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+    "separated": false
+   }
+  }
+ }
+}

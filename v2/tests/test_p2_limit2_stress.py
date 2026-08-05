@@ -343,6 +343,85 @@ def test_the_ratio_verdict_flips_with_the_reading_step_and_the_order_verdict_doe
     assert a["200"] is False and a["600"] is True
 
 
+def test_at_ten_repeats_the_row_stops_clearing_its_own_floor(n10):
+    """The predeclared primary falsifier fired. §5.4 limit 2 does not clear at n = 10.
+
+    Doubling the repeats per arm moves the R3 floor from **1.195x to 1.326x**,
+    past the row's own published ratio of **1.262x**, so `p2_floor_audit.check`'s
+    rule -- the paper's rule, not a new one -- now returns FAIL for the one
+    selection this paper makes at the hyperparameter the project ships.
+
+    The whole increase is on the m = 0.99 arm, and it is one run: `m0.99 rep6`
+    reads R1 5.520 / R3 4.465 where the other nine span 6.462-7.124 / 5.142-5.922.
+    It is not excludable. It trained (`biology_contrastive` 7.575 at step 600
+    against chance ln 80 = 4.382), its R1 is nowhere near the collapsed arm's
+    ~1.5-2.7, and the project's own bimodality rule does not flag it
+    (`concordant` is False, so `bimodal` is False). It is what same-seed GPU
+    non-determinism does at m = 0.99 roughly one run in ten, and five repeats did
+    not see it.
+    """
+    t = n10["tests"]
+    assert t["R3"]["floor"] == pytest.approx(1.3263, abs=5e-4)
+    assert t["R3"]["test_A_published_single_draw"]["passes"] is False
+    assert t["R3"]["floor"] > S.PUBLISHED_TEST_A["R3"]["ratio"]
+    # The floor changed hands: at n = 5 the m = 0.999 arm carried it, at n = 10 the
+    # m = 0.99 arm does. The 2026-08-05 00:00 entry's "carried by m = 0.999" and
+    # "the smallest of the sixteen probe floors" are both overtaken.
+    assert t["R3"]["floor_arm"] == "m099"
+    assert t["R1"]["floor_arm"] == "m099"
+    # R1's ratio test still survives -- it was the one thing that could have
+    # broken and did not -- but it is now alone in doing so.
+    assert t["R1"]["test_B_worst_case_over_repeats"]["passes"] is True
+    for name in ("R1_uncentred", "RankMe", "R3", "R2", "R2_uncentred"):
+        assert t[name]["test_B_worst_case_over_repeats"]["passes"] is False, name
+
+
+def test_the_independent_second_five_reaches_the_same_verdict(n10):
+    """Not one unlucky draw: repeats 6-10 ALONE also put the floor above 1.262x.
+
+    This is the check that decides whether the n = 10 floor is a real widening or
+    an artifact of pooling two batches. Repeats 6-10 are an independent n = 5 --
+    same arms, same seed, same workspace, same 10-way concurrency, run 2h46m
+    after the first five. On their own they give an R3 floor of **1.279x**, which
+    is also above the row's 1.262x. Both halves of the twenty runs agree; the
+    ORIGINAL five were the favourable draw.
+
+    And there is no batch effect to blame it on: at m = 0.99 repeats 6-10 span
+    5.520-7.029 against repeats 1-5's 6.462-7.124, which OVERLAP, so the two
+    batches are samples of one spread rather than two levels.
+    """
+    late = _load(LATE5)
+    assert late["config"]["rep_offset"] == 5 and late["config"]["reps"] == 5
+    assert late["tests"]["R3"]["floor"] == pytest.approx(1.279, abs=1e-3)
+    assert late["tests"]["R3"]["test_A_published_single_draw"]["passes"] is False
+    assert late["tests"]["R1"]["test_B_worst_case_over_repeats"]["passes"] is True
+
+    early = {r: v["views"]["wsi_biology"]["R1"]
+             for r, v in n10["reps"]["m099"].items() if int(r[3:]) <= 5}
+    later = {r: v["views"]["wsi_biology"]["R1"]
+             for r, v in n10["reps"]["m099"].items() if int(r[3:]) > 5}
+    assert min(later.values()) < min(early.values())      # the later five reach lower
+    assert max(later.values()) > min(early.values())      # ... and still overlap
+    assert min(early.values()) < max(later.values())
+
+
+def test_the_arms_stay_completely_separated_at_ten_repeats(n10):
+    """What survives, and it survives more strongly than before.
+
+    Test C is the one test here that gets MORE surprising with more repeats, and
+    it holds: all ten m = 0.999 repeats above all ten m = 0.99 repeats, exact
+    one-sided permutation p = 1/184,756. So the honest residue of this row is an
+    ORDERING claim, not a ratio claim.
+    """
+    for name in ("R1", "R2", "R3", "R1_rownorm", "R1_uncentred", "RankMe"):
+        c = n10["tests"][name]["test_C_complete_separation"]
+        assert c["separated"] is True, name
+        assert c["exact_one_sided_permutation_p"] == pytest.approx(1 / 184756)
+    # It is not universal, and the exception is recorded rather than dropped:
+    # the uncentred order-2 variant loses the separation at ten repeats.
+    assert n10["tests"]["R2_uncentred"]["test_C_complete_separation"]["separated"] is False
+
+
 def test_more_repeats_can_only_move_test_B_against_the_pass(n5, n10):
     """The arithmetic the honesty of this whole exercise rests on.
 
@@ -359,6 +438,8 @@ def test_more_repeats_can_only_move_test_B_against_the_pass(n5, n10):
         if e5["floor"] is None or e10["floor"] is None:
             continue
         assert e10["floor"] >= e5["floor"] - 1e-9, f"{name}: floor shrank with more repeats"
-        s5 = e5["test_B_worst_case_over_repeats"]["separation"]
-        s10 = e10["test_B_worst_case_over_repeats"]["separation"]
+        s5 = e5["test_B_worst_case_over_repeats"].get("separation")
+        s10 = e10["test_B_worst_case_over_repeats"].get("separation")
+        if s5 is None or s10 is None:      # `alpha_req` has no agreed direction
+            continue
         assert s10 <= s5 + 1e-9, f"{name}: worst-case separation grew with more repeats"
