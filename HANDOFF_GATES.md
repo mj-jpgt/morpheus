@@ -1,3 +1,8 @@
+> **See also `PROJECT_GUIDE.md`** for current project state, the per-paper build plan, and the
+> broader methodology (predeclaration, pushing results until failure, canonical-function reuse,
+> shared-tree discipline). This file's gates remain the specific mandatory pre-flight checks for any
+> training run and are not superseded by it.
+
 # HANDOFF — HEALTH GATES (run these or your results mean nothing)
 
 **Purpose: stop us concluding "the science says no" when the truth is "the implementation was broken."**

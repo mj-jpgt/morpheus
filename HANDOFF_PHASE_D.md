@@ -1,3 +1,9 @@
+> # ⚠ ACTIVE ENTRY POINT IS NOW `PROJECT_GUIDE.md`
+> This file's build-phase content is historical — folded into the paper drafts long since. Read
+> `PROJECT_GUIDE.md` for current project state, the per-paper build plan, and the methodology rules.
+> Unlike this chain, `PROJECT_GUIDE.md` is not superseded by a newer handoff file — it is maintained
+> in place.
+
 # HANDOFF — PHASE D: build. **This supersedes the E-series as the active task list.**
 
 **Read in this order:** this file → `HANDOFF_GATES.md` (mandatory; G2 *liveness* matters most here because

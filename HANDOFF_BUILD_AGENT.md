@@ -1,7 +1,7 @@
-> # ⚠ ACTIVE TASK LIST IS NOW `HANDOFF_PHASE_D.md`
-> The E-series (E0–E5) is **closed**. E0/E0b/E3 have run; **F2 is WITHDRAWN** (the identity head
-> is the frozen MLP-CLIP teacher, 2.6e-04). Claims are enforced in `v2/calibra/claim_guards.py`.
-> Read `HANDOFF_PHASE_D.md` §0 for the full context update before anything else.
+> # ⚠ ACTIVE ENTRY POINT IS NOW `PROJECT_GUIDE.md` (not `HANDOFF_PHASE_D.md`)
+> The E-series (E0–E5) and Phase D build are **closed**; both are folded into the paper drafts.
+> Read `PROJECT_GUIDE.md` for current project state, the per-paper build plan, and the methodology
+> rules — it is maintained in place and is not itself superseded by a future handoff file.
 
 # HANDOFF → Build Agent
 
