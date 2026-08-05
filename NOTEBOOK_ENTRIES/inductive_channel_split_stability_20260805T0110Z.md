@@ -345,11 +345,19 @@ and the first was never re-tested here.
 
 ## 9. Suite
 
-Run on this workspace at the commit the runs were launched from (`2b0ad53`):
-`pytest morpheus/v2/tests morpheus/tests --ignore=morpheus/v2/tests/test_p2_figures.py -q` →
-**623 passed, 0 failed in 69.04 s**. `test_p2_figures.py` run separately reads **1 passed, 27 errors
-in 2.54 s**, every error `ModuleNotFoundError: No module named 'matplotlib'` — the known condition of
-`~/venv`. **Nothing was installed into that environment.**
+Both readings are given because other agents' commits landed underneath this one while the runs were
+in flight. `pytest morpheus/v2/tests morpheus/tests --ignore=morpheus/v2/tests/test_p2_figures.py -q`:
+
+* at the commit the runs were launched from (`2b0ad53`, workspace `~/ws_p1sp`) →
+  **623 passed, 0 failed in 69.04 s**;
+* at this entry's final commit (workspace `~/ws_p1sp2`, freshly extracted) →
+  **641 passed, 6 skipped, 0 failed in 72.08 s**. The extra 18 passes and 6 skips are the five
+  commits other agents made in between (`6b3d8e7`…`e772316`, the P2 labelled-probe work); this run's
+  code delta is unchanged between the two readings.
+
+`test_p2_figures.py` run separately reads **1 passed, 27 errors in 2.36 s** at both commits, every
+error `ModuleNotFoundError: No module named 'matplotlib'` — the known condition of `~/venv`.
+**Nothing was installed into that environment.**
 
 **This run's test delta is 12, not the full 13 by which the total exceeds the 23:45 entry's 610.**
 `test_inductive_channel_split_stability.py` alone reads **12 passed**; the remaining +1 comes from
