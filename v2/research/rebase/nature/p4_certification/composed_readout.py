@@ -298,8 +298,12 @@ def main() -> None:
             single, row["single_floor_shipped"], row["single_null_p95_published"])
         row["answered_single_matched_floor"] = _answered(
             single, row["single_floor_matched"], row["single_null_p95_published"])
-        row["answered_single_selection_aware"] = _answered(
-            single, row["single_floor_shipped"], row["single_null_p95_selection_aware"])
+        # ``None``, not ``False``, when the (expensive) selection-aware null was not computed
+        # for this target: "we did not grade this" and "it failed" are opposite statements.
+        row["answered_single_selection_aware"] = (
+            _answered(single, row["single_floor_shipped"],
+                      row["single_null_p95_selection_aware"])
+            if t in selection_aware_for else None)
         for k in K_LADDER:
             statistic = float(composed_observed[t][k])
             floor = float(floors[t]["composed"][k]["detection_floor"])
@@ -313,8 +317,9 @@ def main() -> None:
     group_names = sorted({r["target_group"] for r in rows})
 
     def _counts(key: str) -> dict:
-        return {g: int(sum(1 for r in rows if r["target_group"] == g and r[key]))
-                for g in group_names}
+        return {g: (int(sum(1 for r in rows if r["target_group"] == g and r[key] is True))
+                    if any(r["target_group"] == g and r[key] is not None for r in rows)
+                    else None) for g in group_names}
 
     summary = {
         "n_by_group": {g: int(sum(1 for r in rows if r["target_group"] == g))
