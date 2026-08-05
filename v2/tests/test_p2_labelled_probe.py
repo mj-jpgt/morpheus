@@ -230,7 +230,11 @@ def test_merge_of_shards_reproduces_the_single_process_summary(cohort, result, t
         ["--merge"] + shards + ["--output", str(tmp_path / "merged.json"),
                                 "--views", "wsi_biology"])
     assert set(merged) - {"_config", "_summary"} == set(LABELS)
-    assert merged["_summary"] == result["_summary"]
+    # compared as serialised JSON, not as dicts: absent panel endpoints give NaN floors and
+    # `nan != nan`, so a dict comparison would fail for a reason that has nothing to do with
+    # sharding
+    assert (json.dumps(merged["_summary"], sort_keys=True)
+            == json.dumps(result["_summary"], sort_keys=True))
 
     # A second pass over the same artifact may only ADD endpoints. Scoring one twice is an
     # inconsistency, not a merge, and must raise rather than resolve silently.
