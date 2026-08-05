@@ -297,6 +297,63 @@ def verdict(sep: float | None, floor: float | None, monotone_in_n: bool) -> dict
     }
 
 
+def pair_tests(data: dict, per_arm: dict, high: str, low: str) -> dict:
+    """Tests A, B and C for every statistic, for one ordered pair of arms.
+
+    Split out of `main` because the same three tests are wanted for the shipped
+    pair, for every ADJACENT pair on a momentum grid, and at every reading step
+    the states were saved at. Three copies of this arithmetic would be three
+    chances for one of them to drift.
+    """
+    hi, lo = arm_label(high), arm_label(low)
+    tests = {}
+    for s in sorted(per_arm[hi]):
+        folds = [per_arm[x][s]["fold"] for x in (hi, lo)]
+        floor = max([f for f in folds if f is not None], default=None)
+        floor_arm = None
+        if floor is not None:
+            floor_arm = hi if per_arm[hi][s]["fold"] == floor else lo
+        # The worst-case ratio has to be taken in the direction "better" actually
+        # points, or a smaller-is-better statistic is graded upside down: for
+        # alpha-ReQ's |alpha - 1| the adverse case is the high arm's LARGEST
+        # deviation against the low arm's SMALLEST.
+        d = DIRECTION[s]
+        if d > 0:
+            himin, lomax = per_arm[hi][s]["min"], per_arm[lo][s]["max"]
+        elif d < 0:
+            himin, lomax = per_arm[lo][s]["min"], per_arm[hi][s]["max"]
+        else:
+            himin = lomax = None
+        sep = (himin / lomax) if (himin is not None and lomax and lomax > 0) else None
+        pub = PUBLISHED_TEST_A.get(s)
+        tests[s] = {
+            "floor": floor, "floor_arm": floor_arm, "direction": d,
+            "arm_fold": {x: per_arm[x][s]["fold"] for x in (hi, lo)},
+            "high_min": himin, "low_max": lomax,
+            "test_B_worst_case_over_repeats": verdict(sep, floor, monotone_in_n=True),
+            "test_C_complete_separation": ordering(
+                [v[s] for v in data[high]["per_rep"].values()],
+                [v[s] for v in data[low]["per_rep"].values()], d),
+            "test_A_published_single_draw": (
+                dict(verdict(pub["ratio"], floor, monotone_in_n=False),
+                     **{"published_high": pub["high"], "published_low": pub["low"],
+                        "src": pub["src"]}) if pub else
+                {"passes": None, "why": ABSENT["Test A under any statistic but R3"]}),
+        }
+    return tests
+
+
+def read_arms(root: Path, arms: list[str], step: int, reps: int, offset: int, view: str):
+    """`(data, per_arm)` -- the states and each arm's own fold, at one step."""
+    data = {a: arm_values(root, a, step, reps, offset, view) for a in arms}
+    per_arm = {}
+    for a in arms:
+        names = sorted({s for r in data[a]["per_rep"].values() for s in r})
+        per_arm[arm_label(a)] = {
+            s: _fold({rep: v[s] for rep, v in data[a]["per_rep"].items()}) for s in names}
+    return data, per_arm
+
+
 # --------------------------------------------------------------------------
 def main(argv=None) -> dict:
     ap = argparse.ArgumentParser(description=__doc__,
@@ -308,21 +365,21 @@ def main(argv=None) -> dict:
     ap.add_argument("--reps", type=int, default=10)
     ap.add_argument("--rep-offset", type=int, default=0,
                     help="skip this many repeats first, so repeats 6-10 can be scored alone")
-    ap.add_argument("--step", type=int, default=600)
+    ap.add_argument("--step", type=int, default=600,
+                    help="the step the pair tests are reported at")
+    ap.add_argument("--also-steps", default="",
+                    help=("comma-separated further steps to re-run the SAME pair tests at. "
+                          "The row is read at one step, but the states are saved at all of "
+                          "them, so whether a verdict is a property of the comparison or of "
+                          "the reading step costs nothing to find out -- and it turned out "
+                          "to matter."))
     ap.add_argument("--view", default="wsi_biology")
     ap.add_argument("--output", required=True)
     args = ap.parse_args(argv)
 
     root = Path(args.root).expanduser()
     arms = args.grid.split(",") if args.grid else [args.high, args.low]
-    data = {a: arm_values(root, a, args.step, args.reps, args.rep_offset, args.view) for a in arms}
-
-    # Per arm, per statistic: the fold across its own repeats -- its arm floor.
-    per_arm = {}
-    for a in arms:
-        names = sorted({s for r in data[a]["per_rep"].values() for s in r})
-        per_arm[arm_label(a)] = {
-            s: _fold({rep: v[s] for rep, v in data[a]["per_rep"].items()}) for s in names}
+    data, per_arm = read_arms(root, arms, args.step, args.reps, args.rep_offset, args.view)
 
     out = {
         "_": (f"§5.4 limit 2 under stress. {args.reps} same-seed repeats per arm "
@@ -385,43 +442,25 @@ def main(argv=None) -> dict:
             "§5.4 limit 2 does. Predeclared at "
             "NOTEBOOK_ENTRIES/PREDECLARED_probe_floor_n10_and_momentum_grid_20260805T0200Z.md §6.")
     else:
-        hi, lo = arm_label(args.high), arm_label(args.low)
-        names = sorted(per_arm[hi])
-        tests = {}
-        for s in names:
-            folds = [per_arm[x][s]["fold"] for x in (hi, lo)]
-            floor = max([f for f in folds if f is not None], default=None)
-            floor_arm = None
-            if floor is not None:
-                floor_arm = hi if per_arm[hi][s]["fold"] == floor else lo
-            # The worst-case ratio has to be taken in the direction "better"
-            # actually points, or a smaller-is-better statistic is graded upside
-            # down: for alpha-ReQ's |alpha - 1| the adverse case is the high arm's
-            # LARGEST deviation against the low arm's SMALLEST.
-            d = DIRECTION[s]
-            if d > 0:
-                himin, lomax = per_arm[hi][s]["min"], per_arm[lo][s]["max"]
-            elif d < 0:
-                himin, lomax = per_arm[lo][s]["min"], per_arm[hi][s]["max"]
-            else:
-                himin = lomax = None
-            sep = (himin / lomax) if (himin is not None and lomax and lomax > 0) else None
-            entry = {"floor": floor, "floor_arm": floor_arm,
-                     "arm_fold": {x: per_arm[x][s]["fold"] for x in (hi, lo)},
-                     "high_min": himin, "low_max": lomax,
-                     "test_B_worst_case_over_repeats": verdict(sep, floor, monotone_in_n=True),
-                     "direction": d,
-                     "test_C_complete_separation": ordering(
-                         [v[s] for v in data[args.high]["per_rep"].values()],
-                         [v[s] for v in data[args.low]["per_rep"].values()], d)}
-            pub = PUBLISHED_TEST_A.get(s)
-            entry["test_A_published_single_draw"] = (
-                dict(verdict(pub["ratio"], floor, monotone_in_n=False), **{
-                    "published_high": pub["high"], "published_low": pub["low"],
-                    "src": pub["src"]}) if pub else
-                {"passes": None, "why": ABSENT["Test A under any statistic but R3"]})
-            tests[s] = entry
-        out["tests"] = tests
+        out["tests"] = pair_tests(data, per_arm, args.high, args.low)
+        # THE SAME PAIR AT THE OTHER STEPS THE STATES WERE SAVED AT. The row is
+        # read at one step, and a verdict that holds only there is a property of
+        # the reading step rather than of the comparison. This costs no GPU --
+        # `d1_momentum_probe.py` exports at every step it reads -- and it is the
+        # one axis of this row that had never been varied.
+        also = [int(s) for s in args.also_steps.split(",") if s.strip()]
+        if also:
+            by_step = {}
+            for st in also:
+                d2, p2 = read_arms(root, arms, st, args.reps, args.rep_offset, args.view)
+                by_step[str(st)] = pair_tests(d2, p2, args.high, args.low)
+            by_step[str(args.step)] = out["tests"]
+            out["by_step"] = {k: by_step[k] for k in sorted(by_step, key=int)}
+            out["by_step_note"] = (
+                "The same two arms, the same repeats, the same three tests, at every step "
+                "the probe states were exported. A verdict that changes with the reading "
+                "step is a fact about the reading step. Test C is the one to watch: it is "
+                "the only one of the three that does not depend on a ratio.")
 
     path = Path(args.output).expanduser()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -475,6 +514,23 @@ def main(argv=None) -> dict:
                  f"{c['exact_one_sided_permutation_p']:.2e}"
             print(f"{s:>18} {fl:>8} {str(e['floor_arm']):>7} {bs:>10} {bv:>6} "
                   f"{as_:>12} {av:>6} {cv:>9} {cp:>10}  {dup.get(s, '')}")
+        if "by_step" in out:
+            print("\nthe same pair at every step the states were saved at "
+                  "(B = ratio test, C = order test)")
+            watch = ("R1", "R3", "RankMe")
+            print(f"{'step':>6} " + " ".join(f"{'B:' + s:>13} {'C':>4}" for s in watch)
+                  + f" {'A(R3)':>7}")
+            for st, per_stat in out["by_step"].items():
+                cells = []
+                for s in watch:
+                    b = per_stat[s]["test_B_worst_case_over_repeats"]
+                    c = per_stat[s]["test_C_complete_separation"]
+                    v = {True: "PASS", False: "FAIL", None: "-"}[b.get("passes")]
+                    cells.append(f"{b['separation']:.3f}/{per_stat[s]['floor']:.3f} {v:<4} "
+                                 + ("SEP" if c.get("separated") else "ovl").rjust(4))
+                av = {True: "PASS", False: "FAIL", None: "-"}[
+                    per_stat["R3"]["test_A_published_single_draw"].get("passes")]
+                print(f"{st:>6} " + " ".join(cells) + f" {av:>7}")
     print("\nper repeat, never a mean")
     for a in arms:
         for rep in sorted(data[a]["per_rep"], key=lambda r: int(r[3:])):

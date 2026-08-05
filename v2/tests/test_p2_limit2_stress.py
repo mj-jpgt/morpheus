@@ -293,6 +293,56 @@ def test_the_split_is_the_hill_order_and_not_the_preprocessing(n5):
                 is not t[two]["test_B_worst_case_over_repeats"]["passes"]), (one, two)
 
 
+def test_the_ratio_verdict_flips_with_the_reading_step_and_the_order_verdict_does_not(n5):
+    """The sharpest thing these ten runs say, and it is not in the paper.
+
+    §5.4 limit 2 is read at step 600. The probe states were exported at every
+    step, so the SAME two arms and the SAME repeats can be given the SAME tests
+    at 100, 200, 300, 400 and 500 for no GPU at all -- and the ratio test's
+    verdict is not stable across them. Under R3 it reads
+    FAIL, FAIL, PASS, FAIL, PASS, FAIL: it passes at **two of six** readings and
+    **changes its answer four times in six consecutive steps**. Under RankMe it
+    changes four times as well (PASS, FAIL, PASS, FAIL, FAIL, PASS). Only under
+    canonical R1 does it settle -- one transition, and stable from step 300 on.
+
+    Test C, meanwhile, is SEP at every step under every one of them. So the
+    statistics never disagree about which arm is higher -- they disagree about
+    whether the gap clears the noise, and that disagreement is as much with the
+    reading step as with each other.
+    """
+    by_step = n5["by_step"]
+    assert sorted(by_step, key=int) == ["100", "200", "300", "400", "500", "600"]
+
+    def bs(stat):
+        return [by_step[s][stat]["test_B_worst_case_over_repeats"]["passes"]
+                for s in sorted(by_step, key=int)]
+
+    assert bs("R3") == [False, False, True, False, True, False]
+    assert bs("R1") == [False, False, True, True, True, True]
+    assert bs("RankMe") == [True, False, True, False, False, True]
+    # R3's ratio verdict is a coin flip over the reading step; R1's settles. The
+    # count that matters is how often it CHANGES, not how often it passes.
+    def flips(v):
+        return sum(a is not b for a, b in zip(v[:-1], v[1:]))
+
+    assert sum(bs("R3")) == 2 and flips(bs("R3")) == 4
+    assert flips(bs("RankMe")) == 4
+    assert flips(bs("R1")) == 1
+    assert all(bs("R1")[2:]), "R1 does not settle from step 300"
+
+    # And the ORDER verdict is unanimous at every step, for every Hill variant.
+    for step in by_step:
+        for stat in ("R1", "R2", "R3", "R1_uncentred", "R1_rownorm", "R2_uncentred", "RankMe"):
+            c = by_step[step][stat]["test_C_complete_separation"]
+            assert c["separated"] is True, f"{stat} fails to order the arms at step {step}"
+
+    # Test A -- the audit's OWN rule -- would have read FAIL at step 200. The row
+    # is read at 600 so this does not overturn it, but the pass is step-contingent
+    # and the draft does not say so.
+    a = {s: by_step[s]["R3"]["test_A_published_single_draw"]["passes"] for s in by_step}
+    assert a["200"] is False and a["600"] is True
+
+
 def test_more_repeats_can_only_move_test_B_against_the_pass(n5, n10):
     """The arithmetic the honesty of this whole exercise rests on.
 
