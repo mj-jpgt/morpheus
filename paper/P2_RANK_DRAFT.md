@@ -255,8 +255,12 @@ with GPU non-determinism the only source of variation: effective rank spreads 3.
 molecular channel those same five runs carry spreads 1.055×.** The spread is **bimodal** rather than
 smooth — four repeats agree to within 2% and one lands at a third of them, with its rank down 3.3× and
 its channel down 5% — so on that block the usable statement is that effective rank is **reproducible
-about 80% of the time and catastrophically not about 20% of the time**, on identical inputs. **The
-shape is a property of the block, not of the metric**: ten further same-seed repeats on the fixed
+about 80% of the time and catastrophically not about 20% of the time**, on identical inputs. **This
+row may not be quoted alone**: a labelled linear probe on the same five runs — the reference standard
+rank is meant to substitute for — falls **27%** on the same divergent repeat, so what moves is not
+rank uniquely but the cancer-type direction both rank and the unadjusted probe track and the channel's
+confound adjustment removes by construction (§4.1, §4.1b). **The shape is a property of the block, not
+of the metric**: ten further same-seed repeats on the fixed
 held-out probe give floors of 1.33×–2.06× that are **not bimodal at any step, statistic or arm** —
 there the divergence is graded across all five runs rather than one falling off a cliff. **All seven** between-arm
 rank differences this project has ever measured (**1.004× to 3.246×**) fall inside that floor, each
