@@ -1,6 +1,6 @@
 {
  "box": "ubuntu@150.136.45.194",
- "fetched_utc": "2026-08-04T23:15:18Z",
+ "fetched_utc": "2026-08-05T05:35:49Z",
  "files": {
   "e0_run/collapse_diag.log": {
    "box_path": "~/e0_run/collapse_diag.log",
@@ -464,6 +464,36 @@
    "produced_by": null,
    "sha256": "abb27522f95dc05cd3ef3829dfc36d2387a3abe1aafd07ca89ef4f9ec48619f5"
   },
+  "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_LATE5.json": {
+   "box_path": "~/e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_LATE5.json",
+   "bytes": 49845,
+   "produced_by": null,
+   "sha256": "f86ded0465fdb42ccfb86786c24ea571b0bbc98722f69711082b3ba320ae9768"
+  },
+  "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json": {
+   "box_path": "~/e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json",
+   "bytes": 197166,
+   "produced_by": null,
+   "sha256": "b6fa5aeda3260d1f3d9bce2fe53b9e7143758129aa314ea68fa4f0c018837535"
+  },
+  "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10_RNA.json": {
+   "box_path": "~/e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10_RNA.json",
+   "bytes": 66450,
+   "produced_by": null,
+   "sha256": "327e1af8062b7534c46b6e13c4a01e7ad83040193cc10cafd922f83eb819e547"
+  },
+  "e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N5.json": {
+   "box_path": "~/e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N5.json",
+   "bytes": 180330,
+   "produced_by": null,
+   "sha256": "c9ac696638ac9f37a3b091bc5e8a48d33844dd31022455a6025a9a69390a135b"
+  },
+  "e0_run/d1_probefloor600/out/P2_MOMENTUM_GRID.json": {
+   "box_path": "~/e0_run/d1_probefloor600/out/P2_MOMENTUM_GRID.json",
+   "bytes": 125663,
+   "produced_by": null,
+   "sha256": "6fea0d08101e78f343434c6efdddcb20603fe8488528312177f7fe16e907a331"
+  },
   "e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json": {
    "box_path": "~/e0_run/d1_probefloor600/out/P2_PROBE_FLOORS_S600_m0999_m0.json",
    "bytes": 822531,
@@ -476,17 +506,89 @@
    "produced_by": null,
    "sha256": "68e4dfc87c128b021b27e796dc3bcaffc4f33864c5439805e13041f008338866"
   },
+  "e0_run/d1_probefloor600/out/limit2_stress_run.log": {
+   "box_path": "~/e0_run/d1_probefloor600/out/limit2_stress_run.log",
+   "bytes": 9726,
+   "produced_by": null,
+   "sha256": "cc3d9b2a00c3e7334df8a50b66ffac8d11f8487007daa17b088b04c8f0a10049"
+  },
   "e0_run/d1_probefloor600/out/probe_floors600_run.log": {
    "box_path": "~/e0_run/d1_probefloor600/out/probe_floors600_run.log",
    "bytes": 20785,
    "produced_by": null,
    "sha256": "9f9f525ca02e06f67df726781845ebb346f9f1bc01dc9389c5de267464e12061"
   },
+  "e0_run/d1_probefloor600/pf600_m0.98_rep1.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.98_rep1.log",
+   "bytes": 1474,
+   "produced_by": null,
+   "sha256": "94fd1f9c85eb42b5e266af1de8da8b86062d6a9553dc3643ae5c330f390f3537"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.98_rep2.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.98_rep2.log",
+   "bytes": 1474,
+   "produced_by": null,
+   "sha256": "149bf801a45b5d703f3d543c1f772078aacd1ce0e03e1fd4626aa85d9c6ce438"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.98_rep3.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.98_rep3.log",
+   "bytes": 1474,
+   "produced_by": null,
+   "sha256": "f6f56bb5a58cafc398a1ec867194432569853c80ed5d0bed35e7552b61d83e28"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.98_rep4.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.98_rep4.log",
+   "bytes": 1474,
+   "produced_by": null,
+   "sha256": "2915c785701b085f9e16d4d431e752dd97ec5455a3302221d85b4fc758957d69"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.98_rep5.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.98_rep5.log",
+   "bytes": 1474,
+   "produced_by": null,
+   "sha256": "752daf1f10f19ad3a7bee51a0e8c5b656de0bb7dbe7faf5059d21b519131cc6f"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.995_rep1.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.995_rep1.log",
+   "bytes": 1478,
+   "produced_by": null,
+   "sha256": "d4a894e6e701b39ff4369011a9c70e4d50ad5eb87c588e08077c39362b4b6455"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.995_rep2.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.995_rep2.log",
+   "bytes": 1478,
+   "produced_by": null,
+   "sha256": "77d5c6f78a0702709108718cd5244f2bb067d714570936146298b2b56fe417a9"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.995_rep3.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.995_rep3.log",
+   "bytes": 1478,
+   "produced_by": null,
+   "sha256": "bd6e057b93bcc652305251ada61be1eef64e31cc13474f75915321f04d1aad0f"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.995_rep4.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.995_rep4.log",
+   "bytes": 1478,
+   "produced_by": null,
+   "sha256": "a52e0f07ef06cbae36904e167d92f8eeb5c0f0bfb09215513ebd79c2cec443a8"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.995_rep5.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.995_rep5.log",
+   "bytes": 1478,
+   "produced_by": null,
+   "sha256": "1f1244f9f3ea74dd86c20c3e93dd61a4740267780bf06db68f4cf718fa3a2309"
+  },
   "e0_run/d1_probefloor600/pf600_m0.999_rep1.log": {
    "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep1.log",
    "bytes": 1479,
    "produced_by": null,
    "sha256": "07e3393903af28e9f14b3441132d2beef6af52d14a8f974bd78ef930f15765dc"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.999_rep10.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep10.log",
+   "bytes": 1479,
+   "produced_by": null,
+   "sha256": "afee50ae64ea0718dd15cf5347c1a5f91546ce781119b92eb986f5b179f32aa8"
   },
   "e0_run/d1_probefloor600/pf600_m0.999_rep2.log": {
    "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep2.log",
@@ -512,11 +614,41 @@
    "produced_by": null,
    "sha256": "2cef72e9a6c632c456c13541f9b0a09fffbc6bb3f096ec684cc51a13153b2eca"
   },
+  "e0_run/d1_probefloor600/pf600_m0.999_rep6.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep6.log",
+   "bytes": 1479,
+   "produced_by": null,
+   "sha256": "4cf42b2b151db2857125d50b95d2bf32aa3a8325ffdb5033d15a2e63145c7994"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.999_rep7.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep7.log",
+   "bytes": 1479,
+   "produced_by": null,
+   "sha256": "3c9d26469dd5c521eaee7d9302778d161d237e4eb2e73eb400bcd8e1e14b6d8b"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.999_rep8.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep8.log",
+   "bytes": 1479,
+   "produced_by": null,
+   "sha256": "4063af13c0fa0ee489c1239fa7aa4f7b7905f2270ec98bfff3bf67b37d9419e3"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.999_rep9.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.999_rep9.log",
+   "bytes": 1479,
+   "produced_by": null,
+   "sha256": "7483c97d28c660749402a18585fc0afd489652cc7d0d2123105dfe616f1815ff"
+  },
   "e0_run/d1_probefloor600/pf600_m0.99_rep1.log": {
    "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep1.log",
    "bytes": 1475,
    "produced_by": null,
    "sha256": "0b0b1cea5a30833c549a7641811247fc10524671c1072acb0cbdbb06043e3761"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.99_rep10.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep10.log",
+   "bytes": 1475,
+   "produced_by": null,
+   "sha256": "337b6b8f26d88e57b2ee793f3a8d8df8a768ba348fd00b23614977b1e97e8d78"
   },
   "e0_run/d1_probefloor600/pf600_m0.99_rep2.log": {
    "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep2.log",
@@ -541,6 +673,30 @@
    "bytes": 1475,
    "produced_by": null,
    "sha256": "b9fa028839c7481b7462cf80e8c289cfb1dcd7c3c92c588da53f79185ceabec4"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.99_rep6.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep6.log",
+   "bytes": 1475,
+   "produced_by": null,
+   "sha256": "22d67e44ddd13a0c923952fa01e6edd8b093af7fda918bf6c1ebf8fa68185736"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.99_rep7.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep7.log",
+   "bytes": 1475,
+   "produced_by": null,
+   "sha256": "9f4ca01a140f0fa0efbac40feafe5cec43b2f1856fc245b8bc067ca9be974d65"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.99_rep8.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep8.log",
+   "bytes": 1475,
+   "produced_by": null,
+   "sha256": "78f1d12b101ca94b0417915ac61f6bbfce376f4da4d6161ef8b3b82243bb0897"
+  },
+  "e0_run/d1_probefloor600/pf600_m0.99_rep9.log": {
+   "box_path": "~/e0_run/d1_probefloor600/pf600_m0.99_rep9.log",
+   "bytes": 1475,
+   "produced_by": null,
+   "sha256": "4250475a8863516d2b07c639955c22442b821c52910118d862b39cc60a364f1d"
   },
   "e0_run/d1_probefloor600/pf600_m0_rep1.log": {
    "box_path": "~/e0_run/d1_probefloor600/pf600_m0_rep1.log",

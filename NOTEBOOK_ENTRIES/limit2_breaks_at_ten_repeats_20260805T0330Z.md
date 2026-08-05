@@ -228,14 +228,50 @@ touched by this work. The following are the exact locations that are now wrong.
    because the two runs it quotes predate the canonical column and the state export. The statistic
    the row fails the strong test on is the only one that can rule on it.
 
-### 9. What is still open
+### 9. The momentum grid: SMOOTH, not a step — the shipped comparison is two rungs of a ladder
 
-The momentum grid (five same-seed repeats each at **m = 0.995** and **m = 0.98**, so the shipped
-comparison sits inside {0, 0.98, 0.99, 0.995, 0.999} rather than being a two-point contrast) was
-launched at 02:46 UTC as wave 2 and is running. Its predeclared reading rule — STEP / SMOOTH /
-NEITHER — is §6 of the predeclaration. **It does not bear on §0: the row is already broken at its own
-two arms.** Note the draft's §5.2 table is already non-monotone at this step (m = 0.9 reads 2.23
-against m = 0's 2.81), which the draft's *"the effect is monotone in m"* does not accommodate.
+Wave 2 ran 02:46–05:31 UTC: five same-seed repeats each at **m = 0.995** and **m = 0.98**, everything
+else identical, so the shipped comparison sits inside a five-point grid instead of being a two-point
+contrast. All ten completed; no errors. **Canonical R1 at step 600, five repeats each, never a mean:**
+
+| arm | R1 range | R3 range | R1 fold |
+|---|---|---|---:|
+| m = 0 | 1.564–2.738 | 1.295–2.265 | 1.75× |
+| m = 0.98 | 4.783–6.008 | 3.891–5.075 | 1.26× |
+| m = 0.99 | 6.462–7.124 | 5.142–5.922 | 1.10× |
+| m = 0.995 | **7.710–8.249** | 5.581–5.953 | 1.07× |
+| m = 0.999 | 10.353–11.955 | 6.741–8.054 | 1.15× |
+
+**Under R1 the grid is strictly monotone in m and never overlaps** — every adjacent pair is
+completely separated, all four of them. The predeclared reading is therefore **SMOOTH**: `m = 0.999`
+is not a discontinuity, it is the top of a monotone climb, and the two-point comparison is a coarse
+read of a trend. Under R3, m = 0.995 and m = 0.99 **do** overlap (5.581 < 5.922).
+
+**And each individual rung is inside its own floor.** Adjacent-pair worst-case ratios against each
+pair's own floor:
+
+| adjacent pair | R1 | | R3 | |
+|---|---:|---|---:|---|
+| 0 → 0.98 | 1.747× vs 1.751× | FAIL | 1.718× vs 1.749× | FAIL |
+| 0.98 → 0.99 | 1.076× vs 1.256× | FAIL | 1.013× vs 1.304× | FAIL |
+| 0.99 → 0.995 | 1.082× vs 1.102× | FAIL | 0.943× vs 1.152× | FAIL |
+| **0.995 → 0.999** | **1.255× vs 1.155×** | **PASS** | 1.132× vs 1.195× | FAIL |
+
+**Exactly one of the four increments clears its own floor, under R1 only. None clears under R3.** The
+`m = 0.999`-over-`m = 0.99` gap that §5.4 limit 2 is about is the *sum of two rungs, each of which is
+individually inside the floor* — which is a second, independent reason the row should not be carrying
+weight, and it is consistent with §0's verdict rather than an alternative to it.
+
+**What the grid does support, and it is worth stating positively:** rank climbs monotonically with
+momentum across five values with complete separation at every adjacent pair under canonical R1. That
+is a stronger and more defensible statement than "0.999 beats 0.99", and it is the one the evidence
+carries.
+
+**What it does NOT settle.** The draft's §5.2 table is non-monotone at this step — `m = 0.9` reads
+**2.23** against `m = 0`'s **2.81**, one seed each — and §5.2's prose says *"the effect is monotone in
+m"*. **This grid does not resolve that: no repeat was run at m = 0.9.** The dip sits between m = 0 and
+m = 0.98, which is the one interval the grid does not cover. It remains a one-seed observation that
+the draft's monotonicity claim does not accommodate, and closing it would cost five more runs.
 
 ### 10. Files
 

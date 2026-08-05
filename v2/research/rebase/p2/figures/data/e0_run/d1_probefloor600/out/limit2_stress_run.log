@@ -1,0 +1,110 @@
+
+n = 10 per arm (offset 0), step 600, `wsi_biology`, arms ['0.999', '0.99']
+  DUPLICATE ON THIS BLOCK (not independent evidence): R1_rownorm == R1  worst relative difference 5.86e-08
+  DUPLICATE ON THIS BLOCK (not independent evidence): R3 == R2  worst relative difference 3.82e-08
+  DUPLICATE ON THIS BLOCK (not independent evidence): PR_rownorm == PR  worst relative difference 7.07e-09
+  NEAR-DUPLICATE ON THIS BLOCK (not independent evidence): R1_uncentred ~= RankMe  worst relative difference 2.97e-04
+
+         statistic    floor      by  TestB sep      B  TestA ratio      A   C order          p  dup
+                PR   1.504x   m0999     0.754x   FAIL          n/a      -   overlap          -  
+        PR_rownorm   1.504x   m0999     0.754x   FAIL          n/a      -   overlap          -  PR
+                R1   1.291x    m099     1.453x   PASS          n/a      -       SEP   5.41e-06  
+        R1_rownorm   1.291x    m099     1.453x   PASS          n/a      -       SEP   5.41e-06  R1
+      R1_uncentred   1.209x    m099     1.085x   FAIL          n/a      -       SEP   5.41e-06  RankMe
+                R2   1.326x    m099     1.138x   FAIL          n/a      -       SEP   5.41e-06  
+      R2_uncentred   1.131x   m0999     0.984x   FAIL          n/a      -   overlap          -  
+                R3   1.326x    m099     1.138x   FAIL       1.262x   FAIL       SEP   5.41e-06  R2
+            RankMe   1.209x    m099     1.085x   FAIL          n/a      -       SEP   5.41e-06  
+         alpha_req   1.152x   m0999        n/a   none          n/a      -    no-dir          -  
+ alpha_req_abs_dev   1.237x   m0999     1.029x   FAIL          n/a      -       SEP   5.41e-06  
+         hard_rank   1.000x   m0999     1.000x   none          n/a      -  constant          -  
+       stable_rank   1.541x   m0999     0.724x   FAIL          n/a      -   overlap          -  
+
+the same pair at every step the states were saved at (B = ratio test, C = order test)
+  step          B:R1    C          B:R3    C      B:RankMe    C   A(R3)
+   100 1.043/1.085 FAIL  SEP 0.988/1.092 FAIL  ovl 1.249/1.064 PASS  SEP    PASS
+   200 1.081/1.464 FAIL  SEP 0.976/1.497 FAIL  ovl 1.131/1.303 FAIL  SEP    FAIL
+   300 1.321/1.482 FAIL  SEP 1.120/1.547 FAIL  SEP 1.298/1.330 FAIL  SEP    FAIL
+   400 1.412/1.286 PASS  SEP 1.161/1.319 FAIL  SEP 1.254/1.299 FAIL  SEP    FAIL
+   500 1.420/1.334 PASS  SEP 1.179/1.340 FAIL  SEP 1.122/1.339 FAIL  SEP    FAIL
+   600 1.453/1.291 PASS  SEP 1.138/1.326 FAIL  SEP 1.085/1.209 FAIL  SEP    FAIL
+
+per repeat, never a mean
+  m0999    rep1    R1=  10.939  R3=   6.971  RankMe=  3.013  PR=   3.361  stable= 2.131
+  m0999    rep2    R1=  11.955  R3=   8.054  RankMe=  3.390  PR=   4.813  stable= 2.904
+  m0999    rep3    R1=  10.696  R3=   7.205  RankMe=  3.033  PR=   4.459  stable= 2.852
+  m0999    rep4    R1=  10.353  R3=   6.741  RankMe=  2.934  PR=   3.461  stable= 2.118
+  m0999    rep5    R1=  10.973  R3=   7.348  RankMe=  2.987  PR=   4.229  stable= 2.624
+  m0999    rep6    R1=  11.552  R3=   7.991  RankMe=  3.092  PR=   5.054  stable= 3.264
+  m0999    rep7    R1=  10.782  R3=   7.477  RankMe=  2.852  PR=   4.861  stable= 3.110
+  m0999    rep8    R1=  10.832  R3=   7.293  RankMe=  3.250  PR=   4.219  stable= 2.561
+  m0999    rep9    R1=  10.841  R3=   7.271  RankMe=  3.126  PR=   4.339  stable= 2.664
+  m0999    rep10   R1=  10.977  R3=   7.425  RankMe=  3.398  PR=   4.630  stable= 2.922
+  m099     rep1    R1=   6.935  R3=   5.631  RankMe=  2.348  PR=   4.071  stable= 2.691
+  m099     rep2    R1=   6.913  R3=   5.407  RankMe=  2.488  PR=   3.486  stable= 2.222
+  m099     rep3    R1=   6.462  R3=   5.142  RankMe=  2.218  PR=   3.446  stable= 2.475
+  m099     rep4    R1=   7.124  R3=   5.922  RankMe=  2.456  PR=   4.455  stable= 2.828
+  m099     rep5    R1=   6.805  R3=   5.532  RankMe=  2.287  PR=   3.900  stable= 2.594
+  m099     rep6    R1=   5.520  R3=   4.465  RankMe=  2.174  PR=   3.041  stable= 2.087
+  m099     rep7    R1=   6.908  R3=   5.572  RankMe=  2.280  PR=   3.912  stable= 2.560
+  m099     rep8    R1=   7.029  R3=   5.711  RankMe=  2.609  PR=   4.168  stable= 2.889
+  m099     rep9    R1=   6.903  R3=   5.516  RankMe=  2.435  PR=   4.015  stable= 2.925
+  m099     rep10   R1=   6.676  R3=   5.155  RankMe=  2.629  PR=   3.315  stable= 2.229
+
+wrote /home/ubuntu/e0_run/d1_probefloor600/out/P2_LIMIT2_STRESS_N10.json
+
+n = 5 per arm (offset 0), step 600, `wsi_biology`, arms ['0', '0.98', '0.99', '0.995', '0.999']
+  DUPLICATE ON THIS BLOCK (not independent evidence): R1_rownorm == R1  worst relative difference 5.86e-08
+  DUPLICATE ON THIS BLOCK (not independent evidence): R3 == R2  worst relative difference 3.81e-08
+  DUPLICATE ON THIS BLOCK (not independent evidence): PR_rownorm == PR  worst relative difference 6.03e-09
+  NEAR-DUPLICATE ON THIS BLOCK (not independent evidence): R1_uncentred ~= RankMe  worst relative difference 3.81e-04
+
+         statistic                     m0                   m098                   m099                  m0995                  m0999
+                PR    1.035-1.867    1.80x    2.792-4.111    1.47x    3.446-4.455    1.29x    3.385-4.080    1.21x    3.361-4.813    1.43x
+        PR_rownorm    1.035-1.867    1.80x    2.792-4.111    1.47x    3.446-4.455    1.29x    3.385-4.080    1.21x    3.361-4.813    1.43x
+                R1    1.564-2.738    1.75x    4.783-6.008    1.26x    6.462-7.124    1.10x    7.710-8.249    1.07x   10.353-11.955   1.15x
+        R1_rownorm    1.564-2.738    1.75x    4.783-6.008    1.26x    6.462-7.124    1.10x    7.710-8.249    1.07x   10.353-11.955   1.15x
+      R1_uncentred    1.753-2.214    1.26x    1.968-2.237    1.14x    2.217-2.487    1.12x    2.370-2.698    1.14x    2.934-3.389    1.16x
+                R2    1.295-2.265    1.75x    3.891-5.075    1.30x    5.142-5.922    1.15x    5.581-5.953    1.07x    6.741-8.054    1.19x
+      R2_uncentred    1.499-1.728    1.15x    1.397-1.501    1.07x    1.467-1.579    1.08x    1.501-1.648    1.10x    1.669-1.809    1.08x
+                R3    1.295-2.265    1.75x    3.891-5.075    1.30x    5.142-5.922    1.15x    5.581-5.953    1.07x    6.741-8.054    1.19x
+            RankMe    1.754-2.215    1.26x    1.968-2.238    1.14x    2.218-2.488    1.12x    2.371-2.699    1.14x    2.934-3.390    1.16x
+         alpha_req    4.267-6.589    1.54x    3.370-3.666    1.09x    3.267-3.596    1.10x    3.169-3.319    1.05x    3.009-3.157    1.05x
+ alpha_req_abs_dev    3.267-5.589    1.71x    2.370-2.666    1.12x    2.267-2.596    1.15x    2.169-2.319    1.07x    2.009-2.157    1.07x
+         hard_rank  256.000-256.000  1.00x  256.000-256.000  1.00x  256.000-256.000  1.00x  256.000-256.000  1.00x  256.000-256.000  1.00x
+       stable_rank    1.017-1.564    1.54x    1.846-2.790    1.51x    2.222-2.828    1.27x    2.245-2.801    1.25x    2.118-2.904    1.37x
+
+adjacent steps on the grid -- is the shipped pair a STEP or part of a trend?
+            m098_over_m0  R1: 1.747x vs 1.751x FAIL SEP | R3: 1.718x vs 1.749x FAIL SEP | RankMe: 0.889x vs 1.263x FAIL ovl
+          m099_over_m098  R1: 1.076x vs 1.256x FAIL SEP | R3: 1.013x vs 1.304x FAIL SEP | RankMe: 0.991x vs 1.137x FAIL ovl
+         m0995_over_m099  R1: 1.082x vs 1.102x FAIL SEP | R3: 0.943x vs 1.152x FAIL ovl | RankMe: 0.953x vs 1.138x FAIL ovl
+        m0999_over_m0995  R1: 1.255x vs 1.155x PASS SEP | R3: 1.132x vs 1.195x FAIL SEP | RankMe: 1.087x vs 1.155x FAIL SEP
+
+per repeat, never a mean
+  m0       rep1    R1=   2.738  R3=   2.265  RankMe=  2.186  PR=   1.475  stable= 1.240
+  m0       rep2    R1=   2.456  R3=   2.188  RankMe=  2.215  PR=   1.867  stable= 1.564
+  m0       rep3    R1=   2.129  R3=   1.956  RankMe=  1.961  PR=   1.639  stable= 1.361
+  m0       rep4    R1=   1.564  R3=   1.295  RankMe=  1.754  PR=   1.035  stable= 1.017
+  m0       rep5    R1=   2.246  R3=   1.895  RankMe=  1.907  PR=   1.359  stable= 1.185
+  m098     rep1    R1=   5.665  R3=   4.569  RankMe=  2.238  PR=   3.230  stable= 2.457
+  m098     rep2    R1=   6.008  R3=   5.075  RankMe=  2.166  PR=   4.111  stable= 2.790
+  m098     rep3    R1=   5.787  R3=   4.801  RankMe=  2.140  PR=   3.597  stable= 2.616
+  m098     rep4    R1=   4.783  R3=   3.891  RankMe=  1.968  PR=   2.862  stable= 2.197
+  m098     rep5    R1=   5.625  R3=   4.491  RankMe=  2.088  PR=   2.792  stable= 1.846
+  m099     rep1    R1=   6.935  R3=   5.631  RankMe=  2.348  PR=   4.071  stable= 2.691
+  m099     rep2    R1=   6.913  R3=   5.407  RankMe=  2.488  PR=   3.486  stable= 2.222
+  m099     rep3    R1=   6.462  R3=   5.142  RankMe=  2.218  PR=   3.446  stable= 2.475
+  m099     rep4    R1=   7.124  R3=   5.922  RankMe=  2.456  PR=   4.455  stable= 2.828
+  m099     rep5    R1=   6.805  R3=   5.532  RankMe=  2.287  PR=   3.900  stable= 2.594
+  m0995    rep1    R1=   7.793  R3=   5.581  RankMe=  2.371  PR=   3.385  stable= 2.346
+  m0995    rep2    R1=   7.850  R3=   5.850  RankMe=  2.664  PR=   3.649  stable= 2.245
+  m0995    rep3    R1=   7.781  R3=   5.953  RankMe=  2.544  PR=   4.080  stable= 2.801
+  m0995    rep4    R1=   8.249  R3=   5.887  RankMe=  2.533  PR=   3.610  stable= 2.568
+  m0995    rep5    R1=   7.710  R3=   5.826  RankMe=  2.699  PR=   4.029  stable= 2.762
+  m0999    rep1    R1=  10.939  R3=   6.971  RankMe=  3.013  PR=   3.361  stable= 2.131
+  m0999    rep2    R1=  11.955  R3=   8.054  RankMe=  3.390  PR=   4.813  stable= 2.904
+  m0999    rep3    R1=  10.696  R3=   7.205  RankMe=  3.033  PR=   4.459  stable= 2.852
+  m0999    rep4    R1=  10.353  R3=   6.741  RankMe=  2.934  PR=   3.461  stable= 2.118
+  m0999    rep5    R1=  10.973  R3=   7.348  RankMe=  2.987  PR=   4.229  stable= 2.624
+
+wrote /home/ubuntu/e0_run/d1_probefloor600/out/P2_MOMENTUM_GRID.json

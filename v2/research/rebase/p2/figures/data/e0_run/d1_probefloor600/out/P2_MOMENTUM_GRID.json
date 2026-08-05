@@ -1,0 +1,3902 @@
+{
+ "_": "\u00a75.4 limit 2 under stress. 5 same-seed repeats per arm (offset 0) at step 600 on `wsi_biology`, arms ['0', '0.98', '0.99', '0.995', '0.999']. Ranges, not distributions: seed 42 throughout, one stack.",
+ "absent": {
+  "Test A under any statistic but R3": "The two runs the row is a claim ABOUT were logged before the harness printed a canonical column and before `export_dir` existed. Their states are gone. R1's support for this row is therefore Test B only, and R3's Test A pass cannot be corroborated by a second statistic on the same two runs.",
+  "a seed-varied floor": "Every repeat here is seed 42. The floor excludes seed variation entirely and is smaller than one a reader varying the seed would measure -- a floor twice over, exactly as `p2_probe_floors.py` says of its own.",
+  "an interval on any number here": "n = 5 or n = 10 same-seed repeats on one stack. These are ranges, not estimated distributions, and no confidence statement is made from them."
+ },
+ "adjacent_steps": {
+  "m098_over_m0": {
+   "PR": {
+    "direction": 1,
+    "floor": 1.8048858250051807,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.8048858250051807,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8284229837732923,
+     "passes": false,
+     "separation": 1.495208900520912
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9247476667916421,
+     "high_range": [
+      2.7921366935617526,
+      4.111231130616836
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.0346300031276219,
+      1.8673890267701105
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "PR_rownorm": {
+    "direction": 1,
+    "floor": 1.8048858379875554,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.8048858379875554,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8284229717514672,
+     "passes": false,
+     "separation": 1.4952088895777877
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.9247476510615829,
+     "high_range": [
+      2.792136687332756,
+      4.111231122774019
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.034630000949705,
+      1.8673890362711734
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1": {
+    "direction": 1,
+    "floor": 1.7512790510906602,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.7512790510906602,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9972760081351607,
+     "passes": false,
+     "separation": 1.7465085812024257
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 2.044261287421875,
+     "high_range": [
+      4.782691010666471,
+      6.008445781625046
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.563674116662995,
+      2.738429723244596
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "direction": 1,
+    "floor": 1.7512790010984023,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.7512790010984023,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9972760781502523,
+     "passes": false,
+     "separation": 1.746508653962306
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 2.0442614660084586,
+     "high_range": [
+      4.782691161575901,
+      6.008445919657771
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.5636741454958913,
+      2.7384296955674423
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "direction": 1,
+    "floor": 1.2630248447557697,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2630248447557697,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7036227443928832,
+     "passes": false,
+     "separation": 0.8886930075034499
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.24642595027883618,
+     "high_range": [
+      1.9675045921933638,
+      2.237224008554221
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.7528796457684142,
+      2.2139305424722
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R2": {
+    "direction": 1,
+    "floor": 1.7491036731638623,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.7491036731638623,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9819929641925671,
+     "passes": false,
+     "separation": 1.7176075006902882
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 1.625553102151097,
+     "high_range": [
+      3.890792945083938,
+      5.074990451590062
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.2950860933448085,
+      2.265239842932841
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "direction": 1,
+    "floor": 1.1526204063686054,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1526204063686054,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7012092664078798,
+     "passes": false,
+     "separation": 0.8082281095964822
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.33140982085131276,
+     "high_range": [
+      1.3967361558816436,
+      1.5010607357825343
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.4993192617312547,
+      1.7281459767329563
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R3": {
+    "direction": 1,
+    "floor": 1.7491036582769752,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.7491036582769752,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9819929985860688,
+     "passes": false,
+     "separation": 1.7176075462292695
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 1.6255531953805362,
+     "high_range": [
+      3.890793024479527,
+      5.074990540413623
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.2950860964583746,
+      2.2652398290989906
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "direction": 1,
+    "floor": 1.2630124263488298,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2630124263488298,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7035859452342947,
+     "passes": false,
+     "separation": 0.8886377918353016
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.24663951050248945,
+     "high_range": [
+      1.9681110280080574,
+      2.2378862206458274
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.753546119029915,
+      2.214750538510547
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "alpha_req": {
+    "direction": 0,
+    "floor": 1.544301486946955,
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      3.3703734249167154,
+      3.666372858937106
+     ],
+     "low_range": [
+      4.266966566930653,
+      6.589482814063951
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "direction": -1,
+    "floor": 1.7109090955024144,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.7109090955024144,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7161382571464692,
+     "passes": false,
+     "separation": 1.225247457789141
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.6005937079935468,
+     "high_range": [
+      2.3703734249167154,
+      2.666372858937106
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.2669665669306527,
+      5.589482814063951
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "hard_rank": {
+    "direction": 1,
+    "floor": 1.0,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "direction": 1,
+    "floor": 1.5374651524930107,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.5374651524930107,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7675316481810116,
+     "passes": false,
+     "separation": 1.1800531625138309
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.28161943454291816,
+     "high_range": [
+      1.8457098987761444,
+      2.7901500040214446
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.0173176684343332,
+      1.5640904642332263
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   }
+  },
+  "m0995_over_m099": {
+   "PR": {
+    "direction": 1,
+    "floor": 1.2928777365007125,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2928777365007125,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5876504703397486,
+     "passes": false,
+     "separation": 0.7597602099464332
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -1.0701985709519288,
+     "high_range": [
+      3.3845113283253907,
+      4.07969575812392
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.4455770824350216,
+      4.4547098992773195
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "direction": 1,
+    "floor": 1.29287773353319,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.29287773353319,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5876504726530285,
+     "passes": false,
+     "separation": 0.7597602111933554
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -1.0701985644056795,
+     "high_range": [
+      3.384511330744209,
+      4.079695761450187
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.4455770871511646,
+      4.454709895149889
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "direction": 1,
+    "floor": 1.102409056358124,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.102409056358124,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.981745960449636,
+     "passes": false,
+     "separation": 1.0822856378426833
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.5862075143604102,
+     "high_range": [
+      7.710263786259812,
+      8.248950000259068
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.4622621075285425,
+      7.124056271899402
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "direction": 1,
+    "floor": 1.1024090320823483,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1024090320823483,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9817460098883894,
+     "passes": false,
+     "separation": 1.082285668511767
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.5862077253646731,
+     "high_range": [
+      7.710263906312451,
+      8.248949801893831
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      6.462262167329215,
+      7.124056180947778
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "direction": 1,
+    "floor": 1.138225537640195,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.138225537640195,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.837324816580347,
+     "passes": false,
+     "separation": 0.9530644895316431
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.11673919481388051,
+     "high_range": [
+      2.370486226811905,
+      2.698147959981658
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2168889515769963,
+      2.4872254216257854
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R2": {
+    "direction": 1,
+    "floor": 1.15155455588874,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.15155455588874,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.818499440679972,
+     "passes": false,
+     "separation": 0.9425467599074072
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.3402170543944427,
+     "high_range": [
+      5.581416849039761,
+      5.952799210932464
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.142295580485148,
+      5.921633903434204
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R2_uncentred": {
+    "direction": 1,
+    "floor": 1.097898397783257,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.097898397783257,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8658694986554807,
+     "passes": false,
+     "separation": 0.9506367352632443
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.07793251467776963,
+     "high_range": [
+      1.5008227620116454,
+      1.6477509057692281
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.4666938569014887,
+      1.578755276689415
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R3": {
+    "direction": 1,
+    "floor": 1.1515545377045124,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1515545377045124,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.818499455795323,
+     "passes": false,
+     "separation": 0.9425467624297782
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.3402170366993049,
+     "high_range": [
+      5.5814168187205455,
+      5.95279924247016
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.14229561999202,
+      5.92163385541985
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "RankMe": {
+    "direction": 1,
+    "floor": 1.138222102931221,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.138222102931221,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8373166052355183,
+     "passes": false,
+     "separation": 0.9530522672304026
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.11680247998487658,
+     "high_range": [
+      2.371123413222816,
+      2.6988650777079277
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.217535976003733,
+      2.4879258932076924
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "alpha_req": {
+    "direction": 0,
+    "floor": 1.1008525276053474,
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      3.1693987731995428,
+      3.318627367581737
+     ],
+     "low_range": [
+      3.266702240352273,
+      3.596157418225851
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "direction": -1,
+    "floor": 1.1453455914978832,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1453455914978832,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8535460711517502,
+     "passes": false,
+     "separation": 0.9776052297339956
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.05192512722946363,
+     "high_range": [
+      2.1693987731995428,
+      2.318627367581737
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.266702240352273,
+      2.596157418225851
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "hard_rank": {
+    "direction": 1,
+    "floor": 1.0,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "direction": 1,
+    "floor": 1.272741364590777,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.272741364590777,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.6238633844390797,
+     "passes": false,
+     "separation": 0.7940167352292149
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.5824683593135358,
+     "high_range": [
+      2.2452776712278153,
+      2.8008919182049343
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2217758526694484,
+      2.827746030541351
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  },
+  "m0999_over_m0995": {
+   "PR": {
+    "direction": 1,
+    "floor": 1.432109839530745,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.432109839530745,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5752232839852232,
+     "passes": false,
+     "separation": 0.8237829249224261
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.7189120537029825,
+     "high_range": [
+      3.3607837044209377,
+      4.813011411635812
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.3845113283253907,
+      4.07969575812392
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "direction": 1,
+    "floor": 1.4321098437380828,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.4321098437380828,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5752232800444955,
+     "passes": false,
+     "separation": 0.82378292169903
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.7189120674396032,
+     "high_range": [
+      3.360783694010584,
+      4.813011410866994
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.384511330744209,
+      4.079695761450187
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "direction": 1,
+    "floor": 1.1546857664257222,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1546857664257222,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0869410513256992,
+     "passes": true,
+     "separation": 1.2550753609095953
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 2.104103898441288,
+     "high_range": [
+      10.353053898700356,
+      11.954523975867632
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      7.710263786259812,
+      8.248950000259068
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "direction": 1,
+    "floor": 1.1546857605655423,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1546857605655423,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 1.0869410699802584,
+     "passes": true,
+     "separation": 1.255075376080079
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 2.1041039729837614,
+     "high_range": [
+      10.353053774877592,
+      11.95452377222049
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      7.710263906312451,
+      8.248949801893831
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "direction": 1,
+    "floor": 1.1554045332264102,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1554045332264102,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9410138515173883,
+     "passes": false,
+     "separation": 1.0872516698720345
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.2354179150702227,
+     "high_range": [
+      2.9335658750518805,
+      3.3894553105532435
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.370486226811905,
+      2.698147959981658
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2": {
+    "direction": 1,
+    "floor": 1.194698925496616,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.194698925496616,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9478735233641725,
+     "passes": false,
+     "separation": 1.1324234798698685
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.788290386478284,
+     "high_range": [
+      6.741089597410748,
+      8.053572498703037
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.581416849039761,
+      5.952799210932464
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "direction": 1,
+    "floor": 1.097898397783257,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.097898397783257,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9228015366161719,
+     "passes": false,
+     "separation": 1.0131423285228227
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.02165528372739778,
+     "high_range": [
+      1.669406189496626,
+      1.8086254493926242
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.5008227620116454,
+      1.6477509057692281
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R3": {
+    "direction": 1,
+    "floor": 1.1946989118770555,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1946989118770555,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9478735295364135,
+     "passes": false,
+     "separation": 1.1324234743342172
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.7882903577019942,
+     "high_range": [
+      6.741089600172154,
+      8.053572410191407
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      5.5814168187205455,
+      5.95279924247016
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "direction": 1,
+    "floor": 1.155397215245086,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.155397215245086,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9410015570558445,
+     "passes": false,
+     "separation": 1.0872305785636127
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.23542356219359206,
+     "high_range": [
+      2.93428863990152,
+      3.3902689232675067
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.371123413222816,
+      2.6988650777079277
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "alpha_req": {
+    "direction": 0,
+    "floor": 1.0493251429083044,
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      3.0090043323115157,
+      3.157423901014488
+     ],
+     "low_range": [
+      3.1693987731995428,
+      3.318627367581737
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "direction": -1,
+    "floor": 1.0738771770253994,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0738771770253994,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.936373882982584,
+     "passes": false,
+     "separation": 1.005550542097649
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.011974872185054775,
+     "high_range": [
+      2.0090043323115157,
+      2.157423901014488
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.1693987731995428,
+      2.318627367581737
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "hard_rank": {
+    "direction": 1,
+    "floor": 1.0,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "direction": 1,
+    "floor": 1.3711248212375562,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3711248212375562,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.551504952950522,
+     "passes": false,
+     "separation": 0.7561821300259114
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.6829075015243662,
+     "high_range": [
+      2.117984416680568,
+      2.904021004705074
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.2452776712278153,
+      2.8008919182049343
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  },
+  "m099_over_m098": {
+   "PR": {
+    "direction": 1,
+    "floor": 1.4724318977995299,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.4724318977995299,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5691868523884486,
+     "passes": false,
+     "separation": 0.8380888772648641
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.6656540481818141,
+     "high_range": [
+      3.4455770824350216,
+      4.4547098992773195
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.7921366935617526,
+      4.111231130616836
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "PR_rownorm": {
+    "direction": 1,
+    "floor": 1.4724318982754936,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.4724318982754936,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5691868540693479,
+     "passes": false,
+     "separation": 0.8380888800107863
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.665654035622854,
+     "high_range": [
+      3.4455770871511646,
+      4.454709895149889
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.792136687332756,
+      4.111231122774019
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R1": {
+    "direction": 1,
+    "floor": 1.2562897682967324,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2562897682967324,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8561159722188738,
+     "passes": false,
+     "separation": 1.0755297363739809
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.45381632590349685,
+     "high_range": [
+      6.4622621075285425,
+      7.124056271899402
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      4.782691010666471,
+      6.008445781625046
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_rownorm": {
+    "direction": 1,
+    "floor": 1.2562897575176029,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.2562897575176029,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8561159678191597,
+     "passes": false,
+     "separation": 1.07552972161848
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.453816247671444,
+     "high_range": [
+      6.462262167329215,
+      7.124056180947778
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      4.782691161575901,
+      6.008445919657771
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R1_uncentred": {
+    "direction": 1,
+    "floor": 1.13708705810957,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.13708705810957,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.871446542416872,
+     "passes": false,
+     "separation": 0.9909105852165576
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.02033505697722493,
+     "high_range": [
+      2.2168889515769963,
+      2.4872254216257854
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.9675045921933638,
+      2.237224008554221
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R2": {
+    "direction": 1,
+    "floor": 1.3043589117232186,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3043589117232186,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.776827689226325,
+     "passes": false,
+     "separation": 1.0132621193157119
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.06730512889508589,
+     "high_range": [
+      5.142295580485148,
+      5.921633903434204
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.890792945083938,
+      5.074990451590062
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "R2_uncentred": {
+    "direction": 1,
+    "floor": 1.0764040970517632,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0764040970517632,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.9077491812755952,
+     "passes": false,
+     "separation": 0.9771049378204344
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.034366878881045615,
+     "high_range": [
+      1.4666938569014887,
+      1.578755276689415
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.3967361558816436,
+      1.5010607357825343
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "R3": {
+    "direction": 1,
+    "floor": 1.3043589079356146,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.3043589079356146,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.776827683854036,
+     "passes": false,
+     "separation": 1.0132621093660032
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": 0.003968253968253968,
+     "gap": 0.06730507957839738,
+     "high_range": [
+      5.14229561999202,
+      5.92163385541985
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      3.890793024479527,
+      5.074990540413623
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": true
+    }
+   },
+   "RankMe": {
+    "direction": 1,
+    "floor": 1.1370731573567838,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1370731573567838,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.8714535927957959,
+     "passes": false,
+     "separation": 0.9909064882502286
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.02035024464209423,
+     "high_range": [
+      2.217535976003733,
+      2.4879258932076924
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.9681110280080574,
+      2.2378862206458274
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "alpha_req": {
+    "direction": 0,
+    "floor": 1.1008525276053474,
+    "test_B_worst_case_over_repeats": {
+     "passes": null,
+     "why": "a non-finite value on one side"
+    },
+    "test_C_complete_separation": {
+     "direction": 0,
+     "high_range": [
+      3.266702240352273,
+      3.596157418225851
+     ],
+     "low_range": [
+      3.3703734249167154,
+      3.666372858937106
+     ],
+     "separated": null,
+     "why": "no agreed direction for this statistic on this project -- `p2_selection_rule.METRICS` scores only the |alpha - 1| deviation, so the raw exponent is reported and not judged"
+    }
+   },
+   "alpha_req_abs_dev": {
+    "direction": -1,
+    "floor": 1.1453455914978832,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.1453455914978832,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.7971667915463914,
+     "passes": false,
+     "separation": 0.9130314703861714
+    },
+    "test_C_complete_separation": {
+     "direction": -1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.22578399330913568,
+     "high_range": [
+      2.266702240352273,
+      2.596157418225851
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      2.3703734249167154,
+      2.666372858937106
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   },
+   "hard_rank": {
+    "direction": 1,
+    "floor": 1.0,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.0,
+     "informative": "neither outcome is available from this statistic",
+     "margin": 1.0,
+     "passes": null,
+     "separation": 1.0,
+     "why": "NO DISCRIMINATION -- the statistic is pinned at the same value in every repeat of both arms, so its floor and its separation are both exactly 1. It cannot rule either way and is not counted as a failure."
+    },
+    "test_C_complete_separation": {
+     "constant": true,
+     "direction": 1,
+     "n_high": 5,
+     "n_low": 5,
+     "separated": null,
+     "value": 256.0,
+     "why": "the statistic is PINNED at one value in every repeat of both arms, so it neither orders nor overlaps them -- it cannot rule. Printing this as an overlap would read as a statistic that disagreed, which is the opposite of what it did."
+    }
+   },
+   "stable_rank": {
+    "direction": 1,
+    "floor": 1.5116947716819098,
+    "test_B_worst_case_over_repeats": {
+     "floor": 1.5116947716819098,
+     "informative": "PASSING is informative, FAILING is not: both sides of this test move against the pass as repeats are added, so a failure at larger n is arithmetically expected and a survival is not.",
+     "margin": 0.5267548935156429,
+     "passes": false,
+     "separation": 0.7962926184854584
+    },
+    "test_C_complete_separation": {
+     "direction": 1,
+     "exact_one_sided_permutation_p": null,
+     "gap": -0.5683741513519962,
+     "high_range": [
+      2.2217758526694484,
+      2.827746030541351
+     ],
+     "informative": "EITHER outcome is informative, and this test gets HARDER TO PASS and MORE surprising when passed as repeats are added -- the opposite of Test B.",
+     "inverted": false,
+     "low_range": [
+      1.8457098987761444,
+      2.7901500040214446
+     ],
+     "n_high": 5,
+     "n_low": 5,
+     "scope": "exchangeability holds over GPU non-determinism only: same seed, same workspace, one card. NOT a p-value for the momentum effect.",
+     "separated": false
+    }
+   }
+  }
+ },
+ "arm_floor": {
+  "m0": {
+   "PR": {
+    "fold": 1.8048858250051807,
+    "max": 1.8673890267701105,
+    "min": 1.0346300031276219,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.3739088492009732,
+     "separation": 1.3136867311502154
+    },
+    "values": {
+     "rep1": 1.4754863601113126,
+     "rep2": 1.8673890267701105,
+     "rep3": 1.6388984327867002,
+     "rep4": 1.0346300031276219,
+     "rep5": 1.3591797067586626
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.8048858379875554,
+    "max": 1.8673890362711734,
+    "min": 1.034630000949705,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.3739088531468708,
+     "separation": 1.3136867368265026
+    },
+    "values": {
+     "rep1": 1.47548635647365,
+     "rep2": 1.8673890362711734,
+     "rep3": 1.6388984385071619,
+     "rep4": 1.034630000949705,
+     "rep5": 1.3591797097704192
+    }
+   },
+   "R1": {
+    "fold": 1.7512790510906602,
+    "max": 2.738429723244596,
+    "min": 1.563674116662995,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.2864317908150926,
+     "separation": 1.361346216406108
+    },
+    "values": {
+     "rep1": 2.738429723244596,
+     "rep2": 2.456151557755599,
+     "rep3": 2.1287018424113313,
+     "rep4": 1.563674116662995,
+     "rep5": 2.24567935038956
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.7512790010984023,
+    "max": 2.7384296955674423,
+    "min": 1.5636741454958913,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.2864317783497683,
+     "separation": 1.3613461907361608
+    },
+    "values": {
+     "rep1": 2.7384296955674423,
+     "rep2": 2.456151549101377,
+     "rep3": 2.128701841523453,
+     "rep4": 1.5636741454958913,
+     "rep5": 2.245679358353679
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.2630248447557697,
+    "max": 2.2139305424722,
+    "min": 1.7528796457684142,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1615284213113322,
+     "separation": 1.0873817821262186
+    },
+    "values": {
+     "rep1": 2.1853758418660605,
+     "rep2": 2.2139305424722,
+     "rep3": 1.9601636164280642,
+     "rep4": 1.7528796457684142,
+     "rep5": 1.9060493930684332
+    }
+   },
+   "R2": {
+    "fold": 1.7491036731638623,
+    "max": 2.265239842932841,
+    "min": 1.2950860933448085,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.195423922757132,
+     "separation": 1.4631660282736525
+    },
+    "values": {
+     "rep1": 2.265239842932841,
+     "rep2": 2.1884900648418903,
+     "rep3": 1.9558534823651568,
+     "rep4": 1.2950860933448085,
+     "rep5": 1.894925975471764
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.1526204063686054,
+    "max": 1.7281459767329563,
+    "min": 1.4993192617312547,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.1161911474963566,
+     "separation": 1.032637115026365
+    },
+    "values": {
+     "rep1": 1.6735268872151996,
+     "rep2": 1.7281459767329563,
+     "rep3": 1.5975990815795102,
+     "rep4": 1.505174303691878,
+     "rep5": 1.4993192617312547
+    }
+   },
+   "R3": {
+    "fold": 1.7491036582769752,
+    "max": 2.2652398290989906,
+    "min": 1.2950860964583746,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.19542391263661,
+     "separation": 1.4631660282076648
+    },
+    "values": {
+     "rep1": 2.2652398290989906,
+     "rep2": 2.1884900654294097,
+     "rep3": 1.95585348437996,
+     "rep4": 1.2950860964583746,
+     "rep5": 1.8949259799419689
+    }
+   },
+   "RankMe": {
+    "fold": 1.2630124263488298,
+    "max": 2.214750538510547,
+    "min": 1.753546119029915,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.161517631058757,
+     "separation": 1.0873811921370125
+    },
+    "values": {
+     "rep1": 2.186185222438862,
+     "rep2": 2.214750538510547,
+     "rep3": 1.9609101457820026,
+     "rep4": 1.753546119029915,
+     "rep5": 1.9067730693779807
+    }
+   },
+   "alpha_req": {
+    "fold": 1.544301486946955,
+    "max": 6.589482814063951,
+    "min": 4.266966566930653,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.295646305854397,
+     "separation": 1.1919159418500294
+    },
+    "values": {
+     "rep1": 5.810567157195065,
+     "rep2": 4.266966566930653,
+     "rep3": 5.085865474465736,
+     "rep4": 6.285501297201273,
+     "rep5": 6.589482814063951
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.7109090955024144,
+    "max": 5.589482814063951,
+    "min": 3.2669665669306527,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.368004612240648,
+     "separation": 1.2506603268684342
+    },
+    "values": {
+     "rep1": 4.810567157195065,
+     "rep2": 3.2669665669306527,
+     "rep3": 4.085865474465736,
+     "rep4": 5.285501297201273,
+     "rep5": 5.589482814063951
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.5374651524930107,
+    "max": 1.5640904642332263,
+    "min": 1.0173176684343332,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.320063711772893,
+     "separation": 1.1646901121371935
+    },
+    "values": {
+     "rep1": 1.2399441543614997,
+     "rep2": 1.5640904642332263,
+     "rep3": 1.3605338701860246,
+     "rep4": 1.0173176684343332,
+     "rep5": 1.1848598293279318
+    }
+   }
+  },
+  "m098": {
+   "PR": {
+    "fold": 1.4724318977995299,
+    "max": 4.111231130616836,
+    "min": 2.7921366935617526,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.2883521342983624,
+     "separation": 1.1428800081907866
+    },
+    "values": {
+     "rep1": 3.230484124853828,
+     "rep2": 4.111231130616836,
+     "rep3": 3.5972552684030568,
+     "rep4": 2.8617200219809904,
+     "rep5": 2.7921366935617526
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.4724318982754936,
+    "max": 4.111231122774019,
+    "min": 2.792136687332756,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.2883521394926203,
+     "separation": 1.1428800039524658
+    },
+    "values": {
+     "rep1": 3.230484107368587,
+     "rep2": 4.111231122774019,
+     "rep3": 3.5972552748809936,
+     "rep4": 2.8617200269472507,
+     "rep5": 2.792136687332756
+    }
+   },
+   "R1": {
+    "fold": 1.2562897682967324,
+    "max": 6.008445781625046,
+    "min": 4.782691010666471,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0680741813155759,
+     "separation": 1.1762195831279494
+    },
+    "values": {
+     "rep1": 5.664576261345526,
+     "rep2": 6.008445781625046,
+     "rep3": 5.786590503172612,
+     "rep4": 4.782691010666471,
+     "rep5": 5.625494826795907
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.2562897575176029,
+    "max": 6.008445919657771,
+    "min": 4.782691161575901,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0680742306120619,
+     "separation": 1.1762195187479467
+    },
+    "values": {
+     "rep1": 5.664576042120078,
+     "rep2": 6.008445919657771,
+     "rep3": 5.78659075203508,
+     "rep4": 4.782691161575901,
+     "rep5": 5.625494696388865
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.13708705810957,
+    "max": 2.237224008554221,
+    "min": 1.9675045921933638,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.071759257440717,
+     "separation": 1.0609538011594608
+    },
+    "values": {
+     "rep1": 2.237224008554221,
+     "rep2": 2.165836482637649,
+     "rep3": 2.139100361331261,
+     "rep4": 1.9675045921933638,
+     "rep5": 2.0874314758862442
+    }
+   },
+   "R2": {
+    "fold": 1.3043589117232186,
+    "max": 5.074990451590062,
+    "min": 3.890792945083938,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1301060973710078,
+     "separation": 1.15419155312725
+    },
+    "values": {
+     "rep1": 4.5691675712885615,
+     "rep2": 5.074990451590062,
+     "rep3": 4.800718912441128,
+     "rep4": 3.890792945083938,
+     "rep5": 4.4907203521829775
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.0746916870889185,
+    "max": 1.5010607357825343,
+    "min": 1.3967361558816436,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.042912231056984,
+     "separation": 1.0304718413358007
+    },
+    "values": {
+     "rep1": 1.5010607357825343,
+     "rep2": 1.4566732205284805,
+     "rep3": 1.4495589097228605,
+     "rep4": 1.3967361558816436,
+     "rep5": 1.4295920160829767
+    }
+   },
+   "R3": {
+    "fold": 1.3043589079356146,
+    "max": 5.074990540413623,
+    "min": 3.890793024479527,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.1301061335609817,
+     "separation": 1.154191512814429
+    },
+    "values": {
+     "rep1": 4.569167448057789,
+     "rep2": 5.074990540413623,
+     "rep3": 4.8007190497693335,
+     "rep4": 3.890793024479527,
+     "rep5": 4.490720286971853
+    }
+   },
+   "RankMe": {
+    "fold": 1.1370731573567838,
+    "max": 2.2378862206458274,
+    "min": 1.9681110280080574,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": true,
+     "rest_fold": 1.0717528507680398,
+     "separation": 1.0609471731677076
+    },
+    "values": {
+     "rep1": 2.2378862206458274,
+     "rep2": 2.166482107661088,
+     "rep3": 2.1397390186996077,
+     "rep4": 1.9681110280080574,
+     "rep5": 2.0880618316453394
+    }
+   },
+   "alpha_req": {
+    "fold": 1.0878239283018631,
+    "max": 3.666372858937106,
+    "min": 3.3703734249167154,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.0663165521492737,
+     "separation": 1.0201697855193554
+    },
+    "values": {
+     "rep1": 3.3703734249167154,
+     "rep2": 3.5220061340304705,
+     "rep3": 3.438353134017421,
+     "rep4": 3.666372858937106,
+     "rep5": 3.6082527955253356
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.1248746003093544,
+    "max": 2.666372858937106,
+    "min": 2.3703734249167154,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.0935138236289839,
+     "separation": 1.0286789028201722
+    },
+    "values": {
+     "rep1": 2.3703734249167154,
+     "rep2": 2.5220061340304705,
+     "rep3": 2.438353134017421,
+     "rep4": 2.666372858937106,
+     "rep5": 2.6082527955253356
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.5116947716819098,
+    "max": 2.7901500040214446,
+    "min": 1.8457098987761444,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep5",
+     "outlier_is_low": true,
+     "rest_fold": 1.2698963130825334,
+     "separation": 1.1904080326152278
+    },
+    "values": {
+     "rep1": 2.4569570347208454,
+     "rep2": 2.7901500040214446,
+     "rep3": 2.615999639875236,
+     "rep4": 2.1971478893805614,
+     "rep5": 1.8457098987761444
+    }
+   }
+  },
+  "m099": {
+   "PR": {
+    "fold": 1.2928777365007125,
+    "max": 4.4547098992773195,
+    "min": 3.4455770824350216,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.181439401680803,
+     "separation": 1.0943242071166486
+    },
+    "values": {
+     "rep1": 4.070740526717119,
+     "rep2": 3.4861207371348737,
+     "rep3": 3.4455770824350216,
+     "rep4": 4.4547098992773195,
+     "rep5": 3.900187346572455
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.29287773353319,
+    "max": 4.454709895149889,
+    "min": 3.4455770871511646,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.181439397615806,
+     "separation": 1.0943242083701215
+    },
+    "values": {
+     "rep1": 4.070740518282696,
+     "rep2": 3.486120741485074,
+     "rep3": 3.4455770871511646,
+     "rep4": 4.454709895149889,
+     "rep5": 3.9001873230516613
+    }
+   },
+   "R1": {
+    "fold": 1.102409056358124,
+    "max": 7.124056271899402,
+    "min": 6.4622621075285425,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0469227103819565,
+     "separation": 1.052999467320681
+    },
+    "values": {
+     "rep1": 6.935204377395353,
+     "rep2": 6.913216715637349,
+     "rep3": 6.4622621075285425,
+     "rep4": 7.124056271899402,
+     "rep5": 6.804758556914178
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.1024090320823483,
+    "max": 7.124056180947778,
+    "min": 6.462262167329215,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0469227583536087,
+     "separation": 1.0529993958828419
+    },
+    "values": {
+     "rep1": 6.935204364150566,
+     "rep2": 6.913216881581926,
+     "rep3": 6.462262167329215,
+     "rep4": 7.124056180947778,
+     "rep5": 6.804758158234207
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.121944073859218,
+    "max": 2.4872254216257854,
+    "min": 2.2168889515769963,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0877802277554873,
+     "separation": 1.0314069379383957
+    },
+    "values": {
+     "rep1": 2.346853613692709,
+     "rep2": 2.4872254216257854,
+     "rep3": 2.2168889515769963,
+     "rep4": 2.455185192433369,
+     "rep5": 2.28651464529549
+    }
+   },
+   "R2": {
+    "fold": 1.15155455588874,
+    "max": 5.921633903434204,
+    "min": 5.142295580485148,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.094960471675823,
+     "separation": 1.0516859609793041
+    },
+    "values": {
+     "rep1": 5.630610394304518,
+     "rep2": 5.406754812763371,
+     "rep3": 5.142295580485148,
+     "rep4": 5.921633903434204,
+     "rep5": 5.531764038002345
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.0764040970517632,
+    "max": 1.578755276689415,
+    "min": 1.4666938569014887,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0596790033697259,
+     "separation": 1.0157831698361979
+    },
+    "values": {
+     "rep1": 1.514051324448711,
+     "rep2": 1.578755276689415,
+     "rep3": 1.4666938569014887,
+     "rep4": 1.5573875255779663,
+     "rep5": 1.4898429351426732
+    }
+   },
+   "R3": {
+    "fold": 1.1515545377045124,
+    "max": 5.92163385541985,
+    "min": 5.14229561999202,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.0949604608288204,
+     "separation": 1.0516859547904165
+    },
+    "values": {
+     "rep1": 5.630610381784487,
+     "rep2": 5.406754907034655,
+     "rep3": 5.14229561999202,
+     "rep4": 5.92163385541985,
+     "rep5": 5.531763827101498
+    }
+   },
+   "RankMe": {
+    "fold": 1.1219325955158728,
+    "max": 2.4879258932076924,
+    "min": 2.217535976003733,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": true,
+     "rest_fold": 1.0877742024323918,
+     "separation": 1.0314020988980055
+    },
+    "values": {
+     "rep1": 2.3475191354490526,
+     "rep2": 2.4879258932076924,
+     "rep3": 2.217535976003733,
+     "rep4": 2.455879272263121,
+     "rep5": 2.2871712600320873
+    }
+   },
+   "alpha_req": {
+    "fold": 1.1008525276053474,
+    "max": 3.596157418225851,
+    "min": 3.266702240352273,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": false,
+     "rest_fold": 1.0454236981327862,
+     "separation": 1.0530204447933997
+    },
+    "values": {
+     "rep1": 3.336844456528874,
+     "rep2": 3.4065902289301384,
+     "rep3": 3.596157418225851,
+     "rep4": 3.266702240352273,
+     "rep5": 3.4150879368077316
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.1453455914978832,
+    "max": 2.596157418225851,
+    "min": 2.266702240352273,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep3",
+     "outlier_is_low": false,
+     "rest_fold": 1.0654632504498682,
+     "separation": 1.0749742809189209
+    },
+    "values": {
+     "rep1": 2.336844456528874,
+     "rep2": 2.4065902289301384,
+     "rep3": 2.596157418225851,
+     "rep4": 2.266702240352273,
+     "rep5": 2.4150879368077316
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.272741364590777,
+    "max": 2.827746030541351,
+    "min": 2.2217758526694484,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.1426151027523528,
+     "separation": 1.1138845981686867
+    },
+    "values": {
+     "rep1": 2.6912567466200565,
+     "rep2": 2.2217758526694484,
+     "rep3": 2.4748019028715995,
+     "rep4": 2.827746030541351,
+     "rep5": 2.5935954810227506
+    }
+   }
+  },
+  "m0995": {
+   "PR": {
+    "fold": 1.2054017145637674,
+    "max": 4.07969575812392,
+    "min": 3.3845113283253907,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.1301064776555363,
+     "separation": 1.0666266749168936
+    },
+    "values": {
+     "rep1": 3.3845113283253907,
+     "rep2": 3.6487744142908096,
+     "rep3": 4.07969575812392,
+     "rep4": 3.6100100643502704,
+     "rep5": 4.028882104893293
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.2054017146850906,
+    "max": 4.079695761450187,
+    "min": 3.384511330744209,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.1301064822297284,
+     "separation": 1.0666266707069965
+    },
+    "values": {
+     "rep1": 3.384511330744209,
+     "rep2": 3.6487744152541692,
+     "rep3": 4.079695761450187,
+     "rep4": 3.6100100526818015,
+     "rep5": 4.028882124081612
+    }
+   },
+   "R1": {
+    "fold": 1.0698661198802601,
+    "max": 8.248950000259068,
+    "min": 7.710263786259812,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.0181856840054733,
+     "separation": 1.05075737823329
+    },
+    "values": {
+     "rep1": 7.793218532867837,
+     "rep2": 7.850480207075577,
+     "rep3": 7.780639262918813,
+     "rep4": 8.248950000259068,
+     "rep5": 7.710263786259812
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.0698660774944881,
+    "max": 8.248949801893831,
+    "min": 7.710263906312451,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep4",
+     "outlier_is_low": false,
+     "rest_fold": 1.018185668056065,
+     "separation": 1.0507573530641932
+    },
+    "values": {
+     "rep1": 7.793218417742717,
+     "rep2": 7.850480206337309,
+     "rep3": 7.780639329305839,
+     "rep4": 8.248949801893831,
+     "rep5": 7.710263906312451
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.138225537640195,
+    "max": 2.698147959981658,
+    "min": 2.370486226811905,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.0654111198781533,
+     "separation": 1.0683439626295332
+    },
+    "values": {
+     "rep1": 2.370486226811905,
+     "rep2": 2.6633367558045324,
+     "rep3": 2.542984500856022,
+     "rep4": 2.532494648910961,
+     "rep5": 2.698147959981658
+    }
+   },
+   "R2": {
+    "fold": 1.0665390835225999,
+    "max": 5.952799210932464,
+    "min": 5.581416849039761,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.02171172249891,
+     "separation": 1.0438747643161523
+    },
+    "values": {
+     "rep1": 5.581416849039761,
+     "rep2": 5.850438980217852,
+     "rep3": 5.952799210932464,
+     "rep4": 5.887186090549905,
+     "rep5": 5.826300197841583
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.097898397783257,
+    "max": 1.6477509057692281,
+    "min": 1.5008227620116454,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.0574805312205082,
+     "separation": 1.0382209084417846
+    },
+    "values": {
+     "rep1": 1.5008227620116454,
+     "rep2": 1.6266482758787755,
+     "rep3": 1.5764160776789131,
+     "rep4": 1.5581855713858388,
+     "rep5": 1.6477509057692281
+    }
+   },
+   "R3": {
+    "fold": 1.0665390949667057,
+    "max": 5.95279924247016,
+    "min": 5.5814168187205455,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.021711712333882,
+     "separation": 1.043874785902596
+    },
+    "values": {
+     "rep1": 5.5814168187205455,
+     "rep2": 5.850438994473055,
+     "rep3": 5.95279924247016,
+     "rep4": 5.887185981229394,
+     "rep5": 5.826300286675058
+    }
+   },
+   "RankMe": {
+    "fold": 1.138222102931221,
+    "max": 2.6988650777079277,
+    "min": 2.371123413222816,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": true,
+     "rest_fold": 1.065413162429522,
+     "separation": 1.0683386906312182
+    },
+    "values": {
+     "rep1": 2.371123413222816,
+     "rep2": 2.6640427477505244,
+     "rep3": 2.5436688991172445,
+     "rep4": 2.533162882607488,
+     "rep5": 2.6988650777079277
+    }
+   },
+   "alpha_req": {
+    "fold": 1.0470841964236473,
+    "max": 3.318627367581737,
+    "min": 3.1693987731995428,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.042187236281186,
+     "separation": 1.0046987335595619
+    },
+    "values": {
+     "rep1": 3.318627367581737,
+     "rep2": 3.1693987731995428,
+     "rep3": 3.1803529589019264,
+     "rep4": 3.3031069481138124,
+     "rep5": 3.1976239204208485
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.0687879961147502,
+    "max": 2.318627367581737,
+    "min": 2.1693987731995428,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0616337469007922,
+     "separation": 1.0067389052343554
+    },
+    "values": {
+     "rep1": 2.318627367581737,
+     "rep2": 2.1693987731995428,
+     "rep3": 2.1803529589019264,
+     "rep4": 2.3031069481138124,
+     "rep5": 2.1976239204208485
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.2474590355113115,
+    "max": 2.8008919182049343,
+    "min": 2.2452776712278153,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.1940039527235617,
+     "separation": 1.044769602869251
+    },
+    "values": {
+     "rep1": 2.3457978608998813,
+     "rep2": 2.2452776712278153,
+     "rep3": 2.8008919182049343,
+     "rep4": 2.568373866649377,
+     "rep5": 2.7617801013245384
+    }
+   }
+  },
+  "m0999": {
+   "PR": {
+    "fold": 1.432109839530745,
+    "max": 4.813011411635812,
+    "min": 3.3607837044209377,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.3268452943929256,
+     "separation": 1.0793344526167847
+    },
+    "values": {
+     "rep1": 3.3607837044209377,
+     "rep2": 4.813011411635812,
+     "rep3": 4.459240043683346,
+     "rep4": 3.4607092929815115,
+     "rep5": 4.229209360619513
+    }
+   },
+   "PR_rownorm": {
+    "fold": 1.4321098437380828,
+    "max": 4.813011410866994,
+    "min": 3.360783694010584,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.3268453049353028,
+     "separation": 1.0793344472119248
+    },
+    "values": {
+     "rep1": 3.360783694010584,
+     "rep2": 4.813011410866994,
+     "rep3": 4.459240065301067,
+     "rep4": 3.4607092982260994,
+     "rep5": 4.229209349673269
+    }
+   },
+   "R1": {
+    "fold": 1.1546857664257222,
+    "max": 11.954523975867632,
+    "min": 10.353053898700356,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0599287785265923,
+     "separation": 1.08939939156181
+    },
+    "values": {
+     "rep1": 10.93866668332793,
+     "rep2": 11.954523975867632,
+     "rep3": 10.695832870420565,
+     "rep4": 10.353053898700356,
+     "rep5": 10.973499772869442
+    }
+   },
+   "R1_rownorm": {
+    "fold": 1.1546857605655423,
+    "max": 11.95452377222049,
+    "min": 10.353053774877592,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0599288044625765,
+     "separation": 1.0893993593758509
+    },
+    "values": {
+     "rep1": 10.93866662345326,
+     "rep2": 11.95452377222049,
+     "rep3": 10.695832925686867,
+     "rep4": 10.353053774877592,
+     "rep5": 10.97349991014277
+    }
+   },
+   "R1_uncentred": {
+    "fold": 1.1554045332264102,
+    "max": 3.3894553105532435,
+    "min": 2.9335658750518805,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0336283270291908,
+     "separation": 1.1178143081152034
+    },
+    "values": {
+     "rep1": 3.012465134658713,
+     "rep2": 3.3894553105532435,
+     "rep3": 3.032216787659799,
+     "rep4": 2.9335658750518805,
+     "rep5": 2.985868052764039
+    }
+   },
+   "R2": {
+    "fold": 1.194698925496616,
+    "max": 8.053572498703037,
+    "min": 6.741089597410748,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0900036313739692,
+     "separation": 1.096050408557517
+    },
+    "values": {
+     "rep1": 6.971177995335019,
+     "rep2": 8.053572498703037,
+     "rep3": 7.20454848797257,
+     "rep4": 6.741089597410748,
+     "rep5": 7.3478121405950025
+    }
+   },
+   "R2_uncentred": {
+    "fold": 1.083394479289655,
+    "max": 1.8086254493926242,
+    "min": 1.669406189496626,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0186196045917404,
+     "separation": 1.0635908384306783
+    },
+    "values": {
+     "rep1": 1.6857909349349236,
+     "rep2": 1.8086254493926242,
+     "rep3": 1.700489872648057,
+     "rep4": 1.669406189496626,
+     "rep5": 1.6757068584098587
+    }
+   },
+   "R3": {
+    "fold": 1.1946989118770555,
+    "max": 8.053572410191407,
+    "min": 6.741089600172154,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0900036310254562,
+     "separation": 1.0960503964129953
+    },
+    "values": {
+     "rep1": 6.971177983163769,
+     "rep2": 8.053572410191407,
+     "rep3": 7.204548582523358,
+     "rep4": 6.741089600172154,
+     "rep5": 7.347812141255589
+    }
+   },
+   "RankMe": {
+    "fold": 1.155397215245086,
+    "max": 3.3902689232675067,
+    "min": 2.93428863990152,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.0336270635151077,
+     "separation": 1.1178085946355434
+    },
+    "values": {
+     "rep1": 3.013206576020344,
+     "rep2": 3.3902689232675067,
+     "rep3": 3.032960150367147,
+     "rep4": 2.93428863990152,
+     "rep5": 2.9866041632107794
+    }
+   },
+   "alpha_req": {
+    "fold": 1.0493251429083044,
+    "max": 3.157423901014488,
+    "min": 3.0090043323115157,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.0413009699794376,
+     "separation": 1.0077059113169031
+    },
+    "values": {
+     "rep1": 3.157423901014488,
+     "rep2": 3.0090043323115157,
+     "rep3": 3.1080211702649456,
+     "rep4": 3.0321914528484855,
+     "rep5": 3.143537326161937
+    }
+   },
+   "alpha_req_abs_dev": {
+    "fold": 1.0738771770253994,
+    "max": 2.157423901014488,
+    "min": 2.0090043323115157,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": true,
+     "rest_fold": 1.061624335635536,
+     "separation": 1.0115415980762426
+    },
+    "values": {
+     "rep1": 2.157423901014488,
+     "rep2": 2.0090043323115157,
+     "rep3": 2.1080211702649456,
+     "rep4": 2.0321914528484855,
+     "rep5": 2.143537326161937
+    }
+   },
+   "hard_rank": {
+    "fold": 1.0,
+    "max": 256.0,
+    "min": 256.0,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": true,
+     "defined": true,
+     "outlier": "rep1",
+     "outlier_is_low": false,
+     "rest_fold": 1.0,
+     "separation": 1.0
+    },
+    "values": {
+     "rep1": 256.0,
+     "rep2": 256.0,
+     "rep3": 256.0,
+     "rep4": 256.0,
+     "rep5": 256.0
+    }
+   },
+   "stable_rank": {
+    "fold": 1.3711248212375562,
+    "max": 2.904021004705074,
+    "min": 2.117984416680568,
+    "n": 5,
+    "shape": {
+     "bimodal": false,
+     "concordant": false,
+     "defined": true,
+     "outlier": "rep2",
+     "outlier_is_low": false,
+     "rest_fold": 1.3465803687576523,
+     "separation": 1.0182272466236446
+    },
+    "values": {
+     "rep1": 2.1307675034500337,
+     "rep2": 2.904021004705074,
+     "rep3": 2.8520362368366805,
+     "rep4": 2.117984416680568,
+     "rep5": 2.623846183721045
+    }
+   }
+  }
+ },
+ "config": {
+  "arms": [
+   "0",
+   "0.98",
+   "0.99",
+   "0.995",
+   "0.999"
+  ],
+  "rep_offset": 0,
+  "reps": 5,
+  "root": "/home/ubuntu/e0_run/d1_probefloor600",
+  "statistic_sites": {
+   "PR/PR_rownorm/RankMe/stable_rank/alpha_req/LiDAR": "v2/research/rebase/p2/p2_competing_metrics.py",
+   "R1/R2/R3/R1_uncentred/R1_rownorm/R2_uncentred": "v2/calibra/spectral.py RANK_VARIANTS -- one implementation",
+   "STATISTICS/_fold/_sha256": "v2/research/rebase/p2/p2_envelope_floors.py -- imported, not restated",
+   "hard_rank": "numpy.linalg.matrix_rank -- NOT an effective rank"
+  },
+  "step": 600,
+  "view": "wsi_biology"
+ },
+ "duplicates_on_this_block": {
+  "duplicate_of": {
+   "PR_rownorm": "PR",
+   "R1_rownorm": "R1",
+   "R1_uncentred": "RankMe",
+   "R3": "R2"
+  },
+  "near_duplicates": {
+   "R1_uncentred ~= RankMe": 0.0003808505308851452
+  },
+  "thresholds": {
+   "duplicate": 1e-06,
+   "near_duplicate": 0.001
+  },
+  "why": "`z_biology` is L2-normalised at the model's output, so on this block `normalise_rows` is a no-op. A duplicate is NOT independent corroboration and is excluded from any count of agreeing statistics; a near-duplicate is excluded too and its relative difference is printed so the exclusion can be argued with.",
+  "worst_relative_difference": {
+   "PR_rownorm == PR": 6.030683095167615e-09,
+   "R1_rownorm == R1": 5.8588411583766727e-08,
+   "R3 == R2": 3.812542501820705e-08
+  }
+ },
+ "reading_rule": "STEP: the grid is flat within its own floor across the lower arms and rises only at the top one -- the two-point comparison is then well posed and the closeness of the neighbour is not evidence against it. SMOOTH: every adjacent pair separates by roughly the same amount, so the shipped comparison is a coarse read of a trend and the honest claim is about the trend. NEITHER: non-monotone in m, which undercuts the momentum story more broadly than \u00a75.4 limit 2 does. Predeclared at NOTEBOOK_ENTRIES/PREDECLARED_probe_floor_n10_and_momentum_grid_20260805T0200Z.md \u00a76.",
+ "reps": {
+  "m0": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0_rep1/probe_step600.npz",
+    "sha256": "ff9ff287cb903c8c43604e0629f699c5f3459a2ee610d213e01fdd5c8a588e0a",
+    "views": {
+     "rna_biology": {
+      "PR": 1.031564903269543,
+      "PR_rownorm": 1.0315649075383604,
+      "R1": 1.6002428499178525,
+      "R1_rownorm": 1.6002428643797777,
+      "R1_uncentred": 1.384051496203378,
+      "R2": 1.3016710058000538,
+      "R2_uncentred": 1.1857109861913278,
+      "R3": 1.3016710225774908,
+      "RankMe": 1.3845733485150837,
+      "alpha_req": 2.716278170772307,
+      "alpha_req_abs_dev": 1.716278170772307,
+      "hard_rank": 256.0,
+      "stable_rank": 1.0157816181553598
+     },
+     "wsi_biology": {
+      "PR": 1.4754863601113126,
+      "PR_rownorm": 1.47548635647365,
+      "R1": 2.738429723244596,
+      "R1_rownorm": 2.7384296955674423,
+      "R1_uncentred": 2.1853758418660605,
+      "R2": 2.265239842932841,
+      "R2_uncentred": 1.6735268872151996,
+      "R3": 2.2652398290989906,
+      "RankMe": 2.186185222438862,
+      "alpha_req": 5.810567157195065,
+      "alpha_req_abs_dev": 4.810567157195065,
+      "hard_rank": 256.0,
+      "stable_rank": 1.2399441543614997
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0_rep2/probe_step600.npz",
+    "sha256": "d4c782a9437ad8593cd380718bb90f84f2ae92aaa1b890ed3d298b66d60ac2af",
+    "views": {
+     "rna_biology": {
+      "PR": 1.5370889667362124,
+      "PR_rownorm": 1.5370889934443124,
+      "R1": 2.5156885145988466,
+      "R1_rownorm": 2.5156885080481204,
+      "R1_uncentred": 2.010974618295116,
+      "R2": 2.1169012524669673,
+      "R2_uncentred": 1.5853379723049943,
+      "R3": 2.116901255959306,
+      "RankMe": 2.0116805846040857,
+      "alpha_req": 3.0518530459517414,
+      "alpha_req_abs_dev": 2.0518530459517414,
+      "hard_rank": 256.0,
+      "stable_rank": 1.2863948903929134
+     },
+     "wsi_biology": {
+      "PR": 1.8673890267701105,
+      "PR_rownorm": 1.8673890362711734,
+      "R1": 2.456151557755599,
+      "R1_rownorm": 2.456151549101377,
+      "R1_uncentred": 2.2139305424722,
+      "R2": 2.1884900648418903,
+      "R2_uncentred": 1.7281459767329563,
+      "R3": 2.1884900654294097,
+      "RankMe": 2.214750538510547,
+      "alpha_req": 4.266966566930653,
+      "alpha_req_abs_dev": 3.2669665669306527,
+      "hard_rank": 256.0,
+      "stable_rank": 1.5640904642332263
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0_rep3/probe_step600.npz",
+    "sha256": "49cff433e9ab08a7fb3c1c4859a9a5b0c83e97362eb441469ea7bb87e0aa9cd2",
+    "views": {
+     "rna_biology": {
+      "PR": 1.009160853778951,
+      "PR_rownorm": 1.0091608503915834,
+      "R1": 1.298661200936035,
+      "R1_rownorm": 1.2986611427601418,
+      "R1_uncentred": 1.515677036278901,
+      "R2": 1.1416041891824669,
+      "R2_uncentred": 1.3029335247511693,
+      "R3": 1.1416041617137782,
+      "RankMe": 1.5162489372217764,
+      "alpha_req": 2.517460437501457,
+      "alpha_req_abs_dev": 1.517460437501457,
+      "hard_rank": 256.0,
+      "stable_rank": 1.0045805061416604
+     },
+     "wsi_biology": {
+      "PR": 1.6388984327867002,
+      "PR_rownorm": 1.6388984385071619,
+      "R1": 2.1287018424113313,
+      "R1_rownorm": 2.128701841523453,
+      "R1_uncentred": 1.9601636164280642,
+      "R2": 1.9558534823651568,
+      "R2_uncentred": 1.5975990815795102,
+      "R3": 1.95585348437996,
+      "RankMe": 1.9609101457820026,
+      "alpha_req": 5.085865474465736,
+      "alpha_req_abs_dev": 4.085865474465736,
+      "hard_rank": 256.0,
+      "stable_rank": 1.3605338701860246
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0_rep4/probe_step600.npz",
+    "sha256": "cd5850bd21ff4075eb03a97988e3dee5f271e922967708d20abb759439f5fd61",
+    "views": {
+     "rna_biology": {
+      "PR": 1.028429288871046,
+      "PR_rownorm": 1.0284292873630843,
+      "R1": 1.5822030818965063,
+      "R1_rownorm": 1.5822030624927943,
+      "R1_uncentred": 1.90219090626771,
+      "R2": 1.2887017659368445,
+      "R2_uncentred": 1.6539725294232064,
+      "R3": 1.2887017556136846,
+      "RankMe": 1.9028894474412819,
+      "alpha_req": 4.873703549040628,
+      "alpha_req_abs_dev": 3.873703549040628,
+      "hard_rank": 256.0,
+      "stable_rank": 1.0142118728687437
+     },
+     "wsi_biology": {
+      "PR": 1.0346300031276219,
+      "PR_rownorm": 1.034630000949705,
+      "R1": 1.563674116662995,
+      "R1_rownorm": 1.5636741454958913,
+      "R1_uncentred": 1.7528796457684142,
+      "R2": 1.2950860933448085,
+      "R2_uncentred": 1.505174303691878,
+      "R3": 1.2950860964583746,
+      "RankMe": 1.753546119029915,
+      "alpha_req": 6.285501297201273,
+      "alpha_req_abs_dev": 5.285501297201273,
+      "hard_rank": 256.0,
+      "stable_rank": 1.0173176684343332
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0_rep5/probe_step600.npz",
+    "sha256": "dd004412b25188579df6e947c946e61e9b9adc74863a059b8a4003418ae9f473",
+    "views": {
+     "rna_biology": {
+      "PR": 1.6412819502857363,
+      "PR_rownorm": 1.6412819304133526,
+      "R1": 2.322293310856081,
+      "R1_rownorm": 2.322293290058625,
+      "R1_uncentred": 1.5856924392791418,
+      "R2": 2.070026393216736,
+      "R2_uncentred": 1.3005496927419546,
+      "R3": 2.070026385614331,
+      "RankMe": 1.5862832679861065,
+      "alpha_req": 2.8649931835459044,
+      "alpha_req_abs_dev": 1.8649931835459044,
+      "hard_rank": 256.0,
+      "stable_rank": 1.3583671088685751
+     },
+     "wsi_biology": {
+      "PR": 1.3591797067586626,
+      "PR_rownorm": 1.3591797097704192,
+      "R1": 2.24567935038956,
+      "R1_rownorm": 2.245679358353679,
+      "R1_uncentred": 1.9060493930684332,
+      "R2": 1.894925975471764,
+      "R2_uncentred": 1.4993192617312547,
+      "R3": 1.8949259799419689,
+      "RankMe": 1.9067730693779807,
+      "alpha_req": 6.589482814063951,
+      "alpha_req_abs_dev": 5.589482814063951,
+      "hard_rank": 256.0,
+      "stable_rank": 1.1848598293279318
+     }
+    }
+   }
+  },
+  "m098": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.98_rep1/probe_step600.npz",
+    "sha256": "4c71d75e1984ec3d86e3edb263dffe3f5a745196efa9aba1609b09155a3aa896",
+    "views": {
+     "rna_biology": {
+      "PR": 2.8963595130612516,
+      "PR_rownorm": 2.896359508667803,
+      "R1": 5.819226017559799,
+      "R1_rownorm": 5.819225835813029,
+      "R1_uncentred": 2.8605147680241076,
+      "R2": 4.343671954781496,
+      "R2_uncentred": 1.8236900517354102,
+      "R3": 4.343671867564106,
+      "RankMe": 2.8613013104414637,
+      "alpha_req": 2.8847445204336055,
+      "alpha_req_abs_dev": 1.8847445204336055,
+      "hard_rank": 256.0,
+      "stable_rank": 2.118741080854596
+     },
+     "wsi_biology": {
+      "PR": 3.230484124853828,
+      "PR_rownorm": 3.230484107368587,
+      "R1": 5.664576261345526,
+      "R1_rownorm": 5.664576042120078,
+      "R1_uncentred": 2.237224008554221,
+      "R2": 4.5691675712885615,
+      "R2_uncentred": 1.5010607357825343,
+      "R3": 4.569167448057789,
+      "RankMe": 2.2378862206458274,
+      "alpha_req": 3.3703734249167154,
+      "alpha_req_abs_dev": 2.3703734249167154,
+      "hard_rank": 256.0,
+      "stable_rank": 2.4569570347208454
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.98_rep2/probe_step600.npz",
+    "sha256": "8244aecf1af3ef04eecc3af16e0405176a823942dba000c4f22ec42fb77bd08d",
+    "views": {
+     "rna_biology": {
+      "PR": 3.265228613958768,
+      "PR_rownorm": 3.265228597901455,
+      "R1": 6.301962419239237,
+      "R1_rownorm": 6.301962325058491,
+      "R1_uncentred": 2.8118970949099604,
+      "R2": 4.800138934691519,
+      "R2_uncentred": 1.768025930653589,
+      "R3": 4.800138869796036,
+      "RankMe": 2.812672873373754,
+      "alpha_req": 2.928910894170581,
+      "alpha_req_abs_dev": 1.9289108941705808,
+      "hard_rank": 256.0,
+      "stable_rank": 2.3332311660544525
+     },
+     "wsi_biology": {
+      "PR": 4.111231130616836,
+      "PR_rownorm": 4.111231122774019,
+      "R1": 6.008445781625046,
+      "R1_rownorm": 6.008445919657771,
+      "R1_uncentred": 2.165836482637649,
+      "R2": 5.074990451590062,
+      "R2_uncentred": 1.4566732205284805,
+      "R3": 5.074990540413623,
+      "RankMe": 2.166482107661088,
+      "alpha_req": 3.5220061340304705,
+      "alpha_req_abs_dev": 2.5220061340304705,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7901500040214446
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.98_rep3/probe_step600.npz",
+    "sha256": "bdbc9b22f96c8e76f96fa173705d24e80d96600c012cd3a523f7c44d67c9d5fe",
+    "views": {
+     "rna_biology": {
+      "PR": 2.993317669877897,
+      "PR_rownorm": 2.9933176793963026,
+      "R1": 5.854651195216217,
+      "R1_rownorm": 5.854651414349742,
+      "R1_uncentred": 2.9679337682568554,
+      "R2": 4.3847450261855885,
+      "R2_uncentred": 1.8833507405333856,
+      "R3": 4.384745150085082,
+      "RankMe": 2.9687465187918165,
+      "alpha_req": 2.8490968901463063,
+      "alpha_req_abs_dev": 1.8490968901463063,
+      "hard_rank": 256.0,
+      "stable_rank": 2.157253026782821
+     },
+     "wsi_biology": {
+      "PR": 3.5972552684030568,
+      "PR_rownorm": 3.5972552748809936,
+      "R1": 5.786590503172612,
+      "R1_rownorm": 5.78659075203508,
+      "R1_uncentred": 2.139100361331261,
+      "R2": 4.800718912441128,
+      "R2_uncentred": 1.4495589097228605,
+      "R3": 4.8007190497693335,
+      "RankMe": 2.1397390186996077,
+      "alpha_req": 3.438353134017421,
+      "alpha_req_abs_dev": 2.438353134017421,
+      "hard_rank": 256.0,
+      "stable_rank": 2.615999639875236
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.98_rep4/probe_step600.npz",
+    "sha256": "aceb2a87b59d4f9f3c7f1faba2a3b1bd8b8e89576dab6e1727395d74e92687dc",
+    "views": {
+     "rna_biology": {
+      "PR": 2.2595135566554787,
+      "PR_rownorm": 2.259513530294807,
+      "R1": 4.911347821630059,
+      "R1_rownorm": 4.91134776747722,
+      "R1_uncentred": 2.2278942116805287,
+      "R2": 3.700731508627113,
+      "R2_uncentred": 1.5267852217384636,
+      "R3": 3.700731444988536,
+      "RankMe": 2.228537198688451,
+      "alpha_req": 2.927433107512396,
+      "alpha_req_abs_dev": 1.927433107512396,
+      "hard_rank": 256.0,
+      "stable_rank": 1.624585992635983
+     },
+     "wsi_biology": {
+      "PR": 2.8617200219809904,
+      "PR_rownorm": 2.8617200269472507,
+      "R1": 4.782691010666471,
+      "R1_rownorm": 4.782691161575901,
+      "R1_uncentred": 1.9675045921933638,
+      "R2": 3.890792945083938,
+      "R2_uncentred": 1.3967361558816436,
+      "R3": 3.890793024479527,
+      "RankMe": 1.9681110280080574,
+      "alpha_req": 3.666372858937106,
+      "alpha_req_abs_dev": 2.666372858937106,
+      "hard_rank": 256.0,
+      "stable_rank": 2.1971478893805614
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.98_rep5/probe_step600.npz",
+    "sha256": "4da07ca30999306743cbda558aba604d5617f1b163d4aaba60c66d96155a6e65",
+    "views": {
+     "rna_biology": {
+      "PR": 3.0636288191309715,
+      "PR_rownorm": 3.0636288135542475,
+      "R1": 6.279438583372317,
+      "R1_rownorm": 6.279438597686971,
+      "R1_uncentred": 2.677381664157757,
+      "R2": 4.709737547621346,
+      "R2_uncentred": 1.6966986601502636,
+      "R3": 4.70973755914788,
+      "RankMe": 2.6781189738601396,
+      "alpha_req": 3.010329643699239,
+      "alpha_req_abs_dev": 2.010329643699239,
+      "hard_rank": 256.0,
+      "stable_rank": 2.11165872664353
+     },
+     "wsi_biology": {
+      "PR": 2.7921366935617526,
+      "PR_rownorm": 2.792136687332756,
+      "R1": 5.625494826795907,
+      "R1_rownorm": 5.625494696388865,
+      "R1_uncentred": 2.0874314758862442,
+      "R2": 4.4907203521829775,
+      "R2_uncentred": 1.4295920160829767,
+      "R3": 4.490720286971853,
+      "RankMe": 2.0880618316453394,
+      "alpha_req": 3.6082527955253356,
+      "alpha_req_abs_dev": 2.6082527955253356,
+      "hard_rank": 256.0,
+      "stable_rank": 1.8457098987761444
+     }
+    }
+   }
+  },
+  "m099": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep1/probe_step600.npz",
+    "sha256": "c1d09dacf772e430ff05822cb53cd30ee392e148f660847da204bc9820cb3baa",
+    "views": {
+     "rna_biology": {
+      "PR": 3.4812657962537976,
+      "PR_rownorm": 3.4812657947884107,
+      "R1": 7.517676555846244,
+      "R1_rownorm": 7.517676500346925,
+      "R1_uncentred": 3.428461968948877,
+      "R2": 5.471206960811847,
+      "R2_uncentred": 2.023517707934457,
+      "R3": 5.471206938560424,
+      "RankMe": 3.429346485496639,
+      "alpha_req": 2.7188129852056258,
+      "alpha_req_abs_dev": 1.7188129852056258,
+      "hard_rank": 256.0,
+      "stable_rank": 2.350534789241038
+     },
+     "wsi_biology": {
+      "PR": 4.070740526717119,
+      "PR_rownorm": 4.070740518282696,
+      "R1": 6.935204377395353,
+      "R1_rownorm": 6.935204364150566,
+      "R1_uncentred": 2.346853613692709,
+      "R2": 5.630610394304518,
+      "R2_uncentred": 1.514051324448711,
+      "R3": 5.630610381784487,
+      "RankMe": 2.3475191354490526,
+      "alpha_req": 3.336844456528874,
+      "alpha_req_abs_dev": 2.336844456528874,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6912567466200565
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep2/probe_step600.npz",
+    "sha256": "fc5f67f9fe113a837317ba280a3b03ccc89f9505514d71626549b9b73f5bfdbd",
+    "views": {
+     "rna_biology": {
+      "PR": 3.661849183216074,
+      "PR_rownorm": 3.6618491751866564,
+      "R1": 7.506715248390978,
+      "R1_rownorm": 7.506715173204248,
+      "R1_uncentred": 3.5462806483206717,
+      "R2": 5.466888883354403,
+      "R2_uncentred": 2.0867391554039556,
+      "R3": 5.466888860065538,
+      "RankMe": 3.5471949896730623,
+      "alpha_req": 2.906410530610456,
+      "alpha_req_abs_dev": 1.9064105306104562,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7414797822143266
+     },
+     "wsi_biology": {
+      "PR": 3.4861207371348737,
+      "PR_rownorm": 3.486120741485074,
+      "R1": 6.913216715637349,
+      "R1_rownorm": 6.913216881581926,
+      "R1_uncentred": 2.4872254216257854,
+      "R2": 5.406754812763371,
+      "R2_uncentred": 1.578755276689415,
+      "R3": 5.406754907034655,
+      "RankMe": 2.4879258932076924,
+      "alpha_req": 3.4065902289301384,
+      "alpha_req_abs_dev": 2.4065902289301384,
+      "hard_rank": 256.0,
+      "stable_rank": 2.2217758526694484
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep3/probe_step600.npz",
+    "sha256": "4ae4da96bb451660092ca21a07376acb4825ad0517d002efc6b741a0b4d7565f",
+    "views": {
+     "rna_biology": {
+      "PR": 3.670123273023906,
+      "PR_rownorm": 3.670123261225888,
+      "R1": 7.8021457366489315,
+      "R1_rownorm": 7.8021457055512,
+      "R1_uncentred": 3.765802562269453,
+      "R2": 5.588772405359965,
+      "R2_uncentred": 2.1865548143499014,
+      "R3": 5.58877238594709,
+      "RankMe": 3.766760160997204,
+      "alpha_req": 3.1332926297770154,
+      "alpha_req_abs_dev": 2.1332926297770154,
+      "hard_rank": 256.0,
+      "stable_rank": 2.426389999610732
+     },
+     "wsi_biology": {
+      "PR": 3.4455770824350216,
+      "PR_rownorm": 3.4455770871511646,
+      "R1": 6.4622621075285425,
+      "R1_rownorm": 6.462262167329215,
+      "R1_uncentred": 2.2168889515769963,
+      "R2": 5.142295580485148,
+      "R2_uncentred": 1.4666938569014887,
+      "R3": 5.14229561999202,
+      "RankMe": 2.217535976003733,
+      "alpha_req": 3.596157418225851,
+      "alpha_req_abs_dev": 2.596157418225851,
+      "hard_rank": 256.0,
+      "stable_rank": 2.4748019028715995
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep4/probe_step600.npz",
+    "sha256": "46c7715c12801deaffb6391e2508da54e1b9ef27f5d66aa44dbaa530329ac571",
+    "views": {
+     "rna_biology": {
+      "PR": 4.376006969693911,
+      "PR_rownorm": 4.376006969257933,
+      "R1": 7.919313898595889,
+      "R1_rownorm": 7.919313834947696,
+      "R1_uncentred": 3.789331397221707,
+      "R2": 6.005665456360401,
+      "R2_uncentred": 2.1970835570501936,
+      "R3": 6.005665410940986,
+      "RankMe": 3.790298368940805,
+      "alpha_req": 2.805423313603619,
+      "alpha_req_abs_dev": 1.8054233136036189,
+      "hard_rank": 256.0,
+      "stable_rank": 3.185204064515646
+     },
+     "wsi_biology": {
+      "PR": 4.4547098992773195,
+      "PR_rownorm": 4.454709895149889,
+      "R1": 7.124056271899402,
+      "R1_rownorm": 7.124056180947778,
+      "R1_uncentred": 2.455185192433369,
+      "R2": 5.921633903434204,
+      "R2_uncentred": 1.5573875255779663,
+      "R3": 5.92163385541985,
+      "RankMe": 2.455879272263121,
+      "alpha_req": 3.266702240352273,
+      "alpha_req_abs_dev": 2.266702240352273,
+      "hard_rank": 256.0,
+      "stable_rank": 2.827746030541351
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.99_rep5/probe_step600.npz",
+    "sha256": "c664d2bd84f0048fde6b3bfc65c4bcd06655a90696bca61ed528d58c8824bcf7",
+    "views": {
+     "rna_biology": {
+      "PR": 3.472594313378298,
+      "PR_rownorm": 3.472594314266411,
+      "R1": 7.325689526518578,
+      "R1_rownorm": 7.325689536041914,
+      "R1_uncentred": 3.442683288973593,
+      "R2": 5.310193015508816,
+      "R2_uncentred": 2.042187180117237,
+      "R3": 5.310193007853644,
+      "RankMe": 3.4435765645370933,
+      "alpha_req": 2.906430918118544,
+      "alpha_req_abs_dev": 1.9064309181185441,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7534183312361793
+     },
+     "wsi_biology": {
+      "PR": 3.900187346572455,
+      "PR_rownorm": 3.9001873230516613,
+      "R1": 6.804758556914178,
+      "R1_rownorm": 6.804758158234207,
+      "R1_uncentred": 2.28651464529549,
+      "R2": 5.531764038002345,
+      "R2_uncentred": 1.4898429351426732,
+      "R3": 5.531763827101498,
+      "RankMe": 2.2871712600320873,
+      "alpha_req": 3.4150879368077316,
+      "alpha_req_abs_dev": 2.4150879368077316,
+      "hard_rank": 256.0,
+      "stable_rank": 2.5935954810227506
+     }
+    }
+   }
+  },
+  "m0995": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.995_rep1/probe_step600.npz",
+    "sha256": "8d58ca2afd47b7221f4678648573519963ad8c4732dcdc9e1d074ad1f3889f42",
+    "views": {
+     "rna_biology": {
+      "PR": 3.0090386483640192,
+      "PR_rownorm": 3.0090386426910745,
+      "R1": 8.68443297214015,
+      "R1_rownorm": 8.684433016590173,
+      "R1_uncentred": 3.8187008651227257,
+      "R2": 5.588556798550086,
+      "R2_uncentred": 2.136004856642575,
+      "R3": 5.588556793499852,
+      "RankMe": 3.8196333767111295,
+      "alpha_req": 2.8064132186723083,
+      "alpha_req_abs_dev": 1.8064132186723083,
+      "hard_rank": 256.0,
+      "stable_rank": 2.0326901053286273
+     },
+     "wsi_biology": {
+      "PR": 3.3845113283253907,
+      "PR_rownorm": 3.384511330744209,
+      "R1": 7.793218532867837,
+      "R1_rownorm": 7.793218417742717,
+      "R1_uncentred": 2.370486226811905,
+      "R2": 5.581416849039761,
+      "R2_uncentred": 1.5008227620116454,
+      "R3": 5.5814168187205455,
+      "RankMe": 2.371123413222816,
+      "alpha_req": 3.318627367581737,
+      "alpha_req_abs_dev": 2.318627367581737,
+      "hard_rank": 256.0,
+      "stable_rank": 2.3457978608998813
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.995_rep2/probe_step600.npz",
+    "sha256": "719a1f72f7fd246986b37b20e0874b4fa859e549795c717a70848aa61ebfcd93",
+    "views": {
+     "rna_biology": {
+      "PR": 3.199659567124164,
+      "PR_rownorm": 3.1996595699157053,
+      "R1": 8.787022202547115,
+      "R1_rownorm": 8.787022248466725,
+      "R1_uncentred": 3.9433916809249467,
+      "R2": 5.833788403499468,
+      "R2_uncentred": 2.1964078278887915,
+      "R3": 5.833788451308941,
+      "RankMe": 3.9443554744134857,
+      "alpha_req": 2.7797626275053293,
+      "alpha_req_abs_dev": 1.7797626275053293,
+      "hard_rank": 256.0,
+      "stable_rank": 2.040777194449647
+     },
+     "wsi_biology": {
+      "PR": 3.6487744142908096,
+      "PR_rownorm": 3.6487744152541692,
+      "R1": 7.850480207075577,
+      "R1_rownorm": 7.850480206337309,
+      "R1_uncentred": 2.6633367558045324,
+      "R2": 5.850438980217852,
+      "R2_uncentred": 1.6266482758787755,
+      "R3": 5.850438994473055,
+      "RankMe": 2.6640427477505244,
+      "alpha_req": 3.1693987731995428,
+      "alpha_req_abs_dev": 2.1693987731995428,
+      "hard_rank": 256.0,
+      "stable_rank": 2.2452776712278153
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.995_rep3/probe_step600.npz",
+    "sha256": "d23bb38a885aabb9870c6e5ae14b8920e7208c5a4ff46103e9a60c16f04d53bd",
+    "views": {
+     "rna_biology": {
+      "PR": 3.8198310527906196,
+      "PR_rownorm": 3.8198310604690984,
+      "R1": 8.806661509492226,
+      "R1_rownorm": 8.806661432271722,
+      "R1_uncentred": 4.137814090102035,
+      "R2": 5.988904328382637,
+      "R2_uncentred": 2.304916342515775,
+      "R3": 5.988904300800208,
+      "RankMe": 4.13882108461648,
+      "alpha_req": 2.724163652633089,
+      "alpha_req_abs_dev": 1.7241636526330888,
+      "hard_rank": 256.0,
+      "stable_rank": 2.5419243876389936
+     },
+     "wsi_biology": {
+      "PR": 4.07969575812392,
+      "PR_rownorm": 4.079695761450187,
+      "R1": 7.780639262918813,
+      "R1_rownorm": 7.780639329305839,
+      "R1_uncentred": 2.542984500856022,
+      "R2": 5.952799210932464,
+      "R2_uncentred": 1.5764160776789131,
+      "R3": 5.95279924247016,
+      "RankMe": 2.5436688991172445,
+      "alpha_req": 3.1803529589019264,
+      "alpha_req_abs_dev": 2.1803529589019264,
+      "hard_rank": 256.0,
+      "stable_rank": 2.8008919182049343
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.995_rep4/probe_step600.npz",
+    "sha256": "4df0fd2a561661597bb5b0fccab0ea46bb66bafc3e895a32ed5ca7a4e765decc",
+    "views": {
+     "rna_biology": {
+      "PR": 3.571175423456669,
+      "PR_rownorm": 3.5711754047972954,
+      "R1": 9.061669577971315,
+      "R1_rownorm": 9.061669502291933,
+      "R1_uncentred": 3.762000668847931,
+      "R2": 6.0122954849289565,
+      "R2_uncentred": 2.0920495674357187,
+      "R3": 6.012295448764756,
+      "RankMe": 3.762922592036007,
+      "alpha_req": 2.7514772125183153,
+      "alpha_req_abs_dev": 1.7514772125183153,
+      "hard_rank": 256.0,
+      "stable_rank": 2.500038692865628
+     },
+     "wsi_biology": {
+      "PR": 3.6100100643502704,
+      "PR_rownorm": 3.6100100526818015,
+      "R1": 8.248950000259068,
+      "R1_rownorm": 8.248949801893831,
+      "R1_uncentred": 2.532494648910961,
+      "R2": 5.887186090549905,
+      "R2_uncentred": 1.5581855713858388,
+      "R3": 5.887185981229394,
+      "RankMe": 2.533162882607488,
+      "alpha_req": 3.3031069481138124,
+      "alpha_req_abs_dev": 2.3031069481138124,
+      "hard_rank": 256.0,
+      "stable_rank": 2.568373866649377
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.995_rep5/probe_step600.npz",
+    "sha256": "eb068bc7bb84bfba5fcbb330e82691acfdd7df252af2726e037f9ade51849aee",
+    "views": {
+     "rna_biology": {
+      "PR": 3.968611165570038,
+      "PR_rownorm": 3.9686111568528233,
+      "R1": 8.91630720068346,
+      "R1_rownorm": 8.916307228538901,
+      "R1_uncentred": 4.006938099900609,
+      "R2": 6.081735373091398,
+      "R2_uncentred": 2.227557748308941,
+      "R3": 6.081735360801059,
+      "RankMe": 4.007913343156698,
+      "alpha_req": 2.69747558246899,
+      "alpha_req_abs_dev": 1.6974755824689902,
+      "hard_rank": 256.0,
+      "stable_rank": 2.754397695177308
+     },
+     "wsi_biology": {
+      "PR": 4.028882104893293,
+      "PR_rownorm": 4.028882124081612,
+      "R1": 7.710263786259812,
+      "R1_rownorm": 7.710263906312451,
+      "R1_uncentred": 2.698147959981658,
+      "R2": 5.826300197841583,
+      "R2_uncentred": 1.6477509057692281,
+      "R3": 5.826300286675058,
+      "RankMe": 2.6988650777079277,
+      "alpha_req": 3.1976239204208485,
+      "alpha_req_abs_dev": 2.1976239204208485,
+      "hard_rank": 256.0,
+      "stable_rank": 2.7617801013245384
+     }
+    }
+   }
+  },
+  "m0999": {
+   "rep1": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep1/probe_step600.npz",
+    "sha256": "333abe899e3afeaf590de0a45b547a4ca7594a2927dc394e3b261c7c8a280636",
+    "views": {
+     "rna_biology": {
+      "PR": 4.152330136842167,
+      "PR_rownorm": 4.152330123842125,
+      "R1": 12.436668340327495,
+      "R1_rownorm": 12.436668330598462,
+      "R1_uncentred": 6.566117188102326,
+      "R2": 7.587854933695098,
+      "R2_uncentred": 3.297546258756481,
+      "R3": 7.5878549131766855,
+      "RankMe": 6.567570665454399,
+      "alpha_req": 2.316147698047835,
+      "alpha_req_abs_dev": 1.316147698047835,
+      "hard_rank": 256.0,
+      "stable_rank": 2.9437675213357153
+     },
+     "wsi_biology": {
+      "PR": 3.3607837044209377,
+      "PR_rownorm": 3.360783694010584,
+      "R1": 10.93866668332793,
+      "R1_rownorm": 10.93866662345326,
+      "R1_uncentred": 3.012465134658713,
+      "R2": 6.971177995335019,
+      "R2_uncentred": 1.6857909349349236,
+      "R3": 6.971177983163769,
+      "RankMe": 3.013206576020344,
+      "alpha_req": 3.157423901014488,
+      "alpha_req_abs_dev": 2.157423901014488,
+      "hard_rank": 256.0,
+      "stable_rank": 2.1307675034500337
+     }
+    }
+   },
+   "rep2": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep2/probe_step600.npz",
+    "sha256": "f7c135fd1e617c30a1255096fff47317b4ba50f150ea1438b02e34e07e51cac7",
+    "views": {
+     "rna_biology": {
+      "PR": 4.5253585613334115,
+      "PR_rownorm": 4.525358571753317,
+      "R1": 12.709160286079065,
+      "R1_rownorm": 12.70916031418067,
+      "R1_uncentred": 7.2055548315959514,
+      "R2": 7.9304448582082365,
+      "R2_uncentred": 3.6660184711103794,
+      "R3": 7.9304448756566,
+      "RankMe": 7.207135422186927,
+      "alpha_req": 2.3180628173296682,
+      "alpha_req_abs_dev": 1.3180628173296682,
+      "hard_rank": 256.0,
+      "stable_rank": 3.0248587162067664
+     },
+     "wsi_biology": {
+      "PR": 4.813011411635812,
+      "PR_rownorm": 4.813011410866994,
+      "R1": 11.954523975867632,
+      "R1_rownorm": 11.95452377222049,
+      "R1_uncentred": 3.3894553105532435,
+      "R2": 8.053572498703037,
+      "R2_uncentred": 1.8086254493926242,
+      "R3": 8.053572410191407,
+      "RankMe": 3.3902689232675067,
+      "alpha_req": 3.0090043323115157,
+      "alpha_req_abs_dev": 2.0090043323115157,
+      "hard_rank": 256.0,
+      "stable_rank": 2.904021004705074
+     }
+    }
+   },
+   "rep3": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep3/probe_step600.npz",
+    "sha256": "a907950e6c98924f1394d622e3cd1057fde7e354fcaace2f1aafe701a84ae9b9",
+    "views": {
+     "rna_biology": {
+      "PR": 4.232079766041329,
+      "PR_rownorm": 4.232079768957421,
+      "R1": 11.84642151622174,
+      "R1_rownorm": 11.846421538401454,
+      "R1_uncentred": 6.6465108192608735,
+      "R2": 7.373188121142933,
+      "R2_uncentred": 3.4342829978906417,
+      "R3": 7.373188115644702,
+      "RankMe": 6.6479855040770275,
+      "alpha_req": 2.2472767664237314,
+      "alpha_req_abs_dev": 1.2472767664237314,
+      "hard_rank": 256.0,
+      "stable_rank": 3.1455869167612485
+     },
+     "wsi_biology": {
+      "PR": 4.459240043683346,
+      "PR_rownorm": 4.459240065301067,
+      "R1": 10.695832870420565,
+      "R1_rownorm": 10.695832925686867,
+      "R1_uncentred": 3.032216787659799,
+      "R2": 7.20454848797257,
+      "R2_uncentred": 1.700489872648057,
+      "R3": 7.204548582523358,
+      "RankMe": 3.032960150367147,
+      "alpha_req": 3.1080211702649456,
+      "alpha_req_abs_dev": 2.1080211702649456,
+      "hard_rank": 256.0,
+      "stable_rank": 2.8520362368366805
+     }
+    }
+   },
+   "rep4": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep4/probe_step600.npz",
+    "sha256": "6b62cac2b1d2f5ba9f82207abd695b81afea7199fa46adf3446c2c36008d0948",
+    "views": {
+     "rna_biology": {
+      "PR": 3.9114815551580158,
+      "PR_rownorm": 3.911481564711301,
+      "R1": 11.515209998534578,
+      "R1_rownorm": 11.515210001699552,
+      "R1_uncentred": 6.128566292749447,
+      "R2": 7.070327434015528,
+      "R2_uncentred": 3.157658177313312,
+      "R3": 7.07032744851969,
+      "RankMe": 6.129936769869565,
+      "alpha_req": 2.3579984140382875,
+      "alpha_req_abs_dev": 1.3579984140382875,
+      "hard_rank": 256.0,
+      "stable_rank": 2.6135177793940105
+     },
+     "wsi_biology": {
+      "PR": 3.4607092929815115,
+      "PR_rownorm": 3.4607092982260994,
+      "R1": 10.353053898700356,
+      "R1_rownorm": 10.353053774877592,
+      "R1_uncentred": 2.9335658750518805,
+      "R2": 6.741089597410748,
+      "R2_uncentred": 1.669406189496626,
+      "R3": 6.741089600172154,
+      "RankMe": 2.93428863990152,
+      "alpha_req": 3.0321914528484855,
+      "alpha_req_abs_dev": 2.0321914528484855,
+      "hard_rank": 256.0,
+      "stable_rank": 2.117984416680568
+     }
+    }
+   },
+   "rep5": {
+    "path": "/lambda/nfs/geeg/biorag3_persistent_20260711/morpheus_phase_d/e0_run/d1_probefloor600/m0.999_rep5/probe_step600.npz",
+    "sha256": "9b175c1b8f877bf9e5ed19df7e0802896bbd85cd718333d6e63cf9eb26d27feb",
+    "views": {
+     "rna_biology": {
+      "PR": 4.598413317574959,
+      "PR_rownorm": 4.598413315735822,
+      "R1": 12.108921054920973,
+      "R1_rownorm": 12.108920997550193,
+      "R1_uncentred": 6.866383648049719,
+      "R2": 7.686297060333073,
+      "R2_uncentred": 3.544421585289965,
+      "R3": 7.686297051929697,
+      "RankMe": 6.867904596326074,
+      "alpha_req": 2.3066007052413853,
+      "alpha_req_abs_dev": 1.3066007052413853,
+      "hard_rank": 256.0,
+      "stable_rank": 3.11157168804836
+     },
+     "wsi_biology": {
+      "PR": 4.229209360619513,
+      "PR_rownorm": 4.229209349673269,
+      "R1": 10.973499772869442,
+      "R1_rownorm": 10.97349991014277,
+      "R1_uncentred": 2.985868052764039,
+      "R2": 7.3478121405950025,
+      "R2_uncentred": 1.6757068584098587,
+      "R3": 7.347812141255589,
+      "RankMe": 2.9866041632107794,
+      "alpha_req": 3.143537326161937,
+      "alpha_req_abs_dev": 2.143537326161937,
+      "hard_rank": 256.0,
+      "stable_rank": 2.623846183721045
+     }
+    }
+   }
+  }
+ }
+}

@@ -422,6 +422,58 @@ def test_the_arms_stay_completely_separated_at_ten_repeats(n10):
     assert n10["tests"]["R2_uncentred"]["test_C_complete_separation"]["separated"] is False
 
 
+def test_the_momentum_grid_is_a_smooth_monotone_trend_not_a_step():
+    """The shipped comparison is two rungs of a ladder, not a discontinuity.
+
+    Five same-seed repeats at each of m = 0, 0.98, 0.99, 0.995, 0.999 at step 600.
+    Under canonical R1 the ranges are
+
+        m0     1.564- 2.738
+        m0.98  4.783- 6.008
+        m0.99  6.462- 7.124
+        m0.995 7.710- 8.249
+        m0.999 10.353-11.955
+
+    -- strictly increasing, with EVERY adjacent pair completely separated and no
+    overlap anywhere on the grid. So the predeclared reading is **SMOOTH**: the
+    two-point m = 0.999 vs m = 0.99 contrast is a coarse read of a monotone trend,
+    and the honest claim is about the trend rather than about 0.999 beating its
+    neighbour.
+
+    And the individual rungs are small. Only ONE of the four adjacent increments
+    clears its own floor under R1 (0.995 -> 0.999, 1.255x against 1.155x) and NONE
+    clears under R3. The m = 0.999-over-m = 0.99 gap is two increments each of
+    which is individually inside the floor.
+    """
+    grid = _load(GRID)
+    assert grid["config"]["arms"] == ["0", "0.98", "0.99", "0.995", "0.999"]
+    order = ["m0", "m098", "m099", "m0995", "m0999"]
+    for stat in ("R1", "R3"):
+        mins = [grid["arm_floor"][a][stat]["min"] for a in order]
+        assert mins == sorted(mins), f"{stat} is not monotone in m across the grid"
+    # Under R1 the grid never overlaps; under R3 m = 0.995 and m = 0.99 do.
+    r1 = {a: grid["arm_floor"][a]["R1"] for a in order}
+    for lo, hi in zip(order[:-1], order[1:]):
+        assert r1[hi]["min"] > r1[lo]["max"], f"R1 overlaps between {lo} and {hi}"
+    r3 = {a: grid["arm_floor"][a]["R3"] for a in order}
+    assert r3["m0995"]["min"] < r3["m099"]["max"], "R3 no longer overlaps at 0.99/0.995"
+
+    # The file is written with `sort_keys=True`, so compare as a set: the ORDER
+    # of the four adjacent pairs is alphabetical on disk, not the grid's order.
+    steps = grid["adjacent_steps"]
+    assert set(steps) == {"m098_over_m0", "m099_over_m098",
+                          "m0995_over_m099", "m0999_over_m0995"}
+    passing = [k for k, v in steps.items()
+               if v["R1"]["test_B_worst_case_over_repeats"]["passes"]]
+    assert passing == ["m0999_over_m0995"], passing
+    assert not any(v["R3"]["test_B_worst_case_over_repeats"]["passes"]
+                   for v in steps.values()), "an R3 adjacent step unexpectedly clears"
+    # Every adjacent pair is still completely ORDERED under R1 -- the trend is
+    # real even though each rung is inside its own floor.
+    for k, v in steps.items():
+        assert v["R1"]["test_C_complete_separation"]["separated"] is True, k
+
+
 def test_more_repeats_can_only_move_test_B_against_the_pass(n5, n10):
     """The arithmetic the honesty of this whole exercise rests on.
 
