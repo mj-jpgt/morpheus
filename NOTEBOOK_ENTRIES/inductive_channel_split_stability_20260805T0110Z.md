@@ -182,9 +182,12 @@ not the scale on which the adjustment question is decided.
 
 ### 4a. Within the twelve fixed-fraction partitions: no, and the correlation has the wrong sign
 
-At f = 0.5 the discovery fold's site coverage barely moves — **0.4276 to 0.4870** across twelve
-partitions (43.8% ± 2.0 pp, inside the ±3 pp the predeclaration predicted), because coverage is
-mostly a property of TCGA's site-size distribution and not of the draw. Spearman(retention, coverage)
+At f = 0.5 the discovery fold's site coverage moves little — **0.4276 to 0.4870** across twelve
+partitions, a span of 5.9 percentage points — because coverage is mostly a property of TCGA's
+site-size distribution and not of the draw. (It moves *more* than the ±3 pp §2 predicted: three of
+the twelve sit 3.3–4.9 pp above the published partition's 43.85%, so that prediction is graded ✗
+below. The direction is helpful — the seed sweep varies coverage somewhat more than I allowed for,
+and retention still does not track it.) Spearman(retention, coverage)
 = **−0.406 (p = 0.191)** on `d2_h` and **−0.259 (p = 0.417)** on `d2_i` — *negative*, i.e. the
 opposite sign to the mechanism, and at n = 12 with essentially no power. `d2_i`'s two extremes make
 the point without a correlation: the **worst** retention (0.9221) belongs to the partition with the
@@ -282,12 +285,13 @@ inductive arm on 6 of 12 partitions on each artifact.
 | 5 | **not** all 8 `d2_h` in 0.97–1.00 (p = 0.75) | **correct — 6 of 8 sit above 1.00** | ✓ |
 | 6 | `d2_i` median / min 0.960 / 0.90 | **1.0165 / 0.9221** | ✗ / ✓-ish |
 | 7 | every arm at the 0.0005 floor (p = 0.90) | **24/24** | ✓ |
-| 8 | coverage within ±3 pp of 43.8% (p = 0.80) | 42.8–48.7%, i.e. ±2.0 pp | ✓ |
+| 8 | coverage within ±3 pp of 43.8% (p = 0.80) | **42.76–48.70%**, i.e. −1.1 to **+4.9 pp**; 2 of the predeclared 8 (3 of 12) sit above +3 pp | ✗ |
 | 9 | f = 0.3 below f = 0.7 by > 0.03 (p = 0.45) | **0.0402** | ✓ |
 | 10 | frozen ceiling ≤ 0 or insignificant on all 8, inductive (p = 0.55) | **0/12 significant, both artifacts** | ✓ |
 
-**Seven of ten. The three misses all run the same way: I predicted the single-split figure was a
-typical-to-lucky draw and that the distribution sat below it. It sits above it.** Retention crosses
+**Six of ten. Three of the four misses run the same way: I predicted the single-split figure was a
+typical-to-lucky draw and that the distribution sat below it. It sits above it.** (The fourth,
+row 8, is a miss in the direction that makes §4a's negative result stronger, not weaker.) Retention crosses
 1.0 on 17 of 24 partitions, which I did not predict at all and which has a plain mechanism, measured
 in §6: the inductive arm's within-cancer null median is systematically **0.3–2.8% *below*** its
 matched in-sample control's (`null_ratio` 0.9717–1.0008, never above 1.001), while its S1 is
