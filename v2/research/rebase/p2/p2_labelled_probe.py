@@ -178,7 +178,7 @@ def load_targets(path, groups):
 
 def score_artifact(path, *, labels_table, targets_path, seed, views, endpoints,
                    n_permutations_logistic, n_permutations_lda, n_boot, n_permutations_auroc,
-                   partition="test") -> dict:
+                   partition="test", null_views=None) -> dict:
     raw = np.load(path, allow_pickle=False)
     test = raw["split"].astype(str) == partition
     ids = raw["patient_ids"].astype(str)[test]
@@ -203,6 +203,12 @@ def score_artifact(path, *, labels_table, targets_path, seed, views, endpoints,
     for view in views:
         x = raw[view].astype(np.float64)[test]
         rx = cross_fitted_residuals(x, design, seed=seed)
+        # The logistic permutation null costs ~5 s per draw against the LDA null's 0.04 s, so
+        # it is computed only on the views named in `--null-views` (the readout view by
+        # default) and its absence elsewhere is recorded rather than silently implied. The LDA
+        # null is computed on every view and every block.
+        logistic_draws = (n_permutations_logistic
+                          if (null_views is None or view in null_views) else 0)
         block = {
             # re-quoted with the canonical functions so every column of the agreement table
             # comes off one cohort and one code path
@@ -212,7 +218,7 @@ def score_artifact(path, *, labels_table, targets_path, seed, views, endpoints,
             # Probe A on the raw block -- the RankMe analogue
             "probe_A_cancer_type_raw": probe_cancer_type(
                 x, class_index, n_classes, folds=folds, seed=seed,
-                n_permutations_logistic=n_permutations_logistic,
+                n_permutations_logistic=logistic_draws,
                 n_permutations_lda=n_permutations_lda),
             # Probe A on the adjusted block -- the MUST-FAIL control. If cancer type survives
             # cancer+TSS residualisation well above chance, the adjustment is not doing what
@@ -391,6 +397,9 @@ def main(argv=None):
     ap.add_argument("--wsi-only-endpoints", nargs="+", default=[],
                     help="endpoints scored on the FIRST view only, to bound cost")
     ap.add_argument("--n-permutations-logistic", type=int, default=25)
+    ap.add_argument("--null-views", nargs="+", default=None,
+                    help="views that get the (expensive) logistic permutation null; "
+                         "default = every view named by --views")
     ap.add_argument("--n-permutations-lda", type=int, default=200)
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--n-permutations-auroc", type=int, default=1000)
@@ -410,7 +419,7 @@ def main(argv=None):
             views=a.views, endpoints=list(a.endpoints),
             n_permutations_logistic=a.n_permutations_logistic,
             n_permutations_lda=a.n_permutations_lda, n_boot=a.n_boot,
-            n_permutations_auroc=a.n_permutations_auroc)
+            n_permutations_auroc=a.n_permutations_auroc, null_views=a.null_views)
         # extra endpoints, first view only, to bound cost -- declared, not silent
         if a.wsi_only_endpoints:
             extra = score_artifact(path, labels_table=labels_table, targets_path=a.targets,
