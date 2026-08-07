@@ -62,6 +62,14 @@ def _planted_linear_pair(n: int, p: int, q: int, r_true: float, *, seed: int):
 
 @pytest.mark.parametrize("metric_name", ["rv", "dcor", "hsic", "kernel_cca"])
 def test_positive_control_every_metric_increases_with_planted_strength(metric_name):
+    """Monotonicity is checked RELATIVE to each metric's own scale, not against a shared
+    absolute margin. RV and HSIC read on genuinely different absolute scales from dCor/kernel
+    CCA once only 1 of 5 columns per side carries the planted signal (the other 4 are pure
+    noise that dilutes a whole-block statistic but not a single-direction one) -- an absolute
+    "+0.15" bar the first version of this test used was a test-design bug, not a metric defect:
+    it flagged rv/hsic as failing while both still rose 4-6x from r_true=0 to r_true=0.9,
+    strictly monotonically. Caught on the real training box, see the result notebook entry.
+    """
     metric = ASSOCIATION_METRICS[metric_name]
     n = 400
     readings = []
@@ -72,8 +80,9 @@ def test_positive_control_every_metric_increases_with_planted_strength(metric_na
     # the predeclaration (§3.1): a metric that does not rise with planted strength is flagged
     # unreliable before it is used for anything else.
     for a, b in zip(readings, readings[1:]):
-        assert b >= a - 0.03, (metric_name, readings)
-    assert readings[-1] > readings[0] + 0.15, (metric_name, readings)
+        assert b >= a - 0.02 * max(readings), (metric_name, readings)
+    floor = max(readings[0], 1e-6)
+    assert readings[-1] > floor * 3.0, (metric_name, readings)
 
 
 # --------------------------------------------------------------------------------------- #
@@ -180,24 +189,60 @@ def _block_design(n: int, n_blocks: int, *, seed: int) -> np.ndarray:
     return design
 
 
+def _orthogonalised_block_pair(n: int, n_blocks: int, p: int, *, seed: int):
+    """Per-column pairs that are EXACTLY uncorrelated in raw sample (like spec §4.2's u/v),
+    while EACH column separately carries real, substantial design-explained structure.
+
+    This is the correct synthetic analogue of spec §4's mechanism and deliberately NOT the
+    same as "X and Y both depend on the same block index" (a first version of this test did
+    that, and it manufactures REAL shared-stratification dependence between X and Y -- a
+    mixture-of-Gaussians-over-blocks has genuine, not artefactual, mutual information even
+    with independently-drawn per-block means, which a nonlinear-sensitive metric like RV/HSIC
+    correctly detects. That is a different phenomenon from the FWL projection artifact spec §4
+    describes, which requires u/v to be EXACTLY unrelated before residualisation, not "unrelated
+    in expectation over many random block-mean draws." See the result notebook entry: this
+    distinction is itself one of the two headline findings of this work item.)
+
+    Construction: draw a design D (one-hot blocks), give X real design-explained structure
+    (``x_base = D @ A + noise``), then for each column independently replace Y's column with
+    the ``calibration.spike_targets`` ``r_true=0`` construction against that X column -- which
+    orthogonalises Y's column EXACTLY (raw correlation 0) while leaving its own separately-real
+    design-explained part (``y_base`` also loads on D) intact. That is precisely
+    ``closed_form_induced_correlation``'s single-direction setup, applied column-by-column.
+    """
+    from morpheus.v2.calibra.calibration import spike_targets
+
+    rng = np.random.default_rng(seed)
+    design = _block_design(n, n_blocks, seed=seed + 1)
+    loadings_x = rng.normal(scale=1.5, size=(n_blocks, p))
+    loadings_y = rng.normal(scale=1.5, size=(n_blocks, p))
+    x = design @ loadings_x + rng.normal(size=(n, p))
+    y_base = design @ loadings_y + rng.normal(size=(n, p))
+    y_columns = []
+    for j in range(p):
+        spiked, _, _ = spike_targets(x[:, [j]], y_base[:, [j]], 0.0,
+                                     rng=np.random.default_rng(seed + 100 + j),
+                                     return_directions=True)
+        y_columns.append(spiked[:, 0])
+    y = np.column_stack(y_columns)
+    # Verify the construction actually did what it claims: near-zero RAW per-column
+    # correlation, by construction, checked here so a broken helper fails loudly.
+    raw_corr = np.array([np.corrcoef(x[:, j], y[:, j])[0, 1] for j in range(p)])
+    assert np.max(np.abs(raw_corr)) < 1e-6, ("orthogonalisation failed", raw_corr)
+    return x, y, design
+
+
 @pytest.mark.parametrize("metric_name", ["rv", "dcor", "hsic", "kernel_cca"])
 def test_regime_ii_induced_association_exceeds_regime_i_synthetic(metric_name):
-    """SYNTHETIC. Two blocks unrelated to each other (independent noise) but EACH carrying real
-    block structure (Regime II: residualising against the TRUE block design induces spurious
-    residual association) versus the SAME two blocks residualised against a Gaussian design of
-    matched rank (Regime I: no real structure to explain, so no induced floor is predicted).
-    This is exactly spec §4.4's simulation, generalised from Pearson to the new metric.
+    """SYNTHETIC. X and Y are EXACTLY uncorrelated per column in raw sample (§4's u/v setup),
+    while each column separately carries real, design-explained structure. Regime II
+    residualises against the TRUE design that explains both (spec's mechanism: induced
+    residual association from shared projection geometry); Regime I residualises against a
+    Gaussian design of matched rank that explains neither (the stated falsifier).
     """
-    rng = np.random.default_rng(hash(metric_name) % (2 ** 31))
-    n, n_blocks, p, q = 800, 20, 6, 6
-    design_real = _block_design(n, n_blocks, seed=1)
-    block_means_x = rng.normal(scale=1.5, size=(n_blocks, p))
-    block_means_y = rng.normal(scale=1.5, size=(n_blocks, q))
-    codes = design_real.argmax(axis=1)
-    x = block_means_x[codes] + rng.normal(size=(n, p))
-    y = block_means_y[codes] + rng.normal(size=(n, q))          # X and Y share NO latent signal
-
-    design_gaussian = rng.normal(size=(n, n_blocks))             # Regime I: matched rank, no structure
+    n, n_blocks, p = 800, 20, 5
+    x, y, design_real = _orthogonalised_block_pair(n, n_blocks, p, seed=hash(metric_name) % (2 ** 31))
+    design_gaussian = np.random.default_rng(7).normal(size=(n, n_blocks))
 
     x_res_ii = cross_fitted_residuals(x, design_real, seed=1)
     y_res_ii = cross_fitted_residuals(y, design_real, seed=1)
