@@ -179,45 +179,40 @@ def test_compute_all_metrics_returns_every_key():
 # trusted on real artifacts.                                                                 #
 # --------------------------------------------------------------------------------------- #
 
-def _block_design(n: int, n_blocks: int, *, seed: int) -> np.ndarray:
-    rng = np.random.default_rng(seed)
-    sizes = rng.multinomial(n, np.ones(n_blocks) / n_blocks)
-    codes = np.repeat(np.arange(n_blocks), sizes)
-    rng.shuffle(codes)
-    design = np.zeros((n, n_blocks))
-    design[np.arange(n), codes] = 1.0
-    return design
-
-
-def _orthogonalised_block_pair(n: int, n_blocks: int, p: int, *, seed: int):
+def _orthogonalised_linear_pair(n: int, k: int, p: int, *, seed: int, signal_scale: float = 2.0):
     """Per-column pairs that are EXACTLY uncorrelated in raw sample (like spec §4.2's u/v),
     while EACH column separately carries real, substantial design-explained structure.
 
-    This is the correct synthetic analogue of spec §4's mechanism and deliberately NOT the
-    same as "X and Y both depend on the same block index" (a first version of this test did
-    that, and it manufactures REAL shared-stratification dependence between X and Y -- a
-    mixture-of-Gaussians-over-blocks has genuine, not artefactual, mutual information even
-    with independently-drawn per-block means, which a nonlinear-sensitive metric like RV/HSIC
-    correctly detects. That is a different phenomenon from the FWL projection artifact spec §4
-    describes, which requires u/v to be EXACTLY unrelated before residualisation, not "unrelated
-    in expectation over many random block-mean draws." See the result notebook entry: this
-    distinction is itself one of the two headline findings of this work item.)
+    **Two prior versions of this helper were wrong, and the reason is itself part of the
+    result this work item reports.** Both used a CATEGORICAL one-hot block design to generate
+    X and Y (``x = D_onehot @ A + noise``). That construction makes X and Y both depend on the
+    SAME discrete cluster assignment, and two variables driven by a shared discrete mixture
+    carry real, non-artefactual mutual information (detectable by any nonlinear-aware
+    statistic -- exactly what RV/dCor/HSIC/kernel-CCA are for) via the shared clustering alone,
+    regardless of whether the per-cluster means happen to correlate. Residualising against the
+    TRUE generating design then correctly REMOVES that real shared confound, while an unrelated
+    design does not -- which is the CORRECT, expected direction for "did adjustment remove a
+    real confound", but it is the OPPOSITE phenomenon from spec §4's FWL projection artifact,
+    which requires u/v to be exactly unrelated (in population, not just in raw correlation)
+    before residualisation, so that any correlation appearing afterward is manufactured by the
+    projection geometry alone rather than by imperfectly-removed real dependence. See the
+    result notebook entry: this confusion is reported as a finding in its own right.
 
-    Construction: draw a design D (one-hot blocks), give X real design-explained structure
-    (``x_base = D @ A + noise``), then for each column independently replace Y's column with
-    the ``calibration.spike_targets`` ``r_true=0`` construction against that X column -- which
-    orthogonalises Y's column EXACTLY (raw correlation 0) while leaving its own separately-real
-    design-explained part (``y_base`` also loads on D) intact. That is precisely
-    ``closed_form_induced_correlation``'s single-direction setup, applied column-by-column.
+    Fix: use a CONTINUOUS Gaussian design (not categorical). ``(x, y_base)`` given a Gaussian
+    design and independent Gaussian noise are JOINTLY GAUSSIAN, and for a jointly Gaussian pair
+    zero correlation IS independence -- there is no leftover nonlinear/mixture dependence to
+    confound the measurement. Each column of Y is then forced to raw-correlation-zero against
+    the matching column of X via ``calibration.spike_targets(..., r_true=0)``, reproducing
+    ``closed_form_induced_correlation``'s own construction column-by-column.
     """
     from morpheus.v2.calibra.calibration import spike_targets
 
     rng = np.random.default_rng(seed)
-    design = _block_design(n, n_blocks, seed=seed + 1)
-    loadings_x = rng.normal(scale=1.5, size=(n_blocks, p))
-    loadings_y = rng.normal(scale=1.5, size=(n_blocks, p))
-    x = design @ loadings_x + rng.normal(size=(n, p))
-    y_base = design @ loadings_y + rng.normal(size=(n, p))
+    design = rng.normal(size=(n, k))
+    loadings_x = rng.normal(size=(k, p))
+    loadings_y = rng.normal(size=(k, p))
+    x = signal_scale * (design @ loadings_x) / np.sqrt(k) + rng.normal(size=(n, p))
+    y_base = signal_scale * (design @ loadings_y) / np.sqrt(k) + rng.normal(size=(n, p))
     y_columns = []
     for j in range(p):
         spiked, _, _ = spike_targets(x[:, [j]], y_base[:, [j]], 0.0,
@@ -234,15 +229,18 @@ def _orthogonalised_block_pair(n: int, n_blocks: int, p: int, *, seed: int):
 
 @pytest.mark.parametrize("metric_name", ["rv", "dcor", "hsic", "kernel_cca"])
 def test_regime_ii_induced_association_exceeds_regime_i_synthetic(metric_name):
-    """SYNTHETIC. X and Y are EXACTLY uncorrelated per column in raw sample (§4's u/v setup),
-    while each column separately carries real, design-explained structure. Regime II
-    residualises against the TRUE design that explains both (spec's mechanism: induced
-    residual association from shared projection geometry); Regime I residualises against a
-    Gaussian design of matched rank that explains neither (the stated falsifier).
+    """SYNTHETIC. X and Y are EXACTLY uncorrelated per column in raw sample (§4's u/v setup)
+    AND, because the generating design is Gaussian/linear rather than categorical, exactly
+    population-independent (no leftover mixture dependence -- see the helper's docstring for
+    why the categorical version of this test was measuring a different phenomenon). Each
+    column separately carries real, design-explained structure. Regime II residualises against
+    the TRUE design that explains both (spec's mechanism: induced residual association from
+    shared projection geometry); Regime I residualises against a Gaussian design of matched
+    rank that is UNRELATED to X, Y (the stated falsifier).
     """
-    n, n_blocks, p = 800, 20, 5
-    x, y, design_real = _orthogonalised_block_pair(n, n_blocks, p, seed=hash(metric_name) % (2 ** 31))
-    design_gaussian = np.random.default_rng(7).normal(size=(n, n_blocks))
+    n, k, p = 800, 20, 5
+    x, y, design_real = _orthogonalised_linear_pair(n, k, p, seed=hash(metric_name) % (2 ** 31))
+    design_gaussian = np.random.default_rng(7).normal(size=(n, k))
 
     x_res_ii = cross_fitted_residuals(x, design_real, seed=1)
     y_res_ii = cross_fitted_residuals(y, design_real, seed=1)
